@@ -1,0 +1,7 @@
+App gestionPedidios - Informacion de Versiones
+
+-Python: 3.8.5
+-Django: 4.2.6
+-Js
+-Bootstrap: 5.3
+
