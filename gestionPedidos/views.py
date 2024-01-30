@@ -85,3 +85,6 @@ def guardar_clientes(request):
 
 def prueba(request):
     return Response()
+
+def prueba2(request):
+    return Response()
