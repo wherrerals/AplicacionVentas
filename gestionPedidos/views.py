@@ -82,3 +82,6 @@ def guardar_clientes(request):
     usuarios = Usuario.objects.all()
     data = [{'nombre': usuario.nombre, 'email': str(usuario.email), } for usuario in usuarios]
     return Response(data)
+
+def prueba(request):
+    return Response()
