@@ -4,4 +4,6 @@ App gestionPedidios - Informacion de Versiones
 -Django: 4.2.6
 -Js
 -Bootstrap: 5.3
+-install django-cors-headers
+
 
