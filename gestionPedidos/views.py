@@ -56,13 +56,14 @@ def micuenta(request):
 def registrarCuenta(request):
     nombre = request.POST['nombre']
     email = request.POST['email']
-    #tipo_usuario = request.POST['tipo_usuario']
+    username = request.POST['email']
     telefono = request.POST['telefono']
     #showroom = request.POST['showroom']
     #numero_sap = request.POST['num_sap']
-    #clave = request.POST['clave']
+    password = request.POST['password']
 
     cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono)
+    usuario_login = User.objects.create(username=username, password=password)
 
     return redirect('/')
 
@@ -97,7 +98,7 @@ class SAPServiceLayerView(APIView):
     def get(self, request):
         url = 'https://182.160.29.24:50003/b1s/v1/login'
         headers = {'Content-Type': 'application/json'}
-        auth = ("manager", "1245LED98",)
+        auth = ("manager", "1245LED98", "TEST_LED_PROD")
 
         try:
             response = requests.get(url, headers=headers, auth=auth, verify=False)
