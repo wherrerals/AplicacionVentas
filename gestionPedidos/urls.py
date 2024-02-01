@@ -1,5 +1,6 @@
 from django.urls import path
 from gestionPedidos import views
+from .views import SAPServiceLayerView
 
 
 urlpatterns = [
@@ -14,8 +15,8 @@ urlpatterns = [
     path('salir/', views.salir, name='salir'),
     path('clientes/', views.clientes, name='clientes/'),
     path('api/productos/', views.api_lista_clientes, name='api_lista_clientes'),
-    path('registrarCuenta/', views.registrarCuenta)
-
+    path('registrarCuenta/', views.registrarCuenta),
+    path('sap-service/', SAPServiceLayerView.as_view(), name='sap-service')
 
 ]
 
