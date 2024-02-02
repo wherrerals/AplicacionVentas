@@ -112,3 +112,7 @@ class SAPServiceLayerView(APIView):
 
         except requests.exceptions.RequestException as e:
             return Response(f'Error en la solicitud: {e}', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+def sap(request):
+
+    return HttpResponse('esto es una prueba')
