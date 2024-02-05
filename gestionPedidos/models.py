@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-import bcrypt
 
 # Create your models here.
 class Usuario(models.Model):
