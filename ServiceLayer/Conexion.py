@@ -32,17 +32,17 @@ class funciones:
 
         if self.data is None:
             if self.param == None:
-                newEndpath = (f"('{url}/')")
+                newEndpath = (f"'{url}/'")
                 return newEndpath
             else:
-                newEndpath = (f"'{url}/{self.param}', json={self.dato_solicitud}")
+                newEndpath = (f"'{url}/{self.param}'")
                 return newEndpath
         else:
             if self.extra is None:
-                newEndpath = (f"{self.motor}.{self.accion}('{url}/{self.param}({self.data})', json={self.dato_solicitud})")
+                newEndpath = (f"'{url}/{self.param}({self.data}'")
                 return newEndpath
             else:
-                newEndpath = (f"{self.motor}.{self.accion}('{url}/{self.param}({self.data})/{self.extra}')")
+                newEndpath = (f"'{url}/{self.param}({self.data})/{self.extra}'")
                 return newEndpath
             
 
@@ -67,9 +67,9 @@ mensaje = {
 
 c1 = funciones('httpx','get','quotation')
 c2= funciones('httpx','get','quotation',123)
-c3= funciones('httpx','post','quotation',175,None,data)
+c3= funciones('httpx','post','quotation',None,None,data)
 c4 = funciones('httpx','patch','quotation',123,None,mensaje)
-c5  = funciones('httpx','post','quotation',123,'Close',mensaje)
+c5  = funciones('httpx','post','quotation',123,'Close')
 c6  = funciones('httpx','post','quotation',123,'Cancel')
 
 
@@ -86,4 +86,19 @@ print(f'post quotatiions(id)/close \n {resultado}\n')
 resultado = c6.constructor_url()
 print(f'poset quotations(id)/cancel \n {resultado}\n')
 
+
+"""if self.data is None:
+            if self.param == None:
+                newEndpath = (f"{self.motor}.{self.accion}('{url}/')")
+                return newEndpath
+            else:
+                newEndpath = (f"{self.motor}.{self.accion}('{url}/{self.param}', json={self.dato_solicitud})")
+                return newEndpath
+        else:
+            if self.extra is None:
+                newEndpath = (f"{self.motor}.{self.accion}('{url}/{self.param}({self.data})', json={self.dato_solicitud})")
+                return newEndpath
+            else:
+                newEndpath = (f"{self.motor}.{self.accion}('{url}/{self.param}({self.data})/{self.extra}')")
+                return newEndpath"""
 
