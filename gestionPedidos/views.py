@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, HttpResponse # importa el metodo 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from gestionPedidos.models import *
-import requests
+from django.views import View
+from django.http import JsonResponse
 
 @login_required
 def home(request):
@@ -69,6 +70,11 @@ def lista_usuarios(request):
 @login_required
 def clientes(request):
     return render(request, "cliente.html")
+
+class ejemplo(View):
+    def get(self, request, *args, **kwargs):
+        data = {'message':'Hola prueba exitosa'}
+        return JsonResponse(data)
 
 
 

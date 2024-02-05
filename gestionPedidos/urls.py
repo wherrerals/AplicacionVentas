@@ -1,5 +1,6 @@
 from django.urls import path
 from gestionPedidos import views
+from .views import ejemplo
 
 
 urlpatterns = [
@@ -14,6 +15,7 @@ urlpatterns = [
     path('salir/', views.salir, name='salir'),
     path('clientes/', views.clientes, name='clientes/'),
     path('registrarCuenta/', views.registrarCuenta),
+    path('ejemplo/', ejemplo.as_view(), name="ejemplo")
 
 
 ]
