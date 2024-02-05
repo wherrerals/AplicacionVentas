@@ -13,8 +13,7 @@ urlpatterns = [
     path('lista_usuarios', views.lista_usuarios, name='lista_usuarios'),
     path('salir/', views.salir, name='salir'),
     path('clientes/', views.clientes, name='clientes/'),
-    path('api/productos/', views.api_lista_clientes, name='api_lista_clientes'),
-    path('registrarCuenta/', views.registrarCuenta)
+    path('registrarCuenta/', views.registrarCuenta),
 
 
 ]
