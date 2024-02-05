@@ -4,6 +4,10 @@ from django.contrib.auth import logout
 from gestionPedidos.models import *
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+import requests
 from django.http import JsonResponse
 
 @login_required
@@ -52,13 +56,14 @@ def micuenta(request):
 def registrarCuenta(request):
     nombre = request.POST['nombre']
     email = request.POST['email']
-    #tipo_usuario = request.POST['tipo_usuario']
+    username = request.POST['email']
     telefono = request.POST['telefono']
     #showroom = request.POST['showroom']
     #numero_sap = request.POST['num_sap']
-    #clave = request.POST['clave']
+    password = request.POST['clave']
 
     cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono)
+    usuario_login = User.objects.create(username=username, password=password)
 
     return redirect('/')
 
@@ -85,3 +90,29 @@ def guardar_clientes(request):
 
 def prueba(request):
     return Response()
+
+def prueba2(request):
+    return Response()
+
+class SAPServiceLayerView(APIView):
+    def get(self, request):
+        url = 'https://182.160.29.24:50003/b1s/v1/login'
+        headers = {'Content-Type': 'application/json'}
+        auth = ("manager", "1245LED98", "TEST_LED_PROD")
+
+        try:
+            response = requests.get(url, headers=headers, auth=auth, verify=False)
+
+            if response.status_code == 200:
+                # Puedes personalizar la lógica para manejar los datos según tus necesidades
+                data = response.json()
+                return Response(data, status=status.HTTP_200_OK)
+            else:
+                return Response(f'Error al obtener datos: {response.status_code}', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except requests.exceptions.RequestException as e:
+            return Response(f'Error en la solicitud: {e}', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+def sap(request):
+
+    return HttpResponse('esto es una prueba')
