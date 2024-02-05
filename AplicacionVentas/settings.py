@@ -57,7 +57,7 @@ ROOT_URLCONF = 'AplicacionVentas.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/Users/xalew/Documents/proyectos/AplicacionVentas/gestionPedidos/templates/gestionPedidos/'],
+        'DIRS': ['/Users/nicor/Universidad/Practica/AplicacionVentas/gestionPedidos/templates/gestionPedidos/'],
         
         'APP_DIRS': True,
         'OPTIONS': {
@@ -82,7 +82,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
         'USER':'root',
-        'PASSWORD':'Ea7hava5*',
+        'PASSWORD':'qwerty',
         'HOST':'localhost',
         'PORT':'3306',
     }
