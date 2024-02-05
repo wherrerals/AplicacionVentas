@@ -2,11 +2,9 @@ from django.shortcuts import render, redirect, HttpResponse # importa el metodo 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from gestionPedidos.models import *
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
+from django.http import JsonResponse
+from django.views import View
+import httpx
 
 @login_required
 def home(request):
@@ -74,43 +72,54 @@ def lista_usuarios(request):
 def clientes(request):
     return render(request, "cliente.html")
 
-@api_view(['GET'])
-def api_lista_clientes(request):
-    usuarios = Usuario.objects.all()
-    data = [{'nombre': usuario.nombre, 'email': str(usuario.email)} for usuario in usuarios]
-    return Response(data)
+class Funciones(View):
+    LocalHost = "1.1"
+    Puerto = "50003"
+    Datos = {"CompanyDB": "TEST_LED_PROD", "UserName": "manager", "Password": "1245LED98"}
+    #url = f"https://{LocalHost}:{Puerto}/b1s/v1"
+    url = 'https://httpbin.org'
 
-@api_view(['POST'])
-def guardar_clientes(request):
-    usuarios = Usuario.objects.all()
-    data = [{'nombre': usuario.nombre, 'email': str(usuario.email), } for usuario in usuarios]
-    return Response(data)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-def prueba(request):
-    return Response()
+        self.motor = None  # determina httpx o request
+        self.accion = None  # determina si es GET o POST
+        self.param = None  # determina si es quotation, etc
+        self.data = None  # se ingresa si hay un (id).
+        self.extra = None  # cancel o close
+        self.dato_solicitud = None
 
-def prueba2(request):
-    return Response()
+    def validacion(self):  # protección para los datos enviados a evaluar
+        motor_valido = ['httpx', 'request']
+        accion_valida = ['get', 'post', 'patch']
+        param_valido = ['quotation', 'Orders', 'ReturnRequest', None]  # Quitar None cuando se trabaje con service layer
+        extra_valido = ['Close', 'Cancel', None]  # también quitar
+        if self.accion not in accion_valida or self.motor not in motor_valido or self.param not in param_valido or self.extra not in extra_valido:
+            raise ValueError("Parámetros ingresados no válidos")
 
-class SAPServiceLayerView(APIView):
-    def get(self, request):
-        url = 'https://182.160.29.24:50003/b1s/v1/login'
-        headers = {'Content-Type': 'application/json'}
-        auth = ("manager", "1245LED98", "TEST_LED_PROD")
+    def constructor_url(self):
+        self.validacion()
 
-        try:
-            response = requests.get(url, headers=headers, auth=auth, verify=False)
+        self.dato_solicitud = self.dato_solicitud or {}
 
-            if response.status_code == 200:
-                # Puedes personalizar la lógica para manejar los datos según tus necesidades
-                data = response.json()
-                return Response(data, status=status.HTTP_200_OK)
+        if self.data is None:
+            if self.param is None:
+                new_endpath = f"{self.url}/"
             else:
-                return Response(f'Error al obtener datos: {response.status_code}', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                new_endpath = f"{self.url}/{self.param}"
+        else:
+            if self.extra is None:
+                new_endpath = f"{self.url}/{self.param}({self.data})"
+            else:
+                new_endpath = f"{self.url}/{self.param}({self.data})/{self.extra}"
 
-        except requests.exceptions.RequestException as e:
-            return Response(f'Error en la solicitud: {e}', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-def sap(request):
+        return new_endpath
+    
+    def get(self, request, motor, accion, param):
+        self.motor = motor
+        self.accion = accion
+        self.param = param
 
-    return HttpResponse('esto es una prueba')
+        resultado = self.constructor_url()
+    
+        return HttpResponse('Todo ok')
