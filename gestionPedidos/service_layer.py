@@ -73,9 +73,23 @@ class SAPService:
         try:
             url = c1.constructor_url()
             response = self.client.request(accion,url,auth=self._get_auth, json=dato_solicitud,headers=headers,**kwargs)
+            response.raise_for_status()
 
-        except:
-            pass
+        except httpx.TimeoutException as exc: #cuando el tiempo de espera excede un limite
+            print(f'Finalizo el tiempo de espera {exc}')
+
+        except httpx.HTTPStatusError as exc: #cualquier codigo de retorno 4xx y 5xx
+            print(f"Se produjo un error HTTP: {exc}")
+            print(f"Código de estado HTTP: {exc.response.status_code}")
+            print(f"Mensaje de error: {exc.response.text}")
+
+        except httpx.NetworkError as exc: #error de conexion a internet
+            print(f"Error de red: {exc}")
+            print(f"Revise su conexion a internet.")
+
+        except Exception as exc:
+            print(f"Error desconocido: {exc}")
+
 
 
     def solicitud(self, motor, accion, param, data=None, extra=None, dato_solicitud=None, **kwargs):
