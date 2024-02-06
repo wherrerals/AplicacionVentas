@@ -66,7 +66,6 @@ class SAPService:
     def _get_auth(self): #Se utiliza para cada peticion, agrega seguridad
         return(self.CompanyDB,self.username, self.password)
 
-
     #En el siguiente metodo esta todo el manejo de execepciones y el manejo de los datos
     def _solicitud(self,motor,accion,param,data = None, extra = None, dato_solicitud = None,**kwargs):
         headers = {'CompanyDB': self.CompanyDB}
