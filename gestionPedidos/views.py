@@ -27,6 +27,10 @@ def lista_cotizaciones(request):
     return render(request, "lista_cotizaciones.html")
 
 @login_required
+def cotizacion(request):
+    return render(request, "cotizacion.html")
+
+@login_required
 def lista_ovs(request):
     return render(request, "lista_ovs.html")
 

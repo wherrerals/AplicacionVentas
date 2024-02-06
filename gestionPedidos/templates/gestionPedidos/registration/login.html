@@ -10,7 +10,8 @@
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles.min.css' %}">
 </head>
 
-<body><!-- Start: Login Form Basic -->
+<body>
+  <!-- Start: Login Form Basic -->
   <section class="position-relative py-4 py-xl-5">
     <div class="container">
       <div class="row mb-5">
@@ -32,9 +33,13 @@
                 </svg></div>
               <form class="text-center" id="LoginForm" method="POST" action="">
                 {% csrf_token %}
-                <div class="mb-3"><input class="form-control" type="text" id="user" name="username" placeholder="username"></div>
-                <div class="mb-3"><input class="form-control" type="password" id="pass" name="password" placeholder="password"></div>
-                <div class="mb-3"><button class="btn btn-primary d-block w-100" type="submit">Login</button></div>
+                <div class="mb-3"><input class="form-control" type="text" id="user" name="username"
+                    placeholder="username"></div>
+                <div class="mb-3"><input class="form-control" type="password" id="pass" name="password"
+                    placeholder="password"></div>
+                <div class="mb-3">
+                  <button class="btn btn-primary d-block w-100" type="submit">Login</button>
+                </div>
                 <p class="text-muted">¿Olvidaste tu contraseña?</p>
                 {% if form.errors %}
                 <p class="text-danger">Usuario o contraseña incorrectos. Inténtalo de nuevo.</p>
