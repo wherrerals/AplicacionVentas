@@ -5,6 +5,7 @@ from gestionPedidos.models import *
 from django.http import JsonResponse
 from django.views import View
 import httpx
+import json
 
 @login_required
 def home(request):
@@ -121,5 +122,8 @@ class Funciones(View):
         self.param = param
 
         resultado = self.constructor_url()
+
+        data = {'motor': self.motor, 'accion': self.accion, 'param': self.param, 'resultado': resultado}
+        json_data = json.dumps(data)
     
-        return HttpResponse('Todo ok')
+        return HttpResponse(json_data, content_type='application/json')
