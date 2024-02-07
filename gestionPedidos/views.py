@@ -4,6 +4,7 @@ from django.contrib.auth import logout
 from gestionPedidos.models import *
 from django.views import View
 from django.http import JsonResponse
+from django.contrib.auth.hashers import make_password
 
 @login_required
 def home(request):
@@ -64,7 +65,7 @@ def registrarCuenta(request):
     telefono = request.POST['telefono']
     #showroom = request.POST['showroom']
     #numero_sap = request.POST['num_sap']
-    password = request.POST['clave']
+    password = make_password(request.POST['password'])
 
     cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono)
     usuario_login = User.objects.create(username=username, password=password)

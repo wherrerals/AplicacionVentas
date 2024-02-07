@@ -87,3 +87,7 @@ window.addEventListener('DOMContentLoaded', function() {
     // Asignar el evento click al botón agregar_productos
     document.getElementById('agregar_productos').addEventListener('click', agregarProducto);
 });
+
+function fechaHora(){
+
+}
