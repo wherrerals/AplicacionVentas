@@ -1,6 +1,6 @@
 from django.urls import path
 from gestionPedidos import views
-from .views import ejemplo
+from .views import Funciones
 
 
 urlpatterns = [

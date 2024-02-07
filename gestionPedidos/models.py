@@ -10,7 +10,7 @@ class Usuario(models.Model):
         verbose_name = 'usuario'
         verbose_name_plural = 'usuario'
 
-    nombre = models.CharField(max_length=50, null = False)
+    nombre = models.CharField(max_length=50)
     email = models.EmailField()
     telefono = models.CharField(max_length=15)
     usuarios = models.ForeignKey(User,on_delete=models.CASCADE, default=1)
@@ -151,7 +151,6 @@ class TipoDocTributario(models.Model):
     
     codigo = models.CharField(max_length=50,null = False)
     nombre = models.CharField(max_length=100,null = False)
-
     def __str__(self):
         return f'{self.nombre}'
     
@@ -170,7 +169,6 @@ class Sucursal(models.Model):
 
     codigo = models.CharField(max_length=50,null = False)
     nombre = models.CharField(max_length=50,null = False)
-
     def __str__(self):
         return f'{self.nombre}'
     
@@ -181,7 +179,6 @@ class Vendedor(models.Model):
     codigo = models.IntegerField()
     nombre = models.CharField(max_length=100,null = False)
     sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE, default=1)
-
     def __str__(self):
         return f'{self.nombre}'
     
@@ -278,7 +275,7 @@ class Item(models.Model):
 
 
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)  # Relación uno a uno con Producto
-    numLinea = models.IntegerField(null = False)
+    numLinea = models.IntegerField()
     descuento = models.FloatField(default=0)
     cantidad = models.IntegerField(default=0)
     totalNetoLinea = models.FloatField(null = False)
@@ -288,7 +285,7 @@ class Item(models.Model):
     docEntryBase = models.IntegerField(null = False)
     numLineaBase = models.IntegerField(null = False)
     fechaEntrega = models.DateField(null = False)
-    direccionEntrega = models.CharField(max_length=255,null = False)
+    direccionEntrega = models.CharField(max_length=255)
     documento = models.ForeignKey(Documento, on_delete=models.CASCADE, default=1)
     tipoentrega = models.ForeignKey(TipoEntrega, on_delete=models.CASCADE, default=1)
     tipoobjetoSap = models.ForeignKey(TipoObjetoSap, on_delete=models.CASCADE, default=1)    

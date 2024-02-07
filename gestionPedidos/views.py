@@ -61,7 +61,7 @@ def micuenta(request):
 def registrarCuenta(request):
     nombre = request.POST['nombre']
     email = request.POST['email']
-    username = request.POST['email']
+    username = request.POST['username']
     telefono = request.POST['telefono']
     #showroom = request.POST['showroom']
     #numero_sap = request.POST['num_sap']
@@ -69,6 +69,8 @@ def registrarCuenta(request):
 
     cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono)
     usuario_login = User.objects.create(username=username, password=password)
+
+
 
     return redirect('/')
 
