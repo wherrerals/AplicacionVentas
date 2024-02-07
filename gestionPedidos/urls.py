@@ -1,11 +1,12 @@
 from django.urls import path
 from gestionPedidos import views
-from .views import Funciones
+from .views import ejemplo
 
 
 urlpatterns = [
     path('', views.home, name="home"),
     path('lista_cotizaciones', views.lista_cotizaciones, name="lista_cotizaciones"),
+    path('generar_cotizacion', views.cotizacion, name="generar_cotizacion"),
     path('lista_ovs', views.lista_ovs, name='lista_ovs'),
     path('lista_solic_devoluciones', views.lista_solic_devoluciones, name='lista_solic_devoluciones'),
     path('lista_clientes', views.lista_clientes, name='lista_clientes'),

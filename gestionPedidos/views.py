@@ -2,9 +2,9 @@ from django.shortcuts import render, redirect, HttpResponse # importa el metodo 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from gestionPedidos.models import *
-from django.http import JsonResponse
 from django.views import View
-import httpx
+from django.http import JsonResponse
+from django.contrib.auth.hashers import make_password
 
 @login_required
 def home(request):
@@ -26,6 +26,15 @@ def salir(request):
 @login_required
 def lista_cotizaciones(request):
     return render(request, "lista_cotizaciones.html")
+
+@login_required
+def cotizacion(request):
+    if request.user.is_authenticated:
+        # Acceder al nombre de usuario
+        first_name = request.user.first_name
+        return render(request, 'cotizacion.html', {'first_name': first_name})
+    else:
+        return render(request, "cotizacion.html")
 
 @login_required
 def lista_ovs(request):
@@ -56,7 +65,7 @@ def registrarCuenta(request):
     telefono = request.POST['telefono']
     #showroom = request.POST['showroom']
     #numero_sap = request.POST['num_sap']
-    password = request.POST['password']
+    password = make_password(request.POST['password'])
 
     cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono)
     usuario_login = User.objects.create(username=username, password=password)
