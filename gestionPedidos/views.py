@@ -5,6 +5,8 @@ from gestionPedidos.models import *
 from django.views import View
 from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
+from django.db import transaction
+
 
 @login_required
 def home(request):
@@ -57,18 +59,24 @@ def micuenta(request):
 
     return render(request, "micuenta.html")
 
+@transaction.atomic
 @login_required
 def registrarCuenta(request):
     nombre = request.POST['nombre']
     email = request.POST['email']
     username = request.POST['email']
-    telefono = request.POST['telefono']
+    telefono = request.POST['telefono'] 
     #showroom = request.POST['showroom']
     #numero_sap = request.POST['num_sap']
     password = make_password(request.POST['password'])
+    n = nombre.split(" ")
+    firstname = n[0]
+    lastname = n[1]
 
-    cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono)
-    usuario_login = User.objects.create(username=username, password=password)
+
+    usuario_login = User.objects.create(username=username, password=password, email=email, first_name= firstname,last_name = lastname)
+    cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono, usuarios = usuario_login)
+
 
     return redirect('/')
 
@@ -81,11 +89,54 @@ def lista_usuarios(request):
 def clientes(request):
     return render(request, "cliente.html")
 
-class ejemplo(View):
-    def get(self, request, *args, **kwargs):
-        data = {'message':'Hola prueba exitosa'}
-        return JsonResponse(data)
+class Funciones(View):
+    LocalHost = "1.1"
+    Puerto = "50003"
+    Datos = {"CompanyDB": "TEST_LED_PROD", "UserName": "manager", "Password": "1245LED98"}
+    #url = f"https://{LocalHost}:{Puerto}/b1s/v1"
+    url = 'https://httpbin.org'
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
+        self.motor = None  # determina httpx o request
+        self.accion = None  # determina si es GET o POST
+        self.param = None  # determina si es quotation, etc
+        self.data = None  # se ingresa si hay un (id).
+        self.extra = None  # cancel o close
+        self.dato_solicitud = None
 
+    def validacion(self):  # protección para los datos enviados a evaluar
+        motor_valido = ['httpx', 'request']
+        accion_valida = ['get', 'post', 'patch']
+        param_valido = ['quotation', 'Orders', 'ReturnRequest', None]  # Quitar None cuando se trabaje con service layer
+        extra_valido = ['Close', 'Cancel', None]  # también quitar
+        if self.accion not in accion_valida or self.motor not in motor_valido or self.param not in param_valido or self.extra not in extra_valido:
+            raise ValueError("Parámetros ingresados no válidos")
 
+    def constructor_url(self):
+        self.validacion()
+
+        self.dato_solicitud = self.dato_solicitud or {}
+
+        if self.data is None:
+            if self.param is None:
+                new_endpath = f"{self.url}/"
+            else:
+                new_endpath = f"{self.url}/{self.param}"
+        else:
+            if self.extra is None:
+                new_endpath = f"{self.url}/{self.param}({self.data})"
+            else:
+                new_endpath = f"{self.url}/{self.param}({self.data})/{self.extra}"
+
+        return new_endpath
+    
+    def get(self, request, motor, accion, param):
+        self.motor = motor
+        self.accion = accion
+        self.param = param
+
+        resultado = self.constructor_url()
+    
+        return HttpResponse('Todo ok')
