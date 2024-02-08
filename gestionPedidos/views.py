@@ -61,15 +61,18 @@ def micuenta(request):
 def registrarCuenta(request):
     nombre = request.POST['nombre']
     email = request.POST['email']
-    username = request.POST['username']
-    telefono = request.POST['telefono']
+    username = request.POST['email']
+    telefono = request.POST['telefono'] 
     #showroom = request.POST['showroom']
     #numero_sap = request.POST['num_sap']
     password = make_password(request.POST['password'])
+    n = nombre.split(" ")
+    firstname = n[0]
+    lastname = n[1]
 
-    cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono)
-    usuario_login = User.objects.create(username=username, password=password)
 
+    usuario_login = User.objects.create(username=username, password=password, email=email, first_name= firstname,last_name = lastname)
+    cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono, usuarios = usuario_login)
 
 
     return redirect('/')
