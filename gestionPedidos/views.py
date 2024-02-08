@@ -78,6 +78,10 @@ def registrarCuenta(request):
     return redirect('/')
 
 @login_required
+def eliminarUsuario(request):
+    username = request.GET('')
+
+@login_required
 def lista_usuarios(request):
     return render(request, "lista_usuarios.html")
 
