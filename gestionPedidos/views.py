@@ -140,3 +140,15 @@ class Funciones(View):
         resultado = self.constructor_url()
     
         return HttpResponse('Todo ok')
+
+def obtenerDatosProducto(request, producto_id):
+    producto = Producto.objects.get(id=producto_id)
+    data = {
+        'productoCodigo': producto.codigo,
+        'stock': producto.stock,
+        'precioActual': str(producto.precio_actual),
+        'precioAnterior': str(producto.precio_anterior),
+        'maxDescuento': producto.max_descuento,       
+    }
+
+    return JsonResponse(data)
