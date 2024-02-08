@@ -6,8 +6,21 @@ function cargarProductosGuardados() {
     }
 }
 
+function obtenerDatosProducto(productoId) {
+    $.ajax({
+        url: '/obtener-datos-producto/' + productoId + '/',
+        type: 'GET',
+        success: function(data) {
+            agregarProducto(data.productoCodigo, data.stock, data.precioActual, data.precioAnterior, data.maxDescuento);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al obtener los datos del producto:', error);
+        }
+    });
+}
 
-function agregarProducto() {
+
+function agregarProducto(productoCodigo, stock, precioActual, precioAnterior, maxDescuento) {
     // Crear una nueva fila
     var newRow = document.createElement('tr');
 
@@ -17,7 +30,7 @@ function agregarProducto() {
     <div class="row">
         <div class="col-md-11 col-xxl-6">
             <small>1)</small>&nbsp;&nbsp;
-            <small class="font-weight-bold">N10100256</small>
+            <small class="font-weight-bold">${productoCodigo}</small>
         </div>
         <div class="col-md-11 col-xxl-7 text-center">
             <img src="https://ledstudiocl.vtexassets.com/arquivos/ids/166187-80-auto/label-0.jpg" width="50" height="50">
@@ -30,23 +43,23 @@ function agregarProducto() {
             <select class="form-select" style="font-size: 11px;">
                 <optgroup label="Bodega">
                     <option value="12" selected>GR</option>
-                    <option value="13">LC</option>
+                    <option value="13"></option>
                     <option value="14">PH</option>
                     <option value="15">ME</option>
                 </optgroup>
             </select>
         </div>
         <div class="col text-center">
-            <small class="font-size-12">Stock: 5.314</small>
+            <small class="font-size-12">Stock: ${stock}</small>
         </div>
     </div>
 </td>
 <td>
     <div class="font-size-12">
-        <small>$1.964.900</small>
+        <small>${precioActual}</small>
     </div>
     <div class="font-size-11">
-        <small class="text-muted">Antes: $2.999.900</small>
+        <small class="text-muted">Antes: ${precioAnterior}</small>
     </div>
     <div class="row font-size-11">
         <div class="col-sm-4 col-md-3 col-xl-2" style="padding-right: 0;">
@@ -55,18 +68,18 @@ function agregarProducto() {
             </svg>
         </div>
         <div class="col-sm-7 col-md-8">
-            <small class="text-danger">Max: 15%</small>
+            <small class="text-danger">Max: ${maxDescuento}</small>
         </div>
     </div>
 </td>
 <td>
     <input class="form-control" type="text">
 </td>
-<td class="font-size-11 text-center">$1.964.900</td>
+<td class="font-size-11 text-center">${precioActual}</td>
 <td>
     <input class="form-control" type="text" style="width: 65px;">
 </td>
-<td class="font-weight-bold font-size-11 text-center">$1.964.900</td>
+<td class="font-weight-bold font-size-11 text-center">${precioActual}</td>
     `;
     
     // Agregar la fila a la tabla
@@ -91,3 +104,4 @@ window.addEventListener('DOMContentLoaded', function() {
 function fechaHora(){
 
 }
+
