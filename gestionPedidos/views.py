@@ -33,8 +33,8 @@ def lista_cotizaciones(request):
 def cotizacion(request):
     if request.user.is_authenticated:
         # Acceder al nombre de usuario
-        first_name = request.user.first_name
-        return render(request, 'cotizacion.html', {'first_name': first_name})
+        username = request.user.username
+        return render(request, 'cotizacion.html', {'username': username})
     else:
         return render(request, "cotizacion.html")
 
