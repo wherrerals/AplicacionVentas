@@ -5,6 +5,8 @@ from gestionPedidos.models import *
 from django.views import View
 from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
+from django.db import transaction
+
 
 @login_required
 def home(request):
@@ -57,6 +59,7 @@ def micuenta(request):
 
     return render(request, "micuenta.html")
 
+@transaction.atomic
 @login_required
 def registrarCuenta(request):
     nombre = request.POST['nombre']
@@ -66,9 +69,10 @@ def registrarCuenta(request):
     #showroom = request.POST['showroom']
     #numero_sap = request.POST['num_sap']
     password = make_password(request.POST['password'])
+    
+    usuario_login = User.objects.create(username=username, password=password)
 
     cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono)
-    usuario_login = User.objects.create(username=username, password=password)
 
     return redirect('/')
 

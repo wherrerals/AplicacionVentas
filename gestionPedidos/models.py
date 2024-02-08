@@ -8,6 +8,7 @@ class Usuario(models.Model):
         verbose_name = 'usuario'
         verbose_name_plural = 'usuario'
 
+    #user = models.OneToOneField(User,on_delete=models.CASCADE, default=1)
     nombre = models.CharField(max_length=50)
     email = models.EmailField()
     telefono = models.CharField(max_length=15)
