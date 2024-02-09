@@ -67,8 +67,12 @@ def registrarCuenta(request):
     #numero_sap = request.POST['num_sap']
     password = make_password(request.POST['password'])
     n = nombre.split(" ")
-    firstname = n[0]
-    lastname = n[1]
+    if len(n) == 1:
+        firstname = n[0]
+        lastname = ''
+    else:
+        firstname = n[0]
+        lastname = n[1]
 
 
     usuario_login = User.objects.create(username=username, password=password, email=email, first_name= firstname,last_name = lastname)
@@ -77,9 +81,36 @@ def registrarCuenta(request):
 
     return redirect('/')
 
+#agregaado vista para modificar los datos
 @login_required
-def eliminarUsuario(request):
-    username = request.GET('')
+def mis_datos(request):
+
+    usuario = Usuario.objects.get(usuarios=request.user)
+    user = request.user
+
+    if request.method == "POST":
+        nombre = request.POST['nombre']
+        telefono = request.POST['telefono']
+        n = nombre.split(" ")
+        if len(n) == 1:
+            user.first_name = n[0]
+            user.last_name = ''
+        else:
+            user.first_name = n[0]
+            user.last_name = n[1]
+        
+
+        usuario = Usuario.objects.get(usuarios=user)
+        usuario.telefono = telefono
+        usuario.save()
+        user.save()
+        return redirect("/")
+     
+    nombre = user.first_name
+    apellido = user.last_name
+    nombre_completo = f'{nombre} {apellido}'
+    return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre_completo, "telefono":usuario.telefono})
+#fin vista modificar datos
 
 @login_required
 def lista_usuarios(request):
