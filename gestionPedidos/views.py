@@ -6,6 +6,7 @@ from django.views import View
 from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
+from django.core import serializers
 
 
 @login_required
@@ -152,3 +153,14 @@ def obtenerDatosProducto(request, producto_id):
     }
 
     return JsonResponse(data)
+
+def busquedaProductos(request):
+    if request.method == 'GET' and 'numero' in request.GET:
+        numero = request.GET.get('numero')
+        # Realiza la consulta a la base de datos para obtener los resultados
+        resultados = Producto.objects.filter(codigo__icontains=numero)
+        # Convierte los resultados en una lista de diccionarios
+        resultados_formateados = [{'codigo': producto.codigo, 'nombre': producto.nombre} for producto in resultados]
+        return JsonResponse({'resultados': resultados_formateados})
+    else:
+        return JsonResponse({'error': 'No se proporcionó un número válido'})
