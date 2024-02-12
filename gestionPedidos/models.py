@@ -10,6 +10,7 @@ class Usuario(models.Model):
         verbose_name = 'usuario'
         verbose_name_plural = 'usuario'
 
+    #user = models.OneToOneField(User,on_delete=models.CASCADE, default=1)
     nombre = models.CharField(max_length=50)
     email = models.EmailField()
     telefono = models.CharField(max_length=15)
@@ -206,6 +207,8 @@ class Producto(models.Model):
     dsctoMaxTienda = models.FloatField()
     dctoMaxProyectos = models.FloatField()
     linkProducto = models.CharField(max_length=255,null = False)
+    def __str__(self):
+        return f'{self.nombre} {self.codigo}'
 
 class Bodega(models.Model):
     class Meta:
