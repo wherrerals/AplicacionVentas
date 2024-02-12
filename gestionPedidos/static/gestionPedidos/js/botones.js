@@ -89,24 +89,27 @@ class="bi bi-trash" style="width: 18px;height: 18px;">
         newRow.remove();
     });
 
-  };
-
+};
 
 // Función para guardar los productos en localStorage
 function guardarProductos() {
     localStorage.setItem('productos', document.getElementById('productos').innerHTML);
 }
 
-// Escuchar el evento DOMContentLoaded para cargar los productos guardados
+function cargarProductosGuardados() {
+    var productosGuardados = localStorage.getItem('productos');
+    if (productosGuardados) {
+        document.getElementById('productos').innerHTML = productosGuardados;
+    }
+}
+
 window.addEventListener('DOMContentLoaded', function() {
     cargarProductosGuardados();
 
-    // Asignar el evento click al botón agregar_productos
-    document.getElementById('agregar_productos').addEventListener('click', agregarProducto);
+    // Asignar el evento click al botón agregar_productos (siempre que exista)
+    var botonAgregarProductos = document.getElementById('agregar_productos');
+    if (botonAgregarProductos) {
+        botonAgregarProductos.addEventListener('click', agregarProducto);
+    }
 });
 
-function fechaHora(){
-
-}
-
-agregarProducto('N10100256', '12', '1.964.900', '2.999.900', '15%');

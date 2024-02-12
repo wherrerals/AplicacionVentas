@@ -20,7 +20,7 @@
       <div class="col-sm-4" style="text-align: right;padding-right: 0px;"><input type="search" placeholder="Buscar"
           style="width: 100%;"></div>
       <div class="col-sm-4" style="text-align: left;width: 160px;"><a class="btn btn-primary" role="button"
-          style="font-size: 12px;" href="cotizacion.html">+ Nueva Cotización</a></div>
+          style="font-size: 12px;" href="{% url 'generar_cotizacion' %}">+ Nueva Cotización</a></div>
       <div class="col" style="text-align: right;padding-right: 0px;">
         <div class="dropdown"><button class="btn btn-primary dropdown-toggle" aria-expanded="false"
             data-bs-toggle="dropdown" type="button" style="font-size: 12px;">Acciones&nbsp;</button>
@@ -62,7 +62,7 @@
     <div class="row" style="background: #f0f2f5;">
       <div class="col-sm-5">
         <p>Vendedor:&nbsp;
-        {% if username %}
+          {% if username %}
           <strong> {{ username }}</strong>&nbsp;
         </p>
         {% else %}
@@ -82,9 +82,10 @@
           <div class="row">
             <div class="col-sm-3" style="width: 27%;"><label class="col-form-label"
                 style="font-size: 13px;">Cliente</label></div>
-            <div class="col-sm-6 col-md-6" style="text-align: left;width: 58%;padding-right: 0px;"><input
-                class="form-control" type="text" name="cliente" style="border-color: rgb(159,168,175);font-size: 12px;">
+            <div class="col-sm-6 col-md-6" style="text-align: left;width: 58%;padding-right: 0px;">
+              <input class="form-control" type="text" name="cliente" style="border-color: rgb(159,168,175);font-size: 12px;" id="inputCliente">
             </div>
+            <div div id="resultados_clientes"></div>
             <div class="col" style="width: 15%;text-align: left;padding-left: 0px;padding-right: 0px;">
               <!-- Start: Modal -->
               <div><button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#clienteModal"
@@ -1554,12 +1555,12 @@
         <div class="col-sm-2 col-md-1" style="font-size: 12px;">
           <label class="col-form-label">Buscar:</label>
         </div>
-        <div class="col-sm-7 col-md-7" >
+        <div class="col-sm-7 col-md-7">
           <input class="form-control" type="text" style="font-size: 12px;" id="inputNumero">
           <div id="resultados"></div>
         </div>
-        <div class="col"><button class="btn btn-primary" type="button" style="font-size: 12px;"
-            id="agregar_productos">Agregar</button></div>
+        <div class="col"><button class="btn btn-primary" type="button" style="font-size: 12px;" id="agregar_productos"
+            hidden>Agregar</button></div>
       </div>
       <div class="row">
         <div class="col">

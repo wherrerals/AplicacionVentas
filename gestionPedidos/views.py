@@ -164,3 +164,14 @@ def busquedaProductos(request):
         return JsonResponse({'resultados': resultados_formateados})
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
+
+def busquedaClientes(request):
+    if request.method == 'GET' and 'numero' in request.GET:
+        numero = request.GET.get('numero')
+        # Realiza la consulta a la base de datos para obtener los resultados
+        resultados = SocioNegocio.objects.filter(rut__icontains=numero)
+        # Convierte los resultados en una lista de diccionarios
+        resultados_formateados = [{'nombre': producto.codigo, 'nombre': producto.nombre} for producto in resultados]
+        return JsonResponse({'resultados': resultados_formateados})
+    else:
+        return JsonResponse({'error': 'No se proporcionó un número válido'})
