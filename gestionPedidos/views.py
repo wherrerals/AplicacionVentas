@@ -63,23 +63,50 @@ def registrarCuenta(request):
     email = request.POST['email']
     username = request.POST['email']
     telefono = request.POST['telefono'] 
+    rep_password = request.POST.get('rep_password')
     #showroom = request.POST['showroom']
     #numero_sap = request.POST['num_sap']
-    password = make_password(request.POST['password'])
-    n = nombre.split(" ")
-    if len(n) == 1:
-        firstname = n[0]
-        lastname = ''
+    password = request.POST['password']
+    make = make_password(password)
+    mensaje = validar_contrasena(password,rep_password)
+
+
+    if not mensaje:
+        n = nombre.split(" ")
+        if len(n) == 1:
+            firstname = n[0]
+            lastname = ''
+        else:
+            firstname = n[0]
+            lastname = n[1]
+
+        usuario_login = User.objects.create(username=username, password=make, email=email, first_name= firstname,last_name = lastname)
+        cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono, usuarios = usuario_login)
+        return redirect('/')
+        
     else:
-        firstname = n[0]
-        lastname = n[1]
+        return render(request,"micuenta.html",{'email': email, "nombre": nombre, "telefono":telefono})
+    
 
+def validar_contrasena(password, rep_password):
+    mensajes = ''
 
-    usuario_login = User.objects.create(username=username, password=password, email=email, first_name= firstname,last_name = lastname)
-    cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono, usuarios = usuario_login)
+    if not any(caracter in password for caracter in "!@#$%^&*_+:;<>?/~"):
+        mensajes += "Su contraseña debe incluir al menos un símbolo [!@#$%^&*_+:;<>?/~].\n"
 
+    if not any(caracter.isupper() for caracter in password):
+        mensajes += "Su contraseña debe incluir al menos una mayúscula.\n"
 
-    return redirect('/')
+    if not any(caracter.isdigit() for caracter in password):
+        mensajes += "Su contraseña debe incluir al menos un número.\n"
+
+    if len(password) < 8:
+        mensajes += "Su contraseña debe tener al menos 8 caracteres.\n"
+
+    if password != rep_password:
+        mensajes += "Las contraseñas no coinciden. "
+
+    return mensajes 
 
 #agregaado vista para modificar los datos
 @login_required
@@ -91,26 +118,35 @@ def mis_datos(request):
     if request.method == "POST":
         nombre = request.POST['nombre']
         telefono = request.POST['telefono']
-        n = nombre.split(" ")
-        if len(n) == 1:
-            user.first_name = n[0]
-            user.last_name = ''
-        else:
-            user.first_name = n[0]
-            user.last_name = n[1]
-        
+        password = request.POST.get('password', '')
+        rep_password = request.POST.get('rep_password')
+        mensaje = validar_contrasena(password,rep_password)
 
-        usuario = Usuario.objects.get(usuarios=user)
-        usuario.telefono = telefono
-        usuario.save()
-        user.save()
-        return redirect("/")
+        if not mensaje:
+            n = nombre.split(" ")
+            if len(n) == 1:
+                user.first_name = n[0]
+                user.last_name = ''
+            else:
+                user.first_name = n[0]
+                user.last_name = n[1]
+
+            if password:
+                user.set_password(password)
+            
+            
+            usuario = Usuario.objects.get(usuarios=user)
+            usuario.telefono = telefono
+            usuario.nombre = nombre
+            usuario.save()
+            user.save()
+            return redirect("/")
+        
      
     nombre = user.first_name
     apellido = user.last_name
     nombre_completo = f'{nombre} {apellido}'
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre_completo, "telefono":usuario.telefono})
-#fin vista modificar datos
 
 @login_required
 def lista_usuarios(request):
