@@ -166,7 +166,9 @@ class TipoVenta(models.Model):
     
 class Sucursal(models.Model):
     class Meta:
-        db_table = 'Sucursal' 
+        db_table = 'Sucursal'
+        verbose_name = 'Sucursal'
+        verbose_name_plural = 'Sucursal' 
 
     codigo = models.CharField(max_length=50,null = False)
     nombre = models.CharField(max_length=50,null = False)
@@ -175,7 +177,9 @@ class Sucursal(models.Model):
     
 class Vendedor(models.Model):
     class Meta:
-        db_table = 'Vendedor' 
+        db_table = 'Vendedor'
+        verbose_name = 'Vendedor'
+        verbose_name_plural = 'Vendedor' 
 
     codigo = models.IntegerField()
     nombre = models.CharField(max_length=100,null = False)
@@ -203,6 +207,8 @@ class Producto(models.Model):
     dsctoMaxTienda = models.FloatField()
     dctoMaxProyectos = models.FloatField()
     linkProducto = models.CharField(max_length=255,null = False)
+    def __str__(self):
+        return f'{self.nombre} {self.codigo}'
 
 class Bodega(models.Model):
     class Meta:
@@ -215,7 +221,7 @@ class Bodega(models.Model):
     descripcion = models.CharField(max_length=255,null = False)
 
     def __str__(self):
-        return f'Producto {self.codigo}/ Numero Linea: {self.nombre}/ Descuento: {self.descripcion}'
+        return f'{self.nombre}'
     
 
 class Inventario(models.Model):
@@ -244,6 +250,9 @@ class TipoObjetoSap(models.Model):
 class Documento(models.Model):
     class Meta:
         db_table = 'Documento'
+        verbose_name = 'Documento'
+        verbose_name_plural = 'Documento' 
+
 
     docEntry = models.IntegerField(null = False)
     docNum = models.IntegerField(null = False)
@@ -254,7 +263,7 @@ class Documento(models.Model):
     referencia = models.CharField(max_length=255)
     comentario = models.CharField(max_length=255)  # Corregí el nombre del campo aquí
     totalAntesDelDescuento = models.FloatField()
-    descuento = models.FloatField(default=0)
+    descuento = models.FloatField(default=0) 
     totalDocumento = models.FloatField(null = False)
     codigoVenta = models.IntegerField(null = False)
     tipo_documento = models.ForeignKey(TipoDocTributario, on_delete=models.CASCADE)
