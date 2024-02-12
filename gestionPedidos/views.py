@@ -69,7 +69,7 @@ def registrarCuenta(request):
     #numero_sap = request.POST['num_sap']
     password = request.POST['password']
     make = make_password(password)
-    mensaje = validar_contrasena(password,rep_password)
+    mensaje = validar_contrasena(password)
 
     if not mensaje:
         n = nombre.split(" ")
@@ -107,7 +107,7 @@ def mis_datos(request):
         telefono = request.POST['telefono']
         password = request.POST.get('password', '')
         rep_password = request.POST.get('rep_password')
-        mensaje = validar_contrasena(password,rep_password)
+        mensaje = validar_contrasena(password)
 
         if not mensaje:
             n = nombre.split(" ")
@@ -208,3 +208,20 @@ class Funciones(View):
         resultado = self.constructor_url()
     
         return HttpResponse('Todo ok')
+    
+def validar_contrasena(password):
+    mensajes = []
+
+    if not any(caracter in password for caracter in "!@#$%^&*_+:;<>?/~"):
+        mensajes.append("Su contraseña debe incluir al menos un símbolo [!@#$%^&*_+:;<>?/~].")
+
+    if not any(caracter.isupper() for caracter in password):
+        mensajes.append("Su contraseña debe incluir al menos una mayúscula.")
+
+    if not any(caracter.isdigit() for caracter in password):
+        mensajes.append("Su contraseña debe incluir al menos un número.")
+
+    if len(password) < 8:
+        mensajes.append("Su contraseña debe tener al menos 8 caracteres.")
+
+    return mensajes 
