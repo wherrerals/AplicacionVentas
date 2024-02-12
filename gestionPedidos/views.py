@@ -4,6 +4,7 @@ from django.contrib.auth import logout
 from gestionPedidos.models import *
 from django.views import View
 from django.http import JsonResponse
+from django.views import View
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from django.core import serializers
@@ -67,19 +68,89 @@ def registrarCuenta(request):
     email = request.POST['email']
     username = request.POST['email']
     telefono = request.POST['telefono'] 
+    rep_password = request.POST.get('rep_password')
     #showroom = request.POST['showroom']
     #numero_sap = request.POST['num_sap']
-    password = make_password(request.POST['password'])
-    n = nombre.split(" ")
-    firstname = n[0]
-    lastname = n[1]
+    password = request.POST['password']
+    make = make_password(password)
+    mensaje = validar_contrasena(password)
 
+    if not mensaje:
+        n = nombre.split(" ")
+        if len(n) == 1:
+            firstname = n[0]
+            lastname = ''
+        else:
+            firstname = n[0]
+            lastname = n[1]
+        
+        if password != rep_password:
+            mensaje2 = "Las contraseñas no coinciden"
+            return render(request, "micuenta.html", {'email': email, "nombre": nombre, "telefono": telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
 
-    usuario_login = User.objects.create(username=username, password=password, email=email, first_name= firstname,last_name = lastname)
-    cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono, usuarios = usuario_login)
+        usuario_login = User.objects.create(username=username, password=make, email=email, first_name= firstname,last_name = lastname)
+        cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono, usuarios = usuario_login)
+        return redirect('/')
+        
+    elif password != rep_password:
+        mensaje2 = "Las contraseñas no coinciden"
+        return render(request, "micuenta.html", {'email': email, "nombre": nombre, "telefono": telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
+    
+    return render(request,"micuenta.html",{'email': email, "nombre": nombre, "telefono":telefono,"mensaje_error_contrasena": mensaje})
+    
 
+#agregaado vista para modificar los datos
+@login_required
+def mis_datos(request):
 
-    return redirect('/')
+    usuario = Usuario.objects.get(usuarios=request.user)
+    user = request.user
+
+    if request.method == "POST":
+        nombre = request.POST['nombre']
+        telefono = request.POST['telefono']
+        password = request.POST.get('password', '')
+        rep_password = request.POST.get('rep_password')
+        mensaje = validar_contrasena(password)
+
+        if not mensaje:
+            n = nombre.split(" ")
+            if len(n) == 1:
+                user.first_name = n[0]
+                user.last_name = ''
+            else:
+                user.first_name = n[0]
+                user.last_name = n[1]
+
+            if password:
+                user.set_password(password)
+            
+            if password != rep_password:
+                mensaje2 = "Las contraseñas no coinciden"
+                return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre_completo, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
+            
+            usuario = Usuario.objects.get(usuarios=user)
+            usuario.telefono = telefono
+            usuario.nombre = nombre
+            usuario.save()
+            user.save()
+            return redirect("/")
+        
+        else:
+            nombre = user.first_name
+            apellido = user.last_name
+            nombre_completo = f'{nombre} {apellido}'
+            if password != rep_password:
+                mensaje2 = "Las contraseñas no coinciden"
+                return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre_completo, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
+            
+            return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre_completo, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje})
+        
+    nombre = user.first_name
+    apellido = user.last_name
+    nombre_completo = f'{nombre} {apellido}'
+    return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre_completo, "telefono":usuario.telefono})
+
 
 @login_required
 def lista_usuarios(request):
@@ -176,3 +247,20 @@ def busquedaClientes(request):
         return JsonResponse({'resultados': resultados_formateados})
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
+
+def validar_contrasena(password):
+    mensajes = []
+
+    if not any(caracter in password for caracter in "!@#$%^&*_+:;<>?/~"):
+        mensajes.append("Su contraseña debe incluir al menos un símbolo [!@#$%^&*_+:;<>?/~].")
+
+    if not any(caracter.isupper() for caracter in password):
+        mensajes.append("Su contraseña debe incluir al menos una mayúscula.")
+
+    if not any(caracter.isdigit() for caracter in password):
+        mensajes.append("Su contraseña debe incluir al menos un número.")
+
+    if len(password) < 8:
+        mensajes.append("Su contraseña debe tener al menos 8 caracteres.")
+
+    return mensajes 

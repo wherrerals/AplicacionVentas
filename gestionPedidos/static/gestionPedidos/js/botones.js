@@ -113,3 +113,23 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+function fechaHora(){
+
+}
+
+function togglePassword() {
+    var toggleButton = document.getElementById("togglePasswordButton");
+    var passwordInput = document.getElementById("password");
+
+    toggleButton.addEventListener("click", function() {
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            toggleButton.textContent = "Ocultar";
+        } else {
+            passwordInput.type = "password";
+            toggleButton.textContent = "Mostrar";
+        }
+    });
+}
+
+togglePassword();
