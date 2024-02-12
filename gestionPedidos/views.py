@@ -154,6 +154,7 @@ def obtenerDatosProducto(request, producto_id):
 
     return JsonResponse(data)
 
+
 def busquedaProductos(request):
     if request.method == 'GET' and 'numero' in request.GET:
         numero = request.GET.get('numero')
