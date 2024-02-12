@@ -70,7 +70,7 @@ def registrarCuenta(request):
     #numero_sap = request.POST['num_sap']
     password = request.POST['password']
     make = make_password(password)
-    mensaje = validar_contrasena(password,rep_password)
+    mensaje = validar_contrasena(password)
 
     if not mensaje:
         n = nombre.split(" ")
@@ -108,7 +108,7 @@ def mis_datos(request):
         telefono = request.POST['telefono']
         password = request.POST.get('password', '')
         rep_password = request.POST.get('rep_password')
-        mensaje = validar_contrasena(password,rep_password)
+        mensaje = validar_contrasena(password)
 
         if not mensaje:
             n = nombre.split(" ")
@@ -210,7 +210,7 @@ class Funciones(View):
     
         return HttpResponse('Todo ok')
     
-def validar_contrasena(password, rep_password):
+def validar_contrasena(password):
     mensajes = []
 
     if not any(caracter in password for caracter in "!@#$%^&*_+:;<>?/~"):
