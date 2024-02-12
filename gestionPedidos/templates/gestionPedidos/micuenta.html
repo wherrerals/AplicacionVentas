@@ -97,6 +97,15 @@
                 <input class="form-control" type="password" id="password" name="password" style="border-color: rgb(159,168,175);font-size: 12px;">
                 <button class="btn btn-outline-secondary" type="button" id="togglePasswordButton">Mostrar</button>
             </div>
+            {% if mensaje_error_contrasena %}
+      <div class="alert alert-danger" role="alert" style="font-size: 0.75rem">
+        <ul>
+          {% for error in mensaje_error_contrasena %}
+          <li>{{ error }}</li>
+          {% endfor %}
+      </ul> 
+      </div>
+      {% endif %}
         </div>
     </div>
     
@@ -107,6 +116,11 @@
         <div class="col" style="width: 80%;">
           <input class="form-control" type="password" id="rep_clave"
             style="border-color: rgb(159,168,175);font-size: 12px;" name="rep_password">
+            {% if mensaje_error_repcontrasena %}
+            <div class="alert alert-danger" style="font-size: 0.75rem" role="alert">
+          {{ mensaje_error_repcontrasena }}
+      </div>
+      {% endif %}
         </div>
       </div>
 

@@ -6,6 +6,8 @@ from django.views import View
 from django.http import JsonResponse
 from django.contrib.auth.hashers import make_password
 
+#admin -- hola123
+
 @login_required
 def home(request):
     if request.user.is_authenticated:
@@ -78,34 +80,21 @@ def registrarCuenta(request):
         else:
             firstname = n[0]
             lastname = n[1]
+        
+        if password != rep_password:
+            mensaje2 = "Las contraseñas no coinciden"
+            return render(request, "micuenta.html", {'email': email, "nombre": nombre, "telefono": telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
 
         usuario_login = User.objects.create(username=username, password=make, email=email, first_name= firstname,last_name = lastname)
         cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono, usuarios = usuario_login)
         return redirect('/')
         
-    else:
-        return render(request,"micuenta.html",{'email': email, "nombre": nombre, "telefono":telefono})
+    elif password != rep_password:
+        mensaje2 = "Las contraseñas no coinciden"
+        return render(request, "micuenta.html", {'email': email, "nombre": nombre, "telefono": telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
     
-
-def validar_contrasena(password, rep_password):
-    mensajes = ''
-
-    if not any(caracter in password for caracter in "!@#$%^&*_+:;<>?/~"):
-        mensajes += "Su contraseña debe incluir al menos un símbolo [!@#$%^&*_+:;<>?/~].\n"
-
-    if not any(caracter.isupper() for caracter in password):
-        mensajes += "Su contraseña debe incluir al menos una mayúscula.\n"
-
-    if not any(caracter.isdigit() for caracter in password):
-        mensajes += "Su contraseña debe incluir al menos un número.\n"
-
-    if len(password) < 8:
-        mensajes += "Su contraseña debe tener al menos 8 caracteres.\n"
-
-    if password != rep_password:
-        mensajes += "Las contraseñas no coinciden. "
-
-    return mensajes 
+    return render(request,"micuenta.html",{'email': email, "nombre": nombre, "telefono":telefono,"mensaje_error_contrasena": mensaje})
+    
 
 #agregaado vista para modificar los datos
 @login_required
@@ -133,6 +122,9 @@ def mis_datos(request):
             if password:
                 user.set_password(password)
             
+            if password != rep_password:
+                mensaje2 = "Las contraseñas no coinciden"
+                return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre_completo, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
             
             usuario = Usuario.objects.get(usuarios=user)
             usuario.telefono = telefono
@@ -141,11 +133,21 @@ def mis_datos(request):
             user.save()
             return redirect("/")
         
-     
+        else:
+            nombre = user.first_name
+            apellido = user.last_name
+            nombre_completo = f'{nombre} {apellido}'
+            if password != rep_password:
+                mensaje2 = "Las contraseñas no coinciden"
+                return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre_completo, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
+            
+            return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre_completo, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje})
+        
     nombre = user.first_name
     apellido = user.last_name
     nombre_completo = f'{nombre} {apellido}'
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre_completo, "telefono":usuario.telefono})
+
 
 @login_required
 def lista_usuarios(request):
@@ -207,3 +209,20 @@ class Funciones(View):
         resultado = self.constructor_url()
     
         return HttpResponse('Todo ok')
+    
+def validar_contrasena(password, rep_password):
+    mensajes = []
+
+    if not any(caracter in password for caracter in "!@#$%^&*_+:;<>?/~"):
+        mensajes.append("Su contraseña debe incluir al menos un símbolo [!@#$%^&*_+:;<>?/~].")
+
+    if not any(caracter.isupper() for caracter in password):
+        mensajes.append("Su contraseña debe incluir al menos una mayúscula.")
+
+    if not any(caracter.isdigit() for caracter in password):
+        mensajes.append("Su contraseña debe incluir al menos un número.")
+
+    if len(password) < 8:
+        mensajes.append("Su contraseña debe tener al menos 8 caracteres.")
+
+    return mensajes 
