@@ -70,7 +70,6 @@ def registrarCuenta(request):
     make = make_password(password)
     mensaje = validar_contrasena(password,rep_password)
 
-
     if not mensaje:
         n = nombre.split(" ")
         if len(n) == 1:
