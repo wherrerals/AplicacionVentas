@@ -2,10 +2,10 @@ from django.shortcuts import render, redirect, HttpResponse # importa el metodo 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from gestionPedidos.models import *
+from django.views import View
 from django.http import JsonResponse
 from django.views import View
-import httpx
-import json
+from django.contrib.auth.hashers import make_password
 
 @login_required
 def home(request):
@@ -27,6 +27,15 @@ def salir(request):
 @login_required
 def lista_cotizaciones(request):
     return render(request, "lista_cotizaciones.html")
+
+@login_required
+def cotizacion(request):
+    if request.user.is_authenticated:
+        # Acceder al nombre de usuario
+        first_name = request.user.first_name
+        return render(request, 'cotizacion.html', {'first_name': first_name})
+    else:
+        return render(request, "cotizacion.html")
 
 @login_required
 def lista_ovs(request):
@@ -54,15 +63,90 @@ def registrarCuenta(request):
     nombre = request.POST['nombre']
     email = request.POST['email']
     username = request.POST['email']
-    telefono = request.POST['telefono']
+    telefono = request.POST['telefono'] 
+    rep_password = request.POST.get('rep_password')
     #showroom = request.POST['showroom']
     #numero_sap = request.POST['num_sap']
     password = request.POST['password']
+    make = make_password(password)
+    mensaje = validar_contrasena(password,rep_password)
 
-    cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono)
-    usuario_login = User.objects.create(username=username, password=password)
+    if not mensaje:
+        n = nombre.split(" ")
+        if len(n) == 1:
+            firstname = n[0]
+            lastname = ''
+        else:
+            firstname = n[0]
+            lastname = n[1]
+        
+        if password != rep_password:
+            mensaje2 = "Las contraseñas no coinciden"
+            return render(request, "micuenta.html", {'email': email, "nombre": nombre, "telefono": telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
 
-    return redirect('/')
+        usuario_login = User.objects.create(username=username, password=make, email=email, first_name= firstname,last_name = lastname)
+        cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono, usuarios = usuario_login)
+        return redirect('/')
+        
+    elif password != rep_password:
+        mensaje2 = "Las contraseñas no coinciden"
+        return render(request, "micuenta.html", {'email': email, "nombre": nombre, "telefono": telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
+    
+    return render(request,"micuenta.html",{'email': email, "nombre": nombre, "telefono":telefono,"mensaje_error_contrasena": mensaje})
+    
+
+#agregaado vista para modificar los datos
+@login_required
+def mis_datos(request):
+
+    usuario = Usuario.objects.get(usuarios=request.user)
+    user = request.user
+
+    if request.method == "POST":
+        nombre = request.POST['nombre']
+        telefono = request.POST['telefono']
+        password = request.POST.get('password', '')
+        rep_password = request.POST.get('rep_password')
+        mensaje = validar_contrasena(password,rep_password)
+
+        if not mensaje:
+            n = nombre.split(" ")
+            if len(n) == 1:
+                user.first_name = n[0]
+                user.last_name = ''
+            else:
+                user.first_name = n[0]
+                user.last_name = n[1]
+
+            if password:
+                user.set_password(password)
+            
+            if password != rep_password:
+                mensaje2 = "Las contraseñas no coinciden"
+                return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre_completo, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
+            
+            usuario = Usuario.objects.get(usuarios=user)
+            usuario.telefono = telefono
+            usuario.nombre = nombre
+            usuario.save()
+            user.save()
+            return redirect("/")
+        
+        else:
+            nombre = user.first_name
+            apellido = user.last_name
+            nombre_completo = f'{nombre} {apellido}'
+            if password != rep_password:
+                mensaje2 = "Las contraseñas no coinciden"
+                return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre_completo, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
+            
+            return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre_completo, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje})
+        
+    nombre = user.first_name
+    apellido = user.last_name
+    nombre_completo = f'{nombre} {apellido}'
+    return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre_completo, "telefono":usuario.telefono})
+
 
 @login_required
 def lista_usuarios(request):
@@ -122,8 +206,5 @@ class Funciones(View):
         self.param = param
 
         resultado = self.constructor_url()
-
-        data = {'motor': self.motor, 'accion': self.accion, 'param': self.param, 'resultado': resultado}
-        json_data = json.dumps(data)
     
-        return HttpResponse(json_data, content_type='application/json')
+        return HttpResponse('Todo ok')
