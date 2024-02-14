@@ -42,6 +42,6 @@ $(document).ready(function(){
         var precioLista = $(this).data('precio-anterior');
         var dsctoMaxTienda = $(this).data('max-descuento');
         // Llamar a la función agregarProducto() con los valores obtenidos
-        agregarProducto(codigo, stockTotal, precioVenta, precioLista, dsctoMaxTienda, precioVenta, precioVenta, nombre);
+        agregarProducto(codigo, nombre, stockTotal, precioVenta, precioLista, dsctoMaxTienda);
     });
 });

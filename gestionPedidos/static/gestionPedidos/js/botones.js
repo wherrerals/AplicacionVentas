@@ -1,4 +1,4 @@
-function agregarProducto(productoCodigo, stock, precioActual,  precioAnterior, maxDescuento, precioActual, precioActual, nombre) {
+function agregarProducto(productoCodigo, nombre, stockTotal, precioVenta, precioLista, dsctoMaxTienda) {
     // Crear una nueva fila
     var newRow = document.createElement('tbody');
 
@@ -28,16 +28,16 @@ function agregarProducto(productoCodigo, stock, precioActual,  precioAnterior, m
               </select>
             </div>
             <div class="col" style="text-align: center;>
-                <small style="font-size: 12px;">Stock: ${stock}</small>
+                <small style="font-size: 12px;">Stock: ${stockTotal}</small>
             </div>
         </div>
     </td>
     <td style="background: transparent;border-style: none;padding-bottom: 0px;" rowspan="2">
         <div style="font-size: 12px;">
-            <small>${precioActual}</small>
+            <small>${precioVenta}</small>
         </div>
         <div style="font-size: 11px;">
-            <small style="color: rgb(153,153,153);">Antes: ${precioAnterior}</small>
+            <small style="color: rgb(153,153,153);">Antes: ${precioLista}</small>
         </div>
         <div class="row" style="font-size: 11px;">
             <div class="col-sm-4 col-md-3 col-xl-2" style="padding-right: 0px;">
@@ -46,7 +46,7 @@ function agregarProducto(productoCodigo, stock, precioActual,  precioAnterior, m
                 </svg>
             </div>
             <div class="col-sm-7 col-md-8">
-                <small style="color: rgb(255,0,0);" id="descuento" hidden>Max: ${maxDescuento}</small>
+                <small style="color: rgb(255,0,0);" id="descuento" hidden>Max: ${dsctoMaxTienda}</small>
             </div>
         </div>
     </td>
@@ -55,12 +55,12 @@ function agregarProducto(productoCodigo, stock, precioActual,  precioAnterior, m
             <input class="form-control" type="text" style="font-size: 12px;width: 40px;">
         </div>
     </td>
-    <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">${precioActual}</td>
+    <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">${precioVenta}</td>
     <td style="font-size: 12px;background: transparent;border-style: none;">
         <input class="form-control" type="text" style="width: 65px;">
     </td>
     <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
-        <span>${precioActual}</span>
+        <span>${precioVenta}</span>
     </td>
 </tr> 
     <tr style="font-size: 12px;background: transparent;">
