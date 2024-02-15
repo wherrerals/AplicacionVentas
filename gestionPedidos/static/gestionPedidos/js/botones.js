@@ -1,3 +1,4 @@
+//Funcion para agregar productos
 function agregarProducto(productoCodigo, nombre, stockTotal, precioLista, precioVenta, linkProducto, imagen) {
     
     var productoCodigo = productoCodigo;
@@ -103,6 +104,7 @@ function agregarProducto(productoCodigo, nombre, stockTotal, precioLista, precio
         newRow.remove();
     });
 
+    //Funcion para ocultar descuento
     function AlternarMaxDescuento() {
         var elemento = newRow.querySelector('#descuento');
         if (elemento.getAttribute('hidden') !== null) {
@@ -113,6 +115,7 @@ function agregarProducto(productoCodigo, nombre, stockTotal, precioLista, precio
     }
 
 };
+
 
 /*
 // Función para guardar los productos en localStorage
@@ -137,6 +140,9 @@ function cargarProductosGuardados() {
 }
 
 */
+
+
+/* // escuchador de eventos para agregar productos
 window.addEventListener('DOMContentLoaded', function() {
     // Asignar el evento click al botón agregar_productos (siempre que exista)
     var botonAgregarProductos = document.getElementById('agregar_productos');
@@ -144,7 +150,7 @@ window.addEventListener('DOMContentLoaded', function() {
         botonAgregarProductos.addEventListener('click', agregarProducto);
     }
 
-});
+}); */
 
 
 function togglePassword() {
