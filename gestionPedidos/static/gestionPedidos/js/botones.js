@@ -118,10 +118,9 @@ function agregarProducto(productoCodigo, nombre, stockTotal, precioLista, precio
 
 function agergardireccion(){
 
-    var tabladireccion = document.createElement('div');
+    var newRow = document.createElement('tbody');
 
-
-    tabladireccion.innerHTML =`
+    newRow.innerHTML =`
     <div class="col-sm-12" style="width: 100%;height: 10px;"><span>&nbsp;</span></div>
     <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 230px;">
       <div class="row">
@@ -241,11 +240,20 @@ function agergardireccion(){
           <span>&nbsp;</span>
         </div>
       </div>
-    </div>`,
+    </div>`;
 
-   
+    document.getElementById('tab-1').appendChild(newRow);
 
 }
+
+window.addEventListener('DOMContentLoaded', function() {
+    // Asignar el evento click al botón agregar_productos (siempre que exista)
+    var botonAgregarProductos = document.getElementById('agregar_dir');
+    if (botonAgregarProductos) {
+        botonAgregarProductos.addEventListener('click', agergardireccion);
+    }
+
+});
 
 /* tabladireccion.querySelector('#agregar_dir').addEventListener('click', function() {
     agergardireccion();
@@ -275,14 +283,16 @@ function cargarProductosGuardados() {
 }
 
 */
-window.addEventListener('DOMContentLoaded', function() {
+
+
+/* window.addEventListener('DOMContentLoaded', function() {
     // Asignar el evento click al botón agregar_productos (siempre que exista)
     var botonAgregarProductos = document.getElementById('agregar_dir');
     if (botonAgregarProductos) {
         botonAgregarProductos.addEventListener('click', agergardireccion);
     }
 
-});
+}); */
 
 
 function togglePassword() {
