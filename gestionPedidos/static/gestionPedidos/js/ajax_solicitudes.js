@@ -18,10 +18,9 @@ $(document).ready(function(){
                             data-imagen="${resultado.imagen}"
                             data-precio="${resultado.precioVenta}" 
                             data-stockTotal="${resultado.stockTotal}" 
-                            data-precioActual="${resultado.precioVenta}" 
                             data-precioAnterior="${resultado.precioLista}" 
-                            data-maxDescuento="${resultado.linkProducto}">ID: ${resultado.codigo}, Nombre: ${resultado.nombre}, Stock: ${resultado.stockTotal}</p>`); 
-                            console.log('#resultados')
+                            data-maxDescuento="${resultado.dsctoMaxTienda}">ID: ${resultado.codigo}, Nombre: ${resultado.nombre}, Stock: ${resultado.stockTotal}</p>`); 
+                            console.log(resultado)
                         });
                     } else {
                         $('#resultados').text('No se encontraron resultados');
@@ -41,10 +40,18 @@ $(document).ready(function(){
         var imagen = $(this).data('imagen');
         var precioVenta = $(this).data('precio');
         var stockTotal = $(this).data('stockTotal');
-        var precioVenta = $(this).data('precioActual');
         var precioLista = $(this).data('precioAnterior');
-        var linkProducto = $(this).data('maxDescuento');
+        var precioDescuento = $(this).data('maxDescuento');
+        //prueba
+        console.log("Código:", codigo);
+        console.log("Nombre:", nombre);
+        console.log("Imagen:", imagen);
+        console.log("Precio de venta:", precioVenta);
+        console.log("Stock total:", stockTotal);
+        console.log("Precio anterior:", precioLista);
+        console.log("Precio de descuento máximo:", precioDescuento);
         // Llamar a la función agregarProducto() con los valores obtenidos
-        agregarProducto(codigo, nombre, imagen);
+        agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento);
+        
     });
 });
