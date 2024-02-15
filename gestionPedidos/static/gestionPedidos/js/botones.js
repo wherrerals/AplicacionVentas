@@ -1,4 +1,13 @@
-function agregarProducto(productoCodigo, nombre, stockTotal, precioVenta, precioLista, dsctoMaxTienda) {
+function agregarProducto(productoCodigo, nombre, stockTotal, precioLista, precioVenta, linkProducto, imagen) {
+    
+    var productoCodigo = productoCodigo;
+    var nombre = nombre;
+    var stockTotal = stockTotal;
+    var precioLista = precioLista;
+    var precioVenta = precioVenta;
+    var linkProducto = linkProducto;
+    var imagen = imagen;
+    
     // Crear una nueva fila
     var newRow = document.createElement('tbody');
 
@@ -11,7 +20,7 @@ function agregarProducto(productoCodigo, nombre, stockTotal, precioVenta, precio
             <small>1)</small><small>&nbsp;&nbsp;</small><small style="font-weight-bold">${productoCodigo}</small>
             </div>
             <div class="col-md-11 col-xxl-7" style="text-align: center;">
-                <img src="https://ledstudiocl.vtexassets.com/arquivos/ids/166187-80-auto/label-0.jpg" width="50" height="50" style="width: 50px;height: 50px;">
+                <img src="${imagen}" width="50" height="50" style="width: 50px;height: 50px;">
             </div>
         </div>
     </td>
@@ -28,7 +37,7 @@ function agregarProducto(productoCodigo, nombre, stockTotal, precioVenta, precio
               </select>
             </div>
             <div class="col" style="text-align: center;>
-                <small style="font-size: 12px;">Stock: ${stockTotal}</small>
+                <small style="font-size: 12px;">Stock:${stockTotal}</small>
             </div>
         </div>
     </td>
@@ -46,7 +55,7 @@ function agregarProducto(productoCodigo, nombre, stockTotal, precioVenta, precio
                 </svg>
             </div>
             <div class="col-sm-7 col-md-8">
-                <small style="color: rgb(255,0,0);" id="descuento" hidden>Max: ${dsctoMaxTienda}</small>
+                <small style="color: rgb(255,0,0);" id="descuento" hidden>Max: ${linkProducto}</small>
             </div>
         </div>
     </td>

@@ -245,8 +245,9 @@ def busquedaProductos(request):
         # Convierte los resultados en una lista de diccionarios
         resultados_formateados = [{'codigo': producto.codigo,
                                    'nombre': producto.nombre,
+                                   'imagen': producto.imagen,
                                    'precio': producto.precioVenta,
-                                   'stock': producto.stockTotal,
+                                   'stockTotal': producto.stockTotal,
                                    'precioActual': producto.precioVenta,
                                    'precioAnterior': producto.precioLista,
                                    'maxDescuento': producto.dsctoMaxTienda} for producto in resultados]

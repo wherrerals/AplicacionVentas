@@ -14,12 +14,14 @@ $(document).ready(function(){
                         data.resultados.forEach(function(resultado){
                             $('#resultados').append(`<p class="agregar_productos" 
                             data-codigo="${resultado.codigo}" 
-                            data-nombre="${resultado.nombre}" 
+                            data-nombre="${resultado.nombre}"
+                            data-imagen="${resultado.imagen}"
                             data-precio="${resultado.precioVenta}" 
-                            data-stock="${resultado.stockTotal}" 
-                            data-precio-actual="${resultado.precioVenta}" 
-                            data-precio-anterior="${resultado.precioLista}" 
-                            data-max-descuento="${resultado.dsctoMaxTienda}">ID: ${resultado.codigo}, Nombre: ${resultado.nombre}, Stock: ${resultado.stock}</p>`); 
+                            data-stockTotal="${resultado.stockTotal}" 
+                            data-precioActual="${resultado.precioVenta}" 
+                            data-precioAnterior="${resultado.precioLista}" 
+                            data-maxDescuento="${resultado.linkProducto}">ID: ${resultado.codigo}, Nombre: ${resultado.nombre}, Stock: ${resultado.stockTotal}</p>`); 
+                            console.log('#resultados')
                         });
                     } else {
                         $('#resultados').text('No se encontraron resultados');
@@ -36,12 +38,13 @@ $(document).ready(function(){
         // Obtener los datos del producto seleccionado
         var codigo = $(this).data('codigo');
         var nombre = $(this).data('nombre');
+        var imagen = $(this).data('imagen');
         var precioVenta = $(this).data('precio');
-        var stockTotal = $(this).data('stock');
-        var precioVenta = $(this).data('precio-actual');
-        var precioLista = $(this).data('precio-anterior');
-        var dsctoMaxTienda = $(this).data('max-descuento');
+        var stockTotal = $(this).data('stockTotal');
+        var precioVenta = $(this).data('precioActual');
+        var precioLista = $(this).data('precioAnterior');
+        var linkProducto = $(this).data('maxDescuento');
         // Llamar a la función agregarProducto() con los valores obtenidos
-        agregarProducto(codigo, nombre, stockTotal, precioVenta, precioLista, dsctoMaxTienda);
+        agregarProducto(codigo, nombre, imagen);
     });
 });
