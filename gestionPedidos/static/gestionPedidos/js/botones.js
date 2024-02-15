@@ -120,6 +120,7 @@ function agergardireccion(){
 
     var tabladireccion = document.createElement('div');
 
+
     tabladireccion.innerHTML =`
     <div class="col-sm-12" style="width: 100%;height: 10px;"><span>&nbsp;</span></div>
     <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 230px;">
@@ -242,7 +243,7 @@ function agergardireccion(){
       </div>
     </div>`,
 
-    document.getElementById('tab-1').appendChild(tabladreccion);
+   
 
 }
 
