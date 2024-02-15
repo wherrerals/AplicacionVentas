@@ -39,6 +39,12 @@ def cotizacion(request):
         return render(request, 'cotizacion.html', {'username': username})
     else:
         return render(request, "cotizacion.html")
+    
+@login_required #Implementada para menus de opciones con regiones
+def regiones(request):
+    regiones = Region.objects.all()
+    return render(request, 'cotizacion.html', {'regiones': regiones})
+
 
 @login_required
 def lista_ovs(request):
