@@ -83,9 +83,10 @@
             <div class="col-sm-3" style="width: 27%;"><label class="col-form-label"
                 style="font-size: 13px;">Cliente</label></div>
             <div class="col-sm-6 col-md-6" style="text-align: left;width: 58%;padding-right: 0px;">
-              <input class="form-control" type="text" name="cliente" style="border-color: rgb(159,168,175);font-size: 12px;" id="inputCliente">
+              <input class="form-control" type="text" name="cliente"
+                style="border-color: rgb(159,168,175);font-size: 12px;" id="inputCliente">
             </div>
-            <div div id="resultados_clientes"></div>
+
             <div class="col" style="width: 15%;text-align: left;padding-left: 0px;padding-right: 0px;">
               <!-- Start: Modal -->
               <div><button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#clienteModal"
@@ -1510,42 +1511,32 @@
       <div class="row">
         <div class="col" style="padding: 0px;">
           <div class="table-responsive">
-            <table class="table">
+            <table class="table" id="productos">
               <thead>
                 <tr style="color: var(--bs-table-striped-bg);background: var(--bs-body-color);">
-                  <th
-                    style="font-size: 10px;width: 15%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
+                  <th style="font-size: 10px;width: 15%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
                     # Código</th>
-                  <th
-                    style="font-size: 10px;width: 20%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
+                  <th style="font-size: 10px;width: 20%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
                     Bodega</th>
-                  <th
-                    style="font-size: 10px;width: 15%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
+                  <th style="font-size: 10px;width: 15%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
                     Precio</th>
-                  <th
-                    style="font-size: 10px;width: 10%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
+                  <th style="font-size: 10px;width: 10%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
                     Dcto</th>
                   <th
                     style="font-size: 10px;width: 15%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);text-align: center;">
                     Precio Dcto</th>
-                  <th
-                    style="font-size: 10px;width: 10%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
+                  <th style="font-size: 10px;width: 10%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
                     Cant</th>
                   <th
                     style="font-size: 10px;width: 15%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);text-align: center;">
                     Total</th>
                 </tr>
               </thead>
-
+            </table>
           </div>
         </div>
       </div>
-      <tbody id="productos">
-        <!-- Agregar productos -->
-      </tbody>
-      <table>
-        <!--No se que hace el table pero da estructura al html :)-->
-      </table>
+
       <div class="row">
         <div class="col">
           <p></p>
@@ -1559,8 +1550,8 @@
           <input class="form-control" type="text" style="font-size: 12px;" id="inputNumero">
           <div id="resultados"></div>
         </div>
-        <div class="col"><button class="btn btn-primary" type="button" style="font-size: 12px;" id="agregar_productos"
-            hidden>Agregar</button></div>
+        <div class="col"><button class="btn btn-primary" type="button" style="font-size: 12px;" id="agregar_productos" hidden
+            >Agregar</button></div>
       </div>
       <div class="row">
         <div class="col">

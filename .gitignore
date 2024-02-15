@@ -1,2 +1,12 @@
 AplicacionVentas/AplicacionVentas/settings.py
+
 __pycache__/
+
+__pycache__
+
+AplicacionVentas/__pycache__/
+
+AplicacionVentas/__pycache__
+
+#ignorar cache de python
+*.pyc
