@@ -10,6 +10,7 @@ class Usuario(models.Model):
         verbose_name = 'usuario'
         verbose_name_plural = 'usuario'
 
+    #user = models.OneToOneField(User,on_delete=models.CASCADE, default=1)
     nombre = models.CharField(max_length=50)
     email = models.EmailField()
     telefono = models.CharField(max_length=15)
@@ -18,14 +19,14 @@ class Usuario(models.Model):
     def __str__(self):
         return f'{self.nombre}'
 
-class Pais(models.Model):
+""" class Pais(models.Model): se comenta, pues se considera el pais no es necesario mantenerlo como entidad
     class Meta:
         db_table = 'Pais'
         verbose_name = 'Pais'
         verbose_name_plural = 'Pais'
 
     codigo = models.CharField(max_length=50,null = False)
-    nombre = models.CharField(max_length=50,null = False)
+    nombre = models.CharField(max_length=50,null = False) """
 
 class Region(models.Model):
     class Meta:
@@ -34,9 +35,9 @@ class Region(models.Model):
         verbose_name = 'Region'
         verbose_name_plural = 'Region'
 
-    codigo = models.CharField(max_length=50,null = False)
+    numero = models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=50,null = False)
-    pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
+    #pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1) Al eliminar pais, esto queda comentado 
 
 class Comuna(models.Model):
     class Meta:
@@ -47,7 +48,8 @@ class Comuna(models.Model):
         
     codigo = models.CharField(max_length=50,null = False)
     nombre = models.CharField(max_length=50,null = False)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE, default=1)
+    #region = models.ForeignKey(Region, on_delete=models.CASCADE)#Se elimina campo default = 1, no se considera necesario
+    
 
 class TipoDireccion(models.Model):
     class Meta:
@@ -63,8 +65,8 @@ class TipoTelefono(models.Model):
     class Meta:
         db_table = "TipoTelefono"
 
-        verbose_name = 'TipoDireccion'
-        verbose_name_plural = 'TipoDireccion'
+        verbose_name = 'TipoTelefono'
+        verbose_name_plural = 'TipoTelefono'
 
     tipo = models.CharField(max_length=50,null = False)
 
@@ -88,7 +90,7 @@ class SocioNegocio(models.Model):
     tipotelefono = models.ForeignKey(TipoTelefono, on_delete=models.CASCADE, default=1)
 
 
-class Direccion(models.Model):
+""" class Direccion(models.Model):
     class Meta:
         db_table = "Direccion"
 
@@ -101,7 +103,23 @@ class Direccion(models.Model):
     comuna = models.CharField(max_length=50,null = False)
     calleNumero = models.CharField(max_length=50)
     codigoImpuesto = models.CharField(max_length=100, default='iva')
-    tipoDireccion = models.ManyToManyField(TipoDireccion, related_name='directorios')
+    tipoDireccion = models.ManyToManyField(TipoDireccion, related_name='directorios') """
+
+class Direccion(models.Model):
+    class Meta:
+        db_table = "Direccion"
+
+        verbose_name = 'Direccion'
+        verbose_name_plural = 'Direccion'
+
+    rowNum = models.IntegerField()
+    nombreDireccion = models.CharField(max_length=50,null = False)
+    comuna = models.ForeignKey(Comuna,on_delete=models.CASCADE)
+    region = models.ForeignKey(Region,on_delete=models.CASCADE)
+    pais = models.CharField(max_length=10, default ='Chile')
+    calleNumero = models.CharField(max_length=50)
+    codigoImpuesto = models.CharField(max_length=100, default='iva')
+    tipoDireccion = models.ManyToManyField(TipoDireccion, related_name='directorios') 
 
 class TipoTelefono():
     codigo = models.IntegerField()
@@ -113,8 +131,8 @@ class Contacto(models.Model):
     class Meta:
         db_table = "Contacto"
         
-        verbose_name = 'Direccion'
-        verbose_name_plural = 'Direccion'
+        verbose_name = 'Contacto'
+        verbose_name_plural = 'Contacto'
 
     codigoInternoSap = models.IntegerField()
     nombreCompleto = models.CharField(max_length=255)
@@ -206,6 +224,7 @@ class Producto(models.Model):
     dsctoMaxTienda = models.FloatField()
     dctoMaxProyectos = models.FloatField()
     linkProducto = models.CharField(max_length=255,null = False)
+
 
 class Bodega(models.Model):
     class Meta:

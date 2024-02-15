@@ -6,6 +6,9 @@ from django.views import View
 from django.http import JsonResponse
 from django.views import View
 from django.contrib.auth.hashers import make_password
+from django.db import transaction
+from django.core import serializers
+
 
 @login_required
 def home(request):
@@ -32,10 +35,16 @@ def lista_cotizaciones(request):
 def cotizacion(request):
     if request.user.is_authenticated:
         # Acceder al nombre de usuario
-        first_name = request.user.first_name
-        return render(request, 'cotizacion.html', {'first_name': first_name})
+        username = request.user.username
+        return render(request, 'cotizacion.html', {'username': username})
     else:
         return render(request, "cotizacion.html")
+    
+@login_required #Implementada para menus de opciones con regiones
+def regiones(request):
+    regiones = Region.objects.all()
+    return render(request, 'cotizacion.html', {'regiones': regiones})
+
 
 @login_required
 def lista_ovs(request):
@@ -58,6 +67,7 @@ def micuenta(request):
 
     return render(request, "micuenta.html")
 
+@transaction.atomic
 @login_required
 def registrarCuenta(request):
     nombre = request.POST['nombre']
@@ -208,7 +218,60 @@ class Funciones(View):
         resultado = self.constructor_url()
     
         return HttpResponse('Todo ok')
-    
+
+def obtenerDatosProducto(request, producto_id):
+    producto = Producto.objects.get(id=producto_id)
+    data = {
+        'productoCodigo': producto.codigo,
+        'stock': producto.stock,
+        'precioActual': str(producto.precio_actual),
+        'precioAnterior': str(producto.precio_anterior),
+        'maxDescuento': producto.max_descuento,       
+    }
+
+    return JsonResponse(data)
+
+
+"""def busquedaProductos(request):
+    if request.method == 'GET' and 'numero' in request.GET:
+        numero = request.GET.get('numero')
+        # Realiza la consulta a la base de datos para obtener los resultados
+        resultados = Producto.objects.filter(codigo__icontains=numero)
+        # Convierte los resultados en una lista de diccionarios
+        resultados_formateados = [{'codigo': producto.codigo, 'nombre': producto.nombre} for producto in resultados]
+        return JsonResponse({'resultados': resultados_formateados})
+    else:
+        return JsonResponse({'error': 'No se proporcionó un número válido'})"""
+
+def busquedaProductos(request):
+    if request.method == 'GET' and 'numero' in request.GET:
+        numero = request.GET.get('numero')
+        # Realiza la consulta a la base de datos para obtener los resultados
+        resultados = Producto.objects.filter(codigo__icontains=numero)
+        # Convierte los resultados en una lista de diccionarios
+        resultados_formateados = [{'codigo': producto.codigo,
+                                   'nombre': producto.nombre,
+                                   'imagen': producto.imagen,
+                                   'precio': producto.precioVenta,
+                                   'stockTotal': producto.stockTotal,
+                                   'precioActual': producto.precioVenta,
+                                   'precioAnterior': producto.precioLista,
+                                   'maxDescuento': producto.dsctoMaxTienda} for producto in resultados]
+        return JsonResponse({'resultados': resultados_formateados})
+    else:
+        return JsonResponse({'error': 'No se proporcionó un número válido'})
+
+def busquedaClientes(request):
+    if request.method == 'GET' and 'numero' in request.GET:
+        numero = request.GET.get('numero')
+        # Realiza la consulta a la base de datos para obtener los resultados
+        resultados = SocioNegocio.objects.filter(rut__icontains=numero)
+        # Convierte los resultados en una lista de diccionarios
+        resultados_formateados = [{'nombre': producto.codigo, 'nombre': producto.nombre} for producto in resultados]
+        return JsonResponse({'resultados': resultados_formateados})
+    else:
+        return JsonResponse({'error': 'No se proporcionó un número válido'})
+
 def validar_contrasena(password):
     mensajes = []
 
