@@ -17,7 +17,7 @@ $(document).ready(function(){
                             // Convertir valores a números si son cadenas
                             resultado.precio = parseFloat(resultado.precio);
                             resultado.precioAnterior = resultado.precioAnterior;
-                            resultado.maxdescuento = parseFloat(resultado.maxdescuento);
+                            resultado.maxDescuento = parseFloat(resultado.maxDescuento);
                             resultado.stockTotal = parseInt(resultado.stockTotal);
                             
                             // Agregar elementos al resultado
@@ -29,7 +29,7 @@ $(document).ready(function(){
                             productoElemento.setAttribute('data-precio', resultado.precio);
                             productoElemento.setAttribute('data-stockTotal', resultado.stockTotal);
                             productoElemento.setAttribute('data-precioAnterior', resultado.precioAnterior);
-                            productoElemento.setAttribute('data-maxDescuento', resultado.maxdescuento);
+                            productoElemento.setAttribute('data-maxDescuento', resultado.maxDescuento);
                             productoElemento.textContent = `ID: ${resultado.codigo}, Nombre: ${resultado.nombre}, Stock: ${resultado.stockTotal}`;
 
                             // Agregar evento de clic al elemento
