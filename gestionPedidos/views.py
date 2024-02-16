@@ -250,7 +250,14 @@ def busquedaProductos(request):
                                    'stockTotal': producto.stockTotal,
                                    'precioAnterior': producto.precioLista,
                                    'maxDescuento': producto.dsctoMaxTienda} for producto in resultados]
-        print(resultados_formateados)
+        for producto in resultados_formateados:
+            print(f'Tipo de dato de codigo: {type(producto["codigo"])}')
+            print(f'Tipo de dato de nombre: {type(producto["nombre"])}')
+            print(f'Tipo de dato de imagen: {type(producto["imagen"])}')
+            print(f'Tipo de dato de precio: {type(producto["precio"])}')
+            print(f'Tipo de dato de stockTotal: {type(producto["stockTotal"])}')
+            print(f'Tipo de dato de precioAnterior: {type(producto["precioAnterior"])}')
+            print(f'Tipo de dato de maxDescuento: {type(producto["maxDescuento"])}')
         return JsonResponse({'resultados': resultados_formateados})
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})

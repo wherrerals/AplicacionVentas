@@ -1,4 +1,13 @@
 function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento) {
+
+    console.log("Agregando producto:");
+    console.log("Código:", productoCodigo);
+    console.log("Nombre:", nombre);
+    console.log("Imagen:", imagen);
+    console.log("Precio de venta:", precioVenta);
+    console.log("Stock total:", stockTotal);
+    console.log("Precio anterior:", precioLista);
+    console.log("Precio de descuento máximo:", precioDescuento);
     
     // Crear una nueva fila
     var newRow = document.createElement('tbody');
@@ -56,7 +65,7 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
             <input class="form-control" type="text" style="font-size: 12px;width: 40px;">
         </div>
     </td>
-    <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">${precioVenta}</td>
+    <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">${precioDescuento}</td>
     <td style="font-size: 12px;background: transparent;border-style: none;">
         <input class="form-control" type="text" style="width: 65px;">
     </td>
@@ -303,3 +312,5 @@ function togglePassword() {
 }
 
 togglePassword();
+
+agregarProducto(C25500123,"WILLIAM ALEXIS HERRERA", "ISO.JPG", 2000.00, 50, 150.00, 500.0)
