@@ -281,3 +281,9 @@ def validar_contrasena(password):
         mensajes.append("Su contraseña debe tener al menos 8 caracteres.")
 
     return mensajes 
+
+
+def probando(request):
+    HttpResponse('hola mundo')
+
+    return HttpResponse

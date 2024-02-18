@@ -1,5 +1,7 @@
 AplicacionVentas/AplicacionVentas/settings.py
 
+AplicacionVentas/ __pycache__
 
+gestionPedidos/__pycache__/models.cpython-312.pyc
 #ignorar cache de python
 *.pyc
