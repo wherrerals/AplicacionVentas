@@ -1,5 +1,6 @@
 function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento) {
 
+    var descuento = precioVenta - precioLista;
     console.log("Agregando producto:");
     console.log("Código:", productoCodigo);
     console.log("Nombre:", nombre);
@@ -8,6 +9,9 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     console.log("Stock total:", stockTotal);
     console.log("Precio anterior:", precioLista);
     console.log("Precio de descuento máximo:", precioDescuento);
+    console.log("calculo descuento", descuento);
+
+    
     
     // Crear una nueva fila
     var newRow = document.createElement('tbody');
@@ -18,10 +22,10 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     <td style="font-size: 12px; background: transparent; border-style: none; padding-bottom: 0px;" rowspan="2">
         <div class="row">
             <div class="col-md-11 col-xxl-6" style="font-size: 14px; font-weight: bold;">
-            <small>1)</small><small>&nbsp;&nbsp;</small><small style="font-weight-bold">${productoCodigo}</small>
+            <small>1)</small><small>&nbsp;&nbsp;</small><small style="font-weight-bold" name="sku_producto">${productoCodigo}</small>
             </div>
             <div class="col-md-11 col-xxl-7" style="text-align: center;">
-                <img src="${imagen}" width="50" height="50" style="width: 50px;height: 50px;">
+                <img src="${imagen}" width="50" height="50" style="width: 50px;height: 50px;" name="img_producto">
             </div>
         </div>
     </td>
@@ -65,7 +69,7 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
             <input class="form-control" type="text" style="font-size: 12px;width: 40px;">
         </div>
     </td>
-    <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">${precioDescuento}</td>
+    <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">${descuento}</td>
     <td style="font-size: 12px;background: transparent;border-style: none;">
         <input class="form-control" type="text" style="width: 65px;">
     </td>
@@ -91,6 +95,7 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     </tr>
     `;
 
+
     
     // Agregar la fila a la tabla
     document.getElementById('productos').appendChild(newRow);
@@ -113,7 +118,8 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
             elemento.setAttribute('hidden', '');
         }
     }
-
+    
+    return resultado;
 };
 
 
