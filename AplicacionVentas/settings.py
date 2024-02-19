@@ -54,11 +54,12 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'AplicacionVentas.urls'
-
+#/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/gestionPedidos
+#/Users/nicor/Universidad/Practica/AplicacionVentas/gestionPedidos/templates/gestionPedidos
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
+        'DIRS': ['/Users/nicor/Universidad/Practica/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
         
         'APP_DIRS': True,
         'OPTIONS': {
@@ -83,12 +84,15 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
         'USER':'root',
-        'PASSWORD':'Ea7hava5*',
+        'PASSWORD':'qwerty',
         'HOST':'localhost',
         'PORT':'3306',
     }
 }
 
+#python ./manage.py makemigrations gestionPedidos
+#python ./manage.py sqlmigrate gestionPedidos 0001
+#python ./manage.py migrate
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

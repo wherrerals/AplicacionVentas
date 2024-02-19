@@ -48,7 +48,7 @@ class Comuna(models.Model):
         
     codigo = models.CharField(max_length=50,null = False)
     nombre = models.CharField(max_length=50,null = False)
-    #region = models.ForeignKey(Region, on_delete=models.CASCADE)#Se elimina campo default = 1, no se considera necesario
+    region = models.ForeignKey(Region, on_delete=models.CASCADE,to_field='numero', default=1)#Se elimina campo default = 1, no se considera necesario
     
 
 class TipoDireccion(models.Model):
@@ -114,8 +114,8 @@ class Direccion(models.Model):
 
     rowNum = models.IntegerField()
     nombreDireccion = models.CharField(max_length=50,null = False)
-    comuna = models.ForeignKey(Comuna,on_delete=models.CASCADE)
-    region = models.ForeignKey(Region,on_delete=models.CASCADE)
+    comuna = models.ForeignKey(Comuna,on_delete=models.CASCADE, default=1)
+    region = models.ForeignKey(Region,on_delete=models.CASCADE, default=1)
     pais = models.CharField(max_length=10, default ='Chile')
     calleNumero = models.CharField(max_length=50)
     codigoImpuesto = models.CharField(max_length=100, default='iva')
