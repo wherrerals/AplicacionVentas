@@ -1,4 +1,5 @@
-AplicacionVentas/AplicacionVentas/settings.py
+# no lo ignora porque se tiene que agregar
+AplicacionVentas/AplicacionVentas/settings.py 
 
 __pycache__/
 

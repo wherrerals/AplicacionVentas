@@ -226,7 +226,7 @@ def obtenerDatosProducto(request, producto_id):
     return JsonResponse(data)
 
 
-"""def busquedaProductos(request):
+def busquedaProductos(request):
     if request.method == 'GET' and 'numero' in request.GET:
         numero = request.GET.get('numero')
         # Realiza la consulta a la base de datos para obtener los resultados
@@ -235,7 +235,7 @@ def obtenerDatosProducto(request, producto_id):
         resultados_formateados = [{'codigo': producto.codigo, 'nombre': producto.nombre} for producto in resultados]
         return JsonResponse({'resultados': resultados_formateados})
     else:
-        return JsonResponse({'error': 'No se proporcionó un número válido'})"""
+        return JsonResponse({'error': 'No se proporcionó un número válido'})
 
 def busquedaProductos(request):
     if request.method == 'GET' and 'numero' in request.GET:
@@ -248,23 +248,13 @@ def busquedaProductos(request):
                                    'imagen': producto.imagen,
                                    'precio': producto.precioVenta,
                                    'stockTotal': producto.stockTotal,
-                                   'precioActual': producto.precioVenta,
                                    'precioAnterior': producto.precioLista,
                                    'maxDescuento': producto.dsctoMaxTienda} for producto in resultados]
         return JsonResponse({'resultados': resultados_formateados})
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
 
-def busquedaClientes(request):
-    if request.method == 'GET' and 'numero' in request.GET:
-        numero = request.GET.get('numero')
-        # Realiza la consulta a la base de datos para obtener los resultados
-        resultados = SocioNegocio.objects.filter(rut__icontains=numero)
-        # Convierte los resultados en una lista de diccionarios
-        resultados_formateados = [{'nombre': producto.codigo, 'nombre': producto.nombre} for producto in resultados]
-        return JsonResponse({'resultados': resultados_formateados})
-    else:
-        return JsonResponse({'error': 'No se proporcionó un número válido'})
+
 
 def validar_contrasena(password):
     mensajes = []

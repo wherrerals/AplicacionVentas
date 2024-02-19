@@ -5,6 +5,4 @@ App gestionPedidios - Informacion de Versiones
 -Js
 -Bootstrap: 5.3
 -MySQL 
--install django-cors-headers
-
 

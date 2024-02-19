@@ -1,50 +1,57 @@
 $(document).ready(function(){
-    $('#inputNumero').on('input', function(){
+    $('#inputNumero').on('input', function(){ //escucha el evento de entrada en input con #inputNumero
         var numero = $(this).val();
         if(numero){
-            $.ajax({
-                url: 'buscar/',
+            $.ajax({ //realiza una solicitud ajax al servidor a la url buscar/
+                url: 'buscar/', 
                 data: {
-                    'numero': numero
+                    'numero': numero //envia los datos ingresados por el usuario al servidor (sku)
                 },
-                dataType: 'json',
-                success: function(data){
-                    $('#resultados').empty();
-                    if(data.resultados && data.resultados.length > 0){
-                        data.resultados.forEach(function(resultado){
-                            $('#resultados').append(`<p class="agregar_productos" 
-                            data-codigo="${resultado.codigo}" 
-                            data-nombre="${resultado.nombre}"
-                            data-imagen="${resultado.imagen}"
-                            data-precio="${resultado.precioVenta}" 
-                            data-stockTotal="${resultado.stockTotal}" 
-                            data-precioActual="${resultado.precioVenta}" 
-                            data-precioAnterior="${resultado.precioLista}" 
-                            data-maxDescuento="${resultado.linkProducto}">ID: ${resultado.codigo}, Nombre: ${resultado.nombre}, Stock: ${resultado.stockTotal}</p>`); 
-                            console.log('#resultados')
+                dataType: 'json',  //indica el formato en el que espera los datos
+                success: function(data){ // si la respuesta del servidor es exitosa se ejecuta la funcion
+                    $('#resultados').empty(); //limpia resultados anteriores
+                    if(data.resultados && data.resultados.length > 0){ //comprueba si hay resultados y si estos son mayores que 0
+                        data.resultados.forEach(function(resultado){ // si se obtienen resultados itera sonbre estos para realizar:
+                            // Convertir valores a números si son cadenas
+                            resultado.precio = parseFloat(resultado.precio);
+                            resultado.precioAnterior = resultado.precioAnterior;
+                            resultado.maxDescuento = parseFloat(resultado.maxDescuento);
+                            resultado.stockTotal = parseInt(resultado.stockTotal);
+                            
+                            // Agregar elementos al resultado
+                            var productoElemento = document.createElement('p');
+                            productoElemento.className = 'agregar_productos';
+                            productoElemento.setAttribute('data-codigo', resultado.codigo);
+                            productoElemento.setAttribute('data-nombre', resultado.nombre);
+                            productoElemento.setAttribute('data-imagen', resultado.imagen);
+                            productoElemento.setAttribute('data-precio', resultado.precio);
+                            productoElemento.setAttribute('data-stockTotal', resultado.stockTotal);
+                            productoElemento.setAttribute('data-precioAnterior', resultado.precioAnterior);
+                            productoElemento.setAttribute('data-maxDescuento', resultado.maxDescuento);
+                            productoElemento.textContent = `ID: ${resultado.codigo} | Nombre: ${resultado.nombre} | Stock: ${resultado.stockTotal}`;
+
+                            // Agregar evento de clic al elemento
+                            productoElemento.addEventListener('click', function() {
+                                var codigo = this.getAttribute('data-codigo');
+                                var nombre = this.getAttribute('data-nombre');
+                                var imagen = this.getAttribute('data-imagen');
+                                var precioVenta = parseFloat(this.getAttribute('data-precio'));
+                                var stockTotal = parseInt(this.getAttribute('data-stockTotal'));
+                                var precioLista = parseFloat(this.getAttribute('data-precioAnterior'));
+                                var precioDescuento = parseFloat(this.getAttribute('data-maxDescuento'));
+                                
+                                agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento); //ejecuta la funcion agregar producto
+                            });
+
+                            $('#resultados').append(productoElemento); //agrega los resultados en el contenedor 
                         });
                     } else {
-                        $('#resultados').text('No se encontraron resultados');
+                        $('#resultados').text('No se encontraron resultados'); //si no encuentra resultados muestra el mensaje
                     }
                 }
             });
         } else {
-            $('#resultados').empty();
+            $('#resultados').empty(); // si el usuario elimina el codito borra todos los resultados.
         }
-    });
-
-    // Delegación de eventos para el clic en los elementos con clase 'agregar_productos'
-    $('#resultados').on('click', '.agregar_productos', function() {
-        // Obtener los datos del producto seleccionado
-        var codigo = $(this).data('codigo');
-        var nombre = $(this).data('nombre');
-        var imagen = $(this).data('imagen');
-        var precioVenta = $(this).data('precio');
-        var stockTotal = $(this).data('stockTotal');
-        var precioVenta = $(this).data('precioActual');
-        var precioLista = $(this).data('precioAnterior');
-        var linkProducto = $(this).data('maxDescuento');
-        // Llamar a la función agregarProducto() con los valores obtenidos
-        agregarProducto(codigo, nombre, imagen);
     });
 });
