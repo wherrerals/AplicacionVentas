@@ -1,7 +1,13 @@
-#ignorar cambios en modulo settings
-AplicacionVentas/AplicacionVentas/settings.py
+# no lo ignora porque se tiene que agregar
+AplicacionVentas/AplicacionVentas/settings.py 
 
-#ignorar cache p
+__pycache__/
+
+__pycache__
+
+AplicacionVentas/__pycache__/
+
+AplicacionVentas/__pycache__
 
 #ignorar cache de python
 *.pyc
