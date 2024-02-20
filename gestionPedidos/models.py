@@ -77,17 +77,19 @@ class SocioNegocio(models.Model):
     nombre = models.CharField(max_length=50,null = False)
     apellido = models.CharField(max_length=50,null = False)
     razonSocial = models.CharField(max_length=255,null = False)
-    codigoSN = models.CharField(max_length=255,null = False)
+    codigoSN = models.CharField(max_length=255) #Posible llave primaria
     rut = models.CharField(max_length=255,null = False)
     email = models.EmailField()
     telefono = models.CharField(max_length=10)
     giro = models.CharField(max_length=50,null = False)
-    alias = models.CharField(max_length=55,null = False)
-    condicionPago = models.IntegerField(default=-1,null = False)
-    plazoReclamaciones = models.CharField(max_length=255, default="STANDAR",null = False)
-    clienteExportacion = models.CharField(max_length=255, default="N",null = False)
-    vendedor = models.IntegerField(default=-1,null = False)
+    alias = models.CharField(max_length=55)
+    condicionPago = models.IntegerField(default=-1)
+    plazoReclamaciones = models.CharField(max_length=255, default="STANDAR")
+    clienteExportacion = models.CharField(max_length=255, default="N")
+    vendedor = models.IntegerField(default=-1)
     tipotelefono = models.ForeignKey(TipoTelefono, on_delete=models.CASCADE, default=1)
+    contacto_cliente = models.ManyToManyField('Contacto', blank=True)
+
 
 
 """ class Direccion(models.Model):
@@ -119,7 +121,9 @@ class Direccion(models.Model):
     pais = models.CharField(max_length=10, default ='Chile')
     calleNumero = models.CharField(max_length=50)
     codigoImpuesto = models.CharField(max_length=100, default='iva')
-    tipoDireccion = models.ManyToManyField(TipoDireccion, related_name='directorios') 
+    tipoDireccion = models.ManyToManyField(TipoDireccion, related_name='directorios')
+    SocioNegocio = models.ForeignKey(SocioNegocio,on_delete=models.CASCADE, default=1) 
+    
 
 class TipoTelefono():
     codigo = models.IntegerField()
@@ -143,22 +147,23 @@ class Contacto(models.Model):
     email = models.EmailField(null = False)
     #tipotelefono = models.ForeignKey(TipoTelefono, on_delete=models.CASCADE, default=1)
     tipoDireccion = models.ManyToManyField(SocioNegocio, related_name='SociosNegocio')
+    SocioNegocio = models.ManyToManyField('SocioNegocio', blank=True)
  
 class GrupoSN(models.Model):
     codigo = models.IntegerField()
     nombre = models.CharField(max_length=50,null = False)
-    contacto = models.ForeignKey(Contacto, on_delete=models.CASCADE, default=1)
+    SocioNegocio = models.ForeignKey(SocioNegocio, on_delete=models.CASCADE, default=1)
 
 class TipoSN(models.Model):
     codigo = models.IntegerField()
     nombre = models.CharField(max_length=100,null = False) 
     descripcion = models.CharField(max_length=100,null = False)
-    contacto = models.ForeignKey(Contacto, on_delete=models.CASCADE, default=1)
+    SocioNegocio = models.ForeignKey(SocioNegocio, on_delete=models.CASCADE, default=1)
 
 class TipoCliente(models.Model):
     codigo = models.IntegerField()
     nombre = models.CharField(max_length=50,null = False)
-    contacto = models.ForeignKey(Contacto, on_delete=models.CASCADE, default=1)
+    SocioNegocio = models.ForeignKey(SocioNegocio, on_delete=models.CASCADE, default=1)
 
 class TipoDocTributario(models.Model):
     class Meta:
