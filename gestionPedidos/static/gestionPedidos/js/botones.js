@@ -119,7 +119,6 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
         }
     }
     
-    return resultado;
 };
 
 var contdir = 0;
