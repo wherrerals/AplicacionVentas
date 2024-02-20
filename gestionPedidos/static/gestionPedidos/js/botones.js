@@ -115,7 +115,7 @@ function agregarProducto(productoCodigo, nombre, stockTotal, precioLista, precio
 
 };
 
-var contdir = 0
+var contdir = 0;
 function agergardireccion(){
 
     var newRow = document.createElement('tbody');
@@ -255,11 +255,11 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-var contcon = 0
+var contcon = 0;
 function agregarontacto(){
 
     var newRow = document.createElement('tbody')
-    contcon;
+    contcon ++;
     newRow.innerHTML =`
     <div class="col-sm-12" style="width: 100%;height: 10px;"><span>&nbsp;</span></div>
         <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 230px;">
@@ -333,9 +333,8 @@ function agregarontacto(){
                                           <div class="col-sm-12" style="height: 15px;background: transparent;">
                                             <span>&nbsp;</span>
                                           </div>
-                                          <div class="col-sm-12" style="height: 15px;background: var(--bs-body-bg);">
-                                            <span>&nbsp;</span>
-                                          </div>
+                                         
+                                          
                                         </div>
                                       </div>
                                       `;
