@@ -216,8 +216,8 @@ class Producto(models.Model):
         db_table = 'Producto'   
 
     codigo = models.CharField(max_length=50, unique=True)
-    nombre = models.CharField(max_length=50,null = False)
-    imagen = models.CharField(max_length=50)
+    nombre = models.CharField(max_length=255,null = False)
+    imagen = models.CharField(max_length=255)
     stockTotal = models.IntegerField(default=0,null = False)
     precioLista = models.FloatField(null = False)
     precioVenta = models.FloatField(null = False)
