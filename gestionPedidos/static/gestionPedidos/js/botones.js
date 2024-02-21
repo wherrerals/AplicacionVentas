@@ -319,4 +319,3 @@ function togglePassword() {
 
 togglePassword();
 
-agregarProducto(C25500123,"WILLIAM ALEXIS HERRERA", "ISO.JPG", 2000.00, 50, 150.00, 500.0)
