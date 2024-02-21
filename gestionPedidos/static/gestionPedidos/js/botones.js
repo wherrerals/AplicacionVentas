@@ -243,9 +243,7 @@ function agergardireccion(){
       <div class="col-sm-12" style="height: 15px;background: transparent;">
         <span>&nbsp;</span>
       </div>
-      <div class="col-sm-12" style="height: 15px;background: var(--bs-body-bg);">
-        <span>&nbsp;</span>
-      </div>
+      
     </div>
   </div>`;
 
