@@ -87,7 +87,7 @@ class SocioNegocio(models.Model):
     plazoReclamaciones = models.CharField(max_length=255, default="STANDAR")
     clienteExportacion = models.CharField(max_length=255, default="N")
     vendedor = models.IntegerField(default=-1)
-    tipotelefono = models.ForeignKey(TipoTelefono, on_delete=models.CASCADE, default=1)
+    #tipotelefono = models.ForeignKey(TipoTelefono, on_delete=models.CASCADE, default=1)
     contacto_cliente = models.ManyToManyField('Contacto', blank=True)
 
 

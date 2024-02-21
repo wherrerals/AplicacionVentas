@@ -172,16 +172,15 @@ def clientes(request):
 
 @login_required
 def agregar_editar_clientes(request):
-
     if request.method == "POST":
-        nombre = request.POST('nombre')
+        nombre = request.POST['nombre']
         razonSocial = request.POST.get('razonSocial')
-        rut = request.POST('rut')
-        giro = request.POST('giro')
-        telefono = request.POST('telefono')
-        email = request.POST('email')
+        rut = request.POST['rut']
+        giro = request.POST['giro']
+        telefono = request.POST['telefono']
+        email = request.POST['email']
 
-        cliente = SocioNegocio.objects.create(nombre = nombre,razonSocial = razonSocial, rut = rut, giro = giro, telefono = telefono, email=email)
+        cliente = SocioNegocio.objects.create(nombre=nombre, razonSocial=razonSocial, rut=rut, giro=giro, telefono=telefono, email=email)
 
     return redirect("/")
 
