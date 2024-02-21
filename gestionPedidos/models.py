@@ -19,14 +19,14 @@ class Usuario(models.Model):
     def __str__(self):
         return f'{self.nombre}'
 
-class Pais(models.Model):
+""" class Pais(models.Model): se comenta, pues se considera el pais no es necesario mantenerlo como entidad
     class Meta:
         db_table = 'Pais'
         verbose_name = 'Pais'
         verbose_name_plural = 'Pais'
 
     codigo = models.CharField(max_length=50,null = False)
-    nombre = models.CharField(max_length=50,null = False)
+    nombre = models.CharField(max_length=50,null = False) """
 
 class Region(models.Model):
     class Meta:
@@ -35,9 +35,9 @@ class Region(models.Model):
         verbose_name = 'Region'
         verbose_name_plural = 'Region'
 
-    codigo = models.CharField(max_length=50,null = False)
+    numero = models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=50,null = False)
-    pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1)
+    #pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1) Al eliminar pais, esto queda comentado 
 
 class Comuna(models.Model):
     class Meta:
@@ -48,7 +48,8 @@ class Comuna(models.Model):
         
     codigo = models.CharField(max_length=50,null = False)
     nombre = models.CharField(max_length=50,null = False)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE, default=1)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE,to_field='numero', default=1)#Se elimina campo default = 1, no se considera necesario
+    
 
 class TipoDireccion(models.Model):
     class Meta:
@@ -64,8 +65,8 @@ class TipoTelefono(models.Model):
     class Meta:
         db_table = "TipoTelefono"
 
-        verbose_name = 'TipoDireccion'
-        verbose_name_plural = 'TipoDireccion'
+        verbose_name = 'TipoTelefono'
+        verbose_name_plural = 'TipoTelefono'
 
     tipo = models.CharField(max_length=50,null = False)
 
@@ -76,20 +77,22 @@ class SocioNegocio(models.Model):
     nombre = models.CharField(max_length=50,null = False)
     apellido = models.CharField(max_length=50,null = False)
     razonSocial = models.CharField(max_length=255,null = False)
-    codigoSN = models.CharField(max_length=255,null = False)
+    codigoSN = models.CharField(max_length=255) #Posible llave primaria
     rut = models.CharField(max_length=255,null = False)
     email = models.EmailField()
     telefono = models.CharField(max_length=10)
     giro = models.CharField(max_length=50,null = False)
-    alias = models.CharField(max_length=55,null = False)
-    condicionPago = models.IntegerField(default=-1,null = False)
-    plazoReclamaciones = models.CharField(max_length=255, default="STANDAR",null = False)
-    clienteExportacion = models.CharField(max_length=255, default="N",null = False)
-    vendedor = models.IntegerField(default=-1,null = False)
-    tipotelefono = models.ForeignKey(TipoTelefono, on_delete=models.CASCADE, default=1)
+    alias = models.CharField(max_length=55)
+    condicionPago = models.IntegerField(default=-1)
+    plazoReclamaciones = models.CharField(max_length=255, default="STANDAR")
+    clienteExportacion = models.CharField(max_length=255, default="N")
+    vendedor = models.IntegerField(default=-1)
+    #tipotelefono = models.ForeignKey(TipoTelefono, on_delete=models.CASCADE, default=1)
+    contacto_cliente = models.ManyToManyField('Contacto', blank=True)
 
 
-class Direccion(models.Model):
+
+""" class Direccion(models.Model):
     class Meta:
         db_table = "Direccion"
 
@@ -102,7 +105,25 @@ class Direccion(models.Model):
     comuna = models.CharField(max_length=50,null = False)
     calleNumero = models.CharField(max_length=50)
     codigoImpuesto = models.CharField(max_length=100, default='iva')
+    tipoDireccion = models.ManyToManyField(TipoDireccion, related_name='directorios') """
+
+class Direccion(models.Model):
+    class Meta:
+        db_table = "Direccion"
+
+        verbose_name = 'Direccion'
+        verbose_name_plural = 'Direccion'
+
+    rowNum = models.IntegerField()
+    nombreDireccion = models.CharField(max_length=50,null = False)
+    comuna = models.ForeignKey(Comuna,on_delete=models.CASCADE, default=1)
+    region = models.ForeignKey(Region,on_delete=models.CASCADE, default=1)
+    pais = models.CharField(max_length=10, default ='Chile')
+    calleNumero = models.CharField(max_length=50)
+    codigoImpuesto = models.CharField(max_length=100, default='iva')
     tipoDireccion = models.ManyToManyField(TipoDireccion, related_name='directorios')
+    SocioNegocio = models.ForeignKey(SocioNegocio,on_delete=models.CASCADE, default=1) 
+    
 
 class TipoTelefono():
     codigo = models.IntegerField()
@@ -114,8 +135,8 @@ class Contacto(models.Model):
     class Meta:
         db_table = "Contacto"
         
-        verbose_name = 'Direccion'
-        verbose_name_plural = 'Direccion'
+        verbose_name = 'Contacto'
+        verbose_name_plural = 'Contacto'
 
     codigoInternoSap = models.IntegerField()
     nombreCompleto = models.CharField(max_length=255)
@@ -126,22 +147,23 @@ class Contacto(models.Model):
     email = models.EmailField(null = False)
     #tipotelefono = models.ForeignKey(TipoTelefono, on_delete=models.CASCADE, default=1)
     tipoDireccion = models.ManyToManyField(SocioNegocio, related_name='SociosNegocio')
+    SocioNegocio = models.ManyToManyField('SocioNegocio', blank=True)
  
 class GrupoSN(models.Model):
     codigo = models.IntegerField()
     nombre = models.CharField(max_length=50,null = False)
-    contacto = models.ForeignKey(Contacto, on_delete=models.CASCADE, default=1)
+    SocioNegocio = models.ForeignKey(SocioNegocio, on_delete=models.CASCADE, default=1)
 
 class TipoSN(models.Model):
     codigo = models.IntegerField()
     nombre = models.CharField(max_length=100,null = False) 
     descripcion = models.CharField(max_length=100,null = False)
-    contacto = models.ForeignKey(Contacto, on_delete=models.CASCADE, default=1)
+    SocioNegocio = models.ForeignKey(SocioNegocio, on_delete=models.CASCADE, default=1)
 
 class TipoCliente(models.Model):
     codigo = models.IntegerField()
     nombre = models.CharField(max_length=50,null = False)
-    contacto = models.ForeignKey(Contacto, on_delete=models.CASCADE, default=1)
+    SocioNegocio = models.ForeignKey(SocioNegocio, on_delete=models.CASCADE, default=1)
 
 class TipoDocTributario(models.Model):
     class Meta:

@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-fexe1oq@sx@j&x3m#tw(#x(r!g32fylgea=whky=#ge^vn5f*h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.3.41', '192.168.30.118']
+ALLOWED_HOSTS = []
 #python manage.py runserver 192.168.3.41:8000
 
 
@@ -55,7 +55,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'AplicacionVentas.urls'
-
+#/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/gestionPedidos
+#/Users/nicor/Universidad/Practica/AplicacionVentas/gestionPedidos/templates/gestionPedidos
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -90,6 +91,9 @@ DATABASES = {
     }
 }
 
+#python ./manage.py makemigrations gestionPedidos
+#python ./manage.py sqlmigrate gestionPedidos 0001
+#python ./manage.py migrate
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
