@@ -1,17 +1,6 @@
 function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento) {
 
     var descuento = precioVenta - precioLista;
-    console.log("Agregando producto:");
-    console.log("Código:", productoCodigo);
-    console.log("Nombre:", nombre);
-    console.log("Imagen:", imagen);
-    console.log("Precio de venta:", precioVenta);
-    console.log("Stock total:", stockTotal);
-    console.log("Precio anterior:", precioLista);
-    console.log("Precio de descuento máximo:", precioDescuento);
-    console.log("calculo descuento", descuento);
-
-    
     
     // Crear una nueva fila
     var newRow = document.createElement('tbody');
