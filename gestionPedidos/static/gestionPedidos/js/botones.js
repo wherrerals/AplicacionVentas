@@ -98,7 +98,7 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
 
     
     // Agregar la fila a la tabla
-    document.getElementById('productos');
+    document.getElementById('productos').appendChild(newRow);
 
     // Agregar el evento de clic al ícono de descuento para alternar la visibilidad del elemento oculto
     newRow.querySelector('#mostrar-descuento').addEventListener('click', function() {
