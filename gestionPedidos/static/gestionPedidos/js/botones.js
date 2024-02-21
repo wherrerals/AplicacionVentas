@@ -157,10 +157,10 @@ function agergardireccion(){
           </svg></a></div>
       <div class="col-sm-1" style="padding-right: 0px;padding-left: 10px;"><a
           class="navbar-brand d-flex align-items-center"
-          href="lista_cotizaciones.html" style="width: 32px;"><svg
+           style="width: 32px;"><svg
             xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
             fill="currentColor" viewBox="0 0 16 16" class="bi bi-backspace"
-            style="font-size: 24px;">
+            style="font-size: 24px;" id="eliminar_dir">
             <path
               d="M5.83 5.146a.5.5 0 0 0 0 .708L7.975 8l-2.147 2.146a.5.5 0 0 0 .707.708l2.147-2.147 2.146 2.147a.5.5 0 0 0 .707-.708L9.39 8l2.146-2.146a.5.5 0 0 0-.707-.708L8.683 7.293 6.536 5.146a.5.5 0 0 0-.707 0z">
             </path>
@@ -250,6 +250,10 @@ function agergardireccion(){
   </div>`;
 
   document.getElementById('tab-1').appendChild(newRow);
+
+  newRow.querySelector('#eliminar_dir').addEventListener('click', function() {
+    newRow.remove();
+});
 
 }
 
