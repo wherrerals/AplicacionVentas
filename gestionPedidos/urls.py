@@ -1,6 +1,6 @@
 from django.urls import path
 from gestionPedidos import views
-from .views import ejemplo
+from .views import Funciones
 
 
 urlpatterns = [
@@ -16,8 +16,11 @@ urlpatterns = [
     path('salir/', views.salir, name='salir'),
     path('clientes/', views.clientes, name='clientes/'),
     path('registrarCuenta/', views.registrarCuenta),
-    path('ejemplo/', ejemplo.as_view(), name="ejemplo")
-
+    path('funciones/<str:motor>/<str:accion>/<str:param>/', Funciones.as_view(), name="funciones"),
+    path('obtener-datos-producto/<int:producto_id>/', views.obtenerDatosProducto, name='obtenerDatosProducto'),
+    path('buscar/', views.busquedaProductos, name='busquedaProductos'),
+    path('mis_datos/', views.mis_datos, name='mis_datos'),
+    path('agregar_editar_clientes/',views.agregar_editar_clientes,name='agregar_editar_clientes'),
 
 ]
 
