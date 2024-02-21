@@ -26,6 +26,8 @@
       </div>
     </div>
     <form id="CuentaForm" action="/registrarCuenta/" method="POST"> {% csrf_token %}
+
+
       <div class="row" style="background: #f0f2f5;">
         <div class="col-sm-2 col-md-1 text-nowrap" style="width: 20%;">
           <label class="col-form-label" style="font-size: 13px;">Nombre</label>
@@ -35,16 +37,23 @@
             style="border-color: rgb(159,168,175);font-size: 12px;" value ="{{ nombre }}" required>
         </div>
       </div>
+
       
       <div class="row" style="background: #f0f2f5;">
         <div class="col-sm-2 col-md-1 text-nowrap" style="width: 20%;">
-          <label class="col-form-label" style="font-size: 13px;">Email / Usuario</label>
+            <label class="col-form-label" style="font-size: 13px;">Email / Usuario
+            </label>
         </div>
         <div class="col-sm-8 col-md-6" style="text-align: left;width: 80%;">
-          <input class="form-control" type="email" id="email" name="email" value ="{{ email }}"
-            style="font-size: 12px;border-color: rgb(159,168,175);" required+-*8 7>
+            <input class="form-control" type="email" id="email" name="email" value="{{ email }}" style="font-size: 12px;border-color: rgb(159,168,175);" required+-*8 7>
+            {% if mensaje_error_username %}
+            <div class="alert alert-danger" style="font-size: 0.75rem" role="alert"> {{ mensaje_error_username }}
+            </div>
+            {% endif %}
         </div>
       </div>
+    
+
 
       <div class="row" style="background: #f0f2f5;">
         <div class="col-sm-1 col-md-1" style="width: 20%;">
@@ -70,23 +79,32 @@
             style="font-size: 12px;border-color: rgb(159,168,175);">
         </div>
       </div>
+
+
       <div class="row" style="background: #f0f2f5;">
-        <div class="col-sm-1 col-md-1" style="width: 20%;"><label class="col-form-label"
-            style="font-size: 13px;">Showroom</label></div>
-        <div class="col" style="width: 30%;"><select class="form-select" id="showroom"
-            style="font-size: 12px;border-color: rgb(159,168,175);">
+        <div class="col-sm-1 col-md-1" style="width: 20%;">
+          <label class="col-form-label" style="font-size: 13px;">Showroom
+          </label>
+        </div>
+        <div class="col" style="width: 30%;">
+          <select class="form-select" id="showroom" style="font-size: 12px;border-color: rgb(159,168,175);">
             <optgroup label="Showroom" name="showroom">
               <option value="12">Las Condes</option>
               <option value="13">Padre Hurtado</option>
               <option value="2">Panal</option>
             </optgroup>
-          </select></div>
+          </select>
+        </div>
 
-        <div class="col-md-1" style="width: 20%;text-align: right;"><label class="col-form-label"
-            style="font-size: 13px;">Nº SAP</label></div>
-        <div class="col" style="width: 30%;"><input class="form-control" type="text" id="num_sap" name="num_sap" value ="{{ num_sap }}"
-            inputmode="numeric" style="font-size: 12px;border-color: rgb(159,168,175);"></div>
+        <div class="col-md-1" style="width: 20%;text-align: right;">
+          <label class="col-form-label" style="font-size: 13px;">Nº SAP
+          </label>
+        </div>
+        <div class="col" style="width: 30%;">
+          <input class="form-control" type="text" id="num_sap" name="num_sap" value ="{{ num_sap }}" inputmode="numeric" style="font-size: 12px;border-color: rgb(159,168,175);">
+        </div>
       </div>
+
 
       <div class="row" style="background: #f0f2f5;">
         <div class="col-sm-1 col-md-1" style="width: 20%;">
@@ -111,16 +129,16 @@
     
 
       <div class="row" style="background: #f0f2f5;">
-        <div class="col-sm-1 col-md-1" style="width: 20%;"><label class="col-form-label"
-            style="font-size: 13px;">Repetir Clave</label></div>
+        <div class="col-sm-1 col-md-1" style="width: 20%;">
+          <label class="col-form-label" style="font-size: 13px;">Repetir Clave
+          </label>
+        </div>
         <div class="col" style="width: 80%;">
-          <input class="form-control" type="password" id="rep_clave"
-            style="border-color: rgb(159,168,175);font-size: 12px;" name="rep_password">
+          <input class="form-control" type="password" id="rep_clave" style="border-color: rgb(159,168,175);font-size: 12px;" name="rep_password">
             {% if mensaje_error_repcontrasena %}
-            <div class="alert alert-danger" style="font-size: 0.75rem" role="alert">
-          {{ mensaje_error_repcontrasena }}
-      </div>
-      {% endif %}
+            <div class="alert alert-danger" style="font-size: 0.75rem" role="alert">{{ mensaje_error_repcontrasena }}
+            </div>
+            {% endif %}
         </div>
       </div>
 
@@ -135,8 +153,9 @@
         </div>
       </div>
       <div class="row">
-        <div class="col" style="padding: 0px;text-align: center;"><button class="btn btn-primary" id="btn_guardar"
-            type="submit">Guardar Cambios</button></div>
+        <div class="col" style="padding: 0px;text-align: center;">
+          <button class="btn btn-primary" id="btn_guardar" type="submit">Guardar Cambios</button>
+        </div>
         <div class="col" style="padding: 0px;text-align: center;"><button class="btn btn-primary" id="btn_guardar-1"
             type="button" style="background: rgb(253,27,13);border-color: rgb(255,255,255);">Eliminar Usuario</button>
         </div>

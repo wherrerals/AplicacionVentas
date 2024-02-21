@@ -39,6 +39,12 @@ def cotizacion(request):
         return render(request, 'cotizacion.html', {'username': username})
     else:
         return render(request, "cotizacion.html")
+    
+@login_required #Implementada para menus de opciones con regiones
+def regiones(request):
+    regiones = Region.objects.all()
+    return render(request, 'cotizacion.html', {'regiones': regiones})
+
 
 @login_required
 def lista_ovs(request):
@@ -58,7 +64,6 @@ def reporte_stock(request):
 
 @login_required
 def micuenta(request):
-
     return render(request, "micuenta.html")
 
 @transaction.atomic
@@ -74,6 +79,10 @@ def registrarCuenta(request):
     password = request.POST['password']
     make = make_password(password)
     mensaje = validar_contrasena(password)
+
+    if User.objects.filter(username=username).exists():
+            mensaje3 = "El nombre de usuario ya está en uso"
+            return render(request, "micuenta.html", {'email': email, "nombre": nombre, "telefono": telefono, "mensaje_error_username": mensaje3})
 
     if not mensaje:
         n = nombre.split(" ")
@@ -160,6 +169,20 @@ def lista_usuarios(request):
 @login_required
 def clientes(request):
     return render(request, "cliente.html")
+
+@login_required
+def agregar_editar_clientes(request):
+    if request.method == "POST":
+        nombre = request.POST['nombre']
+        razonSocial = request.POST.get('razonSocial')
+        rut = request.POST['rut']
+        giro = request.POST['giro']
+        telefono = request.POST['telefono']
+        email = request.POST['email']
+
+        cliente = SocioNegocio.objects.create(nombre=nombre, razonSocial=razonSocial, rut=rut, giro=giro, telefono=telefono, email=email)
+
+    return redirect("/")
 
 class Funciones(View):
     LocalHost = "1.1"
