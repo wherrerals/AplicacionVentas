@@ -171,18 +171,58 @@ def clientes(request):
 @login_required
 def agregar_editar_clientes(request):
     if request.method == "POST":
-        nombre = request.POST['nombre']
-        razonSocial = request.POST.get('razonSocial')
+        
+        gruposn = request.POST.get('grupoSN')
         rut = request.POST['rut']
         giro = request.POST['giro']
         telefono = request.POST['telefono']
         email = request.POST['email']
-        #codigoSN rut isn puntos ni digito, concatenada una C
-        #10880683C
+        codigosn = rut[:-2].replace(".","")+'c' #codigoSN rut sin puntos ni digito, concatenada una C
 
-        cliente = SocioNegocio.objects.create(nombre=nombre, razonSocial=razonSocial, rut=rut, giro=giro, telefono=telefono, email=email)
 
-    return redirect("/")
+
+        #Aca se asigan isntancias de los modelos con sus llaves foraneas correpsondientes 
+        gruposn1 = GrupoSN.objects.get(codigo=gruposn)
+        tipocliente = TipoCliente.objects.get(codigo = 'N')
+
+        if gruposn == '100':
+            tiposn = TipoSN.objects.get(codigo='C')
+        else:
+            tiposn = TipoSN.objects.get(codigo='I')
+        
+
+        if gruposn == '100':
+            nombre = request.POST['nombre']
+            apellido = request.POST['apellido']
+            cliente = SocioNegocio.objects.create(codigoSN = codigosn,
+                                                nombre=nombre,
+                                                apellido =apellido,
+                                                rut=rut, 
+                                                giro=giro, 
+                                                telefono=telefono, 
+                                                email=email,
+                                                grupoSN = gruposn1,
+                                                tipoSN = tiposn,
+                                                tipoCliente = tipocliente 
+                                                )
+            return redirect("/")
+            
+        elif gruposn == '105':
+            razonsocial = request.POST['nombre']
+            cliente = SocioNegocio.objects.create(codigoSN = codigosn,
+                                                razonSocial = razonsocial,
+                                                rut=rut, 
+                                                giro=giro, 
+                                                telefono=telefono, 
+                                                email=email,
+                                                grupoSN = gruposn1,
+                                                tipoSN = tiposn,
+                                                tipoCliente = tipocliente 
+                                                )
+
+            return redirect("/")
+        
+        return redirect("/")
 
 class Funciones(View):
     LocalHost = "1.1"

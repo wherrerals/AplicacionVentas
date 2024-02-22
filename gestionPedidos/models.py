@@ -10,7 +10,7 @@ class Usuario(models.Model):
         verbose_name = 'usuario'
         verbose_name_plural = 'usuario'
 
-    #user = models.OneToOneField(User,on_delete=models.CASCADE, default=1)
+    #user = models.OneToOneField(User,on_delete=models.CASCADE, default=1) Esta repetido abajo
     nombre = models.CharField(max_length=50)
     email = models.EmailField()
     telefono = models.CharField(max_length=15)
@@ -48,7 +48,8 @@ class Comuna(models.Model):
         
     codigo = models.CharField(max_length=50,null = False)
     nombre = models.CharField(max_length=50,null = False)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE,to_field='numero', default=1)#Se elimina campo default = 1, no se considera necesario
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, default=1)
+    #El parametro to_field='atributo_En_otro_modelo' es solo necesario si la relacion es con algo que no sea la llave primaria
     
 
 class TipoDireccion(models.Model):
@@ -71,17 +72,31 @@ class TipoTelefono(models.Model):
     tipo = models.CharField(max_length=50,null = False)
 
 class GrupoSN(models.Model):
-    codigo = models.IntegerField()
+    class Meta:
+        db_table = "GrupoSN"
+        verbose_name = 'GrupoSN'
+        verbose_name_plural = 'GrupoSN'
+
+    codigo = models.IntegerField(primary_key=True,max_length=1) #Es un identiicador unico que lo diferencia de todas las otras entradas
     nombre = models.CharField(max_length=50,null = False)
     
 
 class TipoSN(models.Model):
-    codigo = models.IntegerField()
+    class Meta:
+        db_table = "TipoSN"
+        verbose_name = 'TipoSN'
+        verbose_name_plural = 'TipoSN'
+
+    codigo = models.CharField(primary_key=True,max_length=1)#Es un identiicador unico que lo diferencia de todas las otras entradas
     nombre = models.CharField(max_length=100,null = False) 
     descripcion = models.CharField(max_length=100,null = False)
 
 class TipoCliente(models.Model):
-    codigo = models.IntegerField()
+    class Meta:
+        db_table = "TipoCliente"
+        verbose_name = 'TipoCliente'
+        verbose_name_plural = 'TipoCliente'
+    codigo = models.CharField(primary_key=True,max_length=1)#Es un identiicador unico que lo diferencia de todas las otras entradas
     nombre = models.CharField(max_length=50,null = False)
 
 class SocioNegocio(models.Model):
@@ -91,7 +106,7 @@ class SocioNegocio(models.Model):
         verbose_name = 'Socios Negocio'
         verbose_name_plural = 'Socios Negocio'
 
-    codigoSN = models.CharField(primary_key=True, max_length=255)
+    codigoSN = models.CharField(primary_key=True, max_length=255) #Es un identiicador unico que lo diferencia de todas las otras entradas
     nombre = models.CharField(max_length=50,)
     apellido = models.CharField(max_length=50)
     razonSocial = models.CharField(max_length=255)
@@ -182,7 +197,9 @@ class TipoDocTributario(models.Model):
     
 class TipoVenta(models.Model):
     class Meta:
-        db_table = 'TipoVenta'
+        db_table = "TipoVenta"
+        verbose_name = 'TipoVenta'
+        verbose_name_plural = 'TipoVenta'
 
     codigo = models.CharField(max_length=50,null = False)
     nombre = models.CharField(max_length=50,null = False)
@@ -195,7 +212,7 @@ class Sucursal(models.Model):
         verbose_name = 'Sucursal'
         verbose_name_plural = 'Sucursal' 
 
-    codigo = models.CharField(max_length=50,null = False)
+    codigo = models.CharField(primary_key=True,max_length=50)
     nombre = models.CharField(max_length=50,null = False)
     def __str__(self):
         return f'{self.nombre}'
@@ -214,14 +231,18 @@ class Vendedor(models.Model):
     
 class CondicionPago(models.Model):        
     class Meta:
-        db_table = 'CondicionPago' 
+        db_table = "CondicionPago"
+        verbose_name = 'CondicionPago'
+        verbose_name_plural = 'CondicionPago'
 
     codigo = models.IntegerField()
     nombre = models.CharField(max_length=50,null = False)
 
 class Producto(models.Model):
     class Meta:
-        db_table = 'Producto'   
+        db_table = "Producto"
+        verbose_name = 'Producto'
+        verbose_name_plural = 'Producto'
 
     codigo = models.CharField(max_length=50, unique=True)
     nombre = models.CharField(max_length=255,null = False)
@@ -240,7 +261,7 @@ class Bodega(models.Model):
         verbose_name = 'Bodega'
         verbose_name_plural = 'Bodega'
          
-    codigo = models.CharField(max_length=255,null = False)
+    codigo = models.CharField(primary_key=True,max_length=255) #Es un identiicador unico que lo diferencia de todas las otras entradas
     nombre = models.CharField(max_length=50,null = False)
     descripcion = models.CharField(max_length=255,null = False)
 
@@ -250,21 +271,27 @@ class Bodega(models.Model):
 
 class Inventario(models.Model):
     class Meta:
-        db_table = 'Inventario'
+        db_table = "Inventario"
+        verbose_name = 'Inventario'
+        verbose_name_plural = 'Inventario'
 
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, default=1)
     bodega = models.ForeignKey(Bodega, on_delete=models.CASCADE, default=1) 
 
 class TipoEntrega(models.Model):
     class Meta:
-        db_table = 'TipoEntrega'
-
-    codigo = models.IntegerField(null = False)
-    tipo = models.CharField(max_length=255,null = False)
+        db_table = "TipoEntrega"
+        verbose_name = 'TipoEntrega'
+        verbose_name_plural = 'TipoEntrega'
+    codigo = models.IntegerField(primary_key=True)#Es un identiicador unico que lo diferencia de todas las otras entradas
+    nombre = models.CharField(max_length=255,null = False)
+    descripcion = models.CharField(max_length=255,null = False)
 
 class TipoObjetoSap(models.Model):
     class Meta:
-        db_table = 'TipoObjetoSap'
+        db_table = "TipoObjetoSap"
+        verbose_name = 'TipoObjetoSap'
+        verbose_name_plural = 'TipoObjetoSap'
     
     codigo = models.IntegerField(null = False)
     nombre = models.CharField(max_length=50,null = False)

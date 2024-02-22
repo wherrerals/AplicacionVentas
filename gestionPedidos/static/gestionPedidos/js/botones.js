@@ -122,20 +122,25 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
   return resultado;
 };
 
-
+var contdir = 0;
 function agergardireccion(){
 
-  var newRow = document.createElement('tbody');
+  
+  var newRow = document.createElement('div');
+  contdir ++;
+  newRow.className = "col-sm-1";
+  newRow.style="padding: 0px;width: 280px";
+
 
   newRow.innerHTML =`
   <div class="col-sm-12" style="width: 100%;height: 10px;"><span>&nbsp;</span></div>
-  <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 230px;">
+  <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 250px;">
     <div class="row">
       <div class="col-sm-12" style="height: 15px;background: transparent;">
         <span>&nbsp;</span>
       </div>
       <div class="col" style="text-align: center;"><span
-          style="font-weight: bold;">Dirección Nº 1</span></div>
+          style="font-weight: bold;">Dirección Nº ${contdir} </span></div>
       <div class="col-sm-12" style="height: 5px;background: transparent;">
         <span>&nbsp;</span>
       </div>
@@ -247,7 +252,15 @@ function agergardireccion(){
     </div>
   </div>`;
 
-  document.getElementById('tab-1').appendChild(newRow);
+  var tab1 = document.getElementById('dir');
+
+  tab1.style.display = "flex";
+  tab1.style.flexDirection = "row";
+  tab1.style.overflowX = "auto";
+  tab1.style.maxWidth = "100%";
+
+
+  document.getElementById('dir').appendChild(newRow);
 
   newRow.querySelector('#eliminar_dir').addEventListener('click', function() {
     newRow.remove();
@@ -267,9 +280,11 @@ window.addEventListener('DOMContentLoaded', function() {
 var contcon = 0;
 function agregarontacto(){
 
-    var newRow = document.createElement('tbody')
-    contcon ++;
-    newRow.innerHTML =`
+  var newRow = document.createElement('div')
+  newRow.className = "col-sm-1";
+  newRow.style="padding: 0px;width: 280px";
+  contcon ++;
+  newRow.innerHTML =`
 
 <div class="col-sm-12" style="width: 100%;height: 10px;"><span>&nbsp;</span> </div>
 <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 250px;">
@@ -364,12 +379,17 @@ function agregarontacto(){
 <!-- <div class="col-sm-1" style="padding: 0px;width: 20px;"><span></span></div> Revisar bien, es espacio lateral-->
 `;
 
+  var tab2 = document.getElementById('cont');
+  tab2.style.display = "flex";
+  tab2.style.flexDirection = "row";
+  tab2.style.overflowX = "auto";
+  tab2.style.maxWidth = "100%";
 
-    document.getElementById('tab-2').appendChild(newRow);
+  document.getElementById('cont').appendChild(newRow);
 
-    newRow.querySelector('#eliminar_contacto').addEventListener('click', function() {
-        newRow.remove();
-    });
+  newRow.querySelector('#eliminar_contacto').addEventListener('click', function() {
+      newRow.remove();
+  });
 
 }
 
