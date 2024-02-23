@@ -151,7 +151,7 @@ function aplicarDescuento() {
 }
 }
 
-
+var contdir = 0;
 
 function agergardireccion(){
 
@@ -303,7 +303,6 @@ function agergardireccion(){
 
 
   document.getElementById('dir').appendChild(newRow);
-
   newRow.querySelector('#eliminar_dir').addEventListener('click', function() {
     newRow.remove();
 });
@@ -482,6 +481,27 @@ function cargarProductosGuardados() {
 
 }); */
 
+document.addEventListener("DOMContentLoaded", function() {
+  sumarTresDias();
+});
+
+function sumarTresDias() {
+  var hoy = new Date(); // Obtiene la fecha actual
+  var tresDiasDespues = new Date(hoy.getTime() + (3 * 24 * 60 * 60 * 1000)); // Suma tres días en milisegundos
+  
+  // Extrae el día, mes y año de la fecha resultante
+  var dia = tresDiasDespues.getDate();
+  var mes = tresDiasDespues.getMonth() + 1; // Se suma 1 porque los meses van de 0 a 11
+  var año = tresDiasDespues.getFullYear();
+  
+  // Formatea la fecha como DD/MM/AAAA
+  var fechaFormateada = dia + '/' + mes + '/' + año;
+  
+  // Actualiza el contenido del elemento con ID 'dias_vencidos'
+  document.getElementById('dias_vencidos').textContent = fechaFormateada;
+}
+
+
 
 function togglePassword() {
   var toggleButton = document.getElementById("togglePasswordButton");
@@ -500,4 +520,3 @@ function togglePassword() {
 
 togglePassword();
 
-agregarProducto(C25500123,"WILLIAM ALEXIS HERRERA", "ISO.JPG", 2000.00, 50, 150.00, 500.0)

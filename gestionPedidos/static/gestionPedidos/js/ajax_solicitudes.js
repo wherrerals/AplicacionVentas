@@ -28,7 +28,7 @@ $(document).ready(function(){
                             productoElemento.setAttribute('data-stockTotal', resultado.stockTotal);
                             productoElemento.setAttribute('data-precioAnterior', resultado.precioAnterior);
                             productoElemento.setAttribute('data-maxDescuento', resultado.maxDescuento);
-                            productoElemento.textContent = `ID: ${resultado.codigo} | Nombre: ${resultado.nombre} | Stock: ${resultado.stockTotal}`;
+                            productoElemento.textContent = `${resultado.codigo} | ${resultado.nombre} | Stock Total: ${resultado.stockTotal}`;
 
                             // Agregar evento de clic al elemento
                             productoElemento.addEventListener('click', function() {
