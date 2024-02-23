@@ -8,6 +8,8 @@ from django.views import View
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from django.core import serializers
+from django.contrib import messages
+
 
 
 @login_required
@@ -178,19 +180,15 @@ def agregar_editar_clientes(request):
         telefono = request.POST['telefono']
         email = request.POST['email']
         codigosn = rut[:-2].replace(".","")+'c' #codigoSN rut sin puntos ni digito, concatenada una C
-
-
-
+        
         #Aca se asigan isntancias de los modelos con sus llaves foraneas correpsondientes 
         gruposn1 = GrupoSN.objects.get(codigo=gruposn)
         tipocliente = TipoCliente.objects.get(codigo = 'N')
-
         if gruposn == '100':
             tiposn = TipoSN.objects.get(codigo='C')
         else:
             tiposn = TipoSN.objects.get(codigo='I')
-        
-
+    
         if gruposn == '100':
             nombre = request.POST['nombre']
             apellido = request.POST['apellido']
@@ -205,8 +203,8 @@ def agregar_editar_clientes(request):
                                                 tipoSN = tiposn,
                                                 tipoCliente = tipocliente 
                                                 )
-            return redirect("/")
             
+
         elif gruposn == '105':
             razonsocial = request.POST['nombre']
             cliente = SocioNegocio.objects.create(codigoSN = codigosn,
@@ -219,10 +217,40 @@ def agregar_editar_clientes(request):
                                                 tipoSN = tiposn,
                                                 tipoCliente = tipocliente 
                                                 )
-
-            return redirect("/")
-        
+           
         return redirect("/")
+    
+
+@login_required
+#desde ambos botones se puede llamar y usar el tipo para ver donde se muestra en "barras (ayax)"
+def agregar_direccion(request):
+    if request.method == "POST":
+        #numrow se define solo cmo 0
+        nombredireccion = request.POST['id']
+        ciudad = request.POST['cuidad']
+        callenumero = request.POST['direccion']
+        #codio impuesto esta defecto iva
+        tipo = request.POST['tipodespacho'] #Ver si cada boton puede implicar una u otra cosa (o ambas)
+        pais = request.POST['pais'] #igual por defecto esta chile
+        region = request.POST['region']
+        comuna = request.POST['comuna']
+    
+        #Inicialiando las intancias correspondientes de las llaves foraneas
+        socio = SocioNegocio.objects.get(codigoSN = '1c') #Hay que crear un socio que su rut sea 1xx
+        fcomuna = Comuna.objects.get(nombre = comuna)
+        fregion = Region.objects.get(nombre = region)
+
+        dir = Direccion.objects.create(nombreDireccion=nombredireccion,
+                                       ciudad = ciudad,
+                                       calleNumero = callenumero,
+                                       comuna = fcomuna,
+                                       region = fregion,
+                                       tipoDireccion = tipo,
+                                       SocioNegocio = socio,
+                                       pais = pais) #Se crea, el resto se pasan por defecto
+    return redirect("/")
+
+        
 
 class Funciones(View):
     LocalHost = "1.1"
@@ -334,4 +362,4 @@ def validar_contrasena(password):
     if len(password) < 8:
         mensajes.append("Su contraseña debe tener al menos 8 caracteres.")
 
-    return mensajes 
+    return mensajes  
