@@ -85,19 +85,20 @@ def registrarCuenta(request):
             return render(request, "micuenta.html", {'email': email, "nombre": nombre, "telefono": telefono, "mensaje_error_username": mensaje3})
 
     if not mensaje:
-        n = nombre.split(" ")
+
+        """ n = nombre.split(" ")
         if len(n) == 1:
             firstname = n[0]
             lastname = ''
         else:
             firstname = n[0]
-            lastname = n[1]
+            lastname = n[1] """
         
         if password != rep_password:
             mensaje2 = "Las contraseñas no coinciden"
             return render(request, "micuenta.html", {'email': email, "nombre": nombre, "telefono": telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
 
-        usuario_login = User.objects.create(username=username, password=make, email=email, first_name= firstname,last_name = lastname)
+        usuario_login = User.objects.create(username=username, password=make, email=email, first_name= nombre)
         cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono, usuarios = usuario_login)
         return redirect('/')
         
@@ -123,20 +124,20 @@ def mis_datos(request):
         mensaje = validar_contrasena(password)
 
         if not mensaje:
-            n = nombre.split(" ")
+            """ n = nombre.split(" ")
             if len(n) == 1:
                 user.first_name = n[0]
                 user.last_name = ''
             else:
                 user.first_name = n[0]
-                user.last_name = n[1]
+                user.last_name = n[1] """
 
             if password:
                 user.set_password(password)
             
             if password != rep_password:
                 mensaje2 = "Las contraseñas no coinciden"
-                return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre_completo, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
+                return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
             
             usuario = Usuario.objects.get(usuarios=user)
             usuario.telefono = telefono
@@ -147,18 +148,15 @@ def mis_datos(request):
         
         else:
             nombre = user.first_name
-            apellido = user.last_name
-            nombre_completo = f'{nombre} {apellido}'
             if password != rep_password:
                 mensaje2 = "Las contraseñas no coinciden"
-                return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre_completo, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
+                return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
             
-            return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre_completo, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje})
+            return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje})
         
     nombre = user.first_name
-    apellido = user.last_name
-    nombre_completo = f'{nombre} {apellido}'
-    return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre_completo, "telefono":usuario.telefono})
+
+    return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 
 
 @login_required
@@ -173,16 +171,58 @@ def clientes(request):
 @login_required
 def agregar_editar_clientes(request):
     if request.method == "POST":
-        nombre = request.POST['nombre']
-        razonSocial = request.POST.get('razonSocial')
+        
+        gruposn = request.POST.get('grupoSN')
         rut = request.POST['rut']
         giro = request.POST['giro']
         telefono = request.POST['telefono']
         email = request.POST['email']
+        codigosn = rut[:-2].replace(".","")+'c' #codigoSN rut sin puntos ni digito, concatenada una C
 
-        cliente = SocioNegocio.objects.create(nombre=nombre, razonSocial=razonSocial, rut=rut, giro=giro, telefono=telefono, email=email)
 
-    return redirect("/")
+
+        #Aca se asigan isntancias de los modelos con sus llaves foraneas correpsondientes 
+        gruposn1 = GrupoSN.objects.get(codigo=gruposn)
+        tipocliente = TipoCliente.objects.get(codigo = 'N')
+
+        if gruposn == '100':
+            tiposn = TipoSN.objects.get(codigo='C')
+        else:
+            tiposn = TipoSN.objects.get(codigo='I')
+        
+
+        if gruposn == '100':
+            nombre = request.POST['nombre']
+            apellido = request.POST['apellido']
+            cliente = SocioNegocio.objects.create(codigoSN = codigosn,
+                                                nombre=nombre,
+                                                apellido =apellido,
+                                                rut=rut, 
+                                                giro=giro, 
+                                                telefono=telefono, 
+                                                email=email,
+                                                grupoSN = gruposn1,
+                                                tipoSN = tiposn,
+                                                tipoCliente = tipocliente 
+                                                )
+            return redirect("/")
+            
+        elif gruposn == '105':
+            razonsocial = request.POST['nombre']
+            cliente = SocioNegocio.objects.create(codigoSN = codigosn,
+                                                razonSocial = razonsocial,
+                                                rut=rut, 
+                                                giro=giro, 
+                                                telefono=telefono, 
+                                                email=email,
+                                                grupoSN = gruposn1,
+                                                tipoSN = tiposn,
+                                                tipoCliente = tipocliente 
+                                                )
+
+            return redirect("/")
+        
+        return redirect("/")
 
 class Funciones(View):
     LocalHost = "1.1"
