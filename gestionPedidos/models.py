@@ -164,7 +164,7 @@ class TipoCliente(models.Model):
     codigo = models.IntegerField()
     nombre = models.CharField(max_length=50,null = False)
     SocioNegocio = models.ForeignKey(SocioNegocio, on_delete=models.CASCADE, default=1)
-
+    
 class TipoDocTributario(models.Model):
     class Meta:
         db_table = 'TipoDocTributario'

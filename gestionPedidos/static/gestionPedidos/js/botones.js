@@ -1,18 +1,8 @@
 function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento) {
 
-  var descuento = precioVenta - precioLista;
-  console.log("Agregando producto:");
-  console.log("Código:", productoCodigo);
-  console.log("Nombre:", nombre);
-  console.log("Imagen:", imagen);
-  console.log("Precio de venta:", precioVenta);
-  console.log("Stock total:", stockTotal);
-  console.log("Precio anterior:", precioLista);
-  console.log("Precio de descuento máximo:", precioDescuento);
-  console.log("calculo descuento", descuento);
+  var precioSinDescuento = 0
+  var totalProducto = precioVenta
 
-  
-  
   // Crear una nueva fila
   var newRow = document.createElement('tbody');
 
@@ -42,16 +32,16 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
             </select>
           </div>
           <div class="col" style="text-align: center;>
-              <small style="font-size: 12px;">Stock:${stockTotal}</small>
+              <small style="font-size: 12px;" name="stock_total">Stock:${stockTotal}</small>
           </div>
       </div>
   </td>
   <td style="background: transparent;border-style: none;padding-bottom: 0px;" rowspan="2">
       <div style="font-size: 12px;">
-          <small>${precioVenta}</small>
+          <small name="precio_venta">${precioVenta}</small>
       </div>
       <div style="font-size: 11px;">
-          <small style="color: rgb(153,153,153);">Antes: ${precioLista}</small>
+          <small style="color: rgb(153,153,153);" name="precio_lista">Antes: ${precioLista}</small>
       </div>
       <div class="row" style="font-size: 11px;">
           <div class="col-sm-4 col-md-3 col-xl-2" style="padding-right: 0px;">
@@ -60,21 +50,21 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
               </svg>
           </div>
           <div class="col-sm-7 col-md-8">
-              <small style="color: rgb(255,0,0);" id="descuento" hidden>Max: ${precioDescuento}</small>
+              <small style="color: rgb(255,0,0);" id="descuento" name="descuento_max" hidden>Max: ${precioDescuento}</small>
           </div>
       </div>
   </td>
   <td style="font-size: 12px;background: transparent;border-style: none;">
       <div>
-          <input class="form-control" type="text" style="font-size: 12px;width: 40px;">
+          <input class="form-control" type="text" style="font-size: 12px;width: 40px;" id="agg_descuento">
       </div>
   </td>
-  <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">${descuento}</td>
+  <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${precioSinDescuento}</td>
   <td style="font-size: 12px;background: transparent;border-style: none;">
-      <input class="form-control" type="text" style="width: 65px;">
+      <input class="form-control" type="text" style="width: 65px;" id="calcular_cantidad">
   </td>
   <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
-      <span>${precioVenta}</span>
+      <span id="precio_Venta">${totalProducto}</span>
   </td>
 </tr> 
   <tr style="font-size: 12px;background: transparent;">
@@ -98,7 +88,10 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
 
   
   // Agregar la fila a la tabla
-  document.getElementById('productos').appendChild(newRow);
+document.getElementById('productos').appendChild(newRow);
+
+agregarInteractividad(newRow);
+
 
   // Agregar el evento de clic al ícono de descuento para alternar la visibilidad del elemento oculto
   newRow.querySelector('#mostrar-descuento').addEventListener('click', function() {
@@ -119,13 +112,58 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
       }
   }
   
-  return resultado;
 };
+
+function agregarInteractividad(newRow) {
+  // Obtener referencias a los elementos dentro de la fila
+  var inputCantidad = newRow.querySelector('#calcular_cantidad');
+  var inputDescuento = newRow.querySelector('#agg_descuento');
+  var spanPrecioVenta = newRow.querySelector('#precio_Venta');
+  var tdPrecioVenta = newRow.querySelector('#precio_Venta');
+  var tdPrecioDescuento = newRow.querySelector('#Precio_Descuento');
+
+  // Agregar evento de cambio al input de cantidad para calcular el precio total
+  inputCantidad.addEventListener('change', function() {
+    calcularPrecioTotal();
+  });
+  
+  // Agregar evento de cambio al input de descuento para aplicar el descuento
+  inputDescuento.addEventListener('change', function() {
+    aplicarDescuento();
+  });
+
+  // Función para calcular el precio total
+
+
+  function calcularPrecioTotal(descuento) {
+    var cantidad = parseInt(inputCantidad.value);
+    var precioVenta = parseFloat(spanPrecioVenta.textContent);
+    var precioTotal = cantidad * precioVenta;
+    tdPrecioVenta.textContent = precioTotal.toFixed(2);
+    
+  };
+
+  // Función para aplicar el descuento
+  function aplicarDescuento() {
+    var descuento = parseFloat(inputDescuento.value);
+    var precioTotal = parseFloat(tdPrecioVenta.textContent);
+    var precioDescuento = precioTotal * (descuento / 100);
+    tdPrecioDescuento.textContent = precioDescuento.toFixed(2);
+    return precioDescuento;
+  }
+}
+
+
+
 
 
 function agergardireccion(){
 
-  var newRow = document.createElement('tbody');
+  var newRow = document.createElement('div');
+  newRow.className = 'col-sm-5';
+  newRow.style="font-size: 12px";
+  newRow.background = "#f0f2f5; width: 230px;"
+
 
   newRow.innerHTML =`
   <div class="col-sm-12" style="width: 100%;height: 10px;"><span>&nbsp;</span></div>
@@ -247,7 +285,21 @@ function agergardireccion(){
         <span>&nbsp;</span>
       </div>
     </div>
-  </div>`;
+  </div>
+  <div class="col-sm-1" style="padding: 0px;width: 20px;"><span></span></div>
+  `
+  ;
+
+
+  //var tab1 = document.getElementById('tab-1');
+
+  //tab1.style.display = "flex";
+  //tab1.style.flexDirection = "row";
+  //tab1.style.overflowX = "auto";
+  //tab1.style.maxWidth = "100%";
+
+  // Agregar espacio entre las filas
+  //newRow.style.marginRight = "10px"; 
 
   document.getElementById('tab-1').appendChild(newRow);
 

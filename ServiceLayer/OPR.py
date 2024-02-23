@@ -19,3 +19,4 @@ except httpx.NetworkError as exc:
     print(f"Error de red: {exc}")
 except Exception as exc:
     print(f"Error desconocido: {exc}")
+
