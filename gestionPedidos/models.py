@@ -59,7 +59,7 @@ class TipoDireccion(models.Model):
         verbose_name = 'TipoDireccion'
         verbose_name_plural = 'TipoDireccion'
                 
-    codigo = models.CharField(max_length=50,null = False)
+    codigo = models.CharField(primary_key=True,max_length=50)
     nombre = models.CharField(max_length=50,null = False)
 
 class TipoTelefono(models.Model):
@@ -77,7 +77,7 @@ class GrupoSN(models.Model):
         verbose_name = 'GrupoSN'
         verbose_name_plural = 'GrupoSN'
 
-    codigo = models.IntegerField(primary_key=True,max_length=1) #Es un identiicador unico que lo diferencia de todas las otras entradas
+    codigo = models.CharField(primary_key=True,max_length=5) #Es un identiicador unico que lo diferencia de todas las otras entradas
     nombre = models.CharField(max_length=50,null = False)
     
 
@@ -158,7 +158,7 @@ class Direccion(models.Model):
     
 
 class TipoTelefono():
-    codigo = models.IntegerField()
+    codigo = models.IntegerField(primary_key=True)
     tipo = models.CharField(max_length=50,null = False)
 
 
