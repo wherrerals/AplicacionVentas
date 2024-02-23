@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-fexe1oq@sx@j&x3m#tw(#x(r!g32fylgea=whky=#ge^vn5f*h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '192.168.3.41']
 #python manage.py runserver 192.168.3.41:8000
 
 
@@ -60,7 +60,7 @@ ROOT_URLCONF = 'AplicacionVentas.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/Users/nicor/Universidad/Practica/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
+        'DIRS': ['/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
         
         'APP_DIRS': True,
         'OPTIONS': {
@@ -85,7 +85,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
         'USER':'root',
-        'PASSWORD':'qwerty',
+        'PASSWORD':'Ea7hava5*',
         'HOST':'localhost',
         'PORT':'3306',
     }
