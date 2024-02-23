@@ -52,7 +52,7 @@ class Comuna(models.Model):
     #El parametro to_field='atributo_En_otro_modelo' es solo necesario si la relacion es con algo que no sea la llave primaria
     
 
-class TipoDireccion(models.Model):
+""" class TipoDireccion(models.Model):
     class Meta:
         db_table = "TipoDireccion"
 
@@ -60,7 +60,7 @@ class TipoDireccion(models.Model):
         verbose_name_plural = 'TipoDireccion'
                 
     codigo = models.CharField(primary_key=True,max_length=50)
-    nombre = models.CharField(max_length=50,null = False)
+    nombre = models.CharField(max_length=50,null = False) """
 
 class TipoTelefono(models.Model):
     class Meta:
@@ -146,15 +146,18 @@ class Direccion(models.Model):
         verbose_name = 'Direccion'
         verbose_name_plural = 'Direccion'
 
-    rowNum = models.IntegerField()
-    nombreDireccion = models.CharField(max_length=50,null = False)
+    rowNum = models.IntegerField(default='0 ') #dato SAP por socio negocio
+    nombreDireccion = models.CharField(max_length=50,null = False) #identificador natural 
+    ciudad = models.CharField(max_length=50)
+    calleNumero = models.CharField(max_length=50) #corresponde a direccio en direccion
+    codigoImpuesto = models.CharField(max_length=100, default='iva')
+    #tipoDireccion = models.ManyToManyField(TipoDireccion, related_name='directorios')
+    tipoDireccion = models.CharField(max_length=5)
+    pais = models.CharField(max_length=10, default ='Chile')
+    SocioNegocio = models.ForeignKey(SocioNegocio,on_delete=models.CASCADE, default=1) 
     comuna = models.ForeignKey(Comuna,on_delete=models.CASCADE, default=1)
     region = models.ForeignKey(Region,on_delete=models.CASCADE, default=1)
-    pais = models.CharField(max_length=10, default ='Chile')
-    calleNumero = models.CharField(max_length=50)
-    codigoImpuesto = models.CharField(max_length=100, default='iva')
-    tipoDireccion = models.ManyToManyField(TipoDireccion, related_name='directorios')
-    SocioNegocio = models.ForeignKey(SocioNegocio,on_delete=models.CASCADE, default=1) 
+    #TIpo direccion con herencia 
     
 
 class TipoTelefono():

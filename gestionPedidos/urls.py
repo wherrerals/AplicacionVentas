@@ -21,6 +21,7 @@ urlpatterns = [
     path('buscar/', views.busquedaProductos, name='busquedaProductos'),
     path('mis_datos/', views.mis_datos, name='mis_datos'),
     path('agregar_editar_clientes/',views.agregar_editar_clientes,name='agregar_editar_clientes'),
+    path('agregar_direccion/',views.agregar_direccion,name='agregar_direccion'),
 
 ]
 
