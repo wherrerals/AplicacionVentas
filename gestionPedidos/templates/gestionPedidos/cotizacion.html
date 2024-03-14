@@ -115,7 +115,7 @@
                               <div class="col-sm-2 col-md-1 text-nowrap" style="width: 20%;">
                                 <label id="nombreLabel" class="col-form-label" style="font-size: 13px;">Nombre</label>
                               </div>
-                              <div class="col-sm-3 col-md-3" style="text-align: left;width: 30%;">
+                              <div class="col-sm-3 col-md-3" style="text-align: left;width: 80%;">
                                 <input class="form-control" type="text" name="nombre" id="nombre" value="{{ nombre }}" style="border-color: rgb(159,168,175);font-size: 12px;">
                               </div>
                             </div>
@@ -124,7 +124,7 @@
                               <div class="col-sm-1 col-md-1" style="width: 20%;" id="apellidorow">
                                 <label class="col-form-label" style="font-size: 13px;">Apellido</label>
                               </div>
-                              <div class="col-sm-6 col-md-6" style="width: 40%;">
+                              <div class="col-sm-6 col-md-6" style="width: 80%;">
                                 <input class="form-control" type="text" name="apellido" id="apellido" value="{{ apellido }}" style="border-color: rgb(159,168,175);font-size: 12px;">
                               </div>
                             </div>
@@ -154,7 +154,7 @@
                                   apellidoInput.style.display = 'block'; // Asegurarse de que el input de apellido esté visible
                                   apellidolabel.style.display = 'block'
                               } else if (razonSocialRadio[1].checked) {
-                                  nombreLabel.textContent = 'Razon Social';
+                                  nombreLabel.textContent = 'R. Social';
                                   apellidoInput.style.display = 'none'; // Ocultar el input de apellido
                                   apellidolabel.style.display = 'none'
                               }
@@ -370,14 +370,17 @@
                               </div>
                             </div>
                             <div class="row">
-                              <div class="col-sm-4"><label class="col-form-label"
-                                  style="font-size: 13px;">Nombre</label></div>
-                              <div class="col"><input class="form-control" type="text" name="nombreDireccion"
-                                  style="border-color: rgb(159,168,175);font-size: 12px;"></div>
+                              <div class="col-sm-4">
+                                <label class="col-form-label" style="font-size: 13px;">Nombre</label>
+                              </div>
+                              <div class="col">
+                                <input class="form-control" type="text" name="nombreDireccion" style="border-color: rgb(159,168,175);font-size: 12px;">
+                              </div>
                             </div>
                             <div class="row">
-                              <div class="col-sm-4"><label class="col-form-label"
-                                  style="font-size: 13px;">Apellido</label></div>
+                              <div class="col-sm-4">
+                                <label class="col-form-label" style="font-size: 13px;">Apellido</label>
+                              </div>
                               <div class="col"><input class="form-control" type="text" name="pais"
                                   style="border-color: rgb(159,168,175);font-size: 12px;"></div>
                             </div>

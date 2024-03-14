@@ -167,7 +167,7 @@ def lista_usuarios(request):
 
 
 @login_required
-def clientes(request):
+def creacion_clientes(request):
     return render(request, "cliente.html")
 
 @login_required

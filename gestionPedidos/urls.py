@@ -10,11 +10,11 @@ urlpatterns = [
     path('lista_ovs', views.lista_ovs, name='lista_ovs'),
     path('lista_solic_devoluciones', views.lista_solic_devoluciones, name='lista_solic_devoluciones'),
     path('lista_clientes', views.lista_clientes, name='lista_clientes'),
+    path('creacion_clientes/', views.creacion_clientes, name='creacion_clientes'),
     path('reporte_stock', views.reporte_stock, name='reporte_stock'),
     path('micuenta', views.micuenta, name='micuenta'),
     path('lista_usuarios', views.lista_usuarios, name='lista_usuarios'),
     path('salir/', views.salir, name='salir'),
-    path('clientes/', views.clientes, name='clientes/'),
     path('registrarCuenta/', views.registrarCuenta),
     path('funciones/<str:motor>/<str:accion>/<str:param>/', Funciones.as_view(), name="funciones"),
     path('obtener-datos-producto/<int:producto_id>/', views.obtenerDatosProducto, name='obtenerDatosProducto'),
@@ -22,6 +22,5 @@ urlpatterns = [
     path('mis_datos/', views.mis_datos, name='mis_datos'),
     path('agregar_editar_clientes/',views.agregar_editar_clientes,name='agregar_editar_clientes'),
     path('agregar_direccion/',views.agregar_direccion,name='agregar_direccion'),
-
 ]
 

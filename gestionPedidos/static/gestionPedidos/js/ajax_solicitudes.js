@@ -2,7 +2,7 @@ $(document).ready(function(){
     $('#inputNumero').on('input', function(){ //escucha el evento de entrada en input con #inputNumero
         var numero = $(this).val();
         if(numero){
-            $.ajax({ //realiza una solicitud ajax al servidor a la url buscar/
+            $.ajax({ // realiza una solicitud ajax al servidor a la url buscar/
                 url: 'buscar/', 
                 data: {
                     'numero': numero //envia los datos ingresados por el usuario al servidor (sku)
@@ -41,6 +41,7 @@ $(document).ready(function(){
                                 var precioDescuento = parseFloat(this.getAttribute('data-maxDescuento'));
                                 
                                 agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento); //ejecuta la funcion agregar producto
+
                             });
 
                             $('#resultados').append(productoElemento); //agrega los resultados en el contenedor 
