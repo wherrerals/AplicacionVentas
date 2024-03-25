@@ -1,3 +1,5 @@
+var contprod = 0;
+
 function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento) {
 
   var precioSinDescuento = 0
@@ -5,6 +7,7 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
 
   // Crear una nueva fila
   var newRow = document.createElement('tbody');
+  contprod ++;
 
   // Definir el contenido de la fila
   newRow.innerHTML = `
@@ -12,7 +15,7 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
   <td style="font-size: 12px; background: transparent; border-style: none; padding-bottom: 0px;" rowspan="2">
       <div class="row">
           <div class="col-md-11 col-xxl-6" style="font-size: 14px; font-weight: bold;">
-          <small>1)</small><small>&nbsp;&nbsp;</small><small style="font-weight-bold" name="sku_producto">${productoCodigo}</small>
+          <small>${contprod})</small><small>&nbsp;&nbsp;</small><small style="font-weight-bold" name="sku_producto">${productoCodigo}</small>
           </div>
           <div class="col-md-11 col-xxl-7" style="text-align: center;">
               <img src="${imagen}" width="50" height="50" style="width: 50px;height: 50px;" name="img_producto">

@@ -40,19 +40,24 @@ $(document).ready(function(){
                                 var precioLista = parseFloat(this.getAttribute('data-precioAnterior'));
                                 var precioDescuento = parseFloat(this.getAttribute('data-maxDescuento'));
                                 
-                                agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento); //ejecuta la funcion agregar producto
+                                agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento); //Ejecuta la funcion agregar producto
 
                             });
 
-                            $('#resultados').append(productoElemento); //agrega los resultados en el contenedor 
+                            $('#resultados').append(productoElemento); //Agrega los resultados en el contenedor
+                            
+                            $('#resultados').on('click', '*', function() {
+                                // Limpiar el div #resultados al hacer clic en cualquier elemento dentro de él
+                                $('#resultados').empty();
+                            });
                         });
                     } else {
-                        $('#resultados').text('No se encontraron resultados'); //si no encuentra resultados muestra el mensaje
+                        $('#resultados').text('No se encontraron resultados'); //Si no encuentra resultados muestra el mensaje
                     }
                 }
             });
         } else {
-            $('#resultados').empty(); // si el usuario elimina el codito borra todos los resultados.
+            $('#resultados').empty(); //Si el usuario elimina el codito borra todos los resultados.
         }
     });
 });

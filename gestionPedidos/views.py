@@ -10,8 +10,6 @@ from django.db import transaction
 from django.core import serializers
 from django.contrib import messages
 
-
-
 @login_required
 def home(request):
     if request.user.is_authenticated:
@@ -41,12 +39,11 @@ def cotizacion(request):
         return render(request, 'cotizacion.html', {'username': username})
     else:
         return render(request, "cotizacion.html")
-    
+
 @login_required #Implementada para menus de opciones con regiones
 def regiones(request):
     regiones = Region.objects.all()
     return render(request, 'cotizacion.html', {'regiones': regiones})
-
 
 @login_required
 def lista_ovs(request):
@@ -109,7 +106,6 @@ def registrarCuenta(request):
         return render(request, "micuenta.html", {'email': email, "nombre": nombre, "telefono": telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
     
     return render(request,"micuenta.html",{'email': email, "nombre": nombre, "telefono":telefono,"mensaje_error_contrasena": mensaje})
-    
 
 #agregaado vista para modificar los datos
 @login_required
@@ -159,7 +155,6 @@ def mis_datos(request):
     nombre = user.first_name
 
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
-
 
 @login_required
 def lista_usuarios(request):
@@ -219,7 +214,6 @@ def agregar_editar_clientes(request):
                                                 )
            
         return redirect("/")
-    
 
 @login_required
 #desde ambos botones se puede llamar y usar el tipo para ver donde se muestra en "barras (ayax)"
@@ -249,8 +243,6 @@ def agregar_direccion(request):
                                        SocioNegocio = socio,
                                        pais = pais) #Se crea, el resto se pasan por defecto
     return redirect("/")
-
-        
 
 class Funciones(View):
     LocalHost = "1.1"
@@ -304,6 +296,7 @@ class Funciones(View):
     
         return HttpResponse('Todo ok')
 
+@login_required
 def obtenerDatosProducto(request, producto_id):
     producto = Producto.objects.get(id=producto_id)
     data = {
@@ -316,7 +309,7 @@ def obtenerDatosProducto(request, producto_id):
 
     return JsonResponse(data)
 
-
+""" @login_required
 def busquedaProductos(request):
     if request.method == 'GET' and 'numero' in request.GET:
         numero = request.GET.get('numero')
@@ -326,8 +319,9 @@ def busquedaProductos(request):
         resultados_formateados = [{'codigo': producto.codigo, 'nombre': producto.nombre} for producto in resultados]
         return JsonResponse({'resultados': resultados_formateados})
     else:
-        return JsonResponse({'error': 'No se proporcionó un número válido'})
+        return JsonResponse({'error': 'No se proporcionó un número válido'}) """
 
+@login_required
 def busquedaProductos(request):
     if request.method == 'GET' and 'numero' in request.GET:
         numero = request.GET.get('numero')
@@ -344,8 +338,6 @@ def busquedaProductos(request):
         return JsonResponse({'resultados': resultados_formateados})
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
-
-
 
 def validar_contrasena(password):
     mensajes = []
