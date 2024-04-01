@@ -43,6 +43,9 @@ class SocioNegocioper(admin.ModelAdmin):
 class Usuarioper(admin.ModelAdmin):
     list_display = ('nombre', 'email','telefono')
 
+class Contactoper(admin.ModelAdmin):
+    list_display = ('nombreCompleto',)
+
 
 
 # Register your models here.
@@ -58,6 +61,7 @@ admin.site.register(Inventario,Inventarioper)
 admin.site.register(Item,itemper)
 admin.site.register(SocioNegocio,SocioNegocioper)
 admin.site.register(Usuario,Usuarioper)
+admin.site.register(Contacto, Contactoper)
 
 
 

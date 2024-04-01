@@ -108,7 +108,6 @@ def registrarCuenta(request):
     return render(request,"micuenta.html",{'email': email, "nombre": nombre, "telefono":telefono,"mensaje_error_contrasena": mensaje})
 
 #agregaado vista para modificar los datos
-@login_required
 def mis_datos(request):
 
     usuario = Usuario.objects.get(usuarios=request.user)
@@ -355,3 +354,23 @@ def validar_contrasena(password):
         mensajes.append("Su contraseña debe tener al menos 8 caracteres.")
 
     return mensajes  
+
+@login_required
+def busquedaClientes(request):
+    if request.method == 'GET' and 'numero' in request.GET:
+        numero = request.GET.get('numero')
+        resultadosClientes = SocioNegocio.objects.filter(rut__icontains=numero)
+        resultadosClientes_formateados = [{'nombre': socionegocio.nombre,
+                                   'apellido': socionegocio.apellido,
+                                   'razonSocial': socionegocio.razonSocial,
+                                   'rut': socionegocio.rut,
+                                   'email': socionegocio.email,
+                                   'telefono': socionegocio.telefono,
+                                   'giro': socionegocio.giro,
+                                   'condicionPago': socionegocio.condicionPago,
+                                   'plazoReclamaciones': socionegocio.plazoReclamaciones,
+                                   'clienteExportacion': socionegocio.clienteExportacion,
+                                   'vendedor': socionegocio.vendedor,} for socionegocio in resultadosClientes]
+        return JsonResponse({'resultadosClientes': resultadosClientes_formateados})
+    else:
+        return JsonResponse({'error': 'No se proporcionó un número válido'})
