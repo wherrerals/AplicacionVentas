@@ -7,6 +7,7 @@ from django.http import JsonResponse
 from django.views import View
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
+from .forms import *
 from django.core import serializers
 from django.contrib import messages
 
@@ -374,3 +375,15 @@ def busquedaClientes(request):
         return JsonResponse({'resultadosClientes': resultadosClientes_formateados})
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
+
+
+def FormPedidos(request):
+    if request.method == 'POST':
+        pedidos_form = PedidosForm(request.POST)
+        if PedidosForm.is_valid():
+            pedidos = pedidos_form.save()
+            return HttpResponse('<p>Probando Ando</p>')
+        else: 
+            pedidos_form = PedidosForm()
+        
+        return HttpResponse('Probando ando 2')

@@ -33,6 +33,9 @@ $(document).ready(function(){
                     }
                 }
             });
+        } else {
+            $('#resultadosClientes').empty();
         }
     });
 });
+
