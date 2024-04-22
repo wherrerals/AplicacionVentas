@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect, HttpResponse # importa el metodo render 
 from django.contrib.auth.decorators import login_required
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
 from gestionPedidos.models import *
 from django.views import View
@@ -355,7 +358,7 @@ def validar_contrasena(password):
 
     return mensajes  
 
-@login_required
+""" @login_required
 def busquedaClientes(request):
     if request.method == 'GET' and 'numero' in request.GET:
         numero = request.GET.get('numero')
@@ -373,4 +376,24 @@ def busquedaClientes(request):
                                    'vendedor': socionegocio.vendedor,} for socionegocio in resultadosClientes]
         return JsonResponse({'resultadosClientes': resultadosClientes_formateados})
     else:
-        return JsonResponse({'error': 'No se proporcionó un número válido'})
+        return JsonResponse({'error': 'No se proporcionó un número válido'}) """
+
+class BusquedaClientes(LoginRequiredMixin, APIView):
+    def get(self, request):
+        if 'numero' in request.GET:
+            numero = request.GET.get('numero')
+            resultados_clientes = SocioNegocio.objects.filter(rut__icontains=numero)
+            resultados_formateados = [{'nombre': socio.nombre,
+                                       'apellido': socio.apellido,
+                                       'razonSocial': socio.razonSocial,
+                                       'rut': socio.rut,
+                                       'email': socio.email,
+                                       'telefono': socio.telefono,
+                                       'giro': socio.giro,
+                                       'condicionPago': socio.condicionPago,
+                                       'plazoReclamaciones': socio.plazoReclamaciones,
+                                       'clienteExportacion': socio.clienteExportacion,
+                                       'vendedor': socio.vendedor} for socio in resultados_clientes]
+            return Response({'resultadosClientes': resultados_formateados})
+        else:
+            return Response({'error': 'No se proporcionó un número válido'})

@@ -157,13 +157,11 @@ class Direccion(models.Model):
     SocioNegocio = models.ForeignKey(SocioNegocio,on_delete=models.CASCADE, default=1) 
     comuna = models.ForeignKey(Comuna,on_delete=models.CASCADE, default=1)
     region = models.ForeignKey(Region,on_delete=models.CASCADE, default=1)
-    #TIpo direccion con herencia 
-    
+    #TIpo direccion con herencia     
 
 class TipoTelefono():
     codigo = models.IntegerField(primary_key=True)
     tipo = models.CharField(max_length=50,null = False)
-
 
 
 class Contacto(models.Model):

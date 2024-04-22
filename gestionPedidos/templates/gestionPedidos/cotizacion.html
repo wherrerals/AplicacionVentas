@@ -77,7 +77,7 @@
         <p>Estado:&nbsp;<strong></strong></p>
       </div>
     </div>
-    <form  id="form_agregar_editar_cliente" method="POST" action="/agregar_editar_clientes/"> {% csrf_token %} 
+    <form id="forCrearPedidos" method="POST" action="/agregarPedidos/"> {% csrf_token %}
       <!--form  id="form_agregar_editar_cliente" method="POST" action="/agregar_editar_clientes/"> {% csrf_token %} Cambiar para probar distinto form-->
       <div class="row" style="background: #f0f2f5;">
         <div class="col-sm-8 col-md-1 text-nowrap" style="width: 75%;">
@@ -102,7 +102,6 @@
                         <button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                      <form>
                         <div class="row" style="background: #f0f2f5;">
                           <div class="col">
                             <p></p>
@@ -277,8 +276,6 @@
                             <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cerrar</button>
                             <button class="btn btn-primary" id="grabar-btn" type="submit">Grabar</button>
                           </div>
-
-                      </form>
                     </div>
                     
                   </div>
@@ -475,9 +472,6 @@
                   </div>
 
                   <div class="modal-body" style="padding: 9px;">
-
-                    <form id="form_dir_despacho"> <!--Frmulario vista direccion-->
-
                       <div class="row" style="margin-right: 0px;margin-left: 0px;">
 
                         <div class="col-sm-12" style="width: 100%;" hidden> <!-- Boton oculto, pues no se necesitaria agregar mas direccones -->
@@ -632,8 +626,7 @@
                         
             
                       </div>
-                    </form>
-                  </div>
+                                      </div>
 
                   <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cerrar</button>
@@ -678,7 +671,6 @@
                       class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
                   </div>
                   <div class="modal-body" style="padding: 9px;">
-                  <form id="form_agregar_editar_cliente" method="POST" action="/agregar_editar_clientes/"> {% csrf_token %}
                     <div class="row" style="margin-right: 0px;margin-left: 0px;">
 
                        <div class="col-sm-12" style="width: 100%;" hidden> <!-- Boton oculto, pues no se necesitaria agregar mas direccones -->
