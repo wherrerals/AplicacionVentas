@@ -59,12 +59,12 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
   </td>
   <td style="font-size: 12px;background: transparent;border-style: none;">
       <div>
-          <input class="form-control" type="text" style="font-size: 12px;width: 40px;" id="agg_descuento">
+          <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="1" max="1000">
       </div>
   </td>
   <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${precioSinDescuento}</td>
   <td style="font-size: 12px;background: transparent;border-style: none;">
-      <input class="form-control" type="text" style="width: 65px;" id="calcular_cantidad">
+      <input class="form-control" type="number" style="width: 65px;" id="calcular_cantidad" min="1" max="1000">
   </td>
   <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
       <span id="precio_Venta">${totalProducto}</span>
@@ -119,11 +119,11 @@ agregarInteractividad(newRow);
 
 function agregarInteractividad(newRow) {
   // Obtener referencias a los elementos dentro de la fila
-  var inputCantidad = newRow.querySelector('#calcular_cantidad');
-  var inputDescuento = newRow.querySelector('#agg_descuento');
-  var spanPrecioVenta = newRow.querySelector('#precio_Venta');
-  var tdPrecioVenta = newRow.querySelector('#precio_Venta');
-  var tdPrecioDescuento = newRow.querySelector('#Precio_Descuento');
+  var inputCantidad = parseFloat(newRow.querySelector('#calcular_cantidad').value);
+  var inputDescuento = parseFloat(newRow.querySelector('#agg_descuento').value);
+  var spanPrecioVenta = parseFloat(newRow.querySelector('#precio_Venta').innerText);
+  var tdPrecioVenta = parseFloat(newRow.querySelector('#precio_Venta').innerText);
+  var tdPrecioDescuento = parseFloat(newRow.querySelector('#Precio_Descuento').innerText);
 
     // Agregar evento de cambio al input de cantidad para calcular el precio total
   inputCantidad.addEventListener('change', function() {
@@ -133,13 +133,12 @@ function agregarInteractividad(newRow) {
   inputDescuento.addEventListener('change', function() {
     aplicarDescuento();
   });
-// Función para calcular el precio total
 
-
+  // Función para calcular el precio total
 function calcularPrecioTotal(descuento) {
-  var cantidad = parseInt(inputCantidad.value);
-  var precioVenta = parseFloat(spanPrecioVenta.textContent);
-  var precioTotal = cantidad * precioVenta;
+  var cantidad = parseFloat(inputCantidad.value);
+  var descuentoAplicado = parseFloat(tdPrecioDescuento.textContent);
+  var precioTotal = cantidad * descuentoAplicado;
   tdPrecioVenta.textContent = precioTotal.toFixed(2);
   
 };
@@ -149,11 +148,12 @@ function aplicarDescuento() {
   var descuento = parseFloat(inputDescuento.value);
   var precioTotal = parseFloat(tdPrecioVenta.textContent);
   var precioDescuento = precioTotal * (descuento / 100);
-  tdPrecioDescuento.textContent = precioDescuento.toFixed(2);
-  return precioDescuento;
+  var descuentoAplicado = precioTotal - precioDescuento;
+  tdPrecioDescuento.textContent = descuentoAplicado.toFixed(2);
+  return descuentoAplicado;
+  
 }
 }
-
 var contdir = 0;
 
 function agergardireccion(){

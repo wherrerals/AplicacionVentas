@@ -12,6 +12,7 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from django.http import JsonResponse
 from .api_client import APIClient
+from .forms import *
 from django.core import serializers
 from django.contrib import messages
 
