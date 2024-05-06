@@ -24,5 +24,6 @@ urlpatterns = [
     path('agregar_direccion/',views.agregar_direccion,name='agregar_direccion'),
     #path('buscarc/', views.busquedaClientes, name='busquedaClientes'),
     path('buscarc/', BusquedaClientes.as_view(), name='busquedaClientes'),
+    path('test/', views.test_connection, name='test'),
 ]
 

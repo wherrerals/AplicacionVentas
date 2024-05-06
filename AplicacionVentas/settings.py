@@ -93,6 +93,12 @@ DATABASES = {
     }
 }
 
+# Base service Layer
+API_BASE_URL = 'https://182.160.29.24:50003/b1s/v1/'
+COMPANY_DB = "LED"
+API_USERNAME = 'manager'
+API_PASSWORD = '1245LED98'
+
 #python ./manage.py makemigrations gestionPedidos
 #python ./manage.py sqlmigrate gestionPedidos 0001
 #python ./manage.py migrate
@@ -147,3 +153,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #hola mundo
+
+

@@ -10,6 +10,8 @@ from django.http import JsonResponse
 from django.views import View
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
+from django.http import JsonResponse
+from .api_client import APIClient
 from django.core import serializers
 from django.contrib import messages
 
@@ -358,7 +360,8 @@ def validar_contrasena(password):
 
     return mensajes  
 
-""" @login_required
+""" 
+@login_required
 def busquedaClientes(request):
     if request.method == 'GET' and 'numero' in request.GET:
         numero = request.GET.get('numero')
@@ -376,7 +379,8 @@ def busquedaClientes(request):
                                    'vendedor': socionegocio.vendedor,} for socionegocio in resultadosClientes]
         return JsonResponse({'resultadosClientes': resultadosClientes_formateados})
     else:
-        return JsonResponse({'error': 'No se proporcionó un número válido'}) """
+        return JsonResponse({'error': 'No se proporcionó un número válido'}) 
+"""
 
 class BusquedaClientes(LoginRequiredMixin, APIView):
     def get(self, request):
@@ -397,3 +401,30 @@ class BusquedaClientes(LoginRequiredMixin, APIView):
             return Response({'resultadosClientes': resultados_formateados})
         else:
             return Response({'error': 'No se proporcionó un número válido'})
+
+# views.py
+
+
+def my_view(request):
+    # Crear una instancia del cliente de la API
+    client = APIClient()
+
+    # Realizar solicitudes a la API
+    data = client.get_data('endpoint_deseado')
+
+    # Devolver los datos como una respuesta JSON
+    return JsonResponse(data)
+
+def test_connection(request):
+    # Crear una instancia del cliente de la API
+    client = APIClient()
+
+    try:
+        # Realizar una solicitud de prueba a la API
+        test_data = client.get_data('Quotations')
+
+        # Devolver los datos obtenidos como respuesta JSON
+        return JsonResponse({'success': True, 'message': 'Conexión exitosa', 'data': test_data})
+    except Exception as e:
+        # Manejar cualquier error que ocurra durante la solicitud
+        return JsonResponse({'success': False, 'message': 'Error al conectar con la API', 'error': str(e)})
