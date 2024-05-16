@@ -12,9 +12,14 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from django.http import JsonResponse
 from .api_client import APIClient
+from .api_client import AsyncAPIClient
 from .forms import *
 from django.core import serializers
 from django.contrib import messages
+import requests
+import aiohttp
+import asyncio
+
 
 @login_required
 def home(request):
@@ -406,7 +411,7 @@ class BusquedaClientes(LoginRequiredMixin, APIView):
 # views.py
 
 
-def my_view(request):
+""" def my_view(request):
     # Crear una instancia del cliente de la API
     client = APIClient()
 
@@ -414,7 +419,7 @@ def my_view(request):
     data = client.get_data('endpoint_deseado')
 
     # Devolver los datos como una respuesta JSON
-    return JsonResponse(data)
+    return JsonResponse(data) """
 
 def test_connection(request):
     # Crear una instancia del cliente de la API
@@ -422,10 +427,106 @@ def test_connection(request):
 
     try:
         # Realizar una solicitud de prueba a la API
-        test_data = client.get_data('Quotations')
+        test_data = client.get_data('Items')
 
         # Devolver los datos obtenidos como respuesta JSON
         return JsonResponse({'success': True, 'message': 'Conexión exitosa', 'data': test_data})
     except Exception as e:
         # Manejar cualquier error que ocurra durante la solicitud
         return JsonResponse({'success': False, 'message': 'Error al conectar con la API', 'error': str(e)})
+
+class BusquedaClientes2(APIView):
+    def get(self, request):
+        try:
+            # Crear una instancia del cliente de la API
+            client = APIClient()
+
+            # Realizar una solicitud a la API para obtener los datos
+            full_data = client.get_data('Items')
+
+            # Extraer solo los campos necesarios
+            processed_data = []
+            for item in full_data:
+                processed_item = {
+                    'codigo': item['codigo'],
+                    'nombre': item['nombre'],
+                    'imagen': item['imagen'],
+                    'precio': item['precio'],
+                    'stockTotal': item['stockTotal'],
+                    'precioAnterior': item['precioAnterior'],
+                    'maxDescuento': item['maxDescuento']
+                }
+                processed_data.append(processed_item)
+
+            # Devolver los datos procesados como una respuesta JSON
+            return JsonResponse({'resultados': processed_data})
+        except Exception as e:
+            # Manejar cualquier error que ocurra durante la solicitud
+            return JsonResponse({'error': str(e)})
+
+
+def pruebas2(request):
+    try:
+        # Crear una instancia del cliente de la API
+        client = AsyncAPIClient()
+
+        # Realizar una solicitud de prueba a la API 
+        full_data = client.get_data('Items')
+
+        # Extraer solo los campos necesarios
+        processed_data = []
+        for item in full_data['value']:
+            processed_item = {
+                'ItemCode': item['ItemCode'],
+                'ItemName': item['ItemName'],
+                'precio': item.get('ItemPrices', [{}])[0].get('Price', None),  # Precio del primer elemento en ItemPrices
+                'precioAnterior': item.get('ItemPrices', [{}])[0].get('BasePriceList', None)  # Precio anterior del primer elemento en ItemPrices
+            }
+            processed_data.append(processed_item)
+
+        # Devolver los datos procesados como una respuesta JSON
+        return JsonResponse({'resultados': processed_data})
+    except Exception as e:
+        # Manejar cualquier error que ocurra durante la solicitud
+        return JsonResponse({'error': str(e)})
+
+
+
+""" 
+GET https://localhost:50000/b1s/v1/Items?$select=ItemCode,ItemName,ForeignName&$filter=startswith(ItemCode, 'a') &$orderby=ItemCode&$top=10&$skip=1
+"""
+
+""" def pruebas(request):
+    # Crear una instancia del cliente de la API
+    client = APIClient()
+    SKU = "C10100519"
+
+    # Realizar solicitudes a la API
+    data = client.get_data2('Items', SKU)
+
+    # Devolver los datos como una respuesta JSON
+    return JsonResponse(data) """
+
+async def pruebas(request):
+    try:
+        async_client = AsyncAPIClient()
+
+        # Realizar una solicitud de prueba a la API de forma asíncrona
+        full_data = await async_client.get_data('Items')
+
+        # Extraer solo los campos necesarios
+        processed_data = []
+        for item in full_data['value']:
+            processed_item = {
+                'ItemCode': item['ItemCode'],
+                'ItemName': item['ItemName'],
+                'precio': item.get('ItemPrices', [{}])[0].get('Price', None),
+                'precioAnterior': item.get('ItemPrices', [{}])[0].get('BasePriceList', None)
+            }
+            processed_data.append(processed_item)
+
+        # Devolver los datos procesados como una respuesta JSON
+        return JsonResponse({'resultados': processed_data})
+    except Exception as e:
+        # Manejar cualquier error que ocurra durante la solicitud
+        return JsonResponse({'error': str(e)})

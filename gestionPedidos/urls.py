@@ -1,6 +1,6 @@
 from django.urls import path
 from gestionPedidos import views
-from .views import Funciones, BusquedaClientes
+from .views import Funciones, BusquedaClientes, BusquedaClientes2
 
 
 urlpatterns = [
@@ -25,5 +25,8 @@ urlpatterns = [
     #path('buscarc/', views.busquedaClientes, name='busquedaClientes'),
     path('buscarc/', BusquedaClientes.as_view(), name='busquedaClientes'),
     path('test/', views.test_connection, name='test'),
+    path('users/', BusquedaClientes2.as_view(), name='users'),
+    path('debug/', views.pruebas, name='debug'),
+
 ]
 
