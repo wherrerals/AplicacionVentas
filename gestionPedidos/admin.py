@@ -47,7 +47,6 @@ class Contactoper(admin.ModelAdmin):
     list_display = ('nombreCompleto',)
 
 
-
 # Register your models here.
 admin.site.register(TipoDocTributario,TipoDocTributarioper)
 admin.site.register(Sucursal,Sucursalper)

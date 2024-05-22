@@ -1,26 +1,27 @@
+#Django modulos
 from django.shortcuts import render, redirect, HttpResponse # importa el metodo render 
-from django.contrib.auth.decorators import login_required
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.contrib.auth.decorators import login_required 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
-from gestionPedidos.models import *
-from django.views import View
-from django.http import JsonResponse
-from django.views import View
 from django.contrib.auth.hashers import make_password
+from django.contrib import messages
+from django.views import View
 from django.db import transaction
 from django.http import JsonResponse
-from .api_client import APIClient
-from .api_client import AsyncAPIClient
-from .forms import *
 from django.core import serializers
-from django.contrib import messages
+#Django Rest F modulos
+from rest_framework.views import APIView
+from rest_framework.response import Response
+#Modulos Diseñados
+from gestionPedidos.models import *
+from .forms import * #prueba
+from .api_client import APIClient, AsyncAPIClient
+#librerias Python usadas
 import requests
 import aiohttp
 import asyncio
 
-
+#Inicio vistas Renderizadoras
 @login_required
 def home(request):
     if request.user.is_authenticated:
@@ -31,7 +32,7 @@ def home(request):
         # El usuario no está autenticado, puedes manejarlo de alguna manera
         return render(request, 'home.html')
 
-    #return render(request, "home.html")
+        #return render(request, "home.html")
 
 @login_required
 def salir(request):
@@ -41,7 +42,7 @@ def salir(request):
 @login_required
 def lista_cotizaciones(request):
     return render(request, "lista_cotizaciones.html")
-
+ 
 @login_required
 def cotizacion(request):
     if request.user.is_authenticated:
@@ -254,58 +255,6 @@ def agregar_direccion(request):
                                        pais = pais) #Se crea, el resto se pasan por defecto
     return redirect("/")
 
-class Funciones(View):
-    LocalHost = "1.1"
-    Puerto = "50003"
-    Datos = {"CompanyDB": "TEST_LED_PROD", "UserName": "manager", "Password": "1245LED98"}
-    #url = f"https://{LocalHost}:{Puerto}/b1s/v1"
-    url = 'https://httpbin.org'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.motor = None  # determina httpx o request
-        self.accion = None  # determina si es GET o POST
-        self.param = None  # determina si es quotation, etc
-        self.data = None  # se ingresa si hay un (id).
-        self.extra = None  # cancel o close
-        self.dato_solicitud = None
-
-    def validacion(self):  # protección para los datos enviados a evaluar
-        motor_valido = ['httpx', 'request']
-        accion_valida = ['get', 'post', 'patch']
-        param_valido = ['quotation', 'Orders', 'ReturnRequest', None]  # Quitar None cuando se trabaje con service layer
-        extra_valido = ['Close', 'Cancel', None]  # también quitar
-        if self.accion not in accion_valida or self.motor not in motor_valido or self.param not in param_valido or self.extra not in extra_valido:
-            raise ValueError("Parámetros ingresados no válidos")
-
-    def constructor_url(self):
-        self.validacion()
-
-        self.dato_solicitud = self.dato_solicitud or {}
-
-        if self.data is None:
-            if self.param is None:
-                new_endpath = f"{self.url}/"
-            else:
-                new_endpath = f"{self.url}/{self.param}"
-        else:
-            if self.extra is None:
-                new_endpath = f"{self.url}/{self.param}({self.data})"
-            else:
-                new_endpath = f"{self.url}/{self.param}({self.data})/{self.extra}"
-
-        return new_endpath
-    
-    def get(self, request, motor, accion, param):
-        self.motor = motor
-        self.accion = accion
-        self.param = param
-
-        resultado = self.constructor_url()
-    
-        return HttpResponse('Todo ok')
-
 @login_required
 def obtenerDatosProducto(request, producto_id):
     producto = Producto.objects.get(id=producto_id)
@@ -319,17 +268,6 @@ def obtenerDatosProducto(request, producto_id):
 
     return JsonResponse(data)
 
-""" @login_required
-def busquedaProductos(request):
-    if request.method == 'GET' and 'numero' in request.GET:
-        numero = request.GET.get('numero')
-        # Realiza la consulta a la base de datos para obtener los resultados
-        resultados = Producto.objects.filter(codigo__icontains=numero)
-        # Convierte los resultados en una lista de diccionarios
-        resultados_formateados = [{'codigo': producto.codigo, 'nombre': producto.nombre} for producto in resultados]
-        return JsonResponse({'resultados': resultados_formateados})
-    else:
-        return JsonResponse({'error': 'No se proporcionó un número válido'}) """
 
 @login_required
 def busquedaProductos(request):
@@ -348,6 +286,25 @@ def busquedaProductos(request):
         return JsonResponse({'resultados': resultados_formateados})
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
+    
+
+class BusquedaProductosView(LoginRequiredMixin, APIView):
+    def get(self, request, *args, **kwargs):
+        numero = request.GET.get('numero')
+        if numero:
+            # Realiza la consulta a la base de datos para obtener los resultados
+            resultados = Producto.objects.filter(codigo__icontains=numero)
+            # Convierte los resultados en una lista de diccionarios
+            resultados_formateados = [{'codigo': producto.codigo,
+                                       'nombre': producto.nombre,
+                                       'imagen': producto.imagen,
+                                       'precio': producto.precioVenta,
+                                       'stockTotal': producto.stockTotal,
+                                       'precioAnterior': producto.precioLista,
+                                       'maxDescuento': producto.dsctoMaxTienda} for producto in resultados]
+            return JsonResponse({'resultados': resultados_formateados})
+        else:
+            return JsonResponse({'error': 'No se proporcionó un número válido'})
 
 def validar_contrasena(password):
     mensajes = []
@@ -366,47 +323,47 @@ def validar_contrasena(password):
 
     return mensajes  
 
-""" 
-@login_required
-def busquedaClientes(request):
-    if request.method == 'GET' and 'numero' in request.GET:
-        numero = request.GET.get('numero')
-        resultadosClientes = SocioNegocio.objects.filter(rut__icontains=numero)
-        resultadosClientes_formateados = [{'nombre': socionegocio.nombre,
-                                   'apellido': socionegocio.apellido,
-                                   'razonSocial': socionegocio.razonSocial,
-                                   'rut': socionegocio.rut,
-                                   'email': socionegocio.email,
-                                   'telefono': socionegocio.telefono,
-                                   'giro': socionegocio.giro,
-                                   'condicionPago': socionegocio.condicionPago,
-                                   'plazoReclamaciones': socionegocio.plazoReclamaciones,
-                                   'clienteExportacion': socionegocio.clienteExportacion,
-                                   'vendedor': socionegocio.vendedor,} for socionegocio in resultadosClientes]
-        return JsonResponse({'resultadosClientes': resultadosClientes_formateados})
-    else:
-        return JsonResponse({'error': 'No se proporcionó un número válido'}) 
-"""
 
 class BusquedaClientes(LoginRequiredMixin, APIView):
     def get(self, request):
         if 'numero' in request.GET:
             numero = request.GET.get('numero')
             resultados_clientes = SocioNegocio.objects.filter(rut__icontains=numero)
-            resultados_formateados = [{'nombre': socio.nombre,
-                                       'apellido': socio.apellido,
-                                       'razonSocial': socio.razonSocial,
-                                       'rut': socio.rut,
-                                       'email': socio.email,
-                                       'telefono': socio.telefono,
-                                       'giro': socio.giro,
-                                       'condicionPago': socio.condicionPago,
-                                       'plazoReclamaciones': socio.plazoReclamaciones,
-                                       'clienteExportacion': socio.clienteExportacion,
-                                       'vendedor': socio.vendedor} for socio in resultados_clientes]
+            resultados_formateados = []
+
+            for socio in resultados_clientes:
+                direcciones = Direccion.objects.filter(SocioNegocio=socio)
+                direcciones_formateadas = [{
+                    'rowNum': direccion.rowNum,
+                    'nombreDireccion': direccion.nombreDireccion,
+                    'ciudad': direccion.ciudad,
+                    'calleNumero': direccion.calleNumero,
+                    'codigoImpuesto': direccion.codigoImpuesto,
+                    'tipoDireccion': direccion.tipoDireccion,
+                    'pais': direccion.pais,
+                    'comuna': direccion.comuna.nombre,  # Asumiendo que Comuna tiene un campo nombre
+                    'region': direccion.region.nombre  # Asumiendo que Region tiene un campo nombre
+                } for direccion in direcciones]
+
+                resultados_formateados.append({
+                    'nombre': socio.nombre,
+                    'apellido': socio.apellido,
+                    'razonSocial': socio.razonSocial,
+                    'rut': socio.rut,
+                    'email': socio.email,
+                    'telefono': socio.telefono,
+                    'giro': socio.giro,
+                    'condicionPago': socio.condicionPago,
+                    'plazoReclamaciones': socio.plazoReclamaciones,
+                    'clienteExportacion': socio.clienteExportacion,
+                    'vendedor': socio.vendedor,
+                    'direcciones': direcciones_formateadas
+                })
+            
             return Response({'resultadosClientes': resultados_formateados})
         else:
             return Response({'error': 'No se proporcionó un número válido'})
+
 
 # views.py
 
@@ -465,7 +422,7 @@ class BusquedaClientes2(APIView):
             return JsonResponse({'error': str(e)})
 
 
-def pruebas2(request):
+""" def pruebas2(request):
     try:
         # Crear una instancia del cliente de la API
         client = AsyncAPIClient()
@@ -489,7 +446,7 @@ def pruebas2(request):
     except Exception as e:
         # Manejar cualquier error que ocurra durante la solicitud
         return JsonResponse({'error': str(e)})
-
+ """
 
 
 """ 
@@ -530,3 +487,46 @@ async def pruebas(request):
     except Exception as e:
         # Manejar cualquier error que ocurra durante la solicitud
         return JsonResponse({'error': str(e)})
+    
+
+class CotizacionesLista(APIView):
+    def get(self, request):
+        try:
+            # Crear una instancia del cliente de la API
+            client = APIClient()
+
+            # Realizar una solicitud a la API para obtener los datos
+            full_data = client.get_data('Quotations')
+
+            # Extraer solo los campos necesarios
+            processed_data = []
+            for item in full_data:
+                processed_item = {
+                    'codigo': item['codigo'],
+                    'nombre': item['nombre'],
+                    'imagen': item['imagen'],
+                    'precio': item['precio'],
+                    'stockTotal': item['stockTotal'],
+                    'precioAnterior': item['precioAnterior'],
+                    'maxDescuento': item['maxDescuento']
+                }
+                processed_data.append(processed_item)
+
+            # Devolver los datos procesados como una respuesta JSON
+            return JsonResponse({'resultados': processed_data})
+        except Exception as e:
+            # Manejar cualquier error que ocurra durante la solicitud
+            return JsonResponse({'error': str(e)})
+
+
+def pruebas(request):
+    # Crear una instancia del cliente de la API
+    client = APIClient()
+
+    # Realizar solicitudes a la API
+    data = client.get_data('Quotations')
+
+    # Devolver los datos como una respuesta JSON
+    return JsonResponse(data)
+
+

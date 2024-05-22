@@ -95,7 +95,8 @@ DATABASES = {
 
 # Base service Layer
 API_BASE_URL = 'https://182.160.29.24:50003/b1s/v1/'
-COMPANY_DB = "LED"
+COMPANY_DB = "TEST_LED_PROD"
+#COMPANY_DB = "lED"
 API_USERNAME = 'manager'
 API_PASSWORD = '1245LED98'
 

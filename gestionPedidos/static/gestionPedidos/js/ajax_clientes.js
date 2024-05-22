@@ -27,7 +27,7 @@ $(document).ready(function(){
                         $('#resultadosClientes').html('No se encontraron resultados'); // Utilizar html() en lugar de text()
                     }
                 },
-                error: function(xhr, status, error) { // Manejar errores de la solicitud AJAX
+                error: function(xhr, status, error) { // Maneja errores de la solicitud AJAX
                     console.error('Error en la solicitud AJAX:', error);
                 }
             });

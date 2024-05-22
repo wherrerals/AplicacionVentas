@@ -1,6 +1,6 @@
 from django.urls import path
 from gestionPedidos import views
-from .views import Funciones, BusquedaClientes, BusquedaClientes2
+from .views import  BusquedaClientes, BusquedaClientes2, BusquedaProductosView
 
 
 urlpatterns = [
@@ -16,9 +16,9 @@ urlpatterns = [
     path('lista_usuarios', views.lista_usuarios, name='lista_usuarios'),
     path('salir/', views.salir, name='salir'),
     path('registrarCuenta/', views.registrarCuenta),
-    path('funciones/<str:motor>/<str:accion>/<str:param>/', Funciones.as_view(), name="funciones"),
+    #path('funciones/<str:motor>/<str:accion>/<str:param>/', Funciones.as_view(), name="funciones"),
     path('obtener-datos-producto/<int:producto_id>/', views.obtenerDatosProducto, name='obtenerDatosProducto'),
-    path('buscar/', views.busquedaProductos, name='busquedaProductos'),
+    #path('buscar/', views.busquedaProductos, name='busquedaProductos'),
     path('mis_datos/', views.mis_datos, name='mis_datos'),
     path('agregar_editar_clientes/',views.agregar_editar_clientes,name='agregar_editar_clientes'),
     path('agregar_direccion/',views.agregar_direccion,name='agregar_direccion'),
@@ -27,6 +27,7 @@ urlpatterns = [
     path('test/', views.test_connection, name='test'),
     path('users/', BusquedaClientes2.as_view(), name='users'),
     path('debug/', views.pruebas, name='debug'),
-
+    path('buscar/', BusquedaProductosView.as_view(), name='buscar/'),
+    path('testing1/', views.pruebas, name='testing1'),
 ]
 
