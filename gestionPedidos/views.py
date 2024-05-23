@@ -1,11 +1,12 @@
 #Django modulos
 from django.shortcuts import render, redirect, HttpResponse # importa el metodo render 
-from django.contrib.auth.decorators import login_required 
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
 from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 from django.http import JsonResponse
 from django.core import serializers
@@ -518,8 +519,18 @@ class CotizacionesLista(APIView):
             # Manejar cualquier error que ocurra durante la solicitud
             return JsonResponse({'error': str(e)})
 
-
+@csrf_exempt
 def pruebas(request):
+    client = APIClient()
+    try:
+        data = client.get_data('Quotations')
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse(data, safe=False)
+
+
+
+def pruebas1(request):
     # Crear una instancia del cliente de la API
     client = APIClient()
 
@@ -528,5 +539,3 @@ def pruebas(request):
 
     # Devolver los datos como una respuesta JSON
     return JsonResponse(data)
-
-

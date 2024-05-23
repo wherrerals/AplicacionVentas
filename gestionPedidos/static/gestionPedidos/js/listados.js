@@ -8,27 +8,25 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(data => {
             console.log(data); // Verifica la estructura de los datos
-            // Verifica si data es un objeto
-            if (typeof data === 'object' && data !== null) {
-                // Si data es un objeto, conviértelo en un array de un solo elemento
-                const dataArray = [data];
-                const tbody = document.querySelector('#listadoCotizaciones');
-                dataArray.forEach(item => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><a href="cotizacion.html">${item.sap}</a></td>
-                        <td><a href="cliente.html">${item.cliente}</a></td>
-                        <td>${item.vendedor}</td>
-                        <td>${item.fecha}</td>
-                        <td>${item.estado}</td>
-                        <td style="text-align: right;">${item.neto}</td>
-                        <td style="text-align: right;">${item.bruto}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } else {
-                console.error('Expected an object but got:', data);
-            }
+            
+            const tbody = document.querySelector('#listadoCotizaciones');
+            
+            // Asegúrate de que data contiene una clave "items" que es una lista
+            const value = data.value || [];
+            
+            value.forEach(values => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><a href="cotizacion.html">${values.DocNum}</a></td>
+                    <td><a href="cliente.html">${values.CardName}</a></td>
+                    <td>${values.vendedor}</td>
+                    <td>${values.DocDate}</td>
+                    <td>${values.DownPaymentType}</td>
+                    <td style="text-align: right;">${values.U_PGX_FISCALIZACION}</td>
+                    <td style="text-align: right;">${values.DocTotal}</td>
+                `;
+                tbody.appendChild(tr);
+            });
         })
         .catch(error => console.error('Error:', error));
 });
