@@ -26,14 +26,10 @@ import asyncio
 @login_required
 def home(request):
     if request.user.is_authenticated:
-        # Acceder al nombre de usuario
-        username = request.user.username
-        return render(request, 'home.html', {'username': username})
+        username = request.user.username 
+        return render(request, 'home.html', {'username': username}) # Accede al nombre de usuario y permite su uso en el template
     else:
-        # El usuario no está autenticado, puedes manejarlo de alguna manera
         return render(request, 'home.html')
-
-        #return render(request, "home.html")
 
 @login_required
 def salir(request):
@@ -47,7 +43,6 @@ def lista_cotizaciones(request):
 @login_required
 def cotizacion(request):
     if request.user.is_authenticated:
-        # Acceder al nombre de usuario
         username = request.user.username
         return render(request, 'cotizacion.html', {'username': username})
     else:
@@ -520,7 +515,7 @@ class CotizacionesLista(APIView):
             return JsonResponse({'error': str(e)})
 
 @csrf_exempt
-def pruebas(request):
+def listaCotizacion(request):
     client = APIClient()
     try:
         data = client.get_data('Quotations')
