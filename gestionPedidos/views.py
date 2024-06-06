@@ -534,3 +534,5 @@ def pruebas1(request):
 
     # Devolver los datos como una respuesta JSON
     return JsonResponse(data)
+
+

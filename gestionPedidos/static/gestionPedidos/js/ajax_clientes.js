@@ -14,7 +14,7 @@ $(document).ready(function(){
                     if(data.resultadosClientes && data.resultadosClientes.length > 0){
                         data.resultadosClientes.forEach(function(resultadosClientes) {
                             var clientesElemento = $('<p></p>');
-                            clientesElemento.addClass('informacion_clientes');
+                            clientesElemento.addClass('suggestion-item');
                             clientesElemento.attr('data-nombre', resultadosClientes.nombre);
                             clientesElemento.attr('data-apellido', resultadosClientes.apellido);
                             clientesElemento.text(resultadosClientes.nombre + ' ' + resultadosClientes.apellido);
@@ -23,6 +23,7 @@ $(document).ready(function(){
                             $('#resultadosClientes').append(clientesElemento);
                             console.log("Se agregó un elemento <option> al select #resultadosClientes.");
                         });
+
                     } else {
                         $('#resultadosClientes').html('No se encontraron resultados'); // Utilizar html() en lugar de text()
                     }

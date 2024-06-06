@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles.min.css' %}">
+  <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles2.css' %}">  
 
 </head>
 
@@ -87,7 +88,7 @@
             <div class="col-sm-6 col-md-6" style="text-align: left;width: 58%;padding-right: 0px;">
               <input class="form-control" type="text" name="cliente"
                 style="border-color: rgb(159,168,175);font-size: 12px;" id="inputCliente">
-              <div id="resultadosClientes" style="position: relative;"></div>
+              <div id="resultadosClientes" style="font-size: 11px;"></div>
             </div>
             <div class="col" style="width: 15%;text-align: left;padding-left: 0px;padding-right: 0px;">
 
@@ -712,7 +713,7 @@
         <div class="col" style="width: 35%;padding-right: 0px;"><select class="form-select"
             style="font-size: 12px;border-color: rgb(159,168,175);">
             <optgroup label="--">
-              <option value="1" selected=""</option>
+              <option value="1" selected="" </option>
               <option value="13"></option>
               <option value="14"></option>
             </optgroup>
@@ -752,7 +753,7 @@
 
                       <div class="col-sm-12" style="width: 100%;height: 10px;"><span>&nbsp;</span></div>
                       <div class="col-sm-5 mx-auto" style="font-size: 12px;background: #f0f2f5;width: 230px;">
-                        
+
                         <div class="row">
                           <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
                           <div class="col" style="text-align: center;">
@@ -1006,7 +1007,7 @@
         </div>
         <div class="col-sm-7 col-md-7">
           <input class="form-control" type="text" style="font-size: 12px;" id="inputNumero">
-          <div id="resultados"></div>
+          <div id="resultados" style="font-size: 11px;"></div>
         </div>
         <div class="col"><button class="btn btn-primary" type="button" style="font-size: 12px;" id="agregar_productos"
             hidden>Agregar</button></div>
@@ -1032,15 +1033,15 @@
         <div class="col">
           <div class="row">
             <div class="col-sm-7 text-end"><small>Total Neto:</small></div>
-            <div class="col" style="text-align: right;"><small>0</small></div>
+            <div class="col" style="text-align: right;" id="total_neto"><small>0</small></div>
           </div>
           <div class="row">
             <div class="col-sm-7 text-end"><small>IVA:</small></div>
-            <div class="col" style="text-align: right;"><small>0</small></div>
+            <div class="col" style="text-align: right;" id="iva"><small>0</small></div>
           </div>
           <div class="row">
             <div class="col-sm-7 text-end"><small>Total Bruto:</small></div>
-            <div class="col" style="text-align: right;"><small>0</small></div>
+            <div class="col" style="text-align: right;" id="total_bruto"><small>0</small></div>
           </div>
         </div>
       </div>
@@ -1081,7 +1082,7 @@
   <script src="{% static 'gestionPedidos/js/botones.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/ajax_solicitudes.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/generacionCotizaciones.js' %}"></script>
- <script src="{% static 'gestionPedidos/js/ajax_clientes.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/ajax_clientes.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

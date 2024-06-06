@@ -115,17 +115,21 @@ function AlternarMaxDescuento(row) {
 
 function agregarInteractividad(newRow) {
   // Obtener referencias a los elementos dentro de la fila
-  var inputCantidad = newRow.querySelector('#calcular_cantidad');
-  var inputDescuento = newRow.querySelector('#agg_descuento');
-  var spanPrecioVenta = newRow.querySelector('#precio_Venta');
-  var tdPrecioVenta = newRow.querySelector('#precio_Venta');
-  var tdPrecioDescuento = newRow.querySelector('#Precio_Descuento');
+  let inputCantidad = newRow.querySelector('#calcular_cantidad');
+  let inputDescuento = newRow.querySelector('#agg_descuento');
+  let spanPrecioVenta = newRow.querySelector('#precio_Venta');
+  let tdPrecioVenta = newRow.querySelector('#precio_Venta');
+  let tdPrecioDescuento = newRow.querySelector('#Precio_Descuento');
+  let valorBruto = document.getElementById('total_bruto');
+  let valorIva = document.getElementById('iva');
+  let valorNeto= document.getElementById('total_neto');
 
+  
   // Agregar evento de cambio al input de cantidad para calcular el precio total
-  inputCantidad.addEventListener('change', calcularPrecioTotal);
+  inputCantidad.addEventListener('input', calcularPrecioTotal);
   
   // Agregar evento de cambio al input de descuento para aplicar el descuento
-  inputDescuento.addEventListener('change', aplicarDescuento);
+  inputDescuento.addEventListener('input', aplicarDescuento);
 
   // Función para calcular el precio total
   function calcularPrecioTotal() {
@@ -133,7 +137,8 @@ function agregarInteractividad(newRow) {
     var precioUnitario = parseFloat(spanPrecioVenta.textContent);
     var precioTotal = cantidad * precioUnitario;
     tdPrecioVenta.textContent = precioTotal.toFixed(2);
-  };
+    sumarPrecio(precioTotal); // Llamar a la función sumarPrecio con el precio total
+  }
 
   // Función para aplicar el descuento
   function aplicarDescuento() {
@@ -142,8 +147,27 @@ function agregarInteractividad(newRow) {
     var precioDescuento = precioTotal * (descuento / 100);
     var descuentoAplicado = precioTotal - precioDescuento;
     tdPrecioDescuento.textContent = descuentoAplicado.toFixed(2);
-  };
+  }
+
+  // Función para sumar el precio al valor neto
+  function sumarPrecio(precioUnitario) {
+    console.log("Sumar precio ejecutado"); // Agregar un console.log para verificar si se ejecuta
+    var bruto = parseFloat(valorBruto.textContent) || 0; // Inicializar a 0 si no hay valor
+    var iva = parseFloat(valorBruto.textContent) || 0;
+    var total = parseFloat(valorBruto.textContent) || 0;
+
+    bruto += parseFloat(precioUnitario);
+    valorBruto.textContent = '$' + bruto.toFixed(0); // Mostrar total con dos decimales
+
+    iva = (bruto * 0.19);
+    valorIva.textContent = '$' + iva.toFixed(0);
+
+    total = bruto - iva;
+    valorNeto.textContent = '$' + total.toFixed(0);
+  }
 }
+
+
 
 var contdir = 0;
 
