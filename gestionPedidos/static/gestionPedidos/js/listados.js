@@ -11,13 +11,13 @@ document.addEventListener("DOMContentLoaded", function() {
             
             const tbody = document.querySelector('#listadoCotizaciones');
             
-            // Asegúrate de que data contiene una clave "items" que es una lista
+            // Asegúrate de que data contiene una clave "value" que es una lista
             const value = data.value || [];
             
             value.forEach(values => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><a href="cotizacion.html">${values.DocNum}</a></td>
+                    <td><a href="cotizacion?docNum=${values.DocNum}">${values.DocNum}</a></td>
                     <td><a href="cliente.html">${values.CardName}</a></td>
                     <td>${values.vendedor}</td>
                     <td>${values.DocDate}</td>

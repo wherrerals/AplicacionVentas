@@ -47,6 +47,17 @@ def cotizacion(request):
         return render(request, 'cotizacion.html', {'username': username})
     else:
         return render(request, "cotizacion.html")
+    
+@login_required
+def cotizacion_view(request):
+    if request.user.is_authenticated:
+        username = request.user.username 
+    doc_num = request.GET.get('docNum', None)
+    context = {
+        'docnum': doc_num,
+        'username': username
+    }
+    return render(request, 'cotizacion.html', context)
 
 @login_required #Implementada para menus de opciones con regiones
 def regiones(request):
@@ -494,17 +505,14 @@ class CotizacionesLista(APIView):
             # Realizar una solicitud a la API para obtener los datos
             full_data = client.get_data('Quotations')
 
-            # Extraer solo los campos necesarios
+            # Procesar los datos y extraer solo los campos necesarios
             processed_data = []
-            for item in full_data:
+            for value in full_data.get('value', []):
                 processed_item = {
-                    'codigo': item['codigo'],
-                    'nombre': item['nombre'],
-                    'imagen': item['imagen'],
-                    'precio': item['precio'],
-                    'stockTotal': item['stockTotal'],
-                    'precioAnterior': item['precioAnterior'],
-                    'maxDescuento': item['maxDescuento']
+                    'codigo': int(value.get('DocNum', 0)),
+                    'fecha': value.get('DocDate', ''),
+                    'cliente': value.get('CardCode', '')
+                    # Agrega aquí los otros campos que necesites
                 }
                 processed_data.append(processed_item)
 

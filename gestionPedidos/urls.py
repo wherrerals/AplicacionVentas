@@ -27,6 +27,9 @@ urlpatterns = [
     path('users/', BusquedaClientes2.as_view(), name='users'),
     path('debug/', views.pruebas, name='debug'),
     path('buscar/', BusquedaProductosView.as_view(), name='buscar/'),
+    path('probando/', CotizacionesLista.as_view(), name='probando/'),
     path('listaCotizacion/', views.listaCotizacion, name='listaCotizacion'),
+    path('cotizacion/', views.cotizacion_view, name='cotizacion'),
+
 ]
 
