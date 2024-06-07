@@ -21,8 +21,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     <td><a href="cliente.html">${values.CardName}</a></td>
                     <td>${values.vendedor}</td>
                     <td>${values.DocDate}</td>
-                    <td>${values.DownPaymentType}</td>
-                    <td style="text-align: right;">${values.U_PGX_FISCALIZACION}</td>
+                    <td>${values.SalesPersonCode}</td>
+                    <td style="text-align: right;">${values.Cancelled}</td>
                     <td style="text-align: right;">${values.DocTotal}</td>
                 `;
                 tbody.appendChild(tr);

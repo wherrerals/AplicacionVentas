@@ -63,7 +63,7 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     </td>
     <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${precioSinDescuento}</td>
     <td style="font-size: 12px;background: transparent;border-style: none;">
-        <input class="form-control" type="number" style="width: 65px;" id="calcular_cantidad" min="1" max="1000">
+        <input class="form-control" type="number" style="width: 65px;" id="calcular_cantidad" min="1" max="1000" value=0>
     </td>
     <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
         <span id="precio_Venta">${totalProducto}</span>
@@ -115,15 +115,14 @@ function AlternarMaxDescuento(row) {
 
 function agregarInteractividad(newRow) {
   // Obtener referencias a los elementos dentro de la fila
-  let inputCantidad = newRow.querySelector('#calcular_cantidad');
-  let inputDescuento = newRow.querySelector('#agg_descuento');
-  let spanPrecioVenta = newRow.querySelector('#precio_Venta');
-  let tdPrecioVenta = newRow.querySelector('#precio_Venta');
-  let tdPrecioDescuento = newRow.querySelector('#Precio_Descuento');
+  let inputCantidad = newRow.querySelector('#calcular_cantidad'); // Cambié el selector a class
+  let inputDescuento = newRow.querySelector('#agg_descuento'); // Cambié el selector a class
+  let spanPrecioVenta = newRow.querySelector('#precio_Venta'); // Cambié el selector a class
+  let tdPrecioVenta = newRow.querySelector('#precio_Venta'); // Cambié el selector a class
+  let tdPrecioDescuento = newRow.querySelector('#Precio_Descuento'); // Cambié el selector a class
   let valorBruto = document.getElementById('total_bruto');
   let valorIva = document.getElementById('iva');
   let valorNeto= document.getElementById('total_neto');
-
   
   // Agregar evento de cambio al input de cantidad para calcular el precio total
   inputCantidad.addEventListener('input', calcularPrecioTotal);
@@ -133,41 +132,40 @@ function agregarInteractividad(newRow) {
 
   // Función para calcular el precio total
   function calcularPrecioTotal() {
-    var cantidad = parseFloat(inputCantidad.value);
-    var precioUnitario = parseFloat(spanPrecioVenta.textContent);
-    var precioTotal = cantidad * precioUnitario;
+    let cantidad = parseFloat(inputCantidad.value) || 0;
+    let precioUnitario = parseFloat(spanPrecioVenta.textContent) || 0;
+    let precioTotal = cantidad * precioUnitario;
+    let descuento = parseFloat(inputDescuento.value) || 0;
+    let precioConDescuento = precioTotal - (precioTotal * (descuento / 100));
+    
     tdPrecioVenta.textContent = precioTotal.toFixed(2);
-    sumarPrecio(precioTotal); // Llamar a la función sumarPrecio con el precio total
+    tdPrecioDescuento.textContent = precioConDescuento.toFixed(2);
+    
+    sumarPrecio(precioConDescuento);
   }
 
   // Función para aplicar el descuento
   function aplicarDescuento() {
-    var descuento = parseFloat(inputDescuento.value);
-    var precioTotal = parseFloat(tdPrecioVenta.textContent);
-    var precioDescuento = precioTotal * (descuento / 100);
-    var descuentoAplicado = precioTotal - precioDescuento;
-    tdPrecioDescuento.textContent = descuentoAplicado.toFixed(2);
+    calcularPrecioTotal();
   }
 
   // Función para sumar el precio al valor neto
   function sumarPrecio(precioUnitario) {
     console.log("Sumar precio ejecutado"); // Agregar un console.log para verificar si se ejecuta
-    var bruto = parseFloat(valorBruto.textContent) || 0; // Inicializar a 0 si no hay valor
-    var iva = parseFloat(valorBruto.textContent) || 0;
-    var total = parseFloat(valorBruto.textContent) || 0;
+    let bruto = parseFloat(valorBruto.textContent.replace('$', '')) || 0; // Inicializar a 0 si no hay valor
+    let iva = parseFloat(valorIva.textContent.replace('$', '')) || 0;
+    let neto = parseFloat(valorNeto.textContent.replace('$', '')) || 0;
 
-    bruto += parseFloat(precioUnitario);
+    bruto += precioUnitario;
     valorBruto.textContent = '$' + bruto.toFixed(0); // Mostrar total con dos decimales
 
-    iva = (bruto * 0.19);
+    iva = bruto * 0.19;
     valorIva.textContent = '$' + iva.toFixed(0);
 
-    total = bruto - iva;
-    valorNeto.textContent = '$' + total.toFixed(0);
+    neto = bruto - iva;
+    valorNeto.textContent = '$' + neto.toFixed(0);
   }
-}
-
-
+};
 
 var contdir = 0;
 
