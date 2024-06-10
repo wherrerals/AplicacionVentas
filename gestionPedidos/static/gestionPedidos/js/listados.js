@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    fetch('listaCotizacion/')
+    fetch('prueba/')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 tr.innerHTML = `
                     <td><a href="cotizacion?docNum=${values.DocNum}">${values.DocNum}</a></td>
                     <td><a href="cliente.html">${values.CardName}</a></td>
-                    <td>${values.vendedor}</td>
+                    <td>${values.SalesPersonCode}</td>
                     <td>${values.DocDate}</td>
                     <td>${values.SalesPersonCode}</td>
                     <td style="text-align: right;">${values.Cancelled}</td>
@@ -29,4 +29,4 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         })
         .catch(error => console.error('Error:', error));
-});
+}); 

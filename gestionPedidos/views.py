@@ -16,7 +16,7 @@ from rest_framework.response import Response
 #Modulos Diseñados
 from gestionPedidos.models import *
 from .forms import * #prueba
-from .api_client import APIClient, AsyncAPIClient
+from .api_client import APIClient
 #librerias Python usadas
 import requests
 import aiohttp
@@ -428,49 +428,6 @@ class BusquedaClientes2(APIView):
             # Manejar cualquier error que ocurra durante la solicitud
             return JsonResponse({'error': str(e)})
 
-
-""" def pruebas2(request):
-    try:
-        # Crear una instancia del cliente de la API
-        client = AsyncAPIClient()
-
-        # Realizar una solicitud de prueba a la API 
-        full_data = client.get_data('Items')
-
-        # Extraer solo los campos necesarios
-        processed_data = []
-        for item in full_data['value']:
-            processed_item = {
-                'ItemCode': item['ItemCode'],
-                'ItemName': item['ItemName'],
-                'precio': item.get('ItemPrices', [{}])[0].get('Price', None),  # Precio del primer elemento en ItemPrices
-                'precioAnterior': item.get('ItemPrices', [{}])[0].get('BasePriceList', None)  # Precio anterior del primer elemento en ItemPrices
-            }
-            processed_data.append(processed_item)
-
-        # Devolver los datos procesados como una respuesta JSON
-        return JsonResponse({'resultados': processed_data})
-    except Exception as e:
-        # Manejar cualquier error que ocurra durante la solicitud
-        return JsonResponse({'error': str(e)})
- """
-
-
-""" 
-GET https://localhost:50000/b1s/v1/Items?$select=ItemCode,ItemName,ForeignName&$filter=startswith(ItemCode, 'a') &$orderby=ItemCode&$top=10&$skip=1
-"""
-
-""" def pruebas(request):
-    # Crear una instancia del cliente de la API
-    client = APIClient()
-    SKU = "C10100519"
-
-    # Realizar solicitudes a la API
-    data = client.get_data2('Items', SKU)
-
-    # Devolver los datos como una respuesta JSON
-    return JsonResponse(data) """
-
 async def pruebas(request):
     try:
         async_client = AsyncAPIClient()
@@ -544,3 +501,10 @@ def pruebas1(request):
     return JsonResponse(data)
 
 
+def prueba2(request):
+    
+    client = APIClient()
+
+    data = client.get_data_rules2('Quotations')
+
+    return JsonResponse(data)

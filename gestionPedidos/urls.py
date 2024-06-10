@@ -25,11 +25,12 @@ urlpatterns = [
     path('buscarc/', BusquedaClientes.as_view(), name='busquedaClientes'),
     path('test/', views.test_connection, name='test'),
     path('users/', BusquedaClientes2.as_view(), name='users'),
-    path('debug/', views.pruebas, name='debug'),
+    path('debug/', views.pruebas1, name='debug'),
     path('buscar/', BusquedaProductosView.as_view(), name='buscar/'),
     path('probando/', CotizacionesLista.as_view(), name='probando/'),
     path('listaCotizacion/', views.listaCotizacion, name='listaCotizacion'),
     path('cotizacion/', views.cotizacion_view, name='cotizacion'),
+    path('prueba/', views.prueba2, name='prueba')
 
 ]
 
