@@ -19,8 +19,6 @@ from .forms import * #prueba
 from .api_client import APIClient
 #librerias Python usadas
 import requests
-import aiohttp
-import asyncio
 
 #Inicio vistas Renderizadoras
 @login_required
@@ -52,7 +50,9 @@ def cotizacion(request):
 def cotizacion_view(request):
     if request.user.is_authenticated:
         username = request.user.username 
+
     doc_num = request.GET.get('docNum', None)
+    
     context = {
         'docnum': doc_num,
         'username': username
@@ -370,114 +370,7 @@ class BusquedaClientes(LoginRequiredMixin, APIView):
             return Response({'resultadosClientes': resultados_formateados})
         else:
             return Response({'error': 'No se proporcionó un número válido'})
-
-
-# views.py
-
-
-""" def my_view(request):
-    # Crear una instancia del cliente de la API
-    client = APIClient()
-
-    # Realizar solicitudes a la API
-    data = client.get_data('endpoint_deseado')
-
-    # Devolver los datos como una respuesta JSON
-    return JsonResponse(data) """
-
-def test_connection(request):
-    # Crear una instancia del cliente de la API
-    client = APIClient()
-
-    try:
-        # Realizar una solicitud de prueba a la API
-        test_data = client.get_data('Items')
-
-        # Devolver los datos obtenidos como respuesta JSON
-        return JsonResponse({'success': True, 'message': 'Conexión exitosa', 'data': test_data})
-    except Exception as e:
-        # Manejar cualquier error que ocurra durante la solicitud
-        return JsonResponse({'success': False, 'message': 'Error al conectar con la API', 'error': str(e)})
-
-class BusquedaClientes2(APIView):
-    def get(self, request):
-        try:
-            # Crear una instancia del cliente de la API
-            client = APIClient()
-
-            # Realizar una solicitud a la API para obtener los datos
-            full_data = client.get_data('Items')
-
-            # Extraer solo los campos necesarios
-            processed_data = []
-            for item in full_data:
-                processed_item = {
-                    'codigo': item['codigo'],
-                    'nombre': item['nombre'],
-                    'imagen': item['imagen'],
-                    'precio': item['precio'],
-                    'stockTotal': item['stockTotal'],
-                    'precioAnterior': item['precioAnterior'],
-                    'maxDescuento': item['maxDescuento']
-                }
-                processed_data.append(processed_item)
-
-            # Devolver los datos procesados como una respuesta JSON
-            return JsonResponse({'resultados': processed_data})
-        except Exception as e:
-            # Manejar cualquier error que ocurra durante la solicitud
-            return JsonResponse({'error': str(e)})
-
-async def pruebas(request):
-    try:
-        async_client = AsyncAPIClient()
-
-        # Realizar una solicitud de prueba a la API de forma asíncrona
-        full_data = await async_client.get_data('Items')
-
-        # Extraer solo los campos necesarios
-        processed_data = []
-        for item in full_data['value']:
-            processed_item = {
-                'ItemCode': item['ItemCode'],
-                'ItemName': item['ItemName'],
-                'precio': item.get('ItemPrices', [{}])[0].get('Price', None),
-                'precioAnterior': item.get('ItemPrices', [{}])[0].get('BasePriceList', None)
-            }
-            processed_data.append(processed_item)
-
-        # Devolver los datos procesados como una respuesta JSON
-        return JsonResponse({'resultados': processed_data})
-    except Exception as e:
-        # Manejar cualquier error que ocurra durante la solicitud
-        return JsonResponse({'error': str(e)})
-    
-
-class CotizacionesLista(APIView):
-    def get(self, request):
-        try:
-            # Crear una instancia del cliente de la API
-            client = APIClient()
-
-            # Realizar una solicitud a la API para obtener los datos
-            full_data = client.get_data('Quotations')
-
-            # Procesar los datos y extraer solo los campos necesarios
-            processed_data = []
-            for value in full_data.get('value', []):
-                processed_item = {
-                    'codigo': int(value.get('DocNum', 0)),
-                    'fecha': value.get('DocDate', ''),
-                    'cliente': value.get('CardCode', '')
-                    # Agrega aquí los otros campos que necesites
-                }
-                processed_data.append(processed_item)
-
-            # Devolver los datos procesados como una respuesta JSON
-            return JsonResponse({'resultados': processed_data})
-        except Exception as e:
-            # Manejar cualquier error que ocurra durante la solicitud
-            return JsonResponse({'error': str(e)})
+        
 
 @csrf_exempt
 def listaCotizacion(request):
@@ -500,11 +393,3 @@ def pruebas1(request):
     # Devolver los datos como una respuesta JSON
     return JsonResponse(data)
 
-
-def prueba2(request):
-    
-    client = APIClient()
-
-    data = client.get_data_rules2('Quotations')
-
-    return JsonResponse(data)

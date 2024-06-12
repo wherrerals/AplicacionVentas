@@ -6,6 +6,8 @@ urlpatterns = [
     path('', views.home, name="home"),
     path('lista_cotizaciones', views.lista_cotizaciones, name="lista_cotizaciones"),
     path('generar_cotizacion', views.cotizacion, name="generar_cotizacion"),
+    path('listaCotizacion/', views.listaCotizacion, name='listaCotizacion'),
+    path('cotizacion/', views.cotizacion_view, name='cotizacion'),
     path('lista_ovs', views.lista_ovs, name='lista_ovs'),
     path('lista_solic_devoluciones', views.lista_solic_devoluciones, name='lista_solic_devoluciones'),
     path('lista_clientes', views.lista_clientes, name='lista_clientes'),
@@ -23,14 +25,7 @@ urlpatterns = [
     path('agregar_direccion/',views.agregar_direccion,name='agregar_direccion'),
     #path('buscarc/', views.busquedaClientes, name='busquedaClientes'),
     path('buscarc/', BusquedaClientes.as_view(), name='busquedaClientes'),
-    path('test/', views.test_connection, name='test'),
-    path('users/', BusquedaClientes2.as_view(), name='users'),
-    path('debug/', views.pruebas1, name='debug'),
     path('buscar/', BusquedaProductosView.as_view(), name='buscar/'),
-    path('probando/', CotizacionesLista.as_view(), name='probando/'),
-    path('listaCotizacion/', views.listaCotizacion, name='listaCotizacion'),
-    path('cotizacion/', views.cotizacion_view, name='cotizacion'),
-    path('prueba/', views.prueba2, name='prueba')
-
+    path('debug/', views.pruebas1, name='debug'),
 ]
 
