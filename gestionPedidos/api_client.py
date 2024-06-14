@@ -25,7 +25,7 @@ class APIClient:
         return response.json() 
     
     def get_data_rules2(self, endpoint):
-        select = "DocEntry,DocNum,CardName,DocDate,SalesPersonCode,Cancelled,DocTotal"
+        select = "DocEntry,DocNum,CardName,DocDate,SalesPersonCode,Cancelled,DocTotal,DocumentLines"
         top= 80
         skip=1
         queryUrl = f"?$select={select}&$top={top}&$skip={skip}"
@@ -34,4 +34,6 @@ class APIClient:
         response.raise_for_status()
         return response.json()
 
-#DocumentLines agregar a la URL 
+#docTotal total bruto:
+#total neto = vatsum - docTotal
+#DocumentLines agregar a la URL

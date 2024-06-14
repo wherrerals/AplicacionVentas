@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
-    fetch('prueba/')
+    fetch('listaCotizacion/')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -11,23 +11,29 @@ document.addEventListener("DOMContentLoaded", function() {
             
             const tbody = document.querySelector('#listadoCotizaciones');
             
-            // Asegúrate de que data contiene una clave "value" que es una lista
+            // Asegúra que data contiene una clave "value" que es una lista
             const value = data.value || [];
             
-            value.forEach(values => {
+            value.forEach(entry => {
+                // Obténiene DocumentLines para este entry
+                const documentLines = entry.DocumentLines || [];
+
+                // Serializa documentLines a JSON
+                const documentLinesJSON = JSON.stringify(documentLines);
+
+                // Crear una fila para cada entry en value
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><a href="cotizacion?docNum=${values.DocNum}">${values.DocNum}</a></td>
-                    <td><a href="cliente.html">${values.CardName}</a></td>
-                    <td>${values.SalesPersonCode}</td>
-                    <td>${values.DocDate}</td>
-                    <td>${values.SalesPersonCode}</td>
-                    <td style="text-align: right;">${values.Cancelled}</td>
-                    <td style="text-align: right;">${values.DocTotal}</td>
+                    <td><a href="generar_cotizacion?docNum=${entry.DocNum}" data-doc-entry="${entry.DocEntry}" data-document-lines="${documentLinesJSON}">${entry.DocNum}</a></td>
+                    <td><a href="cliente.html">${entry.CardName}</a></td>
+                    <td>${entry.SalesPersonCode}</td>
+                    <td>${entry.DocDate}</td>
+                    <td>${entry.SalesPersonCode}</td>
+                    <td style="text-align: right;">${entry.Cancelled}</td>
+                    <td style="text-align: right;">${entry.DocTotal}</td>
                 `;
                 tbody.appendChild(tr);
             });
         })
         .catch(error => console.error('Error:', error));
-}); 
-
+});

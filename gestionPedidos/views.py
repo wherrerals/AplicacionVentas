@@ -42,7 +42,15 @@ def lista_cotizaciones(request):
 def cotizacion(request):
     if request.user.is_authenticated:
         username = request.user.username
-        return render(request, 'cotizacion.html', {'username': username})
+    
+        doc_num = request.GET.get('docNum', None)
+
+        context = {
+            'docnum': doc_num,
+            'username': username
+        }
+
+        return render(request, 'cotizacion.html', context)
     else:
         return render(request, "cotizacion.html")
     
@@ -374,16 +382,19 @@ class BusquedaClientes(LoginRequiredMixin, APIView):
 
 @csrf_exempt
 def listaCotizacion(request):
+    
     client = APIClient()
+
     try:
-        data = client.get_data('Quotations')
+        data = client.get_data_rules2('Quotations')
+        
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse(data, safe=False)
 
 
 
-def pruebas1(request):
+def pruebas2(request):
     # Crear una instancia del cliente de la API
     client = APIClient()
 
@@ -393,3 +404,62 @@ def pruebas1(request):
     # Devolver los datos como una respuesta JSON
     return JsonResponse(data)
 
+
+
+def pruebas0(request, docNum):
+    client = APIClient()
+
+    data = client.get_data_rules2('Quotations')
+
+
+    return JsonResponse(data)
+
+
+
+def pruebas1(request, docNum):
+    client = APIClient()  
+
+    try:
+        data = client.get_data_rules2('Quotations')  # Ajusta según el método de cliente API
+
+        # Verificar si hay datos y procesarlos
+        if 'value' in data:
+            quotations = data['value']
+            found_quotation = None
+
+            # Buscar la cotización con el DocNum especificado
+            for quotation in quotations:
+                if quotation.get('DocNum') == int(docNum):  # Convertir docNum a entero si es necesario
+                    found_quotation = quotation
+                    break
+
+            if found_quotation:
+                # Obtener las líneas de documentos (DocumentLines)
+                document_lines = found_quotation.get('DocumentLines', [])
+
+                # Preparar los datos para enviar como respuesta JSON
+                lines_data = []
+                for line in document_lines:
+                    line_data = {
+                        'LineNum': line.get('LineNum'),
+                        'ItemCode': line.get('ItemCode'),
+                        'ItemDescription': line.get('ItemDescription'),
+                        'ItemCode': line.get('ItemCode'),
+                        'ItemCode': line.get('ItemCode'),
+                        'ItemCode': line.get('ItemCode'),
+                        'ItemDescription': line.get('ItemDescription'),
+                        'Quantity': line.get('Quantity'),
+                        'Price': line.get('Price'),
+                    }
+                    lines_data.append(line_data)
+
+                # Retornar respuesta JSON con las líneas de documentos encontradas
+                return JsonResponse({'DocumentLines': lines_data}, status=200)
+            else:
+                return JsonResponse({'error': 'No se encontró la cotización con el DocNum especificado'}, status=404)
+
+        else:
+            return JsonResponse({'error': 'No se encontraron datos de cotizaciones'}, status=404)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
