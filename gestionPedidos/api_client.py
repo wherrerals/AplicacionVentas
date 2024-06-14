@@ -25,14 +25,36 @@ class APIClient:
         return response.json() 
     
     def get_data_rules2(self, endpoint):
-        select = "DocEntry,DocNum,CardName,DocDate,SalesPersonCode,Cancelled,DocTotal,DocumentLines"
+        select = "DocEntry,DocNum,CardName,DocDate,SalesPersonCode,Cancelled,DocTotal,VatSum,DocumentLines"
         top= 80
         skip=1
+
+        headers = {
+            "Prefer": f"odata.maxpagesize={top}"
+        }
+
         queryUrl = f"?$select={select}&$top={top}&$skip={skip}"
         url = f"{self.base_url}{endpoint}{queryUrl}"
+
         response = self.session.get(url, verify=False)
         response.raise_for_status()
         return response.json()
+    
+    def get_data_rules3(self, endpoint):
+        select = "DocEntry,DocNum,CardName,DocDate,SalesPersonCode,Cancelled,DocTotal,VatSum,DocumentLines"
+        top = 50  # Tamaño de página personalizado
+        skip = 0  # Cambia este valor para obtener diferentes páginas
+        
+        headers = {
+            "Prefer": f"odata.maxpagesize={top}"
+        }
+        query_url = f"?$select={select}&$top={top}&$skip={skip}"
+        url = f"{self.base_url}{endpoint}{query_url}"
+
+        response = self.session.get(url, headers=headers, verify=False)
+        response.raise_for_status()
+        return response.json()
+
 
 #docTotal total bruto:
 #total neto = vatsum - docTotal

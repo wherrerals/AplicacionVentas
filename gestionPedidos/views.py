@@ -386,7 +386,7 @@ def listaCotizacion(request):
     client = APIClient()
 
     try:
-        data = client.get_data_rules2('Quotations')
+        data = client.get_data_rules3('Quotations')
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
@@ -463,3 +463,12 @@ def pruebas1(request, docNum):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+
+
+# Ejemplo de uso en una vista de Django
+def fetch_orders(request):
+    client = APIClient()
+    endpoint = "Quotations"
+    data = client.get_data_rules3(endpoint)
+    return JsonResponse(data, safe=False)
