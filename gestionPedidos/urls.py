@@ -26,7 +26,9 @@ urlpatterns = [
     #path('buscarc/', views.busquedaClientes, name='busquedaClientes'),
     path('buscarc/', BusquedaClientes.as_view(), name='busquedaClientes'),
     path('buscar/', BusquedaProductosView.as_view(), name='buscar/'),
-    path('debug/', views.pruebas2, name='debug'),
+    path('debug/', views.list_quotations, name='debug'),
     path('generar_cotizacion/<str:docNum>/', pruebas1, name='generar_cotizacion'),
+    path('post-quotations/', post_quotations, name='post_quotations'),
+
 ]
 

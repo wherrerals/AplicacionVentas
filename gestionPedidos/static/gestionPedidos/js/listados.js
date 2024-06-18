@@ -15,22 +15,20 @@ document.addEventListener("DOMContentLoaded", function() {
             const value = data.value || [];
             
             value.forEach(entry => {
-                // Obténiene DocumentLines para este entry
-                const documentLines = entry.DocumentLines || [];
+                // Accede a Quotations dentro de entry
+                const quotation = entry.Quotations || {};
+                const salesPerson = entry.SalesPersons || {};
 
-                // Serializa documentLines a JSON
-                const documentLinesJSON = JSON.stringify(documentLines);
-
-                // Crear una fila para cada entry en value
+                // Crea una fila para cada entrada en value
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><a href="generar_cotizacion?docNum=${entry.DocNum}" data-doc-entry="${entry.DocEntry}" data-document-lines="${documentLinesJSON}">${entry.DocNum}</a></td>
-                    <td><a href="cliente.html">${entry.CardName}</a></td>
-                    <td>${entry.SalesPersonCode}</td>
-                    <td>${entry.DocDate}</td>
-                    <td>${entry.Cancelled}</td>
-                    <td style="text-align: right;">${entry.VatSum}</td>
-                    <td style="text-align: right;">${entry.DocTotal}</td>
+                    <td><a href="generar_cotizacion?docNum=${quotation.DocNum}" data-doc-entry="${entry.DocEntry}" data-document-lines="[]">${quotation.DocNum}</a></td>
+                    <td><a href="cliente.html">${quotation.CardName}</a></td>
+                    <td>${salesPerson.SalesEmployeeName}</td>
+                    <td>${quotation.DocDate}</td>
+                    <td>${quotation.Cancelled}</td>
+                    <td style="text-align: right;">$ ${quotation.VatSum}</td>
+                    <td style="text-align: right;">$ ${quotation.DocTotal}</td>
                 `;
                 tbody.appendChild(tr);
             });

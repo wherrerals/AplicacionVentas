@@ -7,6 +7,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.db import transaction
 from django.http import JsonResponse
 from django.core import serializers
@@ -466,9 +467,49 @@ def pruebas1(request, docNum):
     
 
 
-# Ejemplo de uso en una vista de Django
-def fetch_orders(request):
+def list_quotations(request):
+    client = APIClient()
+    data = client.get_quotations()
+    return JsonResponse(data, safe=False)
+
+
+def post_quotations1(request):
     client = APIClient()
     endpoint = "Quotations"
-    data = client.get_data_rules3(endpoint)
+    data = client.post_data(endpoint)
     return JsonResponse(data, safe=False)
+
+
+@csrf_exempt
+@require_POST
+def post_quotations(request):
+    try:
+        # Datos de prueba
+        data = {
+            "CardCode": "c001",
+            "DocumentLines": [
+                {
+                    "ItemCode": "i001",
+                    "Quantity": "100",
+                    "TaxCode": "T1",
+                    "UnitPrice": "30"
+                }
+            ]
+        }
+
+        client = APIClient()
+        endpoint = "Quotations"
+        response_data = client.post_data(endpoint, data=data)
+
+        # Verificar si response_data es None
+        if response_data is None:
+            return JsonResponse({'error': 'No response data received'}, status=500)
+        
+        # Verificar si hay un error en response_data
+        if isinstance(response_data, dict) and 'error' in response_data:
+            return JsonResponse(response_data, status=500)
+        
+        return JsonResponse(response_data, safe=False)
+    except Exception as e:
+        print("An error occurred:", e)
+        return JsonResponse({'error': str(e)}, status=500)
