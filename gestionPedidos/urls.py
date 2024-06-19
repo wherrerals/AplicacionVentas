@@ -4,11 +4,12 @@ from .views import  *
 
 urlpatterns = [
     path('', views.home, name="home"),
-    path('lista_cotizaciones', views.lista_cotizaciones, name="lista_cotizaciones"),
-    path('generar_cotizacion', views.cotizacion, name="generar_cotizacion"),
-    path('listaCotizacion/', views.listaCotizacion, name='listaCotizacion'),
-    path('cotizacion/', views.cotizacion_view, name='cotizacion'),
+    path('lista_cotizaciones', views.list_quotations, name="lista_cotizaciones"),
+    path('generar_cotizacion', views.quotations, name="generar_cotizacion"),
+    path('cotizacion/', views.quotations_view, name='cotizacion'),
     path('lista_ovs', views.lista_ovs, name='lista_ovs'),
+    path('generar_cotizacion/<str:docNum>/', quotate_items, name='generar_cotizacion'),
+    path('post-quotations/', post_quotations, name='post_quotations'),
     path('lista_solic_devoluciones', views.lista_solic_devoluciones, name='lista_solic_devoluciones'),
     path('lista_clientes', views.lista_clientes, name='lista_clientes'),
     path('creacion_clientes/', views.creacion_clientes, name='creacion_clientes'),
@@ -26,9 +27,6 @@ urlpatterns = [
     #path('buscarc/', views.busquedaClientes, name='busquedaClientes'),
     path('buscarc/', BusquedaClientes.as_view(), name='busquedaClientes'),
     path('buscar/', BusquedaProductosView.as_view(), name='buscar/'),
-    path('debug/', views.list_quotations, name='debug'),
-    path('generar_cotizacion/<str:docNum>/', pruebas1, name='generar_cotizacion'),
-    path('post-quotations/', post_quotations, name='post_quotations'),
-
+    path('listado_Cotizaciones/', views.list_quotations_2, name='listado_Cotizaciones'),
 ]
 

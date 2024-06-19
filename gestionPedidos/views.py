@@ -7,7 +7,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from django.db import transaction
 from django.http import JsonResponse
 from django.core import serializers
@@ -36,11 +36,12 @@ def salir(request):
     return redirect('/')
 
 @login_required
-def lista_cotizaciones(request):
+def list_quotations(request):
+    
     return render(request, "lista_cotizaciones.html")
  
 @login_required
-def cotizacion(request):
+def quotations(request):
     if request.user.is_authenticated:
         username = request.user.username
     
@@ -56,7 +57,7 @@ def cotizacion(request):
         return render(request, "cotizacion.html")
     
 @login_required
-def cotizacion_view(request):
+def quotations_view(request):
     if request.user.is_authenticated:
         username = request.user.username 
 
@@ -381,47 +382,11 @@ class BusquedaClientes(LoginRequiredMixin, APIView):
             return Response({'error': 'No se proporcionó un número válido'})
         
 
-@csrf_exempt
-def listaCotizacion(request):
-    
-    client = APIClient()
-
-    try:
-        data = client.get_data_rules3('Quotations')
-        
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-    return JsonResponse(data, safe=False)
-
-
-
-def pruebas2(request):
-    # Crear una instancia del cliente de la API
-    client = APIClient()
-
-    # Realizar solicitudes a la API
-    data = client.get_data('Quotations')
-
-    # Devolver los datos como una respuesta JSON
-    return JsonResponse(data)
-
-
-
-def pruebas0(request, docNum):
-    client = APIClient()
-
-    data = client.get_data_rules2('Quotations')
-
-
-    return JsonResponse(data)
-
-
-
-def pruebas1(request, docNum):
+def quotate_items(request, docNum):
     client = APIClient()  
 
     try:
-        data = client.get_data_rules2('Quotations')  # Ajusta según el método de cliente API
+        data = client.get_quotations_items('Quotations')  # Ajusta según el método de cliente API
 
         # Verificar si hay datos y procesarlos
         if 'value' in data:
@@ -467,9 +432,23 @@ def pruebas1(request, docNum):
     
 
 
-def list_quotations(request):
+@require_http_methods(["GET"])
+def list_quotations_2(request):
     client = APIClient()
-    data = client.get_quotations()
+
+    # Obtener los valores de 'top' y 'skip' de los parámetros de la solicitud GET
+    top = request.GET.get('top', 20)  # valor predeterminado de 100
+    skip = request.GET.get('skip', 0)  # valor predeterminado de 0
+
+    # Convertir a entero ya que los parámetros de solicitud son cadenas por defecto
+    try:
+        top = int(top)
+        skip = int(skip)
+    except ValueError:
+        # Manejar el caso en que la conversión a entero falle
+        return JsonResponse({'error': 'Invalid parameters'}, status=400)
+
+    data = client.get_quotations(top=top, skip=skip)
     return JsonResponse(data, safe=False)
 
 

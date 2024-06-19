@@ -18,19 +18,10 @@ class APIClient:
         response = self.session.post(login_url, json=auth_data, verify=False)
         response.raise_for_status()
 
-    def get_data(self, endpoint):
-        url = f"{self.base_url}{endpoint}"
-        response = self.session.get(url, verify=False)
-        response.raise_for_status()
-        return response.json()
-    
-
-    def get_quotations(self):
+    def get_quotations(self, top=0, skip=0):
         crossjoin = "Quotations,SalesPersons"
         expand = "Quotations($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
         filter_condition = "Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
-        top = 20
-        skip = 1
 
         headers = {
             "Prefer": f"odata.maxpagesize={top}"
@@ -39,15 +30,14 @@ class APIClient:
         query_url = f"/$crossjoin({crossjoin})?$expand={expand}&$filter={filter_condition}&$top={top}&$skip={skip}"
         url = f"{self.base_url}{query_url}"
 
-        response = self.session.get(url, verify=False)
+        response = self.session.get(url, headers=headers, verify=False)
         response.raise_for_status()
         return response.json()
     
-    def get_data_rules2(self, endpoint):
+    def get_quotations_items(self, endpoint, top=20):
         
         select = "DocEntry,DocNum,CardName,DocDate,SalesPersonCode,Cancelled,DocTotal,VatSum,DocumentLines"
-        top= 80
-        skip=1
+        skip=0
 
         headers = {
             "Prefer": f"odata.maxpagesize={top}"
@@ -59,46 +49,7 @@ class APIClient:
         response = self.session.get(url, verify=False)
         response.raise_for_status()
         return response.json()
-    
-    def get_data_rules3(self, endpoint):
-        select = "DocEntry,DocNum,CardName,DocDate,SalesPersonCode,Cancelled,DocTotal,VatSum,DocumentLines"
-        top = 50  # Tamaño de página personalizado
-        skip = 0  # Cambia este valor para obtener diferentes páginas
-        
-        headers = {
-            "Prefer": f"odata.maxpagesize={top}"
-        }
-        query_url = f"?$select={select}&$top={top}&$skip={skip}"
-        url = f"{self.base_url}{endpoint}{query_url}"
 
-        response = self.session.get(url, headers=headers, verify=False)
-        response.raise_for_status()
-        return response.json()
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
     def post_data2(self, endpoint, data=None, headers=None):
         
         url = f"{self.base_url}{endpoint}"
@@ -141,12 +92,7 @@ class APIClient:
             error_msg = f"Error parsing JSON: {json_err}"
             print(error_msg)
             return {'error': error_msg}
-
-
-
-
-
-
+        
 #docTotal total bruto:
 #total neto = vatsum - docTotal
 #DocumentLines agregar a la URL
