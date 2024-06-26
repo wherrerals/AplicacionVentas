@@ -146,19 +146,11 @@ class Direccion(models.Model):
 
     rowNum = models.IntegerField(default='0 ') #dato SAP por socio negocio
     nombreDireccion = models.CharField(max_length=50,null = False) #identificador natural 
-<<<<<<< HEAD
-    ciudad = models.CharField(max_length=50, default = 'NA')
-    calleNumero = models.CharField(max_length=50) #corresponde a direccio en direccion
-    codigoImpuesto = models.CharField(max_length=100, default='iva')
-    #tipoDireccion = models.ManyToManyField(TipoDireccion, related_name='directorios')
-    tipoDireccion = models.CharField(max_length=5, default = 'NA')
-=======
     ciudad = models.CharField(max_length=50, default='prueba')
     calleNumero = models.CharField(max_length=50) #corresponde a direccio en direccion
     codigoImpuesto = models.CharField(max_length=100, default='iva')
     #tipoDireccion = models.ManyToManyField(TipoDireccion, related_name='directorios')
     #tipoDireccion = models.CharField(max_length=5)
->>>>>>> 4278b0bf69cb6bdeb1e17be609fcdbc9e1987ae5
     pais = models.CharField(max_length=10, default ='Chile')
     SocioNegocio = models.ForeignKey(SocioNegocio,on_delete=models.CASCADE, default=1) 
     comuna = models.ForeignKey(Comuna,on_delete=models.CASCADE, default=1)
