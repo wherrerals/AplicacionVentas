@@ -93,6 +93,16 @@ class APIClient:
             print(error_msg)
             return {'error': error_msg}
         
+
+    def get_orders(self, order_number):
+        select = "DocEntry,DocNum,FolioNumber,U_ReportPdf,DocObjectCode,DocumentSubType"
+        url = f"{self.base_url}Invoices?$select={select}&$filter=U_LED_NROPSH eq '{order_number}'"
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print(url)
+        return response.json()
+        
 #docTotal total bruto:
 #total neto = vatsum - docTotal
 #DocumentLines agregar a la URL
+""" https://182.160.29.24:50003/b1s/v1/Invoices?$select=DocEntry,DocNum,FolioNumber,U_ReportPdf,DocObjectCode,DocumentSubType&$filter=U_LED_NROPSH eq '1352110520137-01' """

@@ -86,6 +86,12 @@ COMPANY_DB = "TEST_LED_PROD"
 API_USERNAME = 'manager'
 API_PASSWORD = '1245LED98'
 
+#Base Vtex API
+VTEX_APP_KEY = 'vtexappkey-ledstudiocl-AJHPCL'
+VTEX_APP_TOKEN = 'WTEPUGSXUOIOMSAVTEIIJOCBMXTUZWTESEFDQHZSLHJZMJXAVHPGOPDKMUVMAPDBZXXDGDFJFNXCMFDNICGGSOCGFNKEHGSEWMEYRLHNCISFSILPJUYXMGKLZUXDKJLB'
+VTEX_BASE_URL = 'https://ledstudiocl.myvtex.com/api/'
+
+
 #python ./manage.py makemigrations gestionPedidos
 #python ./manage.py sqlmigrate gestionPedidos 0001
 #python ./manage.py migrate
