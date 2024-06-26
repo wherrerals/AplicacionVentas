@@ -71,9 +71,9 @@ WSGI_APPLICATION = 'AplicacionVentas.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'led_studio',   
+        'NAME': 'led_studio',
         'USER':'root',
-        'PASSWORD':'',
+        'PASSWORD':'Ea7hava5*',
         'HOST':'localhost',
         'PORT':'3306',
     }
