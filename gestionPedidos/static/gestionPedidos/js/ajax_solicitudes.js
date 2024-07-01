@@ -1,6 +1,6 @@
 $(document).ready(function(){
     $('#inputNumero').on('input', function(){ //escucha el evento de entrada en input con #inputNumero
-        var numero = $(this).val();
+        let numero = $(this).val();
         if(numero){
             $.ajax({ // realiza una solicitud ajax al servidor a la url buscar/
                 url: 'buscar/', 
@@ -32,13 +32,13 @@ $(document).ready(function(){
 
                             // Agregar evento de clic al elemento
                             productoElemento.addEventListener('click', function() {
-                                var codigo = this.getAttribute('data-codigo');
-                                var nombre = this.getAttribute('data-nombre');
-                                var imagen = this.getAttribute('data-imagen');
-                                var precioVenta = parseFloat(this.getAttribute('data-precio'));
-                                var stockTotal = parseInt(this.getAttribute('data-stockTotal'));
-                                var precioLista = parseFloat(this.getAttribute('data-precioAnterior'));
-                                var precioDescuento = parseFloat(this.getAttribute('data-maxDescuento'));
+                                let codigo = this.getAttribute('data-codigo');
+                                let nombre = this.getAttribute('data-nombre');
+                                let imagen = this.getAttribute('data-imagen');
+                                let precioVenta = parseFloat(this.getAttribute('data-precio'));
+                                let stockTotal = parseInt(this.getAttribute('data-stockTotal'));
+                                let precioLista = parseFloat(this.getAttribute('data-precioAnterior'));
+                                let precioDescuento = parseFloat(this.getAttribute('data-maxDescuento'));
                                 
                                 agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento); //Ejecuta la funcion agregar producto
 

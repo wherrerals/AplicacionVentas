@@ -1,10 +1,10 @@
 // Espera a que el DOM esté completamente cargado
 document.addEventListener("DOMContentLoaded", function() {
 // Obtiene una referencia al botón para agregar contacto
-var btnAgregarContacto = document.getElementById("btnAgregarContacto");
+let btnAgregarContacto = document.getElementById("btnAgregarContacto");
 btnAgregarContacto.addEventListener("click", function() {
       // Crea el modal
-      var modalHtml = `
+      let modalHtml = `
       <div class="modal fade" role="dialog" tabindex="-1" id="contactoModal"aria-labelledby="contactoModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -122,7 +122,7 @@ btnAgregarContacto.addEventListener("click", function() {
       `;
 
       // Crea un elemento div para contener el modal generado
-      var modalContainer = document.createElement("div");
+      let modalContainer = document.createElement("div");
       // Agrega el HTML del modal al contenedor
       modalContainer.innerHTML = modalHtml;
 
@@ -130,8 +130,8 @@ btnAgregarContacto.addEventListener("click", function() {
       document.getElementById("modalContainer").appendChild(modalContainer);
 
       // Muestra el modal
-      var modalElement = modalContainer.querySelector(".modal");
-      var modal = new bootstrap.Modal(modalElement);
+      let modalElement = modalContainer.querySelector(".modal");
+      let modal = new bootstrap.Modal(modalElement);
       modal.show();
     });
   });

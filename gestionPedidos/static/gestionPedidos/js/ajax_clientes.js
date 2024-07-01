@@ -1,6 +1,6 @@
 $(document).ready(function(){
     $('#inputCliente').on('input', function(){
-        var numero = $(this).val().trim(); // Trim para eliminar espacios en blanco al inicio y al final
+        let numero = $(this).val().trim(); // Trim para eliminar espacios en blanco al inicio y al final
         if(numero){ // Verificar si el número no está vacío
             $.ajax({
                 url: 'buscarc/',

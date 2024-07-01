@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <tr style="font-size: 12px;background: transparent;">
     <td colspan="7" style="padding-top: 0px;background: transparent;"><span>${line.ItemDescription}</span></td>
 </tr>
-                        `;
+`;
 
       // Agregar la fila a la tabla
   document.getElementById('productos').appendChild(newRow);

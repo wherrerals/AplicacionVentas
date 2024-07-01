@@ -1,11 +1,11 @@
-var contprod = 0;
+let contprod = 0;
 
 function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento) {
-  var precioSinDescuento = 0
-  var totalProducto = precioVenta
+  let precioSinDescuento = 0
+  let totalProducto = precioVenta
 
   // Crear una nueva fila
-  var newRow = document.createElement('tbody');
+  let newRow = document.createElement('tbody');
   contprod++;
 
   // Definir el contenido de la fila
@@ -105,7 +105,7 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
 }
 
 function AlternarMaxDescuento(row) {
-  var elemento = row.querySelector('#descuento');
+  let elemento = row.querySelector('#descuento');
   if (elemento.getAttribute('hidden') !== null) {
       elemento.removeAttribute('hidden');
   } else {
@@ -115,11 +115,11 @@ function AlternarMaxDescuento(row) {
 
 function agregarInteractividad(newRow) {
   // Obtener referencias a los elementos dentro de la fila
-  let inputCantidad = newRow.querySelector('#calcular_cantidad'); // Cambié el selector a class
-  let inputDescuento = newRow.querySelector('#agg_descuento'); // Cambié el selector a class
-  let spanPrecioVenta = newRow.querySelector('#precio_Venta'); // Cambié el selector a class
-  let tdPrecioVenta = newRow.querySelector('#precio_Venta'); // Cambié el selector a class
-  let tdPrecioDescuento = newRow.querySelector('#Precio_Descuento'); // Cambié el selector a class
+  let inputCantidad = newRow.querySelector('#calcular_cantidad');
+  let inputDescuento = newRow.querySelector('#agg_descuento');
+  let spanPrecioVenta = newRow.querySelector('#precio_Venta'); 
+  let tdPrecioVenta = newRow.querySelector('#precio_Venta'); 
+  let tdPrecioDescuento = newRow.querySelector('#Precio_Descuento'); 
   let valorBruto = document.getElementById('total_bruto');
   let valorIva = document.getElementById('iva');
   let valorNeto= document.getElementById('total_neto');
@@ -207,7 +207,6 @@ function agergardireccion(){
         </div>
       <div class="col-sm-12" style="height: 10px;background: transparent;"> <span>&nbsp;</span> </div>
     </div>
-
     <div class="row">
       <div class="col-sm-4">
         <label class="col-form-label" style="font-size: 13px;">Tipo
@@ -221,7 +220,6 @@ function agergardireccion(){
           </optgroup>
         </select></div>
     </div>
-
     <div class="row">
         <div class="col-sm-4">
             <label class="col-form-label" style="font-size: 13px;">ID
@@ -245,8 +243,6 @@ function agergardireccion(){
             </select>
         </div>
     </div>
-
-
     <div class="row">
         <div class="col-sm-4">
             <label class="col-form-label" style="font-size: 13px;">Región
@@ -264,8 +260,6 @@ function agergardireccion(){
             </select>
         </div>
     </div>
-
-
     <div class="row">
         <div class="col-sm-4">
             <label class="col-form-label" style="font-size: 13px;">Ciudad
@@ -275,8 +269,6 @@ function agergardireccion(){
             <input class="form-control" type="text" name="pais" style="border-color: rgb(159,168,175);font-size: 12px;">
         </div>
     </div>
-
-
     <div class="row">
         <div class="col-sm-4">
             <label class="col-form-label" style="font-size: 13px;">Comuna
@@ -293,8 +285,6 @@ function agergardireccion(){
             </select>
         </div>
     </div>
-
-
     <div class="row">
         <div class="col-sm-4">
             <label class="col-form-label" style="font-size: 13px;">Dirección
@@ -303,25 +293,20 @@ function agergardireccion(){
         <div class="col">
             <input class="form-control" type="text" name="pais" style="border-color: rgb(159,168,175);font-size: 12px;"></div>
         </div>
-
-
     <div class="row">
       <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
       </div>
     </div>
-
   <div class="col-sm-1" style="padding: 0px;width: 20px;"><span></span></div>
   `
   ;
 
-
-  var tab1 = document.getElementById('dir');
+  let tab1 = document.getElementById('dir');
 
   tab1.style.display = "flex";
   tab1.style.flexDirection = "row";
   tab1.style.overflowX = "auto";
   tab1.style.maxWidth = "100%";
-
 
   document.getElementById('dir').appendChild(newRow);
   newRow.querySelector('#eliminar_dir').addEventListener('click', function() {
@@ -339,19 +324,16 @@ window.addEventListener('DOMContentLoaded', function() {
 
 });
 
-var contcon = 0;
+let contcon = 0;
 function agregarontacto(){
 
-  var newRow = document.createElement('div')
+  let newRow = document.createElement('div')
   newRow.className = "col-sm-1";
   newRow.style="padding: 0px;width: 280px";
   contcon ++;
   newRow.innerHTML =`
-
 <div class="col-sm-12" style="width: 100%;height: 10px;"><span>&nbsp;</span> </div>
 <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 250px;">
-
-
   <div class="row">
     <div class="col-sm-12" style="height: 15px;background: transparent;"> <span>&nbsp;</span></div>
     <div class="col" style="text-align: center;">
@@ -359,7 +341,6 @@ function agregarontacto(){
     </div>
     <div class="col-sm-12" style="height: 5px;background: transparent;"> <span>&nbsp;</span> </div>
   </div>
-
   <div class="row">
     <div class="col-sm-9"><span></span></div>
     <div class="col-sm-1" style="padding-right: 10px;padding-left: 0px;">
@@ -370,8 +351,6 @@ function agregarontacto(){
         </svg>
       </a>
     </div>
-    
-
     <div class="col-sm-1" style="padding-right: 0px;padding-left: 10px;">
       <a class="navbar-brand d-flex align-items-center"  style="width: 32px;">
         <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-backspace" style="font-size: 24px;" id="eliminar_contacto">
@@ -382,8 +361,6 @@ function agregarontacto(){
     </div>
     <div class="col-sm-12" style="height: 10px;background: transparent;"> <span>&nbsp;</span> </div>
   </div>
-
-
   <div class="row">
     <div class="col-sm-4">
       <label class="col-form-label" style="font-size: 13px;">Nombre
@@ -393,8 +370,6 @@ function agregarontacto(){
       <input class="form-control" type="text" n yle="border-color: rgb(159,168,175);font-size: 12px;">
     </div>
   </div>
-
-
   <div class="row">
     <div class="col-sm-4">
       <label class="col-form-label" style="font-size: 13px;">Apellido
@@ -402,8 +377,6 @@ function agregarontacto(){
     </div>
     <div class="col"><input class="form-control" type="text" name="pais" style="border-color: rgb(159,168,175);font-size: 12px;"></div>
   </div>
-
-
   <div class="row">
     <div class="col-sm-4">
       <label class="col-form-label" style="font-size: 13px;">Teléfono
@@ -411,8 +384,6 @@ function agregarontacto(){
     </div>
     <div class="col"><input class="form-control" type="tel" style="font-size: 12px;border-color: rgb(159,168,175);"></div>
   </div>
-
-
   <div class="row">
     <div class="col-sm-4">
       <label class="col-form-label" style="font-size: 13px;">Celular
@@ -420,8 +391,6 @@ function agregarontacto(){
     </div>
     <div class="col"><input class="form-control" type="tel" style="font-size: 12px;border-color: rgb(159,168,175);"></div>
   </div>
-
-
   <div class="row">
     <div class="col-sm-4">
       <label class="col-form-label" style="font-size: 13px;">Email
@@ -429,19 +398,16 @@ function agregarontacto(){
     </div>
     <div class="col"><input class="form-control" type="email" style="font-size: 12px;border-color: rgb(159,168,175);"></div>
   </div>
-
-
   <div class="row">
     <div class="col-sm-12" style="height: 15px;background: transparent;">
       <span>&nbsp;</span>
     </div>
   </div>
-
 </div>
 <!-- <div class="col-sm-1" style="padding: 0px;width: 20px;"><span></span></div> Revisar bien, es espacio lateral-->
 `;
 
-  var tab2 = document.getElementById('cont');
+  let tab2 = document.getElementById('cont');
   tab2.style.display = "flex";
   tab2.style.flexDirection = "row";
   tab2.style.overflowX = "auto";
@@ -457,45 +423,16 @@ function agregarontacto(){
 
 window.addEventListener('DOMContentLoaded', function() {
     // Asignar el evento click al botón agregar_productos (siempre que exista)
-    var botonAgregarProductos = document.getElementById('agregar_cont');
+    let botonAgregarProductos = document.getElementById('agregar_cont');
     if (botonAgregarProductos) {
         botonAgregarProductos.addEventListener('click', agregarontacto);
     }
 });
 
-/* tabladireccion.querySelector('#agregar_dir').addEventListener('click', function() {
-  agergardireccion();
-});   */
-
-
-/*
-// Función para guardar los productos en localStorage
-function guardarProductos() {
-  localStorage.setItem('productos', document.getElementById('productos').innerHTML);
-}
-
-function cargarProductosGuardados() {
-  var productosGuardados = localStorage.getItem('productos');
-  if (productosGuardados) {
-      document.getElementById('productos').innerHTML = productosGuardados;
-  }
-}
-
-
-// Función para cargar los productos desde localStorage al cargar la página
-function cargarProductosGuardados() {
-  var productosGuardados = localStorage.getItem('productos');
-  if (productosGuardados) {
-      document.getElementById('productos').innerHTML = productosGuardados;
-  }
-}
-
-*/
-
 
 window.addEventListener('DOMContentLoaded', function() {
   // Asignar el evento click al botón agregar_productos (siempre que exista)
-  var botonAgregarProductos = document.getElementById('agregar_dir');
+  let botonAgregarProductos = document.getElementById('agregar_dir');
   if (botonAgregarProductos) {
       botonAgregarProductos.addEventListener('click', agergardireccion);
   }
@@ -507,16 +444,16 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function sumarTresDias() {
-  var hoy = new Date(); // Obtiene la fecha actual
-  var tresDiasDespues = new Date(hoy.getTime() + (3 * 24 * 60 * 60 * 1000)); // Suma tres días en milisegundos
+  let hoy = new Date(); // Obtiene la fecha actual
+  let tresDiasDespues = new Date(hoy.getTime() + (3 * 24 * 60 * 60 * 1000)); // Suma tres días en milisegundos
   
   // Extrae el día, mes y año de la fecha resultante
-  var dia = tresDiasDespues.getDate();
-  var mes = tresDiasDespues.getMonth() + 1; // Se suma 1 porque los meses van de 0 a 11
-  var año = tresDiasDespues.getFullYear();
+  let dia = tresDiasDespues.getDate();
+  let mes = tresDiasDespues.getMonth() + 1; // Se suma 1 porque los meses van de 0 a 11
+  let año = tresDiasDespues.getFullYear();
   
   // Formatea la fecha como DD/MM/AAAA
-  var fechaFormateada = dia + '/' + mes + '/' + año;
+  let fechaFormateada = dia + '/' + mes + '/' + año;
   
   // Actualiza el contenido del elemento con ID 'dias_vencidos'
   document.getElementById('dias_vencidos').textContent = fechaFormateada;
@@ -525,8 +462,8 @@ function sumarTresDias() {
 
 
 function togglePassword() {
-  var toggleButton = document.getElementById("togglePasswordButton");
-  var passwordInput = document.getElementById("password");
+  let toggleButton = document.getElementById("togglePasswordButton");
+  let passwordInput = document.getElementById("password");
 
   toggleButton.addEventListener("click", function() {
       if (passwordInput.type === "password") {
