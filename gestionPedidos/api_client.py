@@ -3,12 +3,12 @@ from django.conf import settings
 from django.http import JsonResponse
 
 class APIClient:
-    def __init__(self):
+    def __init__(self): 
         self.base_url = settings.API_BASE_URL
         self.session = requests.Session()
         self.login()
 
-    def login(self):
+    def login(self): 
         login_url = f"{self.base_url}Login"
         auth_data = {
             "CompanyDB": settings.COMPANY_DB,
@@ -92,7 +92,6 @@ class APIClient:
             error_msg = f"Error parsing JSON: {json_err}"
             print(error_msg)
             return {'error': error_msg}
-        
 
     def get_orders(self, order_number):
         select = "DocEntry,DocNum,FolioNumber,U_ReportPdf,DocObjectCode,DocumentSubType"
@@ -101,8 +100,3 @@ class APIClient:
         response.raise_for_status()
         print(url)
         return response.json()
-        
-#docTotal total bruto:
-#total neto = vatsum - docTotal
-#DocumentLines agregar a la URL
-""" https://182.160.29.24:50003/b1s/v1/Invoices?$select=DocEntry,DocNum,FolioNumber,U_ReportPdf,DocObjectCode,DocumentSubType&$filter=U_LED_NROPSH eq '1352110520137-01' """
