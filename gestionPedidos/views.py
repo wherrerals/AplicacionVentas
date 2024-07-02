@@ -31,8 +31,6 @@ def home(request):
         return render(request, 'home.html', {'username': username}) # Accede al nombre de usuario y permite su uso en el template
     else:
         return render(request, 'home.html')
-    
-
 
 @login_required
 def salir(request):
@@ -307,7 +305,6 @@ def busquedaProductos(request):
         return JsonResponse({'resultados': resultados_formateados})
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
-    
 
 class BusquedaProductosView(LoginRequiredMixin, APIView):
     def get(self, request, *args, **kwargs):
@@ -343,7 +340,6 @@ def validar_contrasena(password):
         mensajes.append("Su contraseña debe tener al menos 8 caracteres.")
 
     return mensajes  
-
 
 class BusquedaClientes(LoginRequiredMixin, APIView):
     def get(self, request):
@@ -383,8 +379,7 @@ class BusquedaClientes(LoginRequiredMixin, APIView):
             
             return Response({'resultadosClientes': resultados_formateados})
         else:
-            return Response({'error': 'No se proporcionó un número válido'})
-        
+            return Response({'error': 'No se proporcionó un número válido'})        
 
 def quotate_items(request, docNum):
     client = APIClient()  
@@ -433,8 +428,6 @@ def quotate_items(request, docNum):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
-    
-
 
 @require_http_methods(["GET"])
 def list_quotations_2(request):
@@ -455,13 +448,11 @@ def list_quotations_2(request):
     data = client.get_quotations(top=top, skip=skip)
     return JsonResponse(data, safe=False)
 
-
 def post_quotations1(request):
     client = APIClient()
     endpoint = "Quotations"
     data = client.post_data(endpoint)
     return JsonResponse(data, safe=False)
-
 
 @csrf_exempt
 @require_POST
@@ -497,11 +488,9 @@ def post_quotations(request):
         print("An error occurred:", e)
         return JsonResponse({'error': str(e)}, status=500)
     
-
 def oredenes(request):
         
     return render(request, "manejo_ordenes.html")
-
 
 def cambio_ordenes(request):
     if request.method == 'POST':
@@ -565,14 +554,3 @@ def cambio_ordenes(request):
     
     else:
         return JsonResponse({'message': 'Método no permitido'}, status=405)
-
-
-def probandoVtex(request):
-    client = VTEXClient()
-    data = client.get_order_details('1352110520137-01')
-    return JsonResponse(data, safe=False)
-
-def probandoSL(request):
-    client = APIClient()
-    data = client.get_orders('1352110520137-01')
-    return JsonResponse(data, safe=False)
