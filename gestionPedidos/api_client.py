@@ -1,6 +1,8 @@
 import requests
 from django.conf import settings
 from django.http import JsonResponse
+from urllib.parse import quote
+
 
 class APIClient:
     def __init__(self): 
@@ -13,15 +15,19 @@ class APIClient:
         auth_data = {
             "CompanyDB": settings.COMPANY_DB,
             "UserName": settings.API_USERNAME,
-            "Password": settings.API_PASSWORD
+            "Password": settings.API_PASSWORD,
         }
         response = self.session.post(login_url, json=auth_data, verify=False)
         response.raise_for_status()
 
-    def get_quotations(self, top=0, skip=0):
+    def get_quotations(self, top=0, skip=0, filters=None):
         crossjoin = "Quotations,SalesPersons"
         expand = "Quotations($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
         filter_condition = "Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
+
+        if filters:
+            for key, value in filters.items():
+                filter_condition += f" and {key} {value}"
 
         headers = {
             "Prefer": f"odata.maxpagesize={top}"
@@ -32,7 +38,29 @@ class APIClient:
 
         response = self.session.get(url, headers=headers, verify=False)
         response.raise_for_status()
+        print(url)
         return response.json()
+    
+    def get_quotations2(self, top=20, skip=0, filters=None):
+        crossjoin = "Quotations,SalesPersons"
+        expand = "Quotations($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
+        filter_condition = "Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
+
+        if filters:
+            filter_condition += " and " + " and ".join([f"{k} {v}" for k, v in filters.items()])
+
+        headers = {
+            "Prefer": f"odata.maxpagesize={top}"
+        }
+
+        query_url = f"/$crossjoin({crossjoin})?$expand={expand}&$filter={filter_condition}&$top={top}&$skip={skip}"
+        url = f"{self.base_url}{query_url}"
+
+        response = self.session.get(url, headers=headers, verify=False)
+        response.raise_for_status()
+        print(url)
+        return response.json()
+
     
     def get_quotations_items(self, endpoint, top=20):
         
