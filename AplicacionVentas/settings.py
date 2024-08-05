@@ -19,7 +19,6 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.3.41']
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,8 +42,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'AplicacionVentas.urls'
+
 #/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/gestionPedidos
 #/Users/nicor/Universidad/Practica/AplicacionVentas/gestionPedidos/templates/gestionPedidos
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -145,6 +146,5 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#hola mundo
 
 

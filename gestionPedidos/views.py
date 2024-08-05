@@ -1,22 +1,18 @@
 #Django modulos
-from django.shortcuts import render, redirect, HttpResponse # importa el metodo render 
+from django.shortcuts import render, redirect  
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
 from django.contrib.auth.hashers import make_password
-from django.contrib import messages
-from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
 from django.db import transaction
 from django.http import JsonResponse
-from django.core import serializers
 #Django Rest F modulos
 from rest_framework.views import APIView
 from rest_framework.response import Response
 #Modulos Diseñados
 from gestionPedidos.models import *
-from .forms import * #prueba
 from .api_client import APIClient
 from .vtex_client import VTEXClient
 #librerias Python usadas
@@ -24,81 +20,178 @@ import requests
 import json
 
 #Inicio vistas Renderizadoras
+
+"""
+Decoradores usados: 
+    @login_required: Decorador que indica que solo se ejecuta el template si el usurio esta logeado
+    @transaction.atomic: Decorador usado para vistas que realizan  un conjunto de operaciones sobre la db, permitiendo que todas se ejecuten con exito o ninguna se aplique si ocurre un error. 
+"""
+
 @login_required
 def home(request):
+    """
+    Rendereriza la pagina principal y muestra el nombre del usuario que ha iniciado sesión
+
+    Args: 
+        request (HttpRequest): La petición HTTP recibida.
+
+    Returns:
+        HttpResponse: Si el ususario esta autenticado renderiza el template 'home.html' con el nombre de usuario.
+        HttpResponse: Si el usuario no esta autenticado redirige a el template del login.
+    """
+
     if request.user.is_authenticated:
         username = request.user.username 
         return render(request, 'home.html', {'username': username}) # Accede al nombre de usuario y permite su uso en el template
     else:
-        return render(request, 'home.html')
+        return render(request, '/')
 
 @login_required
-def salir(request):
+def userLogout(request):
+    """
+    Finaliza la sesion del usuario.
+
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+
+    Returns: 
+        HttpResponse: redirige a la pagina de inicio despues de cerrar la sesion del usuario.
+    """
+
     logout(request)
     return redirect('/')
 
 @login_required
 def list_quotations(request):
+    """
+    Renderiza la pagina de lista de cotizaciones 
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'lista_cotizaciones.html' 
+    """
     
     return render(request, "lista_cotizaciones.html")
- 
+
 @login_required
 def quotations(request):
+    """
+    Renderiza la pagina de cotizaciones y muestra el nombre de usuario.
+
+    Captura de la url el parametro DocNum y, si este no esta presente, lo establece en null
+    También obtiene todas las instancias del modelo 'Region' para ser utilizadas en el template.
+
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns: 
+        HttpResponse: Renderiza el template 'cotizacion.html' con el nombre de usuario y el DocNum
+        HttpResponse: Si el usuario no esta autenticado redirige a el template del inicio.
+    """
+
     if request.user.is_authenticated:
         username = request.user.username
     
         doc_num = request.GET.get('docNum', None)
 
+        regiones = Region.objects.all()
+
+
         context = {
             'docnum': doc_num,
-            'username': username
+            'username': username,
+            'regiones': regiones
         }
 
         return render(request, 'cotizacion.html', context)
-    else:
-        return render(request, "cotizacion.html")
-    
-@login_required
-def quotations_view(request):
-    if request.user.is_authenticated:
-        username = request.user.username 
-
-    doc_num = request.GET.get('docNum', None)
-    
-    context = {
-        'docnum': doc_num,
-        'username': username
-    }
-    return render(request, 'cotizacion.html', context)
-
-@login_required #Implementada para menus de opciones con regiones
-def regiones(request):
-    regiones = Region.objects.all()
-    return render(request, 'cotizacion.html', {'regiones': regiones})
 
 @login_required
 def lista_ovs(request):
+    """
+    Renderiza la página de ordenes de venta
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'lista_ovs.html'
+    """
+    
     return render(request, "lista_ovs.html")
 
 @login_required
 def lista_solic_devoluciones(request):
+    """
+    Renderiza la página de devoluciones 
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'lista_solic_devoluciones.html'
+    """
+
     return render(request, "lista_solic_devoluciones.html")
 
 @login_required
 def lista_clientes(request):
+    """
+    Renderiza la página de Listado de clientes
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'lista_clientes.html'
+    """
+
     return render(request, "lista_clientes.html")
 
 @login_required
 def reporte_stock(request):
+    """
+    Renderiza la página de reportes de stock
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'reporte_stock.html'
+    """
+
     return render(request, "reporte_stock.html")
 
 @login_required
 def micuenta(request):
+    """
+    Renderiza la página de cuenta de usuario
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'micuenta.html'
+    """
+
     return render(request, "micuenta.html")
 
-@transaction.atomic
+@transaction.atomic 
 @login_required
 def registrarCuenta(request):
+
+    """
+        Registra nuevos usuarios en la db
+
+        Args: 
+            request (HttpsRequest): La peticion HTTP recibida
+
+        Returns: 
+            HttpResponse: Si el nombre de usuario ya existe renderiza en el template 'micuenta.html' un mensaje indicando que ya existe
+            HttpResponse: Si las contraseñas no coindicen renderiza en el template 'micuenta.html' un mensaje indicando que las contraseñas no coinciden
+            
+    """
     nombre = request.POST['nombre']
     email = request.POST['email']
     username = request.POST['email']
