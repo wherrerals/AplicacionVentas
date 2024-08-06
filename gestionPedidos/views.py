@@ -39,8 +39,7 @@ def home(request):
     if request.user.is_authenticated:
         username = request.user.username 
         return render(request, 'home.html', {'username': username}) # Accede al nombre de usuario y permite su uso en el template
-    else:
-        return render(request, '/')
+
 
 @login_required
 def userLogout(request):
