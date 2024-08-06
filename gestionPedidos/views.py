@@ -1,22 +1,14 @@
 #Django modulos
-from django.shortcuts import render, redirect, HttpResponse # importa el metodo render 
+from django.shortcuts import render, redirect  
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
 from django.contrib.auth.hashers import make_password
-from django.contrib import messages
-from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
 from django.db import transaction
 from django.http import JsonResponse
-from django.core import serializers
-#Django Rest F modulos
-from rest_framework.views import APIView
-from rest_framework.response import Response
 #Modulos Diseñados
 from gestionPedidos.models import *
-from .forms import * #prueba
 from .api_client import APIClient
 from .vtex_client import VTEXClient
 #librerias Python usadas
@@ -24,83 +16,206 @@ import requests
 import json
 
 #Inicio vistas Renderizadoras
+
+"""
+Decoradores usados: 
+    @login_required: Decorador que indica que solo se ejecuta el template si el usurio esta logeado
+    @transaction.atomic: Decorador usado para vistas que realizan  un conjunto de operaciones sobre la db, permitiendo que todas se ejecuten con exito o ninguna se aplique si ocurre un error. 
+"""
+
 @login_required
 def home(request):
+    """
+    Rendereriza la pagina principal y muestra el nombre del usuario que ha iniciado sesión
+
+    Args: 
+        request (HttpRequest): La petición HTTP recibida.
+
+    Returns:
+        HttpResponse: Si el ususario esta autenticado renderiza el template 'home.html' con el nombre de usuario.
+        HttpResponse: Si el usuario no esta autenticado redirige a el template del login.
+    """
+
     if request.user.is_authenticated:
         username = request.user.username 
         return render(request, 'home.html', {'username': username}) # Accede al nombre de usuario y permite su uso en el template
     else:
-        return render(request, 'home.html')
-    
-
+        return render(request, '/')
 
 @login_required
-def salir(request):
+def userLogout(request):
+    """
+    Finaliza la sesion del usuario.
+
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+
+    Returns: 
+        HttpResponse: redirige a la pagina de inicio despues de cerrar la sesion del usuario.
+    """
+
     logout(request)
     return redirect('/')
 
 @login_required
 def list_quotations(request):
+    """
+    Renderiza la pagina de lista de cotizaciones 
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'lista_cotizaciones.html' 
+    """
     
     return render(request, "lista_cotizaciones.html")
- 
+
 @login_required
 def quotations(request):
+    """
+    Renderiza la pagina de cotizaciones y muestra el nombre de usuario.
+
+    Captura de la url el parametro DocNum y, si este no esta presente, lo establece en null
+    También obtiene todas las instancias del modelo 'Region' para ser utilizadas en el template.
+
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns: 
+        HttpResponse: Renderiza el template 'cotizacion.html' con el nombre de usuario y el DocNum
+        HttpResponse: Si el usuario no esta autenticado redirige a el template del inicio.
+    """
+
     if request.user.is_authenticated:
         username = request.user.username
     
         doc_num = request.GET.get('docNum', None)
 
+        regiones = Region.objects.all()
+
+
         context = {
             'docnum': doc_num,
-            'username': username
+            'username': username,
+            'regiones': regiones
         }
 
         return render(request, 'cotizacion.html', context)
-    else:
-        return render(request, "cotizacion.html")
-    
-@login_required
-def quotations_view(request):
-    if request.user.is_authenticated:
-        username = request.user.username 
-
-    doc_num = request.GET.get('docNum', None)
-    
-    context = {
-        'docnum': doc_num,
-        'username': username
-    }
-    return render(request, 'cotizacion.html', context)
-
-@login_required #Implementada para menus de opciones con regiones
-def regiones(request):
-    regiones = Region.objects.all()
-    return render(request, 'cotizacion.html', {'regiones': regiones})
 
 @login_required
 def lista_ovs(request):
+    """
+    Renderiza la página de ordenes de venta
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'lista_ovs.html'
+    """
+    
     return render(request, "lista_ovs.html")
 
 @login_required
 def lista_solic_devoluciones(request):
+    """
+    Renderiza la página de devoluciones 
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'lista_solic_devoluciones.html'
+    """
+
     return render(request, "lista_solic_devoluciones.html")
 
 @login_required
 def lista_clientes(request):
+    """
+    Renderiza la página de Listado de clientes
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'lista_clientes.html'
+    """
+
     return render(request, "lista_clientes.html")
 
 @login_required
 def reporte_stock(request):
+    """
+    Renderiza la página de reportes de stock
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'reporte_stock.html'
+    """
+
     return render(request, "reporte_stock.html")
 
 @login_required
 def micuenta(request):
+    """
+    Renderiza la página de cuenta de usuario
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'micuenta.html'
+    """
+
     return render(request, "micuenta.html")
 
-@transaction.atomic
+@login_required
+def lista_usuarios(request):
+    """
+    Renderiza la página de lista de usuario
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'lista_usuarios.html'
+    """
+
+    return render(request, "lista_usuarios.html")
+
+@login_required
+def creacion_clientes(request):
+    """
+    Renderiza la página de lista de usuario
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'cliente.html'
+    """
+
+    return render(request, "cliente.html")
+
+@transaction.atomic 
 @login_required
 def registrarCuenta(request):
+
+    """
+        Registra nuevos usuarios en la db
+
+        Args: 
+            request (HttpsRequest): La peticion HTTP recibida
+
+        Returns: 
+            HttpResponse: Si el nombre de usuario ya existe renderiza en el template 'micuenta.html' un mensaje indicando que ya existe
+            HttpResponse: Si las contraseñas no coindicen renderiza en el template 'micuenta.html' un mensaje indicando que las contraseñas no coinciden
+            
+    """
     nombre = request.POST['nombre']
     email = request.POST['email']
     username = request.POST['email']
@@ -188,14 +303,6 @@ def mis_datos(request):
 
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 
-@login_required
-def lista_usuarios(request):
-    return render(request, "lista_usuarios.html")
-
-
-@login_required
-def creacion_clientes(request):
-    return render(request, "cliente.html")
 
 @login_required
 def agregar_editar_clientes(request):
@@ -248,7 +355,7 @@ def agregar_editar_clientes(request):
         return redirect("/")
 
 @login_required
-#desde ambos botones se puede llamar y usar el tipo para ver donde se muestra en "barras (ayax)"
+#desde ambos botones se puede llamar y usar el tipo para ver donde se muestra en "barras (ajax)"
 def agregar_direccion(request):
     if request.method == "POST":
         #numrow se define solo cmo 0
@@ -276,19 +383,6 @@ def agregar_direccion(request):
                                        pais = pais) #Se crea, el resto se pasan por defecto
     return redirect("/")
 
-@login_required
-def obtenerDatosProducto(request, producto_id):
-    producto = Producto.objects.get(id=producto_id)
-    data = {
-        'productoCodigo': producto.codigo,
-        'stock': producto.stock,
-        'precioActual': str(producto.precio_actual),
-        'precioAnterior': str(producto.precio_anterior),
-        'maxDescuento': producto.max_descuento,       
-    }
-
-    return JsonResponse(data)
-
 
 @login_required
 def busquedaProductos(request):
@@ -307,25 +401,46 @@ def busquedaProductos(request):
         return JsonResponse({'resultados': resultados_formateados})
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
-    
 
-class BusquedaProductosView(LoginRequiredMixin, APIView):
-    def get(self, request, *args, **kwargs):
+
+def busquedaClientes(request):
+    if 'numero' in request.GET:
         numero = request.GET.get('numero')
-        if numero:
-            # Realiza la consulta a la base de datos para obtener los resultados
-            resultados = Producto.objects.filter(codigo__icontains=numero)
-            # Convierte los resultados en una lista de diccionarios
-            resultados_formateados = [{'codigo': producto.codigo,
-                                       'nombre': producto.nombre,
-                                       'imagen': producto.imagen,
-                                       'precio': producto.precioVenta,
-                                       'stockTotal': producto.stockTotal,
-                                       'precioAnterior': producto.precioLista,
-                                       'maxDescuento': producto.dsctoMaxTienda} for producto in resultados]
-            return JsonResponse({'resultados': resultados_formateados})
-        else:
-            return JsonResponse({'error': 'No se proporcionó un número válido'})
+        resultados_clientes = SocioNegocio.objects.filter(rut__icontains=numero)
+        resultados_formateados = []
+
+        for socio in resultados_clientes:
+            direcciones = Direccion.objects.filter(SocioNegocio=socio)
+            direcciones_formateadas = [{
+                'rowNum': direccion.rowNum,
+                'nombreDireccion': direccion.nombreDireccion,
+                'ciudad': direccion.ciudad,
+                'calleNumero': direccion.calleNumero,
+                'codigoImpuesto': direccion.codigoImpuesto,
+                'tipoDireccion': direccion.tipoDireccion,
+                'pais': direccion.pais,
+                'comuna': direccion.comuna.nombre,  # Asumiendo que Comuna tiene un campo nombre
+                'region': direccion.region.nombre  # Asumiendo que Region tiene un campo nombre
+            } for direccion in direcciones]
+
+            resultados_formateados.append({
+                'nombre': socio.nombre,
+                'apellido': socio.apellido,
+                'razonSocial': socio.razonSocial,
+                'rut': socio.rut,
+                'email': socio.email,
+                'telefono': socio.telefono,
+                'giro': socio.giro,
+                'condicionPago': socio.condicionPago,
+                'plazoReclamaciones': socio.plazoReclamaciones,
+                'clienteExportacion': socio.clienteExportacion,
+                'vendedor': socio.vendedor,
+                'direcciones': direcciones_formateadas
+            })
+        
+        return JsonResponse({'resultadosClientes': resultados_formateados})
+    else:
+        return JsonResponse({'error': 'No se proporcionó un número válido'})  
 
 def validar_contrasena(password):
     mensajes = []
@@ -343,48 +458,6 @@ def validar_contrasena(password):
         mensajes.append("Su contraseña debe tener al menos 8 caracteres.")
 
     return mensajes  
-
-
-class BusquedaClientes(LoginRequiredMixin, APIView):
-    def get(self, request):
-        if 'numero' in request.GET:
-            numero = request.GET.get('numero')
-            resultados_clientes = SocioNegocio.objects.filter(rut__icontains=numero)
-            resultados_formateados = []
-
-            for socio in resultados_clientes:
-                direcciones = Direccion.objects.filter(SocioNegocio=socio)
-                direcciones_formateadas = [{
-                    'rowNum': direccion.rowNum,
-                    'nombreDireccion': direccion.nombreDireccion,
-                    'ciudad': direccion.ciudad,
-                    'calleNumero': direccion.calleNumero,
-                    'codigoImpuesto': direccion.codigoImpuesto,
-                    'tipoDireccion': direccion.tipoDireccion,
-                    'pais': direccion.pais,
-                    'comuna': direccion.comuna.nombre,  # Asumiendo que Comuna tiene un campo nombre
-                    'region': direccion.region.nombre  # Asumiendo que Region tiene un campo nombre
-                } for direccion in direcciones]
-
-                resultados_formateados.append({
-                    'nombre': socio.nombre,
-                    'apellido': socio.apellido,
-                    'razonSocial': socio.razonSocial,
-                    'rut': socio.rut,
-                    'email': socio.email,
-                    'telefono': socio.telefono,
-                    'giro': socio.giro,
-                    'condicionPago': socio.condicionPago,
-                    'plazoReclamaciones': socio.plazoReclamaciones,
-                    'clienteExportacion': socio.clienteExportacion,
-                    'vendedor': socio.vendedor,
-                    'direcciones': direcciones_formateadas
-                })
-            
-            return Response({'resultadosClientes': resultados_formateados})
-        else:
-            return Response({'error': 'No se proporcionó un número válido'})
-        
 
 def quotate_items(request, docNum):
     client = APIClient()  
@@ -433,8 +506,6 @@ def quotate_items(request, docNum):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
-    
-
 
 @require_http_methods(["GET"])
 def list_quotations_2(request):
@@ -454,14 +525,6 @@ def list_quotations_2(request):
 
     data = client.get_quotations(top=top, skip=skip)
     return JsonResponse(data, safe=False)
-
-
-def post_quotations1(request):
-    client = APIClient()
-    endpoint = "Quotations"
-    data = client.post_data(endpoint)
-    return JsonResponse(data, safe=False)
-
 
 @csrf_exempt
 @require_POST
@@ -497,11 +560,9 @@ def post_quotations(request):
         print("An error occurred:", e)
         return JsonResponse({'error': str(e)}, status=500)
     
-
 def oredenes(request):
         
     return render(request, "manejo_ordenes.html")
-
 
 def cambio_ordenes(request):
     if request.method == 'POST':
@@ -566,13 +627,56 @@ def cambio_ordenes(request):
     else:
         return JsonResponse({'message': 'Método no permitido'}, status=405)
 
-
-def probandoVtex(request):
-    client = VTEXClient()
-    data = client.get_order_details('1352110520137-01')
-    return JsonResponse(data, safe=False)
-
-def probandoSL(request):
+@csrf_exempt
+@require_POST
+def filter_quotations(request):
+    print("Request body:", request.body)  # Verifica el cuerpo de la solicitud JSON recibida
+    
     client = APIClient()
-    data = client.get_orders('1352110520137-01')
-    return JsonResponse(data, safe=False)
+
+    try:
+        data = json.loads(request.body)
+        print("Received data:", data)  # Verifica los datos JSON recibidos
+    except json.JSONDecodeError as e:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    filters = {}
+
+    # Agregar filtros solo si se proporcionan datos válidos
+    if data.get('fecha_inicio'):
+        filters['Quotations/DocDate ge'] = f"'{data.get('fecha_inicio')}'"
+    if data.get('fecha_fin'):
+        filters['Quotations/DocDate le'] = f"'{data.get('fecha_fin')}'"
+    if data.get('docNum'):
+        filters['contains(Quotations/DocNum,'] = data.get('docNum')
+    if data.get('carCode'):
+        filters['contains(Quotations/CardCode,'] = f"'{data.get('carCode')}'"
+    if data.get('cardNAme'):
+        filters['contains(Quotations/CardName,'] = f"'{data.get('cardNAme')}'"
+    if data.get('salesEmployeeName'):
+        filters['contains(SalesPersons/SalesEmployeeName,'] = f"'{data.get('salesEmployeeName')}'"
+    if data.get('DocumentStatus'):
+        filters['Quotations/DocumentStatus eq'] = f"'{data.get('DocumentStatus')}'"
+    if data.get('docTotal'):
+        filters['contains(Quotations/DocTotal,'] = data.get('docTotal')
+    if data.get('cancelled'):
+        filters['Quotations/Cancelled eq'] = f"'{data.get('cancelled')}'"
+
+    # Limpiar los filtros vacíos o con valores inválidos
+    filters = {k: v for k, v in filters.items() if v and v != "''"}
+
+    try:
+        top = int(data.get('top', 20))
+        skip = int(data.get('skip', 0))
+    except ValueError:
+        return JsonResponse({'error': 'Invalid parameters'}, status=400)
+
+    print("Applying filters:", filters)  # Verifica los filtros aplicados
+
+    try:
+        data = client.get_quotations2(top=top, skip=skip, filters=filters)
+        return JsonResponse({'data': data}, safe=False)
+    except Exception as e:
+        print("Error:", e)  # Verifica el error específico que está ocurriendo
+        return JsonResponse({'error': str(e)}, status=500)
+
