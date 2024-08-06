@@ -5,6 +5,17 @@ from urllib.parse import quote
 
 
 class APIClient:
+    """
+    Una clase que representa el cliente de API para la capa de servicio.
+
+    Atributos:
+        base_url (str): La URL base para la API de la capa de servicio.
+        session (requests.Session): Una sesión persistente para realizar solicitudes HTTP.
+    
+    Métodos:
+        login(): Autentica la sesión con la API usando las credenciales proporcionadas.
+    """
+    
     def __init__(self): 
         self.base_url = settings.API_BASE_URL
         self.session = requests.Session()
