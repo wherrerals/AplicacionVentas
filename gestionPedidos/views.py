@@ -1,16 +1,12 @@
 #Django modulos
 from django.shortcuts import render, redirect  
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout
 from django.contrib.auth.hashers import make_password
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
 from django.db import transaction
 from django.http import JsonResponse
-#Django Rest F modulos
-from rest_framework.views import APIView
-from rest_framework.response import Response
 #Modulos Diseñados
 from gestionPedidos.models import *
 from .api_client import APIClient
@@ -177,6 +173,34 @@ def micuenta(request):
 
     return render(request, "micuenta.html")
 
+@login_required
+def lista_usuarios(request):
+    """
+    Renderiza la página de lista de usuario
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'lista_usuarios.html'
+    """
+
+    return render(request, "lista_usuarios.html")
+
+@login_required
+def creacion_clientes(request):
+    """
+    Renderiza la página de lista de usuario
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'cliente.html'
+    """
+
+    return render(request, "cliente.html")
+
 @transaction.atomic 
 @login_required
 def registrarCuenta(request):
@@ -279,14 +303,6 @@ def mis_datos(request):
 
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 
-@login_required
-def lista_usuarios(request):
-    return render(request, "lista_usuarios.html")
-
-
-@login_required
-def creacion_clientes(request):
-    return render(request, "cliente.html")
 
 @login_required
 def agregar_editar_clientes(request):
@@ -339,7 +355,7 @@ def agregar_editar_clientes(request):
         return redirect("/")
 
 @login_required
-#desde ambos botones se puede llamar y usar el tipo para ver donde se muestra en "barras (ayax)"
+#desde ambos botones se puede llamar y usar el tipo para ver donde se muestra en "barras (ajax)"
 def agregar_direccion(request):
     if request.method == "POST":
         #numrow se define solo cmo 0
@@ -367,19 +383,6 @@ def agregar_direccion(request):
                                        pais = pais) #Se crea, el resto se pasan por defecto
     return redirect("/")
 
-@login_required
-def obtenerDatosProducto(request, producto_id):
-    producto = Producto.objects.get(id=producto_id)
-    data = {
-        'productoCodigo': producto.codigo,
-        'stock': producto.stock,
-        'precioActual': str(producto.precio_actual),
-        'precioAnterior': str(producto.precio_anterior),
-        'maxDescuento': producto.max_descuento,       
-    }
-
-    return JsonResponse(data)
-
 
 @login_required
 def busquedaProductos(request):
@@ -399,23 +402,45 @@ def busquedaProductos(request):
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
 
-class BusquedaProductosView(LoginRequiredMixin, APIView):
-    def get(self, request, *args, **kwargs):
+
+def busquedaClientes(request):
+    if 'numero' in request.GET:
         numero = request.GET.get('numero')
-        if numero:
-            # Realiza la consulta a la base de datos para obtener los resultados
-            resultados = Producto.objects.filter(codigo__icontains=numero)
-            # Convierte los resultados en una lista de diccionarios
-            resultados_formateados = [{'codigo': producto.codigo,
-                                       'nombre': producto.nombre,
-                                       'imagen': producto.imagen,
-                                       'precio': producto.precioVenta,
-                                       'stockTotal': producto.stockTotal,
-                                       'precioAnterior': producto.precioLista,
-                                       'maxDescuento': producto.dsctoMaxTienda} for producto in resultados]
-            return JsonResponse({'resultados': resultados_formateados})
-        else:
-            return JsonResponse({'error': 'No se proporcionó un número válido'})
+        resultados_clientes = SocioNegocio.objects.filter(rut__icontains=numero)
+        resultados_formateados = []
+
+        for socio in resultados_clientes:
+            direcciones = Direccion.objects.filter(SocioNegocio=socio)
+            direcciones_formateadas = [{
+                'rowNum': direccion.rowNum,
+                'nombreDireccion': direccion.nombreDireccion,
+                'ciudad': direccion.ciudad,
+                'calleNumero': direccion.calleNumero,
+                'codigoImpuesto': direccion.codigoImpuesto,
+                'tipoDireccion': direccion.tipoDireccion,
+                'pais': direccion.pais,
+                'comuna': direccion.comuna.nombre,  # Asumiendo que Comuna tiene un campo nombre
+                'region': direccion.region.nombre  # Asumiendo que Region tiene un campo nombre
+            } for direccion in direcciones]
+
+            resultados_formateados.append({
+                'nombre': socio.nombre,
+                'apellido': socio.apellido,
+                'razonSocial': socio.razonSocial,
+                'rut': socio.rut,
+                'email': socio.email,
+                'telefono': socio.telefono,
+                'giro': socio.giro,
+                'condicionPago': socio.condicionPago,
+                'plazoReclamaciones': socio.plazoReclamaciones,
+                'clienteExportacion': socio.clienteExportacion,
+                'vendedor': socio.vendedor,
+                'direcciones': direcciones_formateadas
+            })
+        
+        return JsonResponse({'resultadosClientes': resultados_formateados})
+    else:
+        return JsonResponse({'error': 'No se proporcionó un número válido'})  
 
 def validar_contrasena(password):
     mensajes = []
@@ -433,46 +458,6 @@ def validar_contrasena(password):
         mensajes.append("Su contraseña debe tener al menos 8 caracteres.")
 
     return mensajes  
-
-class BusquedaClientes(LoginRequiredMixin, APIView):
-    def get(self, request):
-        if 'numero' in request.GET:
-            numero = request.GET.get('numero')
-            resultados_clientes = SocioNegocio.objects.filter(rut__icontains=numero)
-            resultados_formateados = []
-
-            for socio in resultados_clientes:
-                direcciones = Direccion.objects.filter(SocioNegocio=socio)
-                direcciones_formateadas = [{
-                    'rowNum': direccion.rowNum,
-                    'nombreDireccion': direccion.nombreDireccion,
-                    'ciudad': direccion.ciudad,
-                    'calleNumero': direccion.calleNumero,
-                    'codigoImpuesto': direccion.codigoImpuesto,
-                    'tipoDireccion': direccion.tipoDireccion,
-                    'pais': direccion.pais,
-                    'comuna': direccion.comuna.nombre,  # Asumiendo que Comuna tiene un campo nombre
-                    'region': direccion.region.nombre  # Asumiendo que Region tiene un campo nombre
-                } for direccion in direcciones]
-
-                resultados_formateados.append({
-                    'nombre': socio.nombre,
-                    'apellido': socio.apellido,
-                    'razonSocial': socio.razonSocial,
-                    'rut': socio.rut,
-                    'email': socio.email,
-                    'telefono': socio.telefono,
-                    'giro': socio.giro,
-                    'condicionPago': socio.condicionPago,
-                    'plazoReclamaciones': socio.plazoReclamaciones,
-                    'clienteExportacion': socio.clienteExportacion,
-                    'vendedor': socio.vendedor,
-                    'direcciones': direcciones_formateadas
-                })
-            
-            return Response({'resultadosClientes': resultados_formateados})
-        else:
-            return Response({'error': 'No se proporcionó un número válido'})        
 
 def quotate_items(request, docNum):
     client = APIClient()  
