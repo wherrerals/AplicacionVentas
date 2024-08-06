@@ -27,7 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'gestionPedidos',
-    'AplicacionVentas'
+    'AplicacionVentas',
+    'externalconection'
 ]
 
 MIDDLEWARE = [
