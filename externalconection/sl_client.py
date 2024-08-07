@@ -1,8 +1,5 @@
 import requests
 from django.conf import settings
-from django.http import JsonResponse
-from urllib.parse import quote
-
 
 class APIClient:
     """
