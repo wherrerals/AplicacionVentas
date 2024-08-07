@@ -52,7 +52,8 @@ ROOT_URLCONF = 'AplicacionVentas.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/Users/Cuervo/Documents/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
+        'DIRS': ['/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
+        #'DIRS': ['/Users/Cuervo/Documents/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
         
         'APP_DIRS': True,
         'OPTIONS': {
@@ -77,8 +78,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
         'USER':'root',
-        'PASSWORD':'Ea7hava5}', #home
-        #'PASSWORD':'Ea7hava5}', #led_studio
+        #'PASSWORD':'Ea7hava5}', #home
+        'PASSWORD':'Ea7hava5*', #led_studio
         'HOST':'localhost',
         'PORT':'3306',
     }
@@ -133,8 +134,8 @@ USE_TZ = True
 
 
 
-#LOGIN_REDIRECT_URL = '/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/login'
-LOGIN_REDIRECT_URL = '/Users/Cuervo/Documents/AplicacionVentas/gestionPedidos/templates/login'
+LOGIN_REDIRECT_URL = '/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/login'
+#LOGIN_REDIRECT_URL = '/Users/Cuervo/Documents/AplicacionVentas/gestionPedidos/templates/login'
 
 
 AUTHENTICATION_BACKENDS = [

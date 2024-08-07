@@ -17,9 +17,10 @@ class APIClient:
         """
         Inicializa una nueva instancia de APIClient.
 
-        configura la url base y crea una nueva sesión persistente.
+        Configura la url base
+        Crea una nueva sesión persistente.
         El estado de autenticación se establece en falso.
-        llama el metodo login para autenticar la sesión con la API.
+        Llama el metodo login para autenticar la sesión con la API.
         """
 
         self.base_url = settings.API_BASE_URL
@@ -31,7 +32,7 @@ class APIClient:
         """
         Construye la URL de inicio de sesión.
 
-        Autentica la sesión con la API usando las credenciales proporcionadas.
+        Si la autenticacion es falsa, Autentica la sesión con la API usando las credenciales proporcionadas.
         Establece el estado de autenticación en verdadero si la autenticación es exitosa.
         """
         login_url = f"{self.base_url}Login"
