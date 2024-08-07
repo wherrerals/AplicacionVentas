@@ -17,21 +17,46 @@ class APIClient:
     """
     
     def __init__(self): 
+        """
+        Inicializa una nueva instancia de APIClient.
+
+        configura la url base y crea una nueva sesión persistente.
+        El estado de autenticación se establece en falso.
+        llama el metodo login para autenticar la sesión con la API.
+        """
+
         self.base_url = settings.API_BASE_URL
         self.session = requests.Session()
+        self.autehnticated = False
         self.login()
 
     def login(self): 
+        """
+        Construye la URL de inicio de sesión.
+
+        Autentica la sesión con la API usando las credenciales proporcionadas.
+        Establece el estado de autenticación en verdadero si la autenticación es exitosa.
+        """
         login_url = f"{self.base_url}Login"
-        auth_data = {
-            "CompanyDB": settings.COMPANY_DB,
-            "UserName": settings.API_USERNAME,
-            "Password": settings.API_PASSWORD,
-        }
-        response = self.session.post(login_url, json=auth_data, verify=False)
+
+        if not self.autehnticated:
+            auth_data = {
+                "CompanyDB": settings.COMPANY_DB,
+                "UserName": settings.API_USERNAME,
+                "Password": settings.API_PASSWORD,
+            }
+            response = self.session.post(login_url, json=auth_data, verify=False)
+            response.raise_for_status()
+            self.autehnticated = True
+    
+    def logout(self):
+        logout_url = f"{self.base_url}Logout"
+        response = self.session.post(logout_url, verify=False)
         response.raise_for_status()
+        self.autehnticated = False
 
     def get_quotations(self, top=0, skip=0, filters=None):
+        self.login()
         crossjoin = "Quotations,SalesPersons"
         expand = "Quotations($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
         filter_condition = "Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
@@ -53,6 +78,7 @@ class APIClient:
         return response.json()
     
     def get_quotations2(self, top=20, skip=0, filters=None):
+        self.login()
         crossjoin = "Quotations,SalesPersons"
         expand = "Quotations($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
         filter_condition = "Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode"

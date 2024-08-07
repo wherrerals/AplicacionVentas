@@ -8,6 +8,7 @@ from django.views.decorators.http import require_POST, require_http_methods
 from django.db import transaction
 from django.http import JsonResponse
 #Modulos Diseñados
+from .models.usuario import User 
 from gestionPedidos.models import *
 from externalconection.sl_client import APIClient
 from externalconection.vtex_client import VTEXClient
