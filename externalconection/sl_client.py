@@ -8,9 +8,11 @@ class APIClient:
     Atributos:
         base_url (str): La URL base para la API de la capa de servicio.
         session (requests.Session): Una sesión persistente para realizar solicitudes HTTP.
+        autehnticated (bool): Estado de autenticación.
     
     Métodos:
         login(): Autentica la sesión con la API usando las credenciales proporcionadas.
+        logout(): Cirra la sesión con la API
     """
     
     def __init__(self): 
@@ -33,7 +35,10 @@ class APIClient:
         Construye la URL de inicio de sesión.
 
         Si la autenticacion es falsa, Autentica la sesión con la API usando las credenciales proporcionadas.
-        Establece el estado de autenticación en verdadero si la autenticación es exitosa.
+        Establece el estado de autenticación en True si la autenticación es exitosa.
+        
+        Raises:
+            HTTPError: Si la respuesta HTTP contiene un error de estado.
         """
         login_url = f"{self.base_url}Login"
 
@@ -48,10 +53,20 @@ class APIClient:
             self.autehnticated = True
     
     def logout(self):
-        logout_url = f"{self.base_url}Logout"
-        response = self.session.post(logout_url, verify=False)
-        response.raise_for_status()
-        self.autehnticated = False
+        """
+        Construye la URL de fin de sesión.
+
+        Si la autentincación es verdadera, finaliza la conexion de la API
+        Establece el estado de autenticación en False si el cierre de sesión es exitoso.
+
+        Raises:
+            HTTPError: Si la respuesta HTTP contiene un error de estado.
+        """
+        if self.autehnticated:
+            logout_url = f"{self.base_url}Logout"
+            response = self.session.post(logout_url, verify=False)
+            response.raise_for_status()
+            self.autehnticated = False
 
     def get_quotations(self, top=0, skip=0, filters=None):
         self.login()
@@ -163,3 +178,5 @@ class APIClient:
         response.raise_for_status()
         print(url)
         return response.json()
+    
+
