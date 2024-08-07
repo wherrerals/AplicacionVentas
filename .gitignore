@@ -1,6 +1,8 @@
 # no lo ignora porque se tiene que agregar
 AplicacionVentas/AplicacionVentas/settings.py 
 
+venv/
+
 __pycache__/
 
 __pycache__
