@@ -1,8 +1,8 @@
 $(document).ready(function(){
     $('#inputNumero').on('input', function(){ //escucha el evento de entrada en input con #inputNumero
-        var numero = $(this).val();
+        let numero = $(this).val();
         if(numero){
-            $.ajax({ //realiza una solicitud ajax al servidor a la url buscar/
+            $.ajax({ // realiza una solicitud ajax al servidor a la url buscar/
                 url: 'buscar/', 
                 data: {
                     'numero': numero //envia los datos ingresados por el usuario al servidor (sku)
@@ -28,30 +28,36 @@ $(document).ready(function(){
                             productoElemento.setAttribute('data-stockTotal', resultado.stockTotal);
                             productoElemento.setAttribute('data-precioAnterior', resultado.precioAnterior);
                             productoElemento.setAttribute('data-maxDescuento', resultado.maxDescuento);
-                            productoElemento.textContent = `ID: ${resultado.codigo} | Nombre: ${resultado.nombre} | Stock: ${resultado.stockTotal}`;
+                            productoElemento.textContent = `${resultado.codigo} | ${resultado.nombre} | Stock Total: ${resultado.stockTotal}`;
 
                             // Agregar evento de clic al elemento
                             productoElemento.addEventListener('click', function() {
-                                var codigo = this.getAttribute('data-codigo');
-                                var nombre = this.getAttribute('data-nombre');
-                                var imagen = this.getAttribute('data-imagen');
-                                var precioVenta = parseFloat(this.getAttribute('data-precio'));
-                                var stockTotal = parseInt(this.getAttribute('data-stockTotal'));
-                                var precioLista = parseFloat(this.getAttribute('data-precioAnterior'));
-                                var precioDescuento = parseFloat(this.getAttribute('data-maxDescuento'));
+                                let codigo = this.getAttribute('data-codigo');
+                                let nombre = this.getAttribute('data-nombre');
+                                let imagen = this.getAttribute('data-imagen');
+                                let precioVenta = parseFloat(this.getAttribute('data-precio'));
+                                let stockTotal = parseInt(this.getAttribute('data-stockTotal'));
+                                let precioLista = parseFloat(this.getAttribute('data-precioAnterior'));
+                                let precioDescuento = parseFloat(this.getAttribute('data-maxDescuento'));
                                 
-                                agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento); //ejecuta la funcion agregar producto
+                                agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento); //Ejecuta la funcion agregar producto
+
                             });
 
-                            $('#resultados').append(productoElemento); //agrega los resultados en el contenedor 
+                            $('#resultados').append(productoElemento); //Agrega los resultados en el contenedor
+                            
+                            $('#resultados').on('click', '*', function() {
+                                // Limpiar el div #resultados al hacer clic en cualquier elemento dentro de él
+                                $('#resultados').empty();
+                            });
                         });
                     } else {
-                        $('#resultados').text('No se encontraron resultados'); //si no encuentra resultados muestra el mensaje
+                        $('#resultados').text('No se encontraron resultados'); //Si no encuentra resultados muestra el mensaje
                     }
                 }
             });
         } else {
-            $('#resultados').empty(); // si el usuario elimina el codito borra todos los resultados.
+            $('#resultados').empty(); //Si el usuario elimina el codito borra todos los resultados.
         }
     });
 });

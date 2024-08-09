@@ -9,13 +9,15 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles.min.css' %}">
+  <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles2.css' %}">  
+
 </head>
 
 <body>
   <!-- Start: Navbar Right Links -->
   {% include "barra.html" %}
   <!-- End: Navbar Right Links -->
-  <div class="container">
+  <div id="contenedor" class="container">
     <div class="row" style="color: var(--bs-secondary-color);">
       <div class="col-sm-4" style="text-align: right;padding-right: 0px;"><input type="search" placeholder="Buscar"
           style="width: 100%;"></div>
@@ -42,10 +44,10 @@
         <p style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);">Cotización</p>
       </div>
       <div class="col" style="text-align: right;padding-top: 12px;">
-        <p style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);">Nº</p>
+        <p id="numero_cotizacion" style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);">Nº</p>
       </div>
       <div class="col" style="text-align: left;padding-top: 12px;">
-        <p style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);">0</p>
+        <p style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);"></p>
       </div>
       <div class="col" style="text-align: right;padding-top: 12px;">
         <p style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);">SAP</p>
@@ -76,7 +78,8 @@
         <p>Estado:&nbsp;<strong></strong></p>
       </div>
     </div>
-    <form  id="form_agregar_editar_cliente" method="POST" action="/agregar_editar_clientes/"> {% csrf_token %}
+    <form id="forCrearPedidos" method="POST" action="/post-quotations/"> {% csrf_token %}
+      <!--form  id="form_agregar_editar_cliente" method="POST" action="/agregar_editar_clientes/"> {% csrf_token %} Cambiar para probar distinto form-->
       <div class="row" style="background: #f0f2f5;">
         <div class="col-sm-8 col-md-1 text-nowrap" style="width: 75%;">
           <div class="row">
@@ -85,23 +88,23 @@
             <div class="col-sm-6 col-md-6" style="text-align: left;width: 58%;padding-right: 0px;">
               <input class="form-control" type="text" name="cliente"
                 style="border-color: rgb(159,168,175);font-size: 12px;" id="inputCliente">
+              <div id="resultadosClientes" style="font-size: 11px;"></div>
             </div>
-
             <div class="col" style="width: 15%;text-align: left;padding-left: 0px;padding-right: 0px;">
 
-
               <!-- Start: Modal -->
-            <div>
-              <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#clienteModal" style="font-size: 12px;"> + </button>
-              <div class="modal fade" role="dialog" tabindex="-1" id="clienteModal" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header">
+              <div>
+                <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#clienteModal"
+                  style="font-size: 12px;"> + </button>
+                <div class="modal fade" role="dialog" tabindex="-1" id="clienteModal"
+                  aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
                         <h1 class="fs-5 modal-title" id="exampleModalLabel-4">Agregar / Editar Cliente </h1>
                         <button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                      <form>
+                      </div>
+                      <div class="modal-body">
                         <div class="row" style="background: #f0f2f5;">
                           <div class="col">
                             <p></p>
@@ -109,26 +112,62 @@
                         </div>
 
                         <div class="row" style="background: #f0f2f5;">
+                          <div class="col-sm-6 col-md-6">
+                            <div class="row">
+                              <div class="col-sm-2 col-md-1 text-nowrap" style="width: 20%;">
+                                <label id="nombreLabel" class="col-form-label" style="font-size: 13px;">Nombre</label>
+                              </div>
+                              <div class="col-sm-3 col-md-3" style="text-align: left;width: 80%;">
+                                <input class="form-control" type="text" name="nombre" id="nombre" value="{{ nombre }}"
+                                  style="border-color: rgb(159,168,175);font-size: 12px;">
+                              </div>
+                            </div>
 
-                          <div class="col-sm-2 col-md-1 text-nowrap" style="width: 20%;">
-                            <label class="col-form-label" style="font-size: 13px;">Nombre</label>
-                          </div>
-                          <div class="col-sm-6 col-md-6" style="text-align: left;width: 40%;">
-                            <input class="form-control" type="text" name="nombre" id="nombre" value="{{ nombre }}" style="border-color: rgb(159,168,175);font-size: 12px;">
+                            <div class="row">
+                              <div class="col-sm-1 col-md-1" style="width: 20%;" id="apellidorow">
+                                <label class="col-form-label" style="font-size: 13px;">Apellido</label>
+                              </div>
+                              <div class="col-sm-6 col-md-6" style="width: 80%;">
+                                <input class="form-control" type="text" name="apellido" id="apellido"
+                                  value="{{ apellido }}" style="border-color: rgb(159,168,175);font-size: 12px;">
+                              </div>
+                            </div>
                           </div>
 
                           <div class="col-sm-2" style="width: 25%;">
                             <div class="form-check">
-                              <input class="form-check-input" type="radio" id="formCheck-5" name="razonSocial" value="BOLE" style="border-color: rgb(159,168,175);"checked="">
+                              <input class="form-check-input" type="radio" id="formCheck-5" name="grupoSN" value="100"
+                                style="border-color: rgb(159,168,175);" checked="" onchange="cambiarLabel()">
                               <label class="form-check-label" for="formCheck-5">Persona</label>
                             </div>
                             <div class="form-check">
-                              <input class="form-check-input" type="radio" id="formCheck-6" name="razonSocial" value="FACT" style="border-color: rgb(159,168,175);">
+                              <input class="form-check-input" type="radio" id="formCheck-6" name="grupoSN" value="105"
+                                style="border-color: rgb(159,168,175);" onchange="cambiarLabel()">
                               <label class="form-check-label" for="formCheck-6">Empresa</label>
                             </div>
                           </div>
-
                         </div>
+
+                        <script>
+                          function cambiarLabel() { //Codigo para mostrar y ocultar apellido y mostrar razon social
+                            var razonSocialRadio = document.getElementsByName('grupoSN');
+                            var nombreLabel = document.getElementById('nombreLabel');
+                            var apellidoInput = document.getElementById('apellido');
+                            var apellidolabel = document.getElementById('apellidorow')
+
+                            if (razonSocialRadio[0].checked) {
+                              nombreLabel.textContent = 'Nombre';
+                              apellidoInput.style.display = 'block'; // Asegurarse de que el input de apellido esté visible
+                              apellidolabel.style.display = 'block'
+                            } else if (razonSocialRadio[1].checked) {
+                              nombreLabel.textContent = 'R. Social';
+                              apellidoInput.style.display = 'none'; // Ocultar el input de apellido
+                              apellidolabel.style.display = 'none'
+                            }
+                          }
+                        </script>
+
+
 
 
                         <div class="row" style="background: #f0f2f5;">
@@ -137,142 +176,160 @@
                             <label class="col-form-label" style="font-size: 13px;">RUT</label>
                           </div>
                           <div class="col-sm-3 col-md-3" style="text-align: left;width: 30%;">
-                            <input class="form-control" type="text" name="rut" id="rut" value="{{ rut }}" style="border-color: rgb(159,168,175);font-size: 12px;">
+                            <input class="form-control" type="text" name="rut" id="rut" value="{{ rut }}"
+                              style="border-color: rgb(159,168,175);font-size: 12px;">
                           </div>
 
                           <div class="col-sm-3 col-md-2" style="text-align: right;width: 20%;">
                             <label class="col-form-label" style="font-size: 13px;">Giro</label>
                           </div>
                           <div class="col-sm-3 col-md-2" style="text-align: left;width: 30%;">
-                            <input class="form-control" type="text" name="giro" id="giro" value="{{ giro  }}" style="border-color: rgb(159,168,175);font-size: 12px;">
+                            <input class="form-control" type="text" name="giro" id="giro" value="{{ giro  }}"
+                              style="border-color: rgb(159,168,175);font-size: 12px;">
                           </div>
 
                         </div>
 
 
-                          <div class="row" style="background: #f0f2f5;">
+                        <div class="row" style="background: #f0f2f5;">
 
-                            <div class="col-sm-1 col-md-1" style="width: 20%;">
-                              <label class="col-form-label" style="font-size: 13px;">Teléfono</label>
-                            </div>
-                            <div class="col" style="width: 30%;">
-                              <input class="form-control" type="tel" name="telefono" id="telefono" value="{{ telefono }}"style="font-size: 12px;border-color: rgb(159,168,175);">
-                            </div>
-
-                            <div class="col-md-1" style="width: 20%;text-align: right;">
-                              <label class="col-form-label" style="font-size: 13px;">Email</label>
-                            </div>
-                            <div class="col" style="width: 30%;">
-                              <input class="form-control" type="email" name="email" id="email" value="{{ nombre }}" style="font-size: 12px;border-color: rgb(159,168,175);">
-                            </div>
-
+                          <div class="col-sm-1 col-md-1" style="width: 20%;">
+                            <label class="col-form-label" style="font-size: 13px;">Teléfono</label>
+                          </div>
+                          <div class="col" style="width: 30%;">
+                            <input class="form-control" type="tel" name="telefono" id="telefono" value="{{ telefono }}"
+                              style="font-size: 12px;border-color: rgb(159,168,175);">
                           </div>
 
-
-                          <div class="row" style="background: #f0f2f5;">
-                            <div class="col">
-                              <p></p>
-                            </div>
+                          <div class="col-md-1" style="width: 20%;text-align: right;">
+                            <label class="col-form-label" style="font-size: 13px;">Email</label>
                           </div>
-                          <div class="row">
-                            <div class="col">
-                              <p></p>
-                            </div>
+                          <div class="col" style="width: 30%;">
+                            <input class="form-control" type="email" name="email" id="email" value="{{ nombre }}"
+                              style="font-size: 12px;border-color: rgb(159,168,175);">
                           </div>
 
+                        </div>
 
-                          <div class="row">
-                            <div class="col" style="padding: 0px;">
-                              <div>
-                                <ul class="nav nav-tabs" role="tablist">
-                                  <li class="nav-item" role="presentation">
-                                    <a class="nav-link active" role="tab" data-bs-toggle="tab" href="#tab-1">Direcciones</a></li>
-                                  <li class="nav-item" role="presentation">
-                                    <a class="nav-link" role="tab" data-bs-toggle="tab" href="#tab-2">Contactos</a></li>
-                                </ul>
 
-                                
-                                <div class="tab-content">
+                        <div class="row" style="background: #f0f2f5;">
+                          <div class="col">
+                            <p></p>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col">
+                            <p></p>
+                          </div>
+                        </div>
+
+
+                        <div class="row">
+                          <div class="col" style="padding: 0px;">
+                            <div>
+                              <ul class="nav nav-tabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                  <a class="nav-link active" role="tab" data-bs-toggle="tab"
+                                    href="#tab-1">Direcciones</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                  <a class="nav-link" role="tab" data-bs-toggle="tab" href="#tab-2">Contactos</a>
+                                </li>
+                              </ul>
+
+
+                              <div class="tab-content">
                                 <!--Agregar direccion-->
-                                  <div class="tab-pane active" role="tabpanel" id="tab-1">
-                                    <div class="row" style="margin-right: 0px;margin-left: 0px;">
-                                      <div class="col-sm-12" style="width: 100%;">
-                                        <a class="navbar-brand d-flex align-items-center" style="width: 107px;">
-                                          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-building-fill-add" style="font-size: 45px;" id="agregar_dir">
-                                            <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0"> </path>
-                                            <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7.256A4.493 4.493 0 0 0 12.5 8a4.493 4.493 0 0 0-3.59 1.787A.498.498 0 0 0 9 9.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .39-.187A4.476 4.476 0 0 0 8.027 12H6.5a.5.5 0 0 0-.5.5V16H3a1 1 0 0 1-1-1zm2 1.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m3 0v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"> </path>
-                                          </svg>
-                                        </a>
-                                      </div>
+                                <div class="tab-pane active" role="tabpanel" id="tab-1">
+                                  <div class="row" style="margin-right: 0px;margin-left: 0px;">
+                                    <div class="col-sm-12" style="width: 100%;">
+                                      <a class="navbar-brand d-flex align-items-center" style="width: 107px;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                                          fill="currentColor" viewBox="0 0 16 16" class="bi bi-building-fill-add"
+                                          style="font-size: 45px;" id="agregar_dir">
+                                          <path
+                                            d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0">
+                                          </path>
+                                          <path
+                                            d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7.256A4.493 4.493 0 0 0 12.5 8a4.493 4.493 0 0 0-3.59 1.787A.498.498 0 0 0 9 9.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .39-.187A4.476 4.476 0 0 0 8.027 12H6.5a.5.5 0 0 0-.5.5V16H3a1 1 0 0 1-1-1zm2 1.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m3 0v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z">
+                                          </path>
+                                        </svg>
+                                      </a>
                                     </div>
                                   </div>
-
-                                  <!--Agregar contacto-->
-                                  <div class="tab-pane" role="tabpanel" id="tab-2">
-                                    <div class="row" style="margin-right: 0px;margin-left: 0px;">
-                                      <div class="col-sm-12" style="width: 100%;">
-                                        <a class="navbar-brand d-flex align-items-center" style="width: 107px;">
-                                          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-person-fill-add" style="font-size: 45px;" id="agregar_cont">
-                                            <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"> </path>
-                                            <path d="M2 13c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4"> </path>
-                                          </svg>
-                                        </a>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  
+                                  <div id="dir"></div>
                                 </div>
+
+                                <!--Agregar contacto-->
+                                <div class="tab-pane" role="tabpanel" id="tab-2">
+                                  <div class="row" style="margin-right: 0px;margin-left: 0px;">
+                                    <div class="col-sm-12" style="width: 100%;">
+                                      <a class="navbar-brand d-flex align-items-center" style="width: 107px;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
+                                          fill="currentColor" viewBox="0 0 16 16" class="bi bi-person-fill-add"
+                                          style="font-size: 45px;" id="agregar_cont">
+                                          <path
+                                            d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0">
+                                          </path>
+                                          <path
+                                            d="M2 13c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4">
+                                          </path>
+                                        </svg>
+                                      </a>
+                                    </div>
+                                  </div>
+                                  <div id="cont"></div>
+                                </div>
+
                               </div>
                             </div>
                           </div>
+                        </div>
 
 
-                          <div class="row">
-                            <div class="col">
-                              <p></p>
-                            </div>
+                        <div class="row">
+                          <div class="col">
+                            <p></p>
                           </div>
-                          <div class="row" style="background: var(--bs-primary-text-emphasis);">
-                            <div class="col">
-                              <p></p>
-                            </div>
+                        </div>
+                        <div class="row" style="background: var(--bs-primary-text-emphasis);">
+                          <div class="col">
+                            <p></p>
                           </div>
+                        </div>
 
-                          <div class="modal-footer">
-                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cerrar</button>
-                            <button class="btn btn-primary" id="grabar-btn" type="submit">Grabar</button>
-                          </div>
+                        <div class="modal-footer">
+                          <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cerrar</button>
+                          <button class="btn btn-primary" id="grabar-btn" type="submit">Grabar</button>
+                        </div>
+                      </div>
 
-                      </form>
                     </div>
-                    
                   </div>
                 </div>
-              </div>
-            </div><!-- End: Modal -->
+              </div><!-- End: Modal -->
 
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-sm-3" style="width: 27%;">
-            <label class="col-form-label" style="font-size: 13px;">Contacto</label>
-          </div>
-          <div class="col-sm-6" style="width: 58%;padding-right: 0px;">
-            <select class="form-select" style="font-size: 12px;border-color: rgb(159,168,175);">
-              <optgroup label="Contacto">
-                <option value="0">--</option>
-                <option value="12">Rafael Contreras</option>
-                <option value="13">Rodrigo Valencia</option>
-              </optgroup>
-            </select>
+            </div>
           </div>
 
+          <div class="row">
+            <div class="col-sm-3" style="width: 27%;">
+              <label class="col-form-label" style="font-size: 13px;">Contacto</label>
+            </div>
+            <div class="col-sm-6" style="width: 58%;padding-right: 0px;">
+              <select class="form-select" style="font-size: 12px;border-color: rgb(159,168,175);">
+                <optgroup label="Contacto" id="clientes">
+                </optgroup>
+              </select>
+            </div>
 
-          
-            <div class="col" style="width: 15%;padding-left: 0px;padding-right: 0px;"> <!--Desde aca se eliminaria para sacar lo del boton-->
+
+
+            <div class="col" style="width: 15%;padding-left: 0px;padding-right: 0px;">
+              <!--Desde aca se eliminaria para sacar lo del boton-->
               <!-- Start: Modal -->
-              <div><button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#contactoModal" style="font-size: 12px;" hidden> + </button><!-- Boton sua-->
+              <div><button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#contactoModal"
+                  style="font-size: 12px;"> + </button><!-- Boton sua-->
                 <div class="modal fade" role="dialog" tabindex="-1" id="contactoModal"
                   aria-labelledby="contactoModalLabel" aria-hidden="true">
                   <div class="modal-dialog" role="document">
@@ -335,14 +392,18 @@
                               </div>
                             </div>
                             <div class="row">
-                              <div class="col-sm-4"><label class="col-form-label"
-                                  style="font-size: 13px;">Nombre</label></div>
-                              <div class="col"><input class="form-control" type="text" name="nombreDireccion"
-                                  style="border-color: rgb(159,168,175);font-size: 12px;"></div>
+                              <div class="col-sm-4">
+                                <label class="col-form-label" style="font-size: 13px;">Nombre</label>
+                              </div>
+                              <div class="col">
+                                <input class="form-control" type="text" name="nombreDireccion"
+                                  style="border-color: rgb(159,168,175);font-size: 12px;">
+                              </div>
                             </div>
                             <div class="row">
-                              <div class="col-sm-4"><label class="col-form-label"
-                                  style="font-size: 13px;">Apellido</label></div>
+                              <div class="col-sm-4">
+                                <label class="col-form-label" style="font-size: 13px;">Apellido</label>
+                              </div>
                               <div class="col"><input class="form-control" type="text" name="pais"
                                   style="border-color: rgb(159,168,175);font-size: 12px;"></div>
                             </div>
@@ -374,7 +435,7 @@
                           </div>
 
                           <div class="col-sm-1" style="padding: 0px;width: 20px;"><span></span></div>
-                
+
                           <div class="col-sm-1" style="padding: 0px;width: 20px;"><span></span></div>
                         </div>
                       </div>
@@ -421,101 +482,144 @@
         <div class="col" style="width: 35%;padding-right: 0px;"><select class="form-select"
             style="font-size: 12px;border-color: rgb(159,168,175);">
             <optgroup label="--">
-              <option value="1" selected="">Av. Las Condes 7363</option>
-              <option value="13">This is item 2</option>
-              <option value="14">This is item 3</option>
+              <option value="1" selected=""></option>
+              <option value="13"></option>
+              <option value="14"></option>
             </optgroup>
           </select></div>
+
         <div class="col-md-1" style="width: 10%;text-align: left;padding-left: 0px;padding-right: 0px;">
           <!-- Start: Modal -->
-          <div><button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#dirDespModal"
+          <div>
+            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#dirDespModal"
               style="font-size: 12px;"> + </button>
             <div class="modal fade" role="dialog" tabindex="-1" id="dirDespModal" aria-labelledby="dirDespModalLabel"
               aria-hidden="true">
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h1 class="fs-5 modal-title" id="exampleModalLabel-5">Agregar Dirección de Despacho</h1><button
-                      class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
+                    <h1 class="fs-5 modal-title" id="exampleModalLabel-5">Agregar Dirección de Despacho</h1>
+                    <button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
                   </div>
+
                   <div class="modal-body" style="padding: 9px;">
                     <div class="row" style="margin-right: 0px;margin-left: 0px;">
-                      <div class="col-sm-12" style="width: 100%;"><a class="navbar-brand d-flex align-items-center"
-                          href="lista_cotizaciones.html" style="width: 107px;"><svg xmlns="http://www.w3.org/2000/svg"
-                            width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16"
-                            class="bi bi-building-fill-add" style="font-size: 45px;">
+
+                      <div class="col-sm-12" style="width: 100%;" hidden>
+                        <!-- Boton oculto, pues no se necesitaria agregar mas direccones -->
+                        <a class="navbar-brand d-flex align-items-center" href="lista_cotizaciones.html"
+                          style="width: 107px;">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
+                            viewBox="0 0 16 16" class="bi bi-building-fill-add" style="font-size: 45px;">
                             <path
                               d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0">
                             </path>
                             <path
                               d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7.256A4.493 4.493 0 0 0 12.5 8a4.493 4.493 0 0 0-3.59 1.787A.498.498 0 0 0 9 9.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .39-.187A4.476 4.476 0 0 0 8.027 12H6.5a.5.5 0 0 0-.5.5V16H3a1 1 0 0 1-1-1zm2 1.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m3 0v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z">
                             </path>
-                          </svg></a></div>
+                          </svg>
+                        </a>
+                      </div>
+
                       <div class="col-sm-12" style="width: 100%;height: 10px;"><span>&nbsp;</span></div>
-                      <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 230px;">
+                      <div class="col-sm-5 mx-auto" style="font-size: 12px;background: #f0f2f5;width: 230px;">
+
                         <div class="row">
                           <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
-                          <div class="col" style="text-align: center;"><span style="font-weight: bold;">Dirección Nº
-                              1</span></div>
+                          <div class="col" style="text-align: center;">
+                            <span style="font-weight: bold;">Dirección</span>
+                          </div>
                           <div class="col-sm-12" style="height: 5px;background: transparent;"><span>&nbsp;</span></div>
                         </div>
+
                         <div class="row">
                           <div class="col-sm-9"><span></span></div>
-                          <div class="col-sm-1" style="padding-right: 10px;padding-left: 0px;"><a
-                              class="navbar-brand d-flex align-items-center" href="lista_cotizaciones.html"
-                              style="width: 32px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
-                                fill="currentColor" viewBox="0 0 16 16" class="bi bi-pencil-square"
-                                style="font-size: 24px;">
+                          <div class="col-sm-1" style="padding-right: 10px;padding-left: 0px;">
+                            <a class="navbar-brand d-flex align-items-center" href="lista_cotizaciones.html"
+                              style="width: 32px;">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
+                                viewBox="0 0 16 16" class="bi bi-pencil-square" style="font-size: 24px;">
                                 <path
                                   d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z">
                                 </path>
                                 <path fill-rule="evenodd"
                                   d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z">
                                 </path>
-                              </svg></a></div>
-                          <div class="col-sm-1" style="padding-right: 0px;padding-left: 10px;"><a
-                              class="navbar-brand d-flex align-items-center" href="lista_cotizaciones.html"
-                              style="width: 32px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
-                                fill="currentColor" viewBox="0 0 16 16" class="bi bi-backspace"
-                                style="font-size: 24px;">
+                              </svg>
+                            </a>
+                          </div>
+
+                          <div class="col-sm-1" style="padding-right: 0px;padding-left: 10px;" hidden>
+                            <!--Queada hidden, no se necesita el boton-->
+                            <a class="navbar-brand d-flex align-items-center" href="lista_cotizaciones.html"
+                              style="width: 32px;">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
+                                viewBox="0 0 16 16" class="bi bi-backspace" style="font-size: 24px;">
                                 <path
                                   d="M5.83 5.146a.5.5 0 0 0 0 .708L7.975 8l-2.147 2.146a.5.5 0 0 0 .707.708l2.147-2.147 2.146 2.147a.5.5 0 0 0 .707-.708L9.39 8l2.146-2.146a.5.5 0 0 0-.707-.708L8.683 7.293 6.536 5.146a.5.5 0 0 0-.707 0z">
                                 </path>
                                 <path
                                   d="M13.683 1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1zm-7.08 1a1 1 0 0 0-.76.35L1 8l4.844 5.65a1 1 0 0 0 .759.35h7.08a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z">
                                 </path>
-                              </svg></a></div>
+                              </svg>
+                            </a>
+                          </div>
                           <div class="col-sm-12" style="height: 10px;background: transparent;"><span>&nbsp;</span></div>
                         </div>
+
+
                         <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Tipo</label>
+                          <div class="col-sm-4">
+                            <label class="col-form-label" style="font-size: 13px;">Tipo
+                            </label>
                           </div>
-                          <div class="col"><select class="form-select"
+                          <div class="col">
+                            <select class="form-select" id="tipodespacho" value="{{ tipodespacho }}"
                               style="font-size: 12px;border-color: rgb(159,168,175);" readonly="">
                               <optgroup label="Tipo">
                                 <option value="12" selected="">Despacho</option>
+                                <option value="12" selected="">Facturacion</option>
                               </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">ID</label></div>
-                          <div class="col"><input class="form-control" type="text" name="nombreDireccion"
-                              style="border-color: rgb(159,168,175);font-size: 12px;"></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">País</label>
+                            </select>
                           </div>
-                          <div class="col"><select class="form-select"
+                        </div>
+
+
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <label class="col-form-label" style="font-size: 13px;">ID
+                            </label>
+                          </div>
+                          <div class="col">
+                            <input class="form-control" type="text" name="id" id="id" value="{{ id }}"
+                              style="border-color: rgb(159,168,175);font-size: 12px;">
+                          </div>
+                        </div>
+
+
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <label class="col-form-label" style="font-size: 13px;">País
+                            </label>
+                          </div>
+                          <div class="col">
+                            <select class="form-select" id="pais" value="{{ pais }}"
                               style="font-size: 12px;border-color: rgb(159,168,175);">
                               <optgroup label="País">
                                 <option value="12" selected="">Chile</option>
                               </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Región</label>
+                            </select>
                           </div>
-                          <div class="col"><select class="form-select"
+                        </div>
+
+
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <label class="col-form-label" style="font-size: 13px;">Región
+                            </label>
+                          </div>
+                          <div class="col">
+                            <select class="form-select" id="region" value="{{ region }}"
                               style="font-size: 12px;border-color: rgb(159,168,175);">
                               <optgroup label="Región">
                                 <option value="12" selected="">Arica y Parinacota</option>
@@ -524,18 +628,30 @@
                                 <option value="2">Atacama</option>
                                 <option value="13" selected="">Metropolitana de Santiago</option>
                               </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Ciudad</label>
+                            </select>
                           </div>
-                          <div class="col"><input class="form-control" type="text" name="pais"
-                              style="border-color: rgb(159,168,175);font-size: 12px;"></div>
                         </div>
+
+
                         <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Comuna</label>
+                          <div class="col-sm-4">
+                            <label class="col-form-label" style="font-size: 13px;">Ciudad
+                            </label>
                           </div>
-                          <div class="col"><select class="form-select"
+                          <div class="col">
+                            <input class="form-control" type="text" name="cuidad" id="cuidad" value="{{ cuidad }}"
+                              style="border-color: rgb(159,168,175);font-size: 12px;">
+                          </div>
+                        </div>
+
+
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <label class="col-form-label" style="font-size: 13px;">Comuna
+                            </label>
+                          </div>
+                          <div class="col">
+                            <select class="form-select" id="comuna" value="{{ comuna }}"
                               style="font-size: 12px;border-color: rgb(159,168,175);">
                               <optgroup label="Comuna">
                                 <option value="12" selected="">Arica</option>
@@ -543,140 +659,53 @@
                                 <option value="3">Santiago Centro</option>
                                 <option value="4">Vitacura</option>
                               </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Dirección</label>
+                            </select>
                           </div>
-                          <div class="col"><input class="form-control" type="text" name="pais"
-                              style="border-color: rgb(159,168,175);font-size: 12px;"></div>
                         </div>
+
+
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <label class="col-form-label" style="font-size: 13px;">Dirección
+                            </label>
+                          </div>
+                          <div class="col">
+                            <input class="form-control" type="text" name="direccion" id="direccion"
+                              value="{{ direccion }}" style="border-color: rgb(159,168,175);font-size: 12px;">
+                          </div>
+                        </div>
+
                         <div class="row">
                           <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
                           <div class="col-sm-12" style="height: 15px;background: var(--bs-body-bg);"><span>&nbsp;</span>
                           </div>
                         </div>
+
                       </div>
+
+
                       <div class="col-sm-1" style="padding: 0px;width: 20px;"><span></span></div>
-                      <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 230px;">
-                        <div class="row">
-                          <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
-                          <div class="col" style="text-align: center;"><span style="font-weight: bold;">Dirección Nº
-                              2</span></div>
-                          <div class="col-sm-12" style="height: 5px;background: transparent;"><span>&nbsp;</span></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-9"><span></span></div>
-                          <div class="col-sm-1" style="padding-right: 10px;padding-left: 0px;"><a
-                              class="navbar-brand d-flex align-items-center" href="lista_cotizaciones.html"
-                              style="width: 32px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
-                                fill="currentColor" viewBox="0 0 16 16" class="bi bi-pencil-square"
-                                style="font-size: 24px;">
-                                <path
-                                  d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z">
-                                </path>
-                                <path fill-rule="evenodd"
-                                  d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z">
-                                </path>
-                              </svg></a></div>
-                          <div class="col-sm-1" style="padding-right: 0px;padding-left: 10px;"><a
-                              class="navbar-brand d-flex align-items-center" href="lista_cotizaciones.html"
-                              style="width: 32px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
-                                fill="currentColor" viewBox="0 0 16 16" class="bi bi-backspace"
-                                style="font-size: 24px;">
-                                <path
-                                  d="M5.83 5.146a.5.5 0 0 0 0 .708L7.975 8l-2.147 2.146a.5.5 0 0 0 .707.708l2.147-2.147 2.146 2.147a.5.5 0 0 0 .707-.708L9.39 8l2.146-2.146a.5.5 0 0 0-.707-.708L8.683 7.293 6.536 5.146a.5.5 0 0 0-.707 0z">
-                                </path>
-                                <path
-                                  d="M13.683 1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1zm-7.08 1a1 1 0 0 0-.76.35L1 8l4.844 5.65a1 1 0 0 0 .759.35h7.08a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z">
-                                </path>
-                              </svg></a></div>
-                          <div class="col-sm-12" style="height: 10px;background: transparent;"><span>&nbsp;</span></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Tipo</label>
-                          </div>
-                          <div class="col"><select class="form-select"
-                              style="font-size: 12px;border-color: rgb(159,168,175);" readonly="">
-                              <optgroup label="Tipo">
-                                <option value="12" selected="">Despacho</option>
-                              </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">ID</label></div>
-                          <div class="col"><input class="form-control" type="text" name="nombreDireccion"
-                              style="border-color: rgb(159,168,175);font-size: 12px;"></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">País</label>
-                          </div>
-                          <div class="col"><select class="form-select"
-                              style="font-size: 12px;border-color: rgb(159,168,175);">
-                              <optgroup label="País">
-                                <option value="12" selected="">Chile</option>
-                              </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Región</label>
-                          </div>
-                          <div class="col"><select class="form-select"
-                              style="font-size: 12px;border-color: rgb(159,168,175);">
-                              <optgroup label="Región">
-                                <option value="12" selected="">Arica y Parinacota</option>
-                                <option value="1">Tarapacá</option>
-                                <option value="2">Antofagasta</option>
-                                <option value="2">Atacama</option>
-                                <option value="13" selected="">Metropolitana de Santiago</option>
-                              </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Ciudad</label>
-                          </div>
-                          <div class="col"><input class="form-control" type="text" name="pais"
-                              style="border-color: rgb(159,168,175);font-size: 12px;"></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Comuna</label>
-                          </div>
-                          <div class="col"><select class="form-select"
-                              style="font-size: 12px;border-color: rgb(159,168,175);">
-                              <optgroup label="Comuna">
-                                <option value="12" selected="">Arica</option>
-                                <option value="2" selected="">Las Condes</option>
-                                <option value="3">Santiago Centro</option>
-                                <option value="4">Vitacura</option>
-                              </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Dirección</label>
-                          </div>
-                          <div class="col"><input class="form-control" type="text" name="pais"
-                              style="border-color: rgb(159,168,175);font-size: 12px;"></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
-                          <div class="col-sm-12" style="height: 15px;background: var(--bs-body-bg);"><span>&nbsp;</span>
-                          </div>
-                        </div>
-                      </div>
+
+
                     </div>
                   </div>
-                  <div class="modal-footer"><button class="btn btn-secondary" type="button"
-                      data-bs-dismiss="modal">Cerrar</button><button class="btn btn-primary"
-                      type="button">Grabar</button></div>
+
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cerrar</button>
+                    <button class="btn btn-primary" type="button">Grabar</button>
+                  </div>
                 </div>
               </div>
             </div>
           </div><!-- End: Modal -->
         </div>
+
+
         <div class="col-md-1" style="width: 15%;text-align: right;padding-right: 0px;"><label class="col-form-label"
             style="font-size: 13px;">Válido Hasta</label></div>
-        <div class="col" style="width: 20%;"><label class="col-form-label"
-            style="font-size: 14px;font-weight: bold;">03-02-2024</label></div>
+        <div class="col" style="width: 20%;">
+          <label class="col-form-label" style="font-size: 14px;font-weight: bold;" id="dias_vencidos"></label>
+        </div>
       </div>
       <div class="row" style="background: #f0f2f5;">
         <div class="col-sm-1 col-md-1" style="width: 20%;"><label class="col-form-label"
@@ -684,11 +713,13 @@
         <div class="col" style="width: 35%;padding-right: 0px;"><select class="form-select"
             style="font-size: 12px;border-color: rgb(159,168,175);">
             <optgroup label="--">
-              <option value="1" selected="">Av. Las Condes 7363</option>
-              <option value="13">This is item 2</option>
-              <option value="14">This is item 3</option>
+              <option value="1" selected="" </option>
+              <option value="13"></option>
+              <option value="14"></option>
             </optgroup>
           </select></div>
+
+
         <div class="col-md-1" style="width: 10%;text-align: left;padding-left: 0px;padding-right: 0px;">
           <!-- Start: Modal -->
           <div><button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#dirFactModal"
@@ -703,83 +734,120 @@
                   </div>
                   <div class="modal-body" style="padding: 9px;">
                     <div class="row" style="margin-right: 0px;margin-left: 0px;">
-                      <div class="col-sm-12" style="width: 100%;"><a class="navbar-brand d-flex align-items-center"
-                          href="lista_cotizaciones.html" style="width: 107px;"><svg xmlns="http://www.w3.org/2000/svg"
-                            width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16"
-                            class="bi bi-building-fill-add" style="font-size: 45px;">
+
+                      <div class="col-sm-12" style="width: 100%;" hidden>
+                        <!-- Boton oculto, pues no se necesitaria agregar mas direccones -->
+                        <a class="navbar-brand d-flex align-items-center" href="lista_cotizaciones.html"
+                          style="width: 107px;">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
+                            viewBox="0 0 16 16" class="bi bi-building-fill-add" style="font-size: 45px;">
                             <path
                               d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0">
                             </path>
                             <path
                               d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7.256A4.493 4.493 0 0 0 12.5 8a4.493 4.493 0 0 0-3.59 1.787A.498.498 0 0 0 9 9.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .39-.187A4.476 4.476 0 0 0 8.027 12H6.5a.5.5 0 0 0-.5.5V16H3a1 1 0 0 1-1-1zm2 1.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m3 0v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z">
                             </path>
-                          </svg></a></div>
+                          </svg>
+                        </a>
+                      </div>
+
                       <div class="col-sm-12" style="width: 100%;height: 10px;"><span>&nbsp;</span></div>
-                      <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 230px;">
+                      <div class="col-sm-5 mx-auto" style="font-size: 12px;background: #f0f2f5;width: 230px;">
+
                         <div class="row">
                           <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
-                          <div class="col" style="text-align: center;"><span style="font-weight: bold;">Dirección Nº
-                              1</span></div>
+                          <div class="col" style="text-align: center;">
+                            <span style="font-weight: bold;">Dirección Nº1</span>
+                          </div>
                           <div class="col-sm-12" style="height: 5px;background: transparent;"><span>&nbsp;</span></div>
                         </div>
+
                         <div class="row">
                           <div class="col-sm-9"><span></span></div>
-                          <div class="col-sm-1" style="padding-right: 10px;padding-left: 0px;"><a
-                              class="navbar-brand d-flex align-items-center" href="lista_cotizaciones.html"
-                              style="width: 32px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
-                                fill="currentColor" viewBox="0 0 16 16" class="bi bi-pencil-square"
-                                style="font-size: 24px;">
+                          <div class="col-sm-1" style="padding-right: 10px;padding-left: 0px;">
+                            <a class="navbar-brand d-flex align-items-center" href="lista_cotizaciones.html"
+                              style="width: 32px;">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
+                                viewBox="0 0 16 16" class="bi bi-pencil-square" style="font-size: 24px;">
                                 <path
                                   d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z">
                                 </path>
                                 <path fill-rule="evenodd"
                                   d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z">
                                 </path>
-                              </svg></a></div>
-                          <div class="col-sm-1" style="padding-right: 0px;padding-left: 10px;"><a
-                              class="navbar-brand d-flex align-items-center" href="lista_cotizaciones.html"
-                              style="width: 32px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
-                                fill="currentColor" viewBox="0 0 16 16" class="bi bi-backspace"
-                                style="font-size: 24px;">
+                              </svg>
+                            </a>
+                          </div>
+
+                          <div class="col-sm-1" style="padding-right: 0px;padding-left: 10px;" hidden>
+                            <!--Queada hidden, no se necesita el boton-->
+                            <a class="navbar-brand d-flex align-items-center" href="lista_cotizaciones.html"
+                              style="width: 32px;">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
+                                viewBox="0 0 16 16" class="bi bi-backspace" style="font-size: 24px;">
                                 <path
                                   d="M5.83 5.146a.5.5 0 0 0 0 .708L7.975 8l-2.147 2.146a.5.5 0 0 0 .707.708l2.147-2.147 2.146 2.147a.5.5 0 0 0 .707-.708L9.39 8l2.146-2.146a.5.5 0 0 0-.707-.708L8.683 7.293 6.536 5.146a.5.5 0 0 0-.707 0z">
                                 </path>
                                 <path
                                   d="M13.683 1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1zm-7.08 1a1 1 0 0 0-.76.35L1 8l4.844 5.65a1 1 0 0 0 .759.35h7.08a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z">
                                 </path>
-                              </svg></a></div>
+                              </svg>
+                            </a>
+                          </div>
                           <div class="col-sm-12" style="height: 10px;background: transparent;"><span>&nbsp;</span></div>
                         </div>
+
+
                         <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Tipo</label>
+                          <div class="col-sm-4">
+                            <label class="col-form-label" style="font-size: 13px;">Tipo
+                            </label>
                           </div>
-                          <div class="col"><select class="form-select"
-                              style="font-size: 12px;border-color: rgb(159,168,175);" readonly="">
+                          <div class="col">
+                            <select class="form-select" style="font-size: 12px;border-color: rgb(159,168,175);"
+                              readonly="">
                               <optgroup label="Tipo">
-                                <option value="12" selected="">Facturación</option>
+                                <option value="12" selected="">Despacho</option>
                               </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">ID</label></div>
-                          <div class="col"><input class="form-control" type="text" name="nombreDireccion"
-                              style="border-color: rgb(159,168,175);font-size: 12px;"></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">País</label>
+                            </select>
                           </div>
-                          <div class="col"><select class="form-select"
-                              style="font-size: 12px;border-color: rgb(159,168,175);">
+                        </div>
+
+
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <label class="col-form-label" style="font-size: 13px;">ID
+                            </label>
+                          </div>
+                          <div class="col">
+                            <input class="form-control" type="text" name="nombreDireccion"
+                              style="border-color: rgb(159,168,175);font-size: 12px;">
+                          </div>
+                        </div>
+
+
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <label class="col-form-label" style="font-size: 13px;">País
+                            </label>
+                          </div>
+                          <div class="col">
+                            <select class="form-select" style="font-size: 12px;border-color: rgb(159,168,175);">
                               <optgroup label="País">
                                 <option value="12" selected="">Chile</option>
                               </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Región</label>
+                            </select>
                           </div>
-                          <div class="col"><select class="form-select"
-                              style="font-size: 12px;border-color: rgb(159,168,175);">
+                        </div>
+
+
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <label class="col-form-label" style="font-size: 13px;">Región
+                            </label>
+                          </div>
+                          <div class="col">
+                            <select class="form-select" style="font-size: 12px;border-color: rgb(159,168,175);">
                               <optgroup label="Región">
                                 <option value="12" selected="">Arica y Parinacota</option>
                                 <option value="1">Tarapacá</option>
@@ -787,155 +855,79 @@
                                 <option value="2">Atacama</option>
                                 <option value="13" selected="">Metropolitana de Santiago</option>
                               </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Ciudad</label>
+                            </select>
                           </div>
-                          <div class="col"><input class="form-control" type="text" name="pais"
-                              style="border-color: rgb(159,168,175);font-size: 12px;"></div>
                         </div>
+
+
                         <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Comuna</label>
+                          <div class="col-sm-4">
+                            <label class="col-form-label" style="font-size: 13px;">Ciudad
+                            </label>
                           </div>
-                          <div class="col"><select class="form-select"
-                              style="font-size: 12px;border-color: rgb(159,168,175);">
+                          <div class="col">
+                            <input class="form-control" type="text" name="pais"
+                              style="border-color: rgb(159,168,175);font-size: 12px;">
+                          </div>
+                        </div>
+
+
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <label class="col-form-label" style="font-size: 13px;">Comuna
+                            </label>
+                          </div>
+                          <div class="col">
+                            <select class="form-select" style="font-size: 12px;border-color: rgb(159,168,175);">
                               <optgroup label="Comuna">
                                 <option value="12" selected="">Arica</option>
                                 <option value="2" selected="">Las Condes</option>
                                 <option value="3">Santiago Centro</option>
                                 <option value="4">Vitacura</option>
                               </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Dirección</label>
+                            </select>
                           </div>
-                          <div class="col"><input class="form-control" type="text" name="pais"
-                              style="border-color: rgb(159,168,175);font-size: 12px;"></div>
                         </div>
+
+
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <label class="col-form-label" style="font-size: 13px;">Dirección
+                            </label>
+                          </div>
+                          <div class="col">
+                            <input class="form-control" type="text" name="pais"
+                              style="border-color: rgb(159,168,175);font-size: 12px;">
+                          </div>
+                        </div>
+
                         <div class="row">
                           <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
                           <div class="col-sm-12" style="height: 15px;background: var(--bs-body-bg);"><span>&nbsp;</span>
                           </div>
                         </div>
+
                       </div>
+
+
                       <div class="col-sm-1" style="padding: 0px;width: 20px;"><span></span></div>
-                      <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 230px;">
-                        <div class="row">
-                          <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
-                          <div class="col" style="text-align: center;"><span style="font-weight: bold;">Dirección Nº
-                              2</span></div>
-                          <div class="col-sm-12" style="height: 5px;background: transparent;"><span>&nbsp;</span></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-9"><span></span></div>
-                          <div class="col-sm-1" style="padding-right: 10px;padding-left: 0px;"><a
-                              class="navbar-brand d-flex align-items-center" href="lista_cotizaciones.html"
-                              style="width: 32px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
-                                fill="currentColor" viewBox="0 0 16 16" class="bi bi-pencil-square"
-                                style="font-size: 24px;">
-                                <path
-                                  d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z">
-                                </path>
-                                <path fill-rule="evenodd"
-                                  d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z">
-                                </path>
-                              </svg></a></div>
-                          <div class="col-sm-1" style="padding-right: 0px;padding-left: 10px;"><a
-                              class="navbar-brand d-flex align-items-center" href="lista_cotizaciones.html"
-                              style="width: 32px;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
-                                fill="currentColor" viewBox="0 0 16 16" class="bi bi-backspace"
-                                style="font-size: 24px;">
-                                <path
-                                  d="M5.83 5.146a.5.5 0 0 0 0 .708L7.975 8l-2.147 2.146a.5.5 0 0 0 .707.708l2.147-2.147 2.146 2.147a.5.5 0 0 0 .707-.708L9.39 8l2.146-2.146a.5.5 0 0 0-.707-.708L8.683 7.293 6.536 5.146a.5.5 0 0 0-.707 0z">
-                                </path>
-                                <path
-                                  d="M13.683 1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1zm-7.08 1a1 1 0 0 0-.76.35L1 8l4.844 5.65a1 1 0 0 0 .759.35h7.08a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z">
-                                </path>
-                              </svg></a></div>
-                          <div class="col-sm-12" style="height: 10px;background: transparent;"><span>&nbsp;</span></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Tipo</label>
-                          </div>
-                          <div class="col"><select class="form-select"
-                              style="font-size: 12px;border-color: rgb(159,168,175);" readonly="">
-                              <optgroup label="Tipo">
-                                <option value="12" selected="">Facturación</option>
-                              </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">ID</label></div>
-                          <div class="col"><input class="form-control" type="text" name="nombreDireccion"
-                              style="border-color: rgb(159,168,175);font-size: 12px;"></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">País</label>
-                          </div>
-                          <div class="col"><select class="form-select"
-                              style="font-size: 12px;border-color: rgb(159,168,175);">
-                              <optgroup label="País">
-                                <option value="12" selected="">Chile</option>
-                              </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Región</label>
-                          </div>
-                          <div class="col"><select class="form-select"
-                              style="font-size: 12px;border-color: rgb(159,168,175);">
-                              <optgroup label="Región">
-                                <option value="12" selected="">Arica y Parinacota</option>
-                                <option value="1">Tarapacá</option>
-                                <option value="2">Antofagasta</option>
-                                <option value="2">Atacama</option>
-                                <option value="13" selected="">Metropolitana de Santiago</option>
-                              </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Ciudad</label>
-                          </div>
-                          <div class="col"><input class="form-control" type="text" name="pais"
-                              style="border-color: rgb(159,168,175);font-size: 12px;"></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Comuna</label>
-                          </div>
-                          <div class="col"><select class="form-select"
-                              style="font-size: 12px;border-color: rgb(159,168,175);">
-                              <optgroup label="Comuna">
-                                <option value="12" selected="">Arica</option>
-                                <option value="2" selected="">Las Condes</option>
-                                <option value="3">Santiago Centro</option>
-                                <option value="4">Vitacura</option>
-                              </optgroup>
-                            </select></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Dirección</label>
-                          </div>
-                          <div class="col"><input class="form-control" type="text" name="pais"
-                              style="border-color: rgb(159,168,175);font-size: 12px;"></div>
-                        </div>
-                        <div class="row">
-                          <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
-                          <div class="col-sm-12" style="height: 15px;background: var(--bs-body-bg);"><span>&nbsp;</span>
-                          </div>
-                        </div>
-                      </div>
+
+
                     </div>
+
+
                   </div>
-                  <div class="modal-footer"><button class="btn btn-secondary" type="button"
-                      data-bs-dismiss="modal">Cerrar</button><button class="btn btn-primary"
-                      type="button">Grabar</button></div>
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cerrar</button>
+                    <button class="btn btn-primary" type="button">Grabar</button>
+                  </div>
                 </div>
               </div>
             </div>
           </div><!-- End: Modal -->
         </div>
+
+
         <div class="col-md-1" style="width: 15%;text-align: right;padding-right: 0px;"><label class="col-form-label"
             style="font-size: 13px;">Referencia</label></div>
         <div class="col" style="width: 20%;"><input class="form-control" type="text" name="cliente"
@@ -952,105 +944,6 @@
                   de relaciones</button></h2>
               <div class="accordion-collapse collapse item-1" role="tabpanel" data-bs-parent="#accordion-1">
                 <div class="accordion-body">
-                  <div class="row" style="background: #f0f2f5;">
-                    <div class="col-3 col-sm-2 col-md-2 col-lg-2">
-                      <div class="row">
-                        <div class="col"><a class="navbar-brand d-flex align-items-center" href="cotizacion.html"
-                            style="width: 60px;"><span
-                              class="bs-icon-sm bs-icon-rounded bs-icon-primary d-flex justify-content-center align-items-center me-2 bs-icon"
-                              style="background: var(--bs-body-color);width: 60px;height: 60px;"><svg
-                                xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
-                                viewBox="0 0 16 16" class="bi bi-card-list" style="font-size: 30px;">
-                                <path
-                                  d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z">
-                                </path>
-                                <path
-                                  d="M5 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 5 8m0-2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m0 5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m-1-5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0M4 8a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m0 2.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0">
-                                </path>
-                              </svg></span></a></div>
-                      </div>
-                      <div class="row">
-                        <div class="col" style="font-size: 12px;"><span>Cotización 8536</span></div>
-                      </div>
-                    </div>
-                    <div class="col-1 col-sm-1 col-md-1 col-lg-1 col-xl-1 col-xxl-1"
-                      style="text-align: center;padding-top: 20px;padding-right: 0px;padding-left: 0px;"><svg
-                        xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
-                        viewBox="0 0 16 16" class="bi bi-arrow-right" style="font-size: 30px;">
-                        <path fill-rule="evenodd"
-                          d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8">
-                        </path>
-                      </svg></div>
-                    <div class="col-3 col-sm-2 col-md-2 col-lg-2">
-                      <div class="row">
-                        <div class="col"><a class="navbar-brand d-flex align-items-center" href="ordenventa.html"
-                            style="width: 60px;"><span
-                              class="bs-icon-sm bs-icon-rounded bs-icon-primary d-flex justify-content-center align-items-center me-2 bs-icon"
-                              style="background: #caaa74;width: 60px;height: 60px;"><svg
-                                xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
-                                viewBox="0 0 16 16" class="bi bi-cart" style="font-size: 30px;">
-                                <path
-                                  d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2">
-                                </path>
-                              </svg></span></a></div>
-                      </div>
-                      <div class="row">
-                        <div class="col" style="font-size: 12px;"><span>Orden de Venta 10569</span></div>
-                      </div>
-                    </div>
-                    <div class="col-1 col-sm-1 col-md-1 col-lg-1 col-xl-1 col-xxl-1"
-                      style="text-align: center;padding-top: 20px;padding-right: 0px;padding-left: 0px;"><svg
-                        xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
-                        viewBox="0 0 16 16" class="bi bi-arrow-right" style="font-size: 30px;">
-                        <path fill-rule="evenodd"
-                          d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8">
-                        </path>
-                      </svg></div>
-                    <div class="col-3 col-sm-2 col-md-2 col-lg-2">
-                      <div class="row">
-                        <div class="col"><a class="navbar-brand d-flex align-items-center" href="#"
-                            style="width: 60px;"><span
-                              class="bs-icon-sm bs-icon-rounded bs-icon-primary d-flex justify-content-center align-items-center me-2 bs-icon"
-                              style="background: var(--bs-link-hover-color);width: 60px;height: 60px;"><svg
-                                xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
-                                viewBox="0 0 16 16" class="bi bi-bag" style="font-size: 30px;">
-                                <path
-                                  d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z">
-                                </path>
-                              </svg></span></a></div>
-                      </div>
-                      <div class="row">
-                        <div class="col" style="font-size: 12px;"><span>Boleta 14235</span></div>
-                      </div>
-                    </div>
-                    <div class="col-1 col-sm-1 col-md-1 col-lg-1 col-xl-1 col-xxl-1"
-                      style="text-align: center;padding-top: 20px;padding-right: 0px;padding-left: 0px;"><svg
-                        xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
-                        viewBox="0 0 16 16" class="bi bi-arrow-right" style="font-size: 30px;">
-                        <path fill-rule="evenodd"
-                          d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8">
-                        </path>
-                      </svg></div>
-                    <div class="col-4 col-sm-2 col-md-2 col-lg-2">
-                      <div class="row">
-                        <div class="col"><a class="navbar-brand d-flex align-items-center" href="solic_devolucion.html"
-                            style="width: 60px;"><span
-                              class="bs-icon-sm bs-icon-rounded bs-icon-primary d-flex justify-content-center align-items-center me-2 bs-icon"
-                              style="background: var(--bs-form-invalid-color);width: 60px;height: 60px;"><svg
-                                xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
-                                viewBox="0 0 16 16" class="bi bi-arrow-counterclockwise" style="font-size: 30px;">
-                                <path fill-rule="evenodd"
-                                  d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"></path>
-                                <path
-                                  d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466">
-                                </path>
-                              </svg></span></a></div>
-                      </div>
-                      <div class="row">
-                        <div class="col-md-12" style="font-size: 12px;"><span>Solicitud de Devolución 6569</span></div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -1070,21 +963,28 @@
       <div class="row">
         <div class="col" style="padding: 0px;">
           <div class="table-responsive">
+            {% csrf_token %}
+            {{ pedidos_form.as_p }}
             <table class="table" id="productos">
               <thead>
                 <tr style="color: var(--bs-table-striped-bg);background: var(--bs-body-color);">
-                  <th style="font-size: 10px;width: 15%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
+                  <th
+                    style="font-size: 10px;width: 15%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
                     # Código</th>
-                  <th style="font-size: 10px;width: 20%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
+                  <th
+                    style="font-size: 10px;width: 20%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
                     Bodega</th>
-                  <th style="font-size: 10px;width: 15%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
+                  <th
+                    style="font-size: 10px;width: 15%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
                     Precio</th>
-                  <th style="font-size: 10px;width: 10%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
+                  <th
+                    style="font-size: 10px;width: 10%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
                     Dcto</th>
                   <th
                     style="font-size: 10px;width: 15%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);text-align: center;">
                     Precio Dcto</th>
-                  <th style="font-size: 10px;width: 10%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
+                  <th
+                    style="font-size: 10px;width: 10%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);">
                     Cant</th>
                   <th
                     style="font-size: 10px;width: 15%;background: var(--bs-table-striped-bg);color: var(--bs-table-bg);text-align: center;">
@@ -1107,9 +1007,9 @@
         </div>
         <div class="col-sm-7 col-md-7">
           <input class="form-control" type="text" style="font-size: 12px;" id="inputNumero">
-          <div id="resultados"></div>
+          <div id="resultados" style="font-size: 11px;"></div>
         </div>
-        <div class="col"><button class="btn btn-primary" type="button" style="font-size: 12px;" id="agregar_productos" 
+        <div class="col"><button class="btn btn-primary" type="button" style="font-size: 12px;" id="agregar_productos"
             hidden>Agregar</button></div>
       </div>
       <div class="row">
@@ -1133,15 +1033,15 @@
         <div class="col">
           <div class="row">
             <div class="col-sm-7 text-end"><small>Total Neto:</small></div>
-            <div class="col" style="text-align: right;"><small>$1.897.098</small></div>
+            <div class="col" style="text-align: right;" id="total_neto"><small>0</small></div>
           </div>
           <div class="row">
             <div class="col-sm-7 text-end"><small>IVA:</small></div>
-            <div class="col" style="text-align: right;"><small>$407.098</small></div>
+            <div class="col" style="text-align: right;" id="iva"><small>0</small></div>
           </div>
           <div class="row">
             <div class="col-sm-7 text-end"><small>Total Bruto:</small></div>
-            <div class="col" style="text-align: right;"><small>$2.897.098</small></div>
+            <div class="col" style="text-align: right;" id="total_bruto"><small>0</small></div>
           </div>
         </div>
       </div>
@@ -1161,8 +1061,9 @@
         </div>
       </div>
       <div class="row" style="background: transparent;">
-        <div class="col" style="text-align: right;padding-right: 0px;"><button class="btn btn-primary" type="button"
-            style="font-size: 12px;">Guardar</button><span>&nbsp; &nbsp;</span>
+        <div class="col" style="text-align: right;padding-right: 0px;">
+          <button class="btn btn-primary" type="submit" style="font-size: 12px;">Guardar</button>
+          <span>&nbsp; &nbsp;</span>
           <div class="btn-group"><button class="btn btn-primary" type="button" style="font-size: 12px;">Copiar
               a</button><button class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
               aria-expanded="false" type="button" style="font-size: 12px;"></button>
@@ -1175,11 +1076,14 @@
         <div class="col">
           <p></p>
         </div>
+        <div id="cotizacionContainer"></div>
       </div>
     </form>
   </div>
   <script src="{% static 'gestionPedidos/js/botones.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/ajax_solicitudes.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/ajax_clientes.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/quotations_insert.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

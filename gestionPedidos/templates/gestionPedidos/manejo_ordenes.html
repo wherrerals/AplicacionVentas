@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cambios de Orden</title>
+    <style>
+        form {
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Consulta de Orden</h1>
+    <form id="orderForm">
+        <label for="orderNumber">Número de Orden:</label>
+        <input type="text" id="orderNumber" name="orderNumber" required>
+        <button type="submit">Invoice</button>
+    </form>
+    <div id="result"></div>
+    {% load static %}
+    <script src="{% static 'gestionPedidos/js/Consulta.js' %}"></script>
+</body>
+
+</html>
