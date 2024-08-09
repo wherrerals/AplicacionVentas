@@ -27,7 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'gestionPedidos',
-    'AplicacionVentas'
+    'AplicacionVentas',
+    'externalconection'
 ]
 
 MIDDLEWARE = [
@@ -43,13 +44,18 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'AplicacionVentas.urls'
 
-#/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/gestionPedidos
+#/Users/Cuervo/Documents/AplicacionVentas/gestionPedidos/templates/gestionPedidos
 #/Users/nicor/Universidad/Practica/AplicacionVentas/gestionPedidos/templates/gestionPedidos
+#/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/gestionPedidos
+
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/Users/nicor/Universidad/Practica/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
+        #'DIRS': ['/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
+        #'DIRS': ['/Users/Cuervo/Documents/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
+        #'DIRS': ['/Users/nicor/Universidad/Practica/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
+        
         
         'APP_DIRS': True,
         'OPTIONS': {
@@ -74,7 +80,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
         'USER':'root',
-        'PASSWORD':'qwerty',
+        #'PASSWORD':'Ea7hava5}', #home
+        'PASSWORD':'Ea7hava5*', #led_studio
         'HOST':'localhost',
         'PORT':'3306',
     }
@@ -127,7 +134,11 @@ USE_I18N = True
 
 USE_TZ = True
 
+
+
 LOGIN_REDIRECT_URL = '/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/login'
+#LOGIN_REDIRECT_URL = '/Users/Cuervo/Documents/AplicacionVentas/gestionPedidos/templates/login'
+
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',

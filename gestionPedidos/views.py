@@ -8,9 +8,10 @@ from django.views.decorators.http import require_POST, require_http_methods
 from django.db import transaction
 from django.http import JsonResponse
 #Modulos Diseñados
+from .models.usuario import User 
 from gestionPedidos.models import *
-from .api_client import APIClient
-from .vtex_client import VTEXClient
+from externalconection.sl_client import APIClient
+from externalconection.vtex_client import VTEXClient
 #librerias Python usadas
 import requests
 import json
@@ -213,6 +214,7 @@ def registrarCuenta(request):
         Returns: 
             HttpResponse: Si el nombre de usuario ya existe renderiza en el template 'micuenta.html' un mensaje indicando que ya existe
             HttpResponse: Si las contraseñas no coindicen renderiza en el template 'micuenta.html' un mensaje indicando que las contraseñas no coinciden
+            HttpResponse: Si la contraseña no cumple con los requisitos renderiza en el template 'micuenta.html' un mensaje indicando que la contraseña no cumple con los requisitos            
             
     """
     nombre = request.POST['nombre']
@@ -255,6 +257,7 @@ def registrarCuenta(request):
     return render(request,"micuenta.html",{'email': email, "nombre": nombre, "telefono":telefono,"mensaje_error_contrasena": mensaje})
 
 #agregaado vista para modificar los datos
+@login_required
 def mis_datos(request):
 
     usuario = Usuario.objects.get(usuarios=request.user)
@@ -647,7 +650,7 @@ def filter_quotations(request):
     if data.get('fecha_fin'):
         filters['Quotations/DocDate le'] = f"'{data.get('fecha_fin')}'"
     if data.get('docNum'):
-        filters['contains(Quotations/DocNum,'] = data.get('docNum')
+        filters['contains(Quotations/DocNum,'] = data.get.int(('docNum'))
     if data.get('carCode'):
         filters['contains(Quotations/CardCode,'] = f"'{data.get('carCode')}'"
     if data.get('cardNAme'):
@@ -670,7 +673,10 @@ def filter_quotations(request):
     except ValueError:
         return JsonResponse({'error': 'Invalid parameters'}, status=400)
 
-    print("Applying filters:", filters)  # Verifica los filtros aplicados
+    print("Applying filters:", filters)# Verifica los filtros aplicados
+    print("-" * 10)  
+    print(filters)
+    
 
     try:
         data = client.get_quotations2(top=top, skip=skip, filters=filters)

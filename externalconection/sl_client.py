@@ -1,26 +1,77 @@
 import requests
 from django.conf import settings
-from django.http import JsonResponse
-from urllib.parse import quote
-
 
 class APIClient:
+    """
+    Una clase que representa el cliente de API para la capa de servicio.
+
+    Atributos:
+        base_url (str): La URL base para la API de la capa de servicio.
+        session (requests.Session): Una sesión persistente para realizar solicitudes HTTP.
+        autehnticated (bool): Estado de autenticación.
+    
+    Métodos:
+        login(): Autentica la sesión con la API usando las credenciales proporcionadas.
+        logout(): Cirra la sesión con la API
+    """
+    
     def __init__(self): 
+        """
+        Inicializa una nueva instancia de APIClient.
+
+        Configura la url base
+        Crea una nueva sesión persistente.
+        El estado de autenticación se establece en falso.
+        Llama el metodo login para autenticar la sesión con la API.
+        """
+
         self.base_url = settings.API_BASE_URL
         self.session = requests.Session()
-        self.login()
+        self.__autehnticated = False
+        self.__login()
 
-    def login(self): 
+    def __login(self): 
+        """
+        Construye la URL de inicio de sesión.
+
+        Si la autenticacion es falsa, Autentica la sesión con la API usando las credenciales proporcionadas.
+        Establece el estado de autenticación en True si la autenticación es exitosa.
+        
+        Raises:
+            HTTPError: Si la respuesta HTTP contiene un error de estado.
+        """
         login_url = f"{self.base_url}Login"
-        auth_data = {
-            "CompanyDB": settings.COMPANY_DB,
-            "UserName": settings.API_USERNAME,
-            "Password": settings.API_PASSWORD,
-        }
-        response = self.session.post(login_url, json=auth_data, verify=False)
-        response.raise_for_status()
+
+        if not self.__autehnticated:
+            auth_data = {
+                "CompanyDB": settings.COMPANY_DB,
+                "UserName": settings.API_USERNAME,
+                "Password": settings.API_PASSWORD,
+            }
+            response = self.session.post(login_url, json=auth_data, verify=False)
+            response.raise_for_status()
+            self.__autehnticated = True
+            return print("esta es la respuesta", response)
+    
+    def logout(self):
+        """
+        Construye la URL de fin de sesión.
+
+        Si la autentincación es verdadera, finaliza la conexion de la API
+        Establece el estado de autenticación en False si el cierre de sesión es exitoso.
+
+        Raises:
+            HTTPError: Si la respuesta HTTP contiene un error de estado.
+        """
+        if self.__autehnticated:
+            logout_url = f"{self.base_url}Logout"
+            response = self.session.post(logout_url, verify=False)
+            response.raise_for_status()
+            self.__autehnticated = False
 
     def get_quotations(self, top=0, skip=0, filters=None):
+        
+        self.__login()
         crossjoin = "Quotations,SalesPersons"
         expand = "Quotations($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
         filter_condition = "Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
@@ -42,6 +93,7 @@ class APIClient:
         return response.json()
     
     def get_quotations2(self, top=20, skip=0, filters=None):
+        self.__login()
         crossjoin = "Quotations,SalesPersons"
         expand = "Quotations($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
         filter_condition = "Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
@@ -128,3 +180,4 @@ class APIClient:
         response.raise_for_status()
         print(url)
         return response.json()
+
