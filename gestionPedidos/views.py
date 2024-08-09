@@ -650,7 +650,7 @@ def filter_quotations(request):
     if data.get('fecha_fin'):
         filters['Quotations/DocDate le'] = f"'{data.get('fecha_fin')}'"
     if data.get('docNum'):
-        filters['contains(Quotations/DocNum,'] = data.get('docNum')
+        filters['contains(Quotations/DocNum,'] = data.get.int(('docNum'))
     if data.get('carCode'):
         filters['contains(Quotations/CardCode,'] = f"'{data.get('carCode')}'"
     if data.get('cardNAme'):
@@ -673,7 +673,10 @@ def filter_quotations(request):
     except ValueError:
         return JsonResponse({'error': 'Invalid parameters'}, status=400)
 
-    print("Applying filters:", filters)  # Verifica los filtros aplicados
+    print("Applying filters:", filters)# Verifica los filtros aplicados
+    print("-" * 10)  
+    print(filters)
+    
 
     try:
         data = client.get_quotations2(top=top, skip=skip, filters=filters)

@@ -27,10 +27,10 @@ class APIClient:
 
         self.base_url = settings.API_BASE_URL
         self.session = requests.Session()
-        self.autehnticated = False
-        self.login()
+        self.__autehnticated = False
+        self.__login()
 
-    def login(self): 
+    def __login(self): 
         """
         Construye la URL de inicio de sesión.
 
@@ -42,7 +42,7 @@ class APIClient:
         """
         login_url = f"{self.base_url}Login"
 
-        if not self.autehnticated:
+        if not self.__autehnticated:
             auth_data = {
                 "CompanyDB": settings.COMPANY_DB,
                 "UserName": settings.API_USERNAME,
@@ -50,7 +50,8 @@ class APIClient:
             }
             response = self.session.post(login_url, json=auth_data, verify=False)
             response.raise_for_status()
-            self.autehnticated = True
+            self.__autehnticated = True
+            return print("esta es la respuesta", response)
     
     def logout(self):
         """
@@ -62,14 +63,15 @@ class APIClient:
         Raises:
             HTTPError: Si la respuesta HTTP contiene un error de estado.
         """
-        if self.autehnticated:
+        if self.__autehnticated:
             logout_url = f"{self.base_url}Logout"
             response = self.session.post(logout_url, verify=False)
             response.raise_for_status()
-            self.autehnticated = False
+            self.__autehnticated = False
 
     def get_quotations(self, top=0, skip=0, filters=None):
-        self.login()
+        
+        self.__login()
         crossjoin = "Quotations,SalesPersons"
         expand = "Quotations($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
         filter_condition = "Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
@@ -91,7 +93,7 @@ class APIClient:
         return response.json()
     
     def get_quotations2(self, top=20, skip=0, filters=None):
-        self.login()
+        self.__login()
         crossjoin = "Quotations,SalesPersons"
         expand = "Quotations($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
         filter_condition = "Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
@@ -178,5 +180,4 @@ class APIClient:
         response.raise_for_status()
         print(url)
         return response.json()
-    
 

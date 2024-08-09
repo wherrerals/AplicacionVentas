@@ -52,8 +52,10 @@ ROOT_URLCONF = 'AplicacionVentas.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
+        #'DIRS': ['/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
         #'DIRS': ['/Users/Cuervo/Documents/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
+        #'DIRS': ['/Users/nicor/Universidad/Practica/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
+        
         
         'APP_DIRS': True,
         'OPTIONS': {
