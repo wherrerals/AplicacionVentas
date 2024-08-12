@@ -1,8 +1,8 @@
 import requests
 import json
 from django.http import JsonResponse
-from externalconection.vtex_client import VTEXClient
-from externalconection.sl_client import APIClient
+from datosLsApp.vtex_client import VTEXClient
+from datosLsApp.sl_client import APIClient
 
 def cambio_ordenes(request):
     if request.method == 'POST':

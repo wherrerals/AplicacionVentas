@@ -1,9 +1,9 @@
 from django.db import models
-from .vendedor import Vendedor
-from .condicionpago import CondicionPago
-from .tipodoctributario import TipoDocTributario
-from .tipoentrega import TipoEntrega
-from .tipoobjetosap import TipoObjetoSap
+from datosLsApp.models.vendedor import Vendedor
+from datosLsApp.models.condicionpago import CondicionPago
+from datosLsApp.models.tipodoctributario import TipoDocTributario
+from datosLsApp.models.tipoentrega import TipoEntrega
+from datosLsApp.models.tipoobjetosap import TipoObjetoSap
 
 class Documento(models.Model):
     class Meta:

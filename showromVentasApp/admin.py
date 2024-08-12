@@ -1,5 +1,5 @@
 from django.contrib import admin
-from gestionPedidos.models import *
+from datosLsApp.models import (CondicionPago, Documento, TipoDocTributario, Sucursal, TipoVenta, Vendedor, Producto, Bodega, Inventario, Item, SocioNegocio, Usuario, Contacto)
 
 #Modicaciones en administrador 
 admin.site.site_header = 'Led Studio'
@@ -45,7 +45,6 @@ class Usuarioper(admin.ModelAdmin):
 
 class Contactoper(admin.ModelAdmin):
     list_display = ('nombreCompleto',)
-
 
 # Register your models here.
 admin.site.register(TipoDocTributario,TipoDocTributarioper)

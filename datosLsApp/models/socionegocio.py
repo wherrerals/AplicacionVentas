@@ -1,7 +1,7 @@
 from django.db import models
-from .tipocliente import TipoCliente
-from .tiposn import TipoSN
-from .gruposn import GrupoSN
+from datosLsApp.models.tipocliente import TipoCliente
+from datosLsApp.models.tiposn import TipoSN
+from datosLsApp.models.gruposn import GrupoSN
 
 class SocioNegocio(models.Model):
     class Meta:

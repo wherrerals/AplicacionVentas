@@ -1,5 +1,5 @@
 from django.db import models
-from .sucursal import Sucursal
+from datosLsApp.models.sucursal import Sucursal
 
 class Vendedor(models.Model):
     class Meta:
