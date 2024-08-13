@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class GestionpedidosConfig(AppConfig):
+class ConetionsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'gestionPedidos'
+    name = 'datosLsApp'

@@ -1,6 +1,6 @@
 from django.db import models
-from .producto import Producto
-from .bodega import Bodega
+from datosLsApp.models.producto import Producto
+from datosLsApp.models.bodega import Bodega
 
 class Inventario(models.Model):
     class Meta:

@@ -1,8 +1,8 @@
 from django.db import models
-from .tipoobjetosap import TipoObjetoSap
-from .documento import Documento
-from .tipoentrega import TipoEntrega
-from .producto import Producto
+from datosLsApp.models.tipoobjetosap import TipoObjetoSap
+from datosLsApp.models.documento import Documento
+from datosLsApp.models.tipoentrega import TipoEntrega
+from datosLsApp.models.producto import Producto
 
 class Item(models.Model):
     class Meta:

@@ -26,13 +26,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gestionPedidos',
     'AplicacionVentas',
-    'externalconection'
+    'datosLsApp',
+    'logicaVentasApp',
+    'showromVentasApp'    
 ]
 
 MIDDLEWARE = [
-    'gestionPedidos.middleware.my_middleware.NoCacheMiddleware',
+    'showromVentasApp.middleware.my_middleware.NoCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -44,17 +45,23 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'AplicacionVentas.urls'
 
-#/Users/Cuervo/Documents/AplicacionVentas/gestionPedidos/templates/gestionPedidos
-#/Users/nicor/Universidad/Practica/AplicacionVentas/gestionPedidos/templates/gestionPedidos
-#/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/gestionPedidos
+#/Users/Cuervo/Documents/AplicacionVentas/showromVentasApp/templates/showromVentasApp
+#/Users/nicor/Universidad/Practica/AplicacionVentas/showromVentasApp/templates/showromVentasApp
+#/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/showromVentasApp/templates/showromVentasApp
 
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+<<<<<<< HEAD
         'DIRS': ['/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
         #'DIRS': ['/Users/Cuervo/Documents/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
         #'DIRS': ['/Users/nicor/Universidad/Practica/AplicacionVentas/gestionPedidos/templates/gestionPedidos'],
+=======
+        'DIRS': ['/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
+        #'DIRS': ['/Users/Cuervo/Documents/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
+        #'DIRS': ['/Users/nicor/Universidad/Practica/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
+>>>>>>> developer
         
         
         'APP_DIRS': True,
@@ -100,8 +107,8 @@ VTEX_APP_TOKEN = 'WTEPUGSXUOIOMSAVTEIIJOCBMXTUZWTESEFDQHZSLHJZMJXAVHPGOPDKMUVMAP
 VTEX_BASE_URL = 'https://ledstudiocl.myvtex.com/api/'
 
 
-#python ./manage.py makemigrations gestionPedidos
-#python ./manage.py sqlmigrate gestionPedidos 0001
+#python ./manage.py makemigrations showromVentasApp
+#python ./manage.py sqlmigrate showromVentasApp 0001
 #python ./manage.py migrate
 
 # Password validation
@@ -136,8 +143,8 @@ USE_TZ = True
 
 
 
-LOGIN_REDIRECT_URL = '/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/gestionPedidos/templates/login'
-#LOGIN_REDIRECT_URL = '/Users/Cuervo/Documents/AplicacionVentas/gestionPedidos/templates/login'
+LOGIN_REDIRECT_URL = '/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/showromVentasApp/templates/login'
+#LOGIN_REDIRECT_URL = '/Users/Cuervo/Documents/AplicacionVentas/showromVentasApp/templates/login'
 
 
 AUTHENTICATION_BACKENDS = [
@@ -156,6 +163,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 

@@ -1,7 +1,7 @@
 from django.db import models
-from .region import Region
-from .comuna import Comuna
-from .socionegocio import SocioNegocio
+from datosLsApp.models.region import Region
+from datosLsApp.models.comuna import Comuna
+from datosLsApp.models.socionegocio import SocioNegocio
 
 class Direccion(models.Model):
     class Meta:

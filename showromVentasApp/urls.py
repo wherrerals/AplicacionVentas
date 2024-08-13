@@ -1,5 +1,5 @@
 from django.urls import path
-from gestionPedidos import views
+from showromVentasApp import views
 from .views import  *
 
 urlpatterns = [
@@ -23,7 +23,7 @@ urlpatterns = [
     path('mis_datos/', views.mis_datos, name='mis_datos'),
     path('agregar_editar_clientes/',views.agregar_editar_clientes,name='agregar_editar_clientes'),
     path('agregar_direccion/',views.agregar_direccion,name='agregar_direccion'),
-    path('listado_Cotizaciones/', views.list_quotations_2, name='listado_Cotizaciones'),
+    #path('listado_Cotizaciones/', views.list_quotations_2, name='listado_Cotizaciones'),
     #path('ordenes/', views.cambio_ordenes, name='ordenes'),
     path('probandoVtex/', views.oredenes, name='probandoVtex'),
     path('listado_Cotizaciones_filtrado/', views.filter_quotations, name='filter_quotations'),

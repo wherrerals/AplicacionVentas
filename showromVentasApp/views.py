@@ -8,9 +8,9 @@ from django.views.decorators.http import require_POST, require_http_methods
 from django.db import transaction
 from django.http import JsonResponse
 #Modulos Diseñados
-from .models.usuario import User 
-from gestionPedidos.models import *
-from externalconection.sl_client import APIClient
+from datosLsApp.models.usuario import User 
+from datosLsApp.models import (Producto, SocioNegocio, Usuario, Region, GrupoSN, TipoSN, TipoCliente, Direccion, Comuna)
+from datosLsApp.sl_client import APIClient
 #librerias Python usadas
 import requests
 import json
