@@ -1,3 +1,5 @@
+/* Funcion agregada en productos.js
+
 let contprod = 0;
 
 function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento) {
@@ -114,6 +116,12 @@ function AlternarMaxDescuento(row) {
   }
 }
 
+*/
+
+
+/* Funcion agregada en productosInteraccion.js
+
+
 function agregarInteractividad(newRow) {
   // Obtener referencias a los elementos dentro de la fila
   var inputCantidad = newRow.querySelector('#calcular_cantidad'); // Cambié el selector a class
@@ -167,7 +175,10 @@ function agregarInteractividad(newRow) {
     valorNeto.textContent = '$' + neto.toFixed(0);
   }
 };
+*/
 
+
+/* Funcion agregada en GestorDirecciones.js
 var contdir = 0;
 
 function agergardireccion(){
@@ -325,6 +336,26 @@ window.addEventListener('DOMContentLoaded', function() {
 
 });
 
+*/
+
+
+/* Esta parte no esta en el codigo nuevo, se podria revisar si afecta en algo o no, ademas evaluar dejar let en vez de o que aparece en el codigo
+window.addEventListener('DOMContentLoaded', function() {
+  // Asignar el evento click al botón agregar_productos (siempre que exista)
+  let botonAgregarProductos = document.getElementById('agregar_dir');
+  if (botonAgregarProductos) {
+      botonAgregarProductos.addEventListener('click', agergardireccion);
+  }
+
+}); 
+*/
+
+
+
+
+/* Ya separado en gestorContacto.js
+
+
 let contcon = 0;
 function agregarontacto(){
 
@@ -429,16 +460,10 @@ window.addEventListener('DOMContentLoaded', function() {
         botonAgregarProductos.addEventListener('click', agregarontacto);
     }
 });
+ */
 
 
-window.addEventListener('DOMContentLoaded', function() {
-  // Asignar el evento click al botón agregar_productos (siempre que exista)
-  let botonAgregarProductos = document.getElementById('agregar_dir');
-  if (botonAgregarProductos) {
-      botonAgregarProductos.addEventListener('click', agergardireccion);
-  }
-
-}); 
+/* Funciones ya separadas
 
 document.addEventListener("DOMContentLoaded", function() {
   sumarTresDias();
@@ -478,6 +503,8 @@ function togglePassword() {
 }
 
 togglePassword();
+*/
+
 
 function datosSocioNegocio(){
   
