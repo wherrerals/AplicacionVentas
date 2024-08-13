@@ -17,3 +17,5 @@ class VTEXClient:
         response = requests.get(url, headers=self.headers)
         response.raise_for_status()
         return response.json()
+    
+    

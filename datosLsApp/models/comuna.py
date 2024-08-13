@@ -1,5 +1,5 @@
 from django.db import models
-from .region import Region
+from datosLsApp.models.region import Region
 
 class Comuna(models.Model):
     class Meta:
