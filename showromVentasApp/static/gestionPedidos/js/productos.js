@@ -44,23 +44,25 @@ class Producto {
               </div>
           </td>
           <td style="background: transparent;border-style: none;padding-bottom: 0px;" rowspan="2">
-              <div style="font-size: 12px;">
-                  <small name="precio_venta">${this.precioVenta}</small>
-              </div>
-              <div style="font-size: 11px;">
-                  <small style="color: rgb(153,153,153);" name="precio_lista">Antes: ${this.precioLista}</small>
-              </div>
-              <div class="row" style="font-size: 11px;">
-                  <div class="col-sm-4 col-md-3 col-xl-2" style="padding-right: 0px;">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="mostrar-descuento" class="bi bi-arrow-right-circle-fill" style="font-size: 18px;">
-                          <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"></path>
-                      </svg>
-                  </div>
-                  <div class="col-sm-7 col-md-8">
-                      <small style="color: rgb(255,0,0);" id="descuento" name="descuento_max" hidden>Max: ${this.precioDescuento}</small>
-                  </div>
-              </div>
-          </td>
+    <div style="font-size: 12px;">
+        <small name="precio_venta" data-precio-unitario="100.00">${this.precioVenta}</small>
+
+    </div>
+    <div style="font-size: 11px;">
+        <small style="color: rgb(153,153,153);" name="precio_lista">Antes: ${this.precioLista}</small>
+    </div>
+    <div class="row" style="font-size: 11px;">
+        <div class="col-sm-4 col-md-3 col-xl-2" style="padding-right: 0px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="mostrar-descuento" class="bi bi-arrow-right-circle-fill" style="font-size: 18px;">
+                <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"></path>
+            </svg>
+        </div>
+        <div class="col-sm-7 col-md-8">
+            <small style="color: rgb(255,0,0);" id="descuento" name="descuento_max" hidden>Max: ${this.precioDescuento}</small>
+        </div>
+    </div>
+</td>
+
           <td style="font-size: 12px;background: transparent;border-style: none;">
               <div>
                   <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="1" max="1000">
@@ -68,7 +70,7 @@ class Producto {
           </td>
           <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${this.precioSinDescuento}</td>
           <td style="font-size: 12px;background: transparent;border-style: none;">
-              <input class="form-control" type="number" style="width: 65px;" id="calcular_cantidad" min="1" max="1000" value=0>
+              <input class="form-control" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value=0>
           </td>
           <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
               <span id="precio_Venta">${this.totalProducto}</span>
