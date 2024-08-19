@@ -26,6 +26,5 @@ urlpatterns = [
     #path('listado_Cotizaciones/', views.list_quotations_2, name='listado_Cotizaciones'),
     #path('ordenes/', views.cambio_ordenes, name='ordenes'),
     path('probandoVtex/', views.oredenes, name='probandoVtex'),
-    path('listado_Cotizaciones_filtrado/', views.filter_quotations, name='filter_quotations'),
 ]
 

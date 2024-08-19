@@ -70,7 +70,28 @@ class APIClient:
             self.__autehnticated = False
 
     def get_quotations(self, top=0, skip=0, filters=None):
-        
+        """
+        Recupera una lista de cotizaciones con filtros opcionales, paginación y expansión.
+
+        Este método envía una solicitud GET a la API para obtener datos de cotizaciones junto con
+        información asociada de SalesPersons. La solicitud puede personalizarse con filtros opcionales, 
+        parámetros de paginación (`top` y `skip`) y campos específicos para expandir.
+
+        Parámetros:
+        -----------
+        top : int, opcional
+            El número máximo de registros a recuperar (por defecto es 0, lo que recupera todos los registros).
+        skip : int, opcional
+            El número de registros a omitir desde el inicio del conjunto de resultados (por defecto es 0).
+        filters : dict, opcional
+            Un diccionario de pares clave-valor para filtrar los resultados según condiciones específicas.
+            
+        Retorna:
+        --------
+        dict
+            Un diccionario con la respuesta de la API en formato JSON.
+        """
+
         self.__login()
         crossjoin = "Quotations,SalesPersons"
         expand = "Quotations($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
@@ -92,27 +113,6 @@ class APIClient:
         print(url)
         return response.json()
     
-    def get_quotations2(self, top=20, skip=0, filters=None):
-        self.__login()
-        crossjoin = "Quotations,SalesPersons"
-        expand = "Quotations($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
-        filter_condition = "Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
-
-        if filters:
-            filter_condition += " and " + " and ".join([f"{k} {v}" for k, v in filters.items()])
-
-        headers = {
-            "Prefer": f"odata.maxpagesize={top}"
-        }
-
-        query_url = f"/$crossjoin({crossjoin})?$expand={expand}&$filter={filter_condition}&$top={top}&$skip={skip}"
-        url = f"{self.base_url}{query_url}"
-
-        response = self.session.get(url, headers=headers, verify=False)
-        response.raise_for_status()
-        print(url)
-        return response.json()
-
     
     def get_quotations_items(self, endpoint, top=20):
         
