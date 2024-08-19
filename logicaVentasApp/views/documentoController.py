@@ -1,18 +1,33 @@
-from django.views.generic import View
-from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.views import View
+from django.http import JsonResponse
 from datosLsApp.sl_client import APIClient
 import json
 
 @method_decorator(csrf_exempt, name='dispatch')
-@method_decorator(require_http_methods(["GET", "POST"]), name="dispatch")
-class CotizacionesController(View):
+@method_decorator(require_http_methods(["GET", "POST"]), name='dispatch')
+class Documento(View):
     
-    def get(self, request):
-        client = APIClient()
+    def __init__(self, docEntry=None, docNum=None, folio=None, fechaDocumento=None, numEntrega=None, fechaEntrega=None, 
+                 referencia=None, comentario=None, totalAntesDelDescuento=None, totalDocumento=None, codigoVenta=None, client=None):
+        
+        self.docEntry = docEntry
+        self.docNum = docNum
+        self.folio = folio
+        self.fechaDocumento = fechaDocumento
+        self.numEntrega = numEntrega
+        self.fechaEntrega = fechaEntrega
+        self.referencia = referencia
+        self.comentario = comentario
+        self.totalAntesDelDescuento = totalAntesDelDescuento
+        self.descuento = 0
+        self.totalDocumento = totalDocumento
+        self.codigoVenta = codigoVenta
+        self.client = client or APIClient()
 
+    def get(self, request):
         top = request.GET.get('top', 20)
         skip = request.GET.get('skip', 0)
 
@@ -22,18 +37,16 @@ class CotizacionesController(View):
         except ValueError:
             return JsonResponse({'error': 'Invalid parameters'}, status=400)
 
-        data = client.getData(endpoint='Quotations', top=top, skip=skip)
+        data = self.client.getData(endpoint='Quotations', top=top, skip=skip)
         return JsonResponse(data, safe=False)
     
     def post(self, request):
-        # Implementación del método POST para filtrado de cotizaciones
         if request.path == '/listado_Cotizaciones_filtrado/':
-            return self.filter_quotations(request)
+            return self.filter(request)
         else:
-            # Manejar el caso cuando la ruta no es correcta
             return JsonResponse({'error': 'Invalid URL'}, status=404)
     
-    def filter_quotations(self, request):
+    def filter(self, request):
         print("Request body:", request.body)  # Verifica el cuerpo de la solicitud JSON recibida
         
         client = APIClient()
@@ -83,7 +96,7 @@ class CotizacionesController(View):
         
 
         try:
-            data = client.getData(endpoint='Quotations', top=top, skip=skip, filters=filters)
+            data = self.client.getData(endpoint='Quotations', top=top, skip=skip, filters=filters)
             return JsonResponse({'data': data}, safe=False)
         except Exception as e:
             print("Error:", e)  # Verifica el error específico que está ocurriendo
