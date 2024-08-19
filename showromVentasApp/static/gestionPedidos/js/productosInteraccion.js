@@ -6,9 +6,11 @@ function agregarInteractividad(newRow) {
   var tdPrecioVenta = newRow.querySelector('#precio_Venta'); 
   var tdPrecioDescuento = newRow.querySelector('#Precio_Descuento'); 
   
-  var valorBruto = document.getElementById('total_bruto');
-  var valorIva = document.getElementById('iva');
-  var valorNeto = document.getElementById('total_neto');
+  // Select the small elements inside the divs by their ID
+  var valorBruto = document.querySelector('#total_bruto small');
+  var valorIva = document.querySelector('#iva small');
+  var valorNeto = document.querySelector('#total_neto small');
+
   
   // Agregar evento de cambio al input de cantidad para calcular el precio total
   inputCantidad.addEventListener('input', calcularPrecioTotal);
@@ -23,16 +25,14 @@ function agregarInteractividad(newRow) {
     var precioTotal = (cantidad * precioUnitario);
     var descuento = parseFloat(inputDescuento.value) || 0;
 
-    var dctoFinal = (descuento / 100);
-    console.log("Descuento final:", dctoFinal); // Debug: Verifica el descuento final
-    var precioConDescuento = precioTotal * (descuento / 100);
-    console.log("Precio con descuento calculado:", precioConDescuento); // Debug: Verifica el cálculo del precio con descuento
+    var precioFinal = precioTotal - (precioTotal * (descuento / 100));
+    var precioConDescuento = precioUnitario * (descuento / 100);
 
     
-    tdPrecioVenta.textContent = precioTotal.toFixed(2);
+    tdPrecioVenta.textContent = precioFinal.toFixed(2);
     tdPrecioDescuento.textContent = precioConDescuento.toFixed(2);
     
-    sumarPrecio(precioConDescuento);
+    sumarPrecio(precioFinal);
   }
 
   // Función para aplicar el descuento
@@ -41,23 +41,22 @@ function agregarInteractividad(newRow) {
   }
 
   // Función para sumar el precio al valor neto
-  function sumarPrecio(precioUnitario) {
-    var bruto = parseFloat(valorBruto.textContent.replace('$', '')) || 0;
-    var iva = parseFloat(valorIva.textContent.replace('$', '')) || 0;
-    var neto = parseFloat(valorNeto.textContent.replace('$', '')) || 0;
+  function sumarPrecio(precioConDescuento) {
 
-    bruto += precioUnitario;
-    valorBruto.textContent = '$' + bruto.toFixed(0);
-
-    iva = bruto * 0.19;
+    // Calcular el IVA (19% del precio neto)
+    var iva = precioConDescuento * 0.19;
     valorIva.textContent = '$' + iva.toFixed(0);
 
-    neto = bruto - iva;
+    // El precio bruto es el precio con descuento más el IVA
+    var bruto = precioConDescuento;
+    valorBruto.textContent = '$' + bruto.toFixed(0);
+
+    // El precio neto es simplemente el precio con descuento
+    var neto = precioConDescuento - iva;
     valorNeto.textContent = '$' + neto.toFixed(0);
-    console.log("Valor neto actualizado:", neto); // Debug: Verifica el valor neto actualizado
-    console.log("Valor bruto actualizado:", bruto); // Debug: Verifica el valor bruto actualizado
-    console.log("Valor IVA actualizado:", iva); // Debug: Verifica el valor IVA actualizado
-  }
+}
+
+
   
   window.agregarInteractividad = agregarInteractividad;
 };
