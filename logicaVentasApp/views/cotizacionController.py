@@ -33,6 +33,29 @@ class CotizacionesController(View):
             # Manejar el caso cuando la ruta no es correcta
             return JsonResponse({'error': 'Invalid URL'}, status=404)
     
+    def create_product(self, request):
+        client = APIClient()
+        try:
+            # Cargar los datos del cuerpo de la solicitud
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        
+        # Validar los datos recibidos
+        if not data.get('CardCode') or not data.get('DocumentLines'):
+            return JsonResponse({'error': 'Missing required fields'}, status=400)
+        
+        # Endpoint para crear productos
+        endpoint = 'productos/'  # Reemplaza esto con el endpoint adecuado para la API de productos
+        headers = {"Content-Type": "application/json"}
+
+        # Llama al método post_data para enviar los datos a la API
+        result = client.post_data(endpoint, data=data, headers=headers)
+
+        # Retorna la respuesta de la API
+        return JsonResponse(result, safe=False)
+
+
     def filter_quotations(self, request):
         print("Request body:", request.body)  # Verifica el cuerpo de la solicitud JSON recibida
         

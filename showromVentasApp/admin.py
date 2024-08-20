@@ -1,5 +1,5 @@
 from django.contrib import admin
-from datosLsApp.models import (CondicionPago, Documento, TipoDocTributario, Sucursal, TipoVenta, Vendedor, Producto, Bodega, Inventario, Item, SocioNegocio, Usuario, Contacto)
+from datosLsApp.models import (CondicionPago, Documento, TipoDocTributario, Sucursal, TipoVenta, Vendedor, Producto, Bodega, Inventario, Item, SocioNegocio, Usuario, Contacto, Direccion)
 
 #Modicaciones en administrador 
 admin.site.site_header = 'Led Studio'
@@ -46,6 +46,9 @@ class Usuarioper(admin.ModelAdmin):
 class Contactoper(admin.ModelAdmin):
     list_display = ('nombreCompleto',)
 
+class Direccionesper(admin.ModelAdmin):
+    list_display = ('nombreDireccion','region','SocioNegocio')
+
 # Register your models here.
 admin.site.register(TipoDocTributario,TipoDocTributarioper)
 admin.site.register(Sucursal,Sucursalper)
@@ -60,6 +63,7 @@ admin.site.register(Item,itemper)
 admin.site.register(SocioNegocio,SocioNegocioper)
 admin.site.register(Usuario,Usuarioper)
 admin.site.register(Contacto, Contactoper)
+admin.site.register(Direccion,Direccionesper)
 
 
 

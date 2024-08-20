@@ -7,5 +7,6 @@ urlpatterns = [
     path('listado_Cotizaciones_filtrado/', CotizacionesController.as_view(), name='filter_quotations'),
     #path('listado_Cotizaciones_filtrado/', Documento.as_view(), name='filter_quotations'),
     #path('listado_Cotizaciones/', Documento.as_view(), name='listado_Cotizaciones'),
+    #path('crear_cotizacion/', CotizacionesController.as_view(), name='create_quotation'),
 
 ]

@@ -26,3 +26,6 @@ class SocioNegocio(models.Model):
     grupoSN = models.ForeignKey(GrupoSN, on_delete=models.CASCADE, default=1)
     tipoSN = models.ForeignKey(TipoSN,on_delete=models.CASCADE, default=1)
     tipoCliente = models.ForeignKey(TipoCliente,on_delete=models.CASCADE, default=1)
+    
+    def __str__(self):
+        return f"{self.rut}"

@@ -420,8 +420,8 @@ def busquedaClientes(request):
                 'codigoImpuesto': direccion.codigoImpuesto,
                 'tipoDireccion': direccion.tipoDireccion,
                 'pais': direccion.pais,
-                'comuna': direccion.comuna.nombre,  # Asumiendo que Comuna tiene un campo nombre
-                'region': direccion.region.nombre  # Asumiendo que Region tiene un campo nombre
+                'comuna': direccion.comuna.nombre,
+                'region': direccion.region.nombre
             } for direccion in direcciones]
 
             resultados_formateados.append({

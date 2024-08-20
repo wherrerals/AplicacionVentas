@@ -17,9 +17,10 @@ AplicacionVentas/__pycache__
 
 * migrations
 
-AplicacionVentas/datosLsApp/migrations/
-AplicacionVentas/logicaVentasApp/migrations/
-AplicacionVentas/showromVentasApp/migrations/
+datosLsApp/migrations/
+
+logicaVentasApp/migrations/
+showromVentasApp/migrations/
 
 #ignorar cache de python
 *.pyc   
