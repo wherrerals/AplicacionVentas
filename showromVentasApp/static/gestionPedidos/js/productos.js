@@ -90,7 +90,9 @@ class Producto {
           </svg>
       </a>
           </td>
-          <td colspan="7" style="padding-top: 0px;background: transparent;"><span>${this.nombre}</span></td>
+          <tr style="font-size: 12px;background: transparent;">
+            <td colspan="7" style="padding-top: 0px;background: transparent;"><span>${this.nombre}</span></td>
+          </tr>
         </tr>
       `;
       

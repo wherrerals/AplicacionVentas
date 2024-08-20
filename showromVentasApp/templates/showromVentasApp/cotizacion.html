@@ -78,18 +78,19 @@
         <p>Estado:&nbsp;<strong></strong></p>
       </div>
     </div>
-    <form id="forCrearPedidos" method="POST" action="/post-quotations/"> {% csrf_token %}
+    <form id="forCrearPedidos" method="POST" action="/agregar_editar_clientes/"> {% csrf_token %}
       <!--form  id="form_agregar_editar_cliente" method="POST" action="/agregar_editar_clientes/"> {% csrf_token %} Cambiar para probar distinto form-->
       <div class="row" style="background: #f0f2f5;">
         <div class="col-sm-8 col-md-1 text-nowrap" style="width: 75%;">
           <div class="row">
-            <div class="col-sm-3" style="width: 27%;"><label class="col-form-label"
-                style="font-size: 13px;">Cliente</label></div>
-            <div class="col-sm-6 col-md-6" style="text-align: left;width: 58%;padding-right: 0px;">
-              <input class="form-control" type="text" name="cliente"
-                style="border-color: rgb(159,168,175);font-size: 12px;" id="inputCliente">
-              <div id="resultadosClientes" style="font-size: 11px;"></div>
+            <div class="col-sm-3" style="width: 27%;">
+              <label class="col-form-label" style="font-size: 13px;">Cliente</label>
             </div>
+            <div class="col-sm-6 col-md-6" style="text-align: left;width: 58%;padding-right: 0px;">
+              <input class="form-control" type="text" name="cliente" style="border-color: rgb(159,168,175);font-size: 12px;" id="inputCliente">
+                <div id="resultadosClientes" style="font-size: 11px;"></div>
+            </div>
+            
             <div class="col" style="width: 15%;text-align: left;padding-left: 0px;padding-right: 0px;">
 
               <!-- Start: Modal -->

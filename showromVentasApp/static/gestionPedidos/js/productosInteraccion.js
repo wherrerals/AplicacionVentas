@@ -26,8 +26,7 @@ function agregarInteractividad(newRow) {
     var descuento = parseFloat(inputDescuento.value) || 0;
 
     var precioFinal = precioTotal - (precioTotal * (descuento / 100));
-    var precioConDescuento = precioUnitario * (descuento / 100);
-
+    var precioConDescuento = precioUnitario * (1 - (descuento / 100));
     
     tdPrecioVenta.textContent = precioFinal.toFixed(2);
     tdPrecioDescuento.textContent = precioConDescuento.toFixed(2);
