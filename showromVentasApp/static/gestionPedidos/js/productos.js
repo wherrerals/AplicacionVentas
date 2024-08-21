@@ -82,13 +82,11 @@ class Producto {
           </td>
           <td style="background: transparent;padding-top: 8px;padding-left: 50px;border-style: none;padding-bottom: 0px;">
               <a class="navbar-brand d-flex align-items-center" href="#" style="width: 18px;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="eliminarp" class="bi bi-trash" style="width: 18px;height: 18px;">
-              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z">
-              </path>
-              <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z">
-              </path>
-          </svg>
-      </a>
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="eliminarp" class="bi bi-trash" style="width: 18px;height: 18px;">
+                  <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"> </path>
+                  <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"> </path>
+                </svg>
+              </a>
           </td>
           <tr style="font-size: 12px;background: transparent;">
             <td colspan="7" style="padding-top: 0px;background: transparent;"><span>${this.nombre}</span></td>
@@ -130,10 +128,19 @@ class Producto {
     });
   
     newRow.querySelector('#eliminarp').addEventListener('click', function() {
+      // Eliminar la fila del DOM
       newRow.remove();
-    });
+  
+      // Emitir un evento personalizado pasando el código del producto
+      const event = new CustomEvent('productoEliminado', {
+          detail: { codigoProducto: productoCodigo }
+      });
+      console.log('Evento emitido:', event);
+      document.dispatchEvent(event);
+  });
+  
   
     // Llamar a la función agregarInteractividad si es necesario
-    agregarInteractividad(newRow);
+    agregarInteractividad(newRow,productoCodigo);
   }
   
