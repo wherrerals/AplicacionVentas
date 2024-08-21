@@ -14,11 +14,8 @@ AplicacionVentas/__pycache__/
 AplicacionVentas/__pycache__
 
 #Ignorar Migrations de django
-
 * migrations
-
 datosLsApp/migrations/
-
 logicaVentasApp/migrations/
 showromVentasApp/migrations/
 
