@@ -78,18 +78,19 @@
         <p>Estado:&nbsp;<strong></strong></p>
       </div>
     </div>
-    <form id="forCrearPedidos" method="POST" action="/post-quotations/"> {% csrf_token %}
+    <form id="forCrearPedidos" method="POST" action="/agregar_editar_clientes/"> {% csrf_token %}
       <!--form  id="form_agregar_editar_cliente" method="POST" action="/agregar_editar_clientes/"> {% csrf_token %} Cambiar para probar distinto form-->
       <div class="row" style="background: #f0f2f5;">
         <div class="col-sm-8 col-md-1 text-nowrap" style="width: 75%;">
           <div class="row">
-            <div class="col-sm-3" style="width: 27%;"><label class="col-form-label"
-                style="font-size: 13px;">Cliente</label></div>
-            <div class="col-sm-6 col-md-6" style="text-align: left;width: 58%;padding-right: 0px;">
-              <input class="form-control" type="text" name="cliente"
-                style="border-color: rgb(159,168,175);font-size: 12px;" id="inputCliente">
-              <div id="resultadosClientes" style="font-size: 11px;"></div>
+            <div class="col-sm-3" style="width: 27%;">
+              <label class="col-form-label" style="font-size: 13px;">Cliente</label>
             </div>
+            <div class="col-sm-6 col-md-6" style="text-align: left;width: 58%;padding-right: 0px;">
+              <input class="form-control" type="text" name="cliente" style="border-color: rgb(159,168,175);font-size: 12px;" id="inputCliente">
+                <div id="resultadosClientes" style="font-size: 11px;"></div>
+            </div>
+            
             <div class="col" style="width: 15%;text-align: left;padding-left: 0px;padding-right: 0px;">
 
               <!-- Start: Modal -->
@@ -701,8 +702,9 @@
         </div>
 
 
-        <div class="col-md-1" style="width: 15%;text-align: right;padding-right: 0px;"><label class="col-form-label"
-            style="font-size: 13px;">Válido Hasta</label></div>
+        <div class="col-md-1" style="width: 15%;text-align: right;padding-right: 0px;">
+          <label class="col-form-label" style="font-size: 13px;">Válido Hasta</label>
+        </div>
         <div class="col" style="width: 20%;">
           <label class="col-form-label" style="font-size: 14px;font-weight: bold;" id="dias_vencidos"></label>
         </div>
@@ -713,7 +715,7 @@
         <div class="col" style="width: 35%;padding-right: 0px;"><select class="form-select"
             style="font-size: 12px;border-color: rgb(159,168,175);">
             <optgroup label="--">
-              <option value="1" selected="" </option>
+              <option value="1" selected="" > </option>
               <option value="13"></option>
               <option value="14"></option>
             </optgroup>
@@ -1080,7 +1082,16 @@
       </div>
     </form>
   </div>
-  <script src="{% static 'gestionPedidos/js/botones.js' %}"></script>
+
+  <script src="{% static 'gestionPedidos/js/botones.js' %}"></script>  <!-- evaluar si se puede quitar, igual todo en botones esta comentado -->
+  <script src="{% static 'gestionPedidos/js/gestorDirecciones.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/interfazUsuario.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/interactividadUsuario.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/productos.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/productosInteraccion.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/gestorContacto.js' %}"></script>
+
+
   <script src="{% static 'gestionPedidos/js/ajax_solicitudes.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/ajax_clientes.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/quotations_insert.js' %}"></script>

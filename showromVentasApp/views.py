@@ -420,8 +420,8 @@ def busquedaClientes(request):
                 'codigoImpuesto': direccion.codigoImpuesto,
                 'tipoDireccion': direccion.tipoDireccion,
                 'pais': direccion.pais,
-                'comuna': direccion.comuna.nombre,  # Asumiendo que Comuna tiene un campo nombre
-                'region': direccion.region.nombre  # Asumiendo que Region tiene un campo nombre
+                'comuna': direccion.comuna.nombre,
+                'region': direccion.region.nombre
             } for direccion in direcciones]
 
             resultados_formateados.append({
@@ -564,60 +564,4 @@ def post_quotations(request):
 def oredenes(request):
         
     return render(request, "manejo_ordenes.html")
-
-@csrf_exempt
-@require_POST
-def filter_quotations(request):
-    print("Request body:", request.body)  # Verifica el cuerpo de la solicitud JSON recibida
-    
-    client = APIClient()
-
-    try:
-        data = json.loads(request.body)
-        print("Received data:", data)  # Verifica los datos JSON recibidos
-    except json.JSONDecodeError as e:
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
-
-    filters = {}
-
-    # Agregar filtros solo si se proporcionan datos válidos
-    if data.get('fecha_inicio'):
-        filters['Quotations/DocDate ge'] = f"'{data.get('fecha_inicio')}'"
-    if data.get('fecha_fin'):
-        filters['Quotations/DocDate le'] = f"'{data.get('fecha_fin')}'"
-    if data.get('docNum'):
-        filters['contains(Quotations/DocNum,'] = data.get.int(('docNum'))
-    if data.get('carCode'):
-        filters['contains(Quotations/CardCode,'] = f"'{data.get('carCode')}'"
-    if data.get('cardNAme'):
-        filters['contains(Quotations/CardName,'] = f"'{data.get('cardNAme')}'"
-    if data.get('salesEmployeeName'):
-        filters['contains(SalesPersons/SalesEmployeeName,'] = f"'{data.get('salesEmployeeName')}'"
-    if data.get('DocumentStatus'):
-        filters['Quotations/DocumentStatus eq'] = f"'{data.get('DocumentStatus')}'"
-    if data.get('docTotal'):
-        filters['contains(Quotations/DocTotal,'] = data.get('docTotal')
-    if data.get('cancelled'):
-        filters['Quotations/Cancelled eq'] = f"'{data.get('cancelled')}'"
-
-    # Limpiar los filtros vacíos o con valores inválidos
-    filters = {k: v for k, v in filters.items() if v and v != "''"}
-
-    try:
-        top = int(data.get('top', 20))
-        skip = int(data.get('skip', 0))
-    except ValueError:
-        return JsonResponse({'error': 'Invalid parameters'}, status=400)
-
-    print("Applying filters:", filters)# Verifica los filtros aplicados
-    print("-" * 10)  
-    print(filters)
-    
-
-    try:
-        data = client.get_quotations2(top=top, skip=skip, filters=filters)
-        return JsonResponse({'data': data}, safe=False)
-    except Exception as e:
-        print("Error:", e)  # Verifica el error específico que está ocurriendo
-        return JsonResponse({'error': str(e)}, status=500)
 
