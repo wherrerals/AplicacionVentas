@@ -24,7 +24,23 @@ class CotizacionesController(View):
 
         data = client.getData(endpoint='Quotations', top=top, skip=skip)
         return JsonResponse(data, safe=False)
+
+    def post(self, request):
+        # Definir un diccionario de rutas a métodos
+        route_map = {
+            '/listado_Cotizaciones_filtrado/': self.filter_quotations,
+            '/crear_cotizacion/': self.crearCotizacion,
+        }
+
+        # Buscar el método basado en la ruta
+        handler = route_map.get(request.path)
+
+        if handler:
+            return handler(request)
+        else:
+            return JsonResponse({'error': 'Invalid URL'}, status=404)
     
+    """     
     def post(self, request):
         # Implementación del método POST para filtrado de cotizaciones
         if request.path == '/listado_Cotizaciones_filtrado/':
@@ -39,7 +55,8 @@ class CotizacionesController(View):
             return self.crearCotizacion(request)
         else:
             # Manejar el caso cuando la ruta no es correcta
-            return JsonResponse({'error': 'Invalid URL'}, status=404)
+            return JsonResponse({'error': 'Invalid URL'}, status=404) 
+    """
     
     def crearCotizacion(self, request):
         client = APIClient()
