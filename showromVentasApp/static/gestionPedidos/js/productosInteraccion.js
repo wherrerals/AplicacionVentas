@@ -67,8 +67,6 @@ function agregarInteractividad(newRow, codigoProducto) {
       tdPrecioVenta.textContent = precioFinal.toFixed(2);
       tdPrecioDescuento.textContent = precioConDescuento.toFixed(2);
 
-      console.log('Precio final actualizado para:', producto.codigoProducto, 'Precio:', precioFinal);
-
       actualizarValores();
   }
 
@@ -79,7 +77,6 @@ function agregarInteractividad(newRow, codigoProducto) {
 
   document.addEventListener('productoEliminado', function(event) {
     const codigoProducto = event.detail.codigoProducto;
-    console.log('Producto a eliminar:', codigoProducto);
 
     // Buscar el índice del producto a eliminar
     const index = productos.findIndex(producto => producto.codigoProducto === codigoProducto);
@@ -87,9 +84,7 @@ function agregarInteractividad(newRow, codigoProducto) {
 
     if (index > -1) {
         productos.splice(index, 1);
-        console.log('Producto eliminado del array:', codigoProducto);
     } else {
-        console.log('Producto no encontrado en el array.');
     }
 
     // Imprimir el estado actual del array productos después de la eliminación

@@ -93,7 +93,7 @@ class Producto {
           </tr>
         </tr>
       `;
-      
+      this.limitarMaxDescuento(newRow);
       return newRow;
     }
   
@@ -106,7 +106,23 @@ class Producto {
         elemento.setAttribute('hidden', '');
       }
     }
+
+    limitarMaxDescuento(row) {
+      // Obtener el valor del descuento máximo
+      let descuentoMaxElem = row.querySelector('#descuento');
+      let descuentoMax = parseFloat(descuentoMaxElem.textContent.replace('Max: ', ''));
+      console.log('Descuento máximo:', descuentoMax);
+
+      // Configurar el input para limitar el valor máximo
+      let inputDescuento = row.querySelector('#agg_descuento');
+      inputDescuento.max = descuentoMax;
+
+      // Validar el valor actual del input
+      if (inputDescuento.value > descuentoMax) {
+          inputDescuento.value = descuentoMax;
+      }
   }
+}
   
   // Función global para manejar la adición de productos
   function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento) {
