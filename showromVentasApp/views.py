@@ -6,7 +6,7 @@ from django.contrib.auth.hashers import make_password
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
 from django.db import transaction
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 #Modulos Diseñados
 from datosLsApp.models.usuario import User 
 from datosLsApp.models import (Producto, SocioNegocio, Usuario, Region, GrupoSN, TipoSN, TipoCliente, Direccion, Comuna)
@@ -305,65 +305,7 @@ def mis_datos(request):
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 
 
-@login_required
-def agregar_editar_clientes(request):
-    if request.method == "POST":
-        
-        gruposn = request.POST.get('grupoSN')
-        rut = request.POST['rut']
-        giro = request.POST['giro']
-        telefono = request.POST['telefono']
-        email = request.POST['email']
-        
-        rut_original = rut
 
-        # Si hay un guion en el rut, eliminarlo y todo lo que está a la derecha
-        if "-" in rut:
-            rut_sn = rut.split("-")[0]
-        else:
-            rut_sn = rut  # Si no hay guion, usa el rut tal cual
-
-        # Eliminar los puntos y agregar la 'c' al final
-        codigosn = rut_sn.replace(".", "") + 'c'#codigoSN rut sin puntos ni digito, concatenada una C
-        
-        #Aca se asigan isntancias de los modelos con sus llaves foraneas correpsondientes 
-        gruposn1 = GrupoSN.objects.get(codigo=gruposn)
-        tipocliente = TipoCliente.objects.get(codigo = 'N')
-        if gruposn == '100':
-            tiposn = TipoSN.objects.get(codigo='C')
-        else:
-            tiposn = TipoSN.objects.get(codigo='I')
-    
-        if gruposn == '100':
-            nombre = request.POST['nombre']
-            apellido = request.POST['apellido']
-            cliente = SocioNegocio.objects.create(codigoSN = codigosn,
-                                                nombre=nombre,
-                                                apellido =apellido,
-                                                rut=rut, 
-                                                giro=giro, 
-                                                telefono=telefono, 
-                                                email=email,
-                                                grupoSN = gruposn1,
-                                                tipoSN = tiposn,
-                                                tipoCliente = tipocliente 
-                                                )
-            
-
-        elif gruposn == '105':
-            razonsocial = request.POST['nombre']
-            cliente = SocioNegocio.objects.create(codigoSN = codigosn,
-                                                razonSocial = razonsocial,
-                                                rut=rut, 
-                                                giro=giro, 
-                                                telefono=telefono, 
-                                                email=email,
-                                                grupoSN = gruposn1,
-                                                tipoSN = tiposn,
-                                                tipoCliente = tipocliente 
-                                                )
-           
-        return redirect("/")
 
 @login_required
 #desde ambos botones se puede llamar y usar el tipo para ver donde se muestra en "barras (ajax)"
@@ -414,44 +356,7 @@ def busquedaProductos(request):
         return JsonResponse({'error': 'No se proporcionó un número válido'})
 
 
-def busquedaClientes(request):
-    if 'numero' in request.GET:
-        numero = request.GET.get('numero')
-        resultados_clientes = SocioNegocio.objects.filter(rut__icontains=numero)
-        resultados_formateados = []
 
-        for socio in resultados_clientes:
-            direcciones = Direccion.objects.filter(SocioNegocio=socio)
-            direcciones_formateadas = [{
-                'rowNum': direccion.rowNum,
-                'nombreDireccion': direccion.nombreDireccion,
-                'ciudad': direccion.ciudad,
-                'calleNumero': direccion.calleNumero,
-                'codigoImpuesto': direccion.codigoImpuesto,
-                'tipoDireccion': direccion.tipoDireccion,
-                'pais': direccion.pais,
-                'comuna': direccion.comuna.nombre,
-                'region': direccion.region.nombre
-            } for direccion in direcciones]
-
-            resultados_formateados.append({
-                'nombre': socio.nombre,
-                'apellido': socio.apellido,
-                'razonSocial': socio.razonSocial,
-                'rut': socio.rut,
-                'email': socio.email,
-                'telefono': socio.telefono,
-                'giro': socio.giro,
-                'condicionPago': socio.condicionPago,
-                'plazoReclamaciones': socio.plazoReclamaciones,
-                'clienteExportacion': socio.clienteExportacion,
-                'vendedor': socio.vendedor,
-                'direcciones': direcciones_formateadas
-            })
-        
-        return JsonResponse({'resultadosClientes': resultados_formateados})
-    else:
-        return JsonResponse({'error': 'No se proporcionó un número válido'})  
 
 def validar_contrasena(password):
     mensajes = []
@@ -470,53 +375,6 @@ def validar_contrasena(password):
 
     return mensajes  
 
-def quotate_items(request, docNum):
-    client = APIClient()  
-
-    try:
-        data = client.get_quotations_items('Quotations')  # Ajusta según el método de cliente API
-
-        # Verificar si hay datos y procesarlos
-        if 'value' in data:
-            quotations = data['value']
-            found_quotation = None
-
-            # Buscar la cotización con el DocNum especificado
-            for quotation in quotations:
-                if quotation.get('DocNum') == int(docNum):  # Convertir docNum a entero si es necesario
-                    found_quotation = quotation
-                    break
-
-            if found_quotation:
-                # Obtener las líneas de documentos (DocumentLines)
-                document_lines = found_quotation.get('DocumentLines', [])
-
-                # Preparar los datos para enviar como respuesta JSON
-                lines_data = []
-                for line in document_lines:
-                    line_data = {
-                        'LineNum': line.get('LineNum'),
-                        'ItemCode': line.get('ItemCode'),
-                        'ItemDescription': line.get('ItemDescription'),
-                        'ItemCode': line.get('ItemCode'),
-                        'ItemCode': line.get('ItemCode'),
-                        'ItemCode': line.get('ItemCode'),
-                        'ItemDescription': line.get('ItemDescription'),
-                        'Quantity': line.get('Quantity'),
-                        'Price': line.get('Price'),
-                    }
-                    lines_data.append(line_data)
-
-                # Retornar respuesta JSON con las líneas de documentos encontradas
-                return JsonResponse({'DocumentLines': lines_data}, status=200)
-            else:
-                return JsonResponse({'error': 'No se encontró la cotización con el DocNum especificado'}, status=404)
-
-        else:
-            return JsonResponse({'error': 'No se encontraron datos de cotizaciones'}, status=404)
-
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
 
 """ @require_http_methods(["GET"])
 def list_quotations_2(request):
@@ -537,41 +395,4 @@ def list_quotations_2(request):
     data = client.get_quotations(top=top, skip=skip)
     return JsonResponse(data, safe=False) """
 
-@csrf_exempt
-@require_POST
-def post_quotations(request):
-    try:
-        # Datos de prueba
-        data = {
-            "CardCode": "c001",
-            "DocumentLines": [
-                {
-                    "ItemCode": "i001",
-                    "Quantity": "100",
-                    "TaxCode": "T1",
-                    "UnitPrice": "30"
-                }
-            ]
-        }
-
-        client = APIClient()
-        endpoint = "Quotations"
-        response_data = client.post_data(endpoint, data=data)
-
-        # Verificar si response_data es None
-        if response_data is None:
-            return JsonResponse({'error': 'No response data received'}, status=500)
-        
-        # Verificar si hay un error en response_data
-        if isinstance(response_data, dict) and 'error' in response_data:
-            return JsonResponse(response_data, status=500)
-        
-        return JsonResponse(response_data, safe=False)
-    except Exception as e:
-        print("An error occurred:", e)
-        return JsonResponse({'error': str(e)}, status=500)
-    
-def oredenes(request):
-        
-    return render(request, "manejo_ordenes.html")
 

@@ -2,11 +2,14 @@ from django.views.generic import View
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from datosLsApp.sl_client import APIClient
+import re
 import json
 
 @method_decorator(csrf_exempt, name='dispatch')
+@method_decorator(login_required, name='dispatch')
 @method_decorator(require_http_methods(["GET", "POST"]), name="dispatch")
 class CotizacionesController(View):
     
@@ -26,36 +29,45 @@ class CotizacionesController(View):
         return JsonResponse(data, safe=False)
 
     def post(self, request):
-        # Definir un diccionario de rutas a métodos
+
         route_map = {
             '/listado_Cotizaciones_filtrado/': self.filter_quotations,
             '/crear_cotizacion/': self.crearCotizacion,
         }
 
-        # Buscar el método basado en la ruta
         handler = route_map.get(request.path)
 
-        if handler:
-            return handler(request)
-        else:
+        if not handler:
+
+            dynamic_routes = [
+                (r'^/actualizar_cotizacion/\d+/$', self.actualizarCotizacion),
+            ]
+
+            for pattern, view_method in dynamic_routes:
+                if re.match(pattern, request.path):
+
+                    doc_num = re.findall(r'\d+', request.path)[0]
+                    return view_method(request, doc_num)
+
             return JsonResponse({'error': 'Invalid URL'}, status=404)
+
+        return handler(request)
     
 
     def crearCotizacion(self, request):
         client = APIClient()
         try:
-            # Cargar los datos del cuerpo de la solicitud
+
             data = json.loads(request.body)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
         
-        # Validar los datos recibidos
         required_fields = ['CardCode', 'DocumentLines']
         for field in required_fields:
             if not data.get(field):
                 return JsonResponse({'error': f'Missing required field: {field}'}, status=400)
         
-        # Crear un diccionario con los datos completos para la API
+
         json_data = {
             "DocDate": data.get('DocDate'),
             "DocDueDate": data.get('DocDueDate'),
@@ -71,31 +83,31 @@ class CotizacionesController(View):
             "DocumentLines": data.get('DocumentLines')
         }
 
-        # Endpoint para crear cotizaciones
-        endpoint = 'Quotations'  # Reemplaza esto con el endpoint adecuado para la API de cotizaciones
+
+        endpoint = 'Quotations'
         headers = {"Content-Type": "application/json"}
 
-        # Llama al método post_data para enviar los datos a la API
+
         result = client.post_data(endpoint, data=json_data, headers=headers)
 
-        # Retorna la respuesta de la API
+
         return JsonResponse(result, safe=False)
 
 
     def filter_quotations(self, request):
-        print("Request body:", request.body)  # Verifica el cuerpo de la solicitud JSON recibida
+        print("Request body:", request.body)
         
         client = APIClient()
 
         try:
             data = json.loads(request.body)
-            print("Received data:", data)  # Verifica los datos JSON recibidos
+            print("Received data:", data)
         except json.JSONDecodeError as e:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
         filters = {}
 
-        # Agregar filtros solo si se proporcionan datos válidos
+
         if data.get('fecha_inicio'):
             filters['Quotations/DocDate ge'] = f"'{data.get('fecha_inicio')}'"
         if data.get('fecha_fin'):
@@ -117,7 +129,7 @@ class CotizacionesController(View):
         if data.get('cancelled'):
             filters['Quotations/Cancelled eq'] = f"'{data.get('cancelled')}'"
 
-        # Limpiar los filtros vacíos o con valores inválidos
+
         filters = {k: v for k, v in filters.items() if v and v != "''"}
 
         try:
@@ -126,7 +138,7 @@ class CotizacionesController(View):
         except ValueError:
             return JsonResponse({'error': 'Invalid parameters'}, status=400)
 
-        print("Applying filters:", filters)# Verifica los filtros aplicados
+        print("Applying filters:", filters)
         print("-" * 10)  
         print(filters)
         
@@ -135,7 +147,52 @@ class CotizacionesController(View):
             data = client.getData(endpoint='Quotations', top=top, skip=skip, filters=filters)
             return JsonResponse({'data': data}, safe=False)
         except Exception as e:
-            print("Error:", e)  # Verifica el error específico que está ocurriendo
+            print("Error:", e) 
+            return JsonResponse({'error': str(e)}, status=500)
+
+    def actualizarCotizacion(self, request,  docNum):
+        client = APIClient()  
+
+        try:
+            data = client.get_quotations_items('Quotations')
+
+
+            if 'value' in data:
+                quotations = data['value']
+                found_quotation = None
+
+                for quotation in quotations:
+                    if quotation.get('DocNum') == int(docNum):
+                        found_quotation = quotation
+                        break
+
+                if found_quotation:
+
+                    document_lines = found_quotation.get('DocumentLines', [])
+
+
+                    lines_data = []
+                    for line in document_lines:
+                        line_data = {
+                            'LineNum': line.get('LineNum'),
+                            'ItemCode': line.get('ItemCode'),
+                            'ItemDescription': line.get('ItemDescription'),
+                            'ItemCode': line.get('ItemCode'),
+                            'ItemDescription': line.get('ItemDescription'),
+                            'Quantity': line.get('Quantity'),
+                            'Price': line.get('Price'),
+                        }
+                        lines_data.append(line_data)
+
+
+                    return JsonResponse({'DocumentLines': lines_data}, status=200)
+                else:
+                    return JsonResponse({'error': 'No se encontró la cotización con el DocNum especificado'}, status=404)
+
+            else:
+                return JsonResponse({'error': 'No se encontraron datos de cotizaciones'}, status=404)
+
+        except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
 

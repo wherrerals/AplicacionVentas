@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const docNum = getQueryParamInt('docNum'); // Aquí obtenemos el docNum como entero
 
     if (docNum !== null) { // Verificamos que docNum no sea null antes de usarlo
-        fetch(`generar_cotizacion/${docNum}`)
+        fetch(`actualizar_cotizacion/${docNum}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
