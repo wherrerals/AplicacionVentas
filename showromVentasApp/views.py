@@ -314,7 +314,17 @@ def agregar_editar_clientes(request):
         giro = request.POST['giro']
         telefono = request.POST['telefono']
         email = request.POST['email']
-        codigosn = rut[:-2].replace(".","")+'c' #codigoSN rut sin puntos ni digito, concatenada una C
+        
+        rut_original = rut
+
+        # Si hay un guion en el rut, eliminarlo y todo lo que está a la derecha
+        if "-" in rut:
+            rut_sn = rut.split("-")[0]
+        else:
+            rut_sn = rut  # Si no hay guion, usa el rut tal cual
+
+        # Eliminar los puntos y agregar la 'c' al final
+        codigosn = rut_sn.replace(".", "") + 'c'#codigoSN rut sin puntos ni digito, concatenada una C
         
         #Aca se asigan isntancias de los modelos con sus llaves foraneas correpsondientes 
         gruposn1 = GrupoSN.objects.get(codigo=gruposn)
