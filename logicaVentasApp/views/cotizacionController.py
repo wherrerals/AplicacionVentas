@@ -40,24 +40,7 @@ class CotizacionesController(View):
         else:
             return JsonResponse({'error': 'Invalid URL'}, status=404)
     
-    """     
-    def post(self, request):
-        # Implementación del método POST para filtrado de cotizaciones
-        if request.path == '/listado_Cotizaciones_filtrado/':
-            return self.filter_quotations(request)
-        else:
-            # Manejar el caso cuando la ruta no es correcta
-            return JsonResponse({'error': 'Invalid URL'}, status=404)
-    
-    def post(self, request):
-        # Implementación del método POST para crear productos
-        if request.path == '/crear_cotizacion/':
-            return self.crearCotizacion(request)
-        else:
-            # Manejar el caso cuando la ruta no es correcta
-            return JsonResponse({'error': 'Invalid URL'}, status=404) 
-    """
-    
+
     def crearCotizacion(self, request):
         client = APIClient()
         try:
@@ -154,3 +137,23 @@ class CotizacionesController(View):
         except Exception as e:
             print("Error:", e)  # Verifica el error específico que está ocurriendo
             return JsonResponse({'error': str(e)}, status=500)
+
+
+    """     
+    def post(self, request):
+        # Implementación del método POST para filtrado de cotizaciones
+        if request.path == '/listado_Cotizaciones_filtrado/':
+            return self.filter_quotations(request)
+        else:
+            # Manejar el caso cuando la ruta no es correcta
+            return JsonResponse({'error': 'Invalid URL'}, status=404)
+    
+    def post(self, request):
+        # Implementación del método POST para crear productos
+        if request.path == '/crear_cotizacion/':
+            return self.crearCotizacion(request)
+        else:
+            # Manejar el caso cuando la ruta no es correcta
+            return JsonResponse({'error': 'Invalid URL'}, status=404) 
+    """
+    
