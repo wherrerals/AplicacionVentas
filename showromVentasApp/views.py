@@ -71,6 +71,7 @@ def list_quotations(request):
     return render(request, "lista_cotizaciones.html")
 
 @login_required
+
 def quotations(request):
     """
     Renderiza la pagina de cotizaciones y muestra el nombre de usuario.
