@@ -576,7 +576,7 @@
                             </label>
                           </div>
                           <div class="col">
-                            <select class="form-select" id="tipodespacho" value="{{ tipodespacho }}"
+                            <select class="form-select" name="tipodireccion" id="tipodespacho" value="{{ tipodespacho }}"
                               style="font-size: 12px;border-color: rgb(159,168,175);" readonly="">
                               <optgroup label="Tipo">
                                 <option value="12" selected="">Despacho</option>
@@ -617,17 +617,15 @@
 
                         <div class="row">
                           <div class="col-sm-4">
-                            <label class="col-form-label" style="font-size: 13px;">Región
-                            </label>
+                            <label class="col-form-label" style="font-size: 13px;">Región </label>
                           </div>
                           <div class="col">
-                            <select class="form-select" id="region" value="{{ region }}"
-                              style="font-size: 12px;border-color: rgb(159,168,175);">
+                            <select class="form-select" id="region" name='region'value="{{ region }}" style="font-size: 12px;border-color: rgb(159,168,175);">
                               <optgroup label="Región">
-                                <option value="12" selected="">Arica y Parinacota</option>
+                                <option value="15" selected="">Arica y Parinacota</option>
                                 <option value="1">Tarapacá</option>
                                 <option value="2">Antofagasta</option>
-                                <option value="2">Atacama</option>
+                                <option value="3">Atacama</option>
                                 <option value="13" selected="">Metropolitana de Santiago</option>
                               </optgroup>
                             </select>
@@ -653,11 +651,10 @@
                             </label>
                           </div>
                           <div class="col">
-                            <select class="form-select" id="comuna" value="{{ comuna }}"
-                              style="font-size: 12px;border-color: rgb(159,168,175);">
+                            <select class="form-select" name = "comuna" id="comuna" value="{{ comuna }}" style="font-size: 12px;border-color: rgb(159,168,175);">
                               <optgroup label="Comuna">
-                                <option value="12" selected="">Arica</option>
-                                <option value="2" selected="">Las Condes</option>
+                                <option value="12">Arica</option>
+                                <option value="2">Las Condes</option>
                                 <option value="3">Santiago Centro</option>
                                 <option value="4">Vitacura</option>
                               </optgroup>

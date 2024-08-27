@@ -71,7 +71,7 @@ class ContactoManager {
               <label class="col-form-label" style="font-size: 13px;">Celular</label>
             </div>
             <div class="col">
-              <input class="form-control" type="tel" style="font-size: 12px;border-color: rgb(159,168,175);">
+              <input class="form-control" name="celular" type="tel" style="font-size: 12px;border-color: rgb(159,168,175);">
             </div>
           </div>
           <div class="row">

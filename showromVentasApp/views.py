@@ -9,7 +9,7 @@ from django.db import transaction
 from django.http import JsonResponse
 #Modulos Diseñados
 from datosLsApp.models.usuario import User 
-from datosLsApp.models import (Producto, SocioNegocio, Usuario, Region, GrupoSN, TipoSN, TipoCliente, Direccion, Comuna)
+from datosLsApp.models import (Producto, SocioNegocio, Usuario, Region, GrupoSN, TipoSN, TipoCliente, Direccion, Comuna, Contacto)
 from datosLsApp.sl_client import APIClient
 #librerias Python usadas
 import requests
@@ -305,6 +305,8 @@ def mis_datos(request):
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 
 
+from django.db import transaction
+
 @login_required
 def agregar_editar_clientes(request):
     if request.method == "POST":
@@ -317,81 +319,95 @@ def agregar_editar_clientes(request):
         
         rut_original = rut
 
-        # Si hay un guion en el rut, eliminarlo y todo lo que está a la derecha
         if "-" in rut:
             rut_sn = rut.split("-")[0]
         else:
-            rut_sn = rut  # Si no hay guion, usa el rut tal cual
+            rut_sn = rut
 
-        # Eliminar los puntos y agregar la 'c' al final
-        codigosn = rut_sn.replace(".", "") + 'c'#codigoSN rut sin puntos ni digito, concatenada una C
+        codigosn = rut_sn.replace(".", "") + 'c'
         
-        #Aca se asigan isntancias de los modelos con sus llaves foraneas correpsondientes 
         gruposn1 = GrupoSN.objects.get(codigo=gruposn)
         tipocliente = TipoCliente.objects.get(codigo = 'N')
         if gruposn == '100':
             tiposn = TipoSN.objects.get(codigo='C')
         else:
             tiposn = TipoSN.objects.get(codigo='I')
-    
-        if gruposn == '100':
-            nombre = request.POST['nombre']
-            apellido = request.POST['apellido']
-            cliente = SocioNegocio.objects.create(codigoSN = codigosn,
-                                                nombre=nombre,
-                                                apellido =apellido,
-                                                rut=rut, 
-                                                giro=giro, 
-                                                telefono=telefono, 
-                                                email=email,
-                                                grupoSN = gruposn1,
-                                                tipoSN = tiposn,
-                                                tipoCliente = tipocliente 
-                                                )
-            
+        
+        with transaction.atomic():
+            if gruposn == '100':
+                nombre = request.POST['nombre']
+                apellido = request.POST['apellido']
+                cliente = SocioNegocio.objects.create(codigoSN=codigosn,
+                                                      nombre=nombre,
+                                                      apellido=apellido,
+                                                      rut=rut,
+                                                      giro=giro,
+                                                      telefono=telefono,
+                                                      email=email,
+                                                      grupoSN=gruposn1,
+                                                      tipoSN=tiposn,
+                                                      tipoCliente=tipocliente)
+            elif gruposn == '105':
+                razonsocial = request.POST['nombre']
+                cliente = SocioNegocio.objects.create(codigoSN=codigosn,
+                                                      razonSocial=razonsocial,
+                                                      rut=rut,
+                                                      giro=giro,
+                                                      telefono=telefono,
+                                                      email=email,
+                                                      grupoSN=gruposn1,
+                                                      tipoSN=tiposn,
+                                                      tipoCliente=tipocliente)
 
-        elif gruposn == '105':
-            razonsocial = request.POST['nombre']
-            cliente = SocioNegocio.objects.create(codigoSN = codigosn,
-                                                razonSocial = razonsocial,
-                                                rut=rut, 
-                                                giro=giro, 
-                                                telefono=telefono, 
-                                                email=email,
-                                                grupoSN = gruposn1,
-                                                tipoSN = tiposn,
-                                                tipoCliente = tipocliente 
-                                                )
-           
+            # Ahora llamas a agregar_direccion con el cliente recién creado
+            agregar_direccion(request, cliente)
+            agregar_contacto(request, cliente)
+
         return redirect("/")
 
 @login_required
-#desde ambos botones se puede llamar y usar el tipo para ver donde se muestra en "barras (ajax)"
-def agregar_direccion(request):
+def agregar_direccion(request, socio):
     if request.method == "POST":
-        #numrow se define solo cmo 0
         nombredireccion = request.POST['id']
         ciudad = request.POST['cuidad']
         callenumero = request.POST['direccion']
-        #codio impuesto esta defecto iva
-        tipo = request.POST['tipodespacho'] #Ver si cada boton puede implicar una u otra cosa (o ambas)
-        pais = request.POST['pais'] #igual por defecto esta chile
-        region = request.POST['region']
-        comuna = request.POST['comuna']
-    
-        #Inicialiando las intancias correspondientes de las llaves foraneas
-        socio = SocioNegocio.objects.get(codigoSN = '1c') #Hay que crear un socio que su rut sea 1xx
-        fcomuna = Comuna.objects.get(nombre = comuna)
-        fregion = Region.objects.get(nombre = region)
+        tipo = request.POST['tipodireccion']
+        pais = request.POST['pais']
+        region = request.POST.get('region')
+        comuna = request.POST.get('comuna')
 
-        dir = Direccion.objects.create(nombreDireccion=nombredireccion,
-                                       ciudad = ciudad,
-                                       calleNumero = callenumero,
-                                       comuna = fcomuna,
-                                       region = fregion,
-                                       tipoDireccion = tipo,
-                                       SocioNegocio = socio,
-                                       pais = pais) #Se crea, el resto se pasan por defecto
+        fregion = Region.objects.get(numero=region)
+        fcomuna = Comuna.objects.get(codigo=comuna)
+        
+
+        Direccion.objects.create(nombreDireccion=nombredireccion,
+                                 ciudad=ciudad,
+                                 calleNumero=callenumero,
+                                 comuna=fcomuna,
+                                 region=fregion,
+                                 tipoDireccion=tipo,
+                                 SocioNegocio=socio,
+                                 pais=pais)
+    return redirect("/")
+
+@login_required
+def agregar_contacto(request,socio):
+    if request.method == "POST":
+        nombre = request.POST['nombre']
+        apellido = request.POST['apellido']
+        telefono = request.POST['telefono']
+        celular = request.POST.get('celular')
+        email = request.POST['email']
+        
+
+        Contacto.objects.create(nombre=nombre,
+                                apellido=apellido,
+                                telefono=telefono,
+                                celular=celular,
+                                email=email,
+                                SocioNegocio=socio)
+        
+
     return redirect("/")
 
 
