@@ -397,3 +397,50 @@ def list_quotations_2(request):
     return JsonResponse(data, safe=False) """
 
 
+def quotate_items(request, docEntry):
+    client = APIClient()  
+
+    try:
+        data = client.get_quotations_items('Quotations')  # Ajusta según el método de cliente API
+
+        # Verificar si hay datos y procesarlos
+        if 'value' in data:
+            quotations = data['value']
+            found_quotation = None
+
+            # Buscar la cotización con el DocNum especificado
+            for quotation in quotations:
+                if quotation.get('DocEntry') == int(docEntry):  # Convertir docNum a entero si es necesario
+                    found_quotation = quotation
+                    break
+
+            if found_quotation:
+                # Obtener las líneas de documentos (DocumentLines)
+                document_lines = found_quotation.get('DocumentLines', [])
+
+                # Preparar los datos para enviar como respuesta JSON
+                lines_data = []
+                for line in document_lines:
+                    line_data = {
+                        'LineNum': line.get('LineNum'),
+                        'ItemCode': line.get('ItemCode'),
+                        'ItemDescription': line.get('ItemDescription'),
+                        'ItemCode': line.get('ItemCode'),
+                        'ItemCode': line.get('ItemCode'),
+                        'ItemCode': line.get('ItemCode'),
+                        'ItemDescription': line.get('ItemDescription'),
+                        'Quantity': line.get('Quantity'),
+                        'Price': line.get('Price'),
+                    }
+                    lines_data.append(line_data)
+
+                # Retornar respuesta JSON con las líneas de documentos encontradas
+                return JsonResponse({'DocumentLines': lines_data}, status=200)
+            else:
+                return JsonResponse({'error': 'No se encontró la cotización con el DocNum especificado'}, status=404)
+
+        else:
+            return JsonResponse({'error': 'No se encontraron datos de cotizaciones'}, status=404)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

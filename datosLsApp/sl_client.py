@@ -116,21 +116,33 @@ class APIClient:
 
     
     
-    def get_quotations_items(self, endpoint, top=20):
+    def get_quotations_items(self, endpoint, docEntry, top=20, skip=0):
         
-        select = "DocEntry,DocNum,CardName,DocDate,SalesPersonCode,Cancelled,DocTotal,VatSum,DocumentLines"
-        skip=0
+        self.__login()
 
-        headers = {
-            "Prefer": f"odata.maxpagesize={top}"
-        }
+        crossjoin = f"({endpoint},SalesPersons,BusinessPartners/ContactEmployees)"
 
-        queryUrl = f"?$select={select}&$top={top}&$skip={skip}"
-        url = f"{self.base_url}{endpoint}{queryUrl}"
+        expand_fields = ("Quotations($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address, Address2,DocDate,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto)"
+                         ",SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
+                         )
+        
+        filter_condition = f"Quotations/DocEntry eq {docEntry} and Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Quotations/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode"
 
-        response = self.session.get(url, verify=False)
-        response.raise_for_status()
-        return response.json()
+        # Construir la URL con el endpoint y la consulta
+        queryUrl = (
+            f"$crossjoin{crossjoin}?$expand={expand_fields}&$filter={filter_condition}"
+            f"&$top={top}&$skip={skip}"
+        )
+        url = f"{self.base_url}{queryUrl}"
+        print (url)
+        try:
+            response = self.session.get(url, headers={"Prefer": f"odata.maxpagesize={top}"}, verify=False)
+            response.raise_for_status()  # Esto generará una excepción para cualquier código de estado HTTP 4xx/5xx
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error en la solicitud a la API: {e}")
+            raise
+
     
     def get_orders(self, order_number):
         select = "DocEntry,DocNum,FolioNumber,U_ReportPdf,DocObjectCode,DocumentSubType"
@@ -139,6 +151,7 @@ class APIClient:
         response.raise_for_status()
         print(url)
         return response.json()
+    
 
     def post_data(self, endpoint, data=None, headers=None):
         """

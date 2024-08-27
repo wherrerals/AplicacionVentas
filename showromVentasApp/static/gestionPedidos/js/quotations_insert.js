@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', function () {
         return null;
     }
 
-    const docNum = getQueryParamInt('docNum'); // Aquí obtenemos el docNum como entero
+    const docEntry = getQueryParamInt('docEntry'); // Aquí obtenemos el docNum como entero
 
-    if (docNum !== null) { // Verificamos que docNum no sea null antes de usarlo
-        fetch(`actualizar_cotizacion/${docNum}`)
+    if (docEntry !== null) { // Verificamos que docNum no sea null antes de usarlo
+        fetch(`generar_cotizacion/${docEntry}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');

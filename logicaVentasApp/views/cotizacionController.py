@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from datosLsApp.sl_client import APIClient
+import requests
 import re
 import json
 
@@ -13,7 +14,40 @@ import json
 @method_decorator(require_http_methods(["GET", "POST"]), name="dispatch")
 class CotizacionesController(View):
     
-    def get(self, request):
+    def get (self, request, *args, **kwargs):
+        docEntry = kwargs.get('DocEntry')
+        if docEntry:
+            return self.quotate_items(request, docEntry)
+        else:
+            return self.listarCotizaciones(request)
+
+    def post(self, request):
+
+        route_map = {
+            '/listado_Cotizaciones_filtrado/': self.filter_quotations,
+            '/crear_cotizacion/': self.crearCotizacion,
+        }
+
+        handler = route_map.get(request.path)
+        if handler:
+            return handler(request)
+
+
+    """         
+    dynamic_routes = [
+            (r'^/obtener_detalles_cotizacion/\d+/$', self.obtenerDetallesCotizacion),
+        ]
+
+        for pattern, view_method in dynamic_routes:
+            match = re.match(pattern, request.path)
+            if match:
+                doc_num = match.group(1)
+                return view_method(request, doc_num)
+
+        return JsonResponse({'error': 'Invalid URL'}, status=404) 
+    """
+    
+    def listarCotizaciones(self, request):
         client = APIClient()
 
         top = request.GET.get('top', 20)
@@ -28,31 +62,6 @@ class CotizacionesController(View):
         data = client.getData(endpoint='Quotations', top=top, skip=skip)
         return JsonResponse(data, safe=False)
 
-    def post(self, request):
-
-        route_map = {
-            '/listado_Cotizaciones_filtrado/': self.filter_quotations,
-            '/crear_cotizacion/': self.crearCotizacion,
-        }
-
-        handler = route_map.get(request.path)
-
-        if not handler:
-
-            dynamic_routes = [
-                (r'^/actualizar_cotizacion/\d+/$', self.obtenerDetallesCotizacion),
-            ]
-
-            for pattern, view_method in dynamic_routes:
-                match = re.match(pattern, request.path)
-                if match:
-                    doc_num = match.group(1)
-                    return view_method(request, doc_num)
-
-            return JsonResponse({'error': 'Invalid URL'}, status=404)
-
-        return handler(request)
-    
 
     def crearCotizacion(self, request):
         client = APIClient()
@@ -151,21 +160,16 @@ class CotizacionesController(View):
             return JsonResponse({'error': str(e)}, status=500)
 
 
-    def obtenerDetallesCotizacion(self, request, docNum):
+
+    def obtenerDetallesCotizacion(self, request, docEntry):
         client = APIClient()
 
         try:
-            # Validar que docNum sea un número
-            try:
-                doc_num_int = int(docNum)
-            except ValueError:
-                return JsonResponse({'error': 'DocNum debe ser un número válido'}, status=400)
-
-            # Obtener cotizaciones con manejo de paginación
+            doc_num_int = int(docEntry)
             all_quotations = []
             page = 1
             while True:
-                data = client.get_quotations_items('Quotations', page=page)
+                data = client.get_quotations_items('Quotations', docEntry, top=20, skip=(page - 1) * 20)
                 if 'value' not in data or not data['value']:
                     break
                 all_quotations.extend(data['value'])
@@ -173,13 +177,11 @@ class CotizacionesController(View):
                     break
                 page += 1
 
-            # Buscar la cotización específica
-            found_quotation = next((q for q in all_quotations if q.get('DocNum') == doc_num_int), None)
+            found_quotation = next((q for q in all_quotations if q.get('docEntry') == doc_num_int), None)
 
             if not found_quotation:
                 return JsonResponse({'error': 'No se encontró la cotización con el DocNum especificado'}, status=404)
 
-            # Extraer y procesar las líneas del documento
             document_lines = found_quotation.get('DocumentLines', [])
             lines_data = [
                 {
@@ -194,10 +196,8 @@ class CotizacionesController(View):
 
             return JsonResponse({'DocumentLines': lines_data}, status=200)
 
-        except APIClient.ConnectionError as e:
-            return JsonResponse({'error': f'Error de conexión con la API: {str(e)}'}, status=503)
-        except APIClient.AuthenticationError as e:
-            return JsonResponse({'error': f'Error de autenticación con la API: {str(e)}'}, status=401)
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'error': f'Error en la solicitud: {str(e)}'}, status=503)
         except Exception as e:
             return JsonResponse({'error': f'Error inesperado: {str(e)}'}, status=500)
 
@@ -219,3 +219,50 @@ class CotizacionesController(View):
             return JsonResponse({'error': 'Invalid URL'}, status=404) 
     """
     
+    def quotate_items(self, request, docNum):
+        client = APIClient()  
+
+        try:
+            data = client.get_quotations_items('Quotations')  # Ajusta según el método de cliente API
+
+            # Verificar si hay datos y procesarlos
+            if 'value' in data:
+                quotations = data['value']
+                found_quotation = None
+
+                # Buscar la cotización con el DocNum especificado
+                for quotation in quotations:
+                    if quotation.get('DocNum') == int(docNum):  # Convertir docNum a entero si es necesario
+                        found_quotation = quotation
+                        break
+
+                if found_quotation:
+                    # Obtener las líneas de documentos (DocumentLines)
+                    document_lines = found_quotation.get('DocumentLines', [])
+
+                    # Preparar los datos para enviar como respuesta JSON
+                    lines_data = []
+                    for line in document_lines:
+                        line_data = {
+                            'LineNum': line.get('LineNum'),
+                            'ItemCode': line.get('ItemCode'),
+                            'ItemDescription': line.get('ItemDescription'),
+                            'ItemCode': line.get('ItemCode'),
+                            'ItemCode': line.get('ItemCode'),
+                            'ItemCode': line.get('ItemCode'),
+                            'ItemDescription': line.get('ItemDescription'),
+                            'Quantity': line.get('Quantity'),
+                            'Price': line.get('Price'),
+                        }
+                        lines_data.append(line_data)
+
+                    # Retornar respuesta JSON con las líneas de documentos encontradas
+                    return JsonResponse({'DocumentLines': lines_data}, status=200)
+                else:
+                    return JsonResponse({'error': 'No se encontró la cotización con el DocNum especificado'}, status=404)
+
+            else:
+                return JsonResponse({'error': 'No se encontraron datos de cotizaciones'}, status=404)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)

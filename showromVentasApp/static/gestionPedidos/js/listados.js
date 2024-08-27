@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><a href="generar_cotizacion?docNum=${quotation.DocNum}" data-doc-entry="${entry.DocEntry}" data-document-lines="[]">${quotation.DocNum}</a></td>
+                <td><a href="generar_cotizacion?docNum=${quotation.DocEntry}" data-doc-entry="${quotation.DocNum}" data-document-lines="[]">${quotation.DocEntry}</a></td>
                 <td><a href="cliente.html">${quotation.CardName}</a></td>
                 <td>${salesPerson.SalesEmployeeName || ''}</td>
                 <td>${quotation.DocDate}</td>

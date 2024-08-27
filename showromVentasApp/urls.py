@@ -20,5 +20,7 @@ urlpatterns = [
     path('mis_datos/', views.mis_datos, name='mis_datos'),
     path('agregar_direccion/',views.agregar_direccion,name='agregar_direccion'),
     #path('ordenes/', views.cambio_ordenes, name='ordenes'),
+    path('generar_cotizacion/<str:docEntry>/', quotate_items, name='generar_cotizacion'),
+
 ]
 
