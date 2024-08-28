@@ -16,7 +16,7 @@ class Direccion(models.Model):
     calleNumero = models.CharField(max_length=50) #corresponde a direccio en direccion
     codigoImpuesto = models.CharField(max_length=100, default='iva')
     #tipoDireccion = models.ManyToManyField(TipoDireccion, related_name='directorios')
-    tipoDireccion = models.CharField(max_length=10)
+    tipoDireccion = models.CharField(max_length=10, null = True)
     pais = models.CharField(max_length=10, default ='Chile')
     SocioNegocio = models.ForeignKey(SocioNegocio,on_delete=models.CASCADE, default=1) 
     comuna = models.ForeignKey(Comuna,on_delete=models.CASCADE, default=1)
