@@ -306,66 +306,6 @@ def mis_datos(request):
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 
 
-from django.db import transaction
-
-@login_required
-def agregar_editar_clientes(request):
-    if request.method == "POST":
-        
-        gruposn = request.POST.get('grupoSN')
-        rut = request.POST['rut']
-        giro = request.POST['giro']
-        telefono = request.POST['telefono']
-        email = request.POST['email']
-        
-        rut_original = rut
-
-        if "-" in rut:
-            rut_sn = rut.split("-")[0]
-        else:
-            rut_sn = rut
-
-        codigosn = rut_sn.replace(".", "") + 'c'
-        
-        gruposn1 = GrupoSN.objects.get(codigo=gruposn)
-        tipocliente = TipoCliente.objects.get(codigo = 'N')
-        if gruposn == '100':
-            tiposn = TipoSN.objects.get(codigo='C')
-        else:
-            tiposn = TipoSN.objects.get(codigo='I')
-        
-        with transaction.atomic():
-            if gruposn == '100':
-                nombre = request.POST['nombre']
-                apellido = request.POST['apellido']
-                cliente = SocioNegocio.objects.create(codigoSN=codigosn,
-                                                      nombre=nombre,
-                                                      apellido=apellido,
-                                                      rut=rut,
-                                                      giro=giro,
-                                                      telefono=telefono,
-                                                      email=email,
-                                                      grupoSN=gruposn1,
-                                                      tipoSN=tiposn,
-                                                      tipoCliente=tipocliente)
-            elif gruposn == '105':
-                razonsocial = request.POST['nombre']
-                cliente = SocioNegocio.objects.create(codigoSN=codigosn,
-                                                      razonSocial=razonsocial,
-                                                      rut=rut,
-                                                      giro=giro,
-                                                      telefono=telefono,
-                                                      email=email,
-                                                      grupoSN=gruposn1,
-                                                      tipoSN=tiposn,
-                                                      tipoCliente=tipocliente)
-
-            # Ahora llamas a agregar_direccion con el cliente recién creado
-            agregar_direccion(request, cliente)
-            agregar_contacto(request, cliente)
-
-        return redirect("/")
-
 @login_required
 def agregar_direccion(request, socio):
     if request.method == "POST":

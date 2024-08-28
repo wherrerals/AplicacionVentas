@@ -6,6 +6,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from datosLsApp.models import (SocioNegocio, GrupoSN, TipoSN, TipoCliente, Direccion)
+from django.db import transaction
+from showromVentasApp.views import agregar_direccion, agregar_contacto
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -28,7 +30,8 @@ class ClienteController(View):
         else:
             return JsonResponse({'error': 'Invalid URL'}, status=404)
         
-    def agregar_editar_clientes(self, request):
+    @login_required
+    def agregar_editar_clientes(request):
         if request.method == "POST":
             
             gruposn = request.POST.get('grupoSN')
@@ -36,58 +39,54 @@ class ClienteController(View):
             giro = request.POST['giro']
             telefono = request.POST['telefono']
             email = request.POST['email']
-
             
             rut_original = rut
 
-            # Si hay un guion en el rut, eliminarlo y todo lo que está a la derecha
             if "-" in rut:
                 rut_sn = rut.split("-")[0]
             else:
-                rut_sn = rut  # Si no hay guion, usa el rut tal cual
+                rut_sn = rut
 
-            # Eliminar los puntos y agregar la 'c' al final
-            codigosn = rut_sn.replace(".", "") + 'c'#codigoSN rut sin puntos ni digito, concatenada una C
+            codigosn = rut_sn.replace(".", "") + 'c'
             
-            #Aca se asigan isntancias de los modelos con sus llaves foraneas correpsondientes 
             gruposn1 = GrupoSN.objects.get(codigo=gruposn)
             tipocliente = TipoCliente.objects.get(codigo = 'N')
             if gruposn == '100':
                 tiposn = TipoSN.objects.get(codigo='C')
             else:
                 tiposn = TipoSN.objects.get(codigo='I')
-        
-            if gruposn == '100':
-                nombre = request.POST['nombre']
-                apellido = request.POST['apellido']
-                cliente = SocioNegocio.objects.create(codigoSN = codigosn,
-                                                    nombre=nombre,
-                                                    apellido =apellido,
-                                                    rut=rut, 
-                                                    giro=giro, 
-                                                    telefono=telefono, 
-                                                    email=email,
-                                                    grupoSN = gruposn1,
-                                                    tipoSN = tiposn,
-                                                    tipoCliente = tipocliente 
-                                                    )
-                
-
-            elif gruposn == '105':
-                razonsocial = request.POST['nombre']
-                cliente = SocioNegocio.objects.create(codigoSN = codigosn,
-                                                    razonSocial = razonsocial,
-                                                    rut=rut, 
-                                                    giro=giro, 
-                                                    telefono=telefono, 
-                                                    email=email,
-                                                    grupoSN = gruposn1,
-                                                    tipoSN = tiposn,
-                                                    tipoCliente = tipocliente 
-                                                    )
             
-            #return redirect(request.META.get('HTTP_REFERER', 'generar_cotizacion'))
-            return HttpResponse("Cliente creado exitosamente")
+            with transaction.atomic():
+                if gruposn == '100':
+                    nombre = request.POST['nombre']
+                    apellido = request.POST['apellido']
+                    cliente = SocioNegocio.objects.create(codigoSN=codigosn,
+                                                        nombre=nombre,
+                                                        apellido=apellido,
+                                                        rut=rut,
+                                                        giro=giro,
+                                                        telefono=telefono,
+                                                        email=email,
+                                                        grupoSN=gruposn1,
+                                                        tipoSN=tiposn,
+                                                        tipoCliente=tipocliente)
+                elif gruposn == '105':
+                    razonsocial = request.POST['nombre']
+                    cliente = SocioNegocio.objects.create(codigoSN=codigosn,
+                                                        razonSocial=razonsocial,
+                                                        rut=rut,
+                                                        giro=giro,
+                                                        telefono=telefono,
+                                                        email=email,
+                                                        grupoSN=gruposn1,
+                                                        tipoSN=tiposn,
+                                                        tipoCliente=tipocliente)
+
+                # Ahora llamas a agregar_direccion con el cliente recién creado
+                agregar_direccion(request, cliente)
+                agregar_contacto(request, cliente)
+
+            return redirect("/")
         
     def busquedaClientes(self, request):
         if 'numero' in request.GET:
