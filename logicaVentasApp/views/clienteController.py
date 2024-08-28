@@ -19,6 +19,19 @@ class ClienteController(View):
         # Definir un diccionario de rutas a métodos
         route_map = {
             '/agregar_editar_clientes/': self.agregar_editar_clientes,
+        }
+
+        # Buscar el método basado en la ruta
+        handler = route_map.get(request.path)
+
+        if handler:
+            return handler(request)
+        else:
+            return JsonResponse({'error': 'Invalid URL'}, status=404)
+        
+    def get(self, request):
+        # Definir un diccionario de rutas a métodos
+        route_map = {
             '/buscarc/': self.busquedaClientes,
         }
 
@@ -30,8 +43,7 @@ class ClienteController(View):
         else:
             return JsonResponse({'error': 'Invalid URL'}, status=404)
         
-    @login_required
-    def agregar_editar_clientes(request):
+    def agregar_editar_clientes(self, request):
         if request.method == "POST":
             
             gruposn = request.POST.get('grupoSN')

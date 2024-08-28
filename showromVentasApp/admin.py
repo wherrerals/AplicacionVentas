@@ -1,5 +1,5 @@
 from django.contrib import admin
-from datosLsApp.models import (CondicionPago, Documento, TipoDocTributario, Sucursal, TipoVenta, Vendedor, Producto, Bodega, Inventario, Item, SocioNegocio, Usuario, Contacto, Direccion)
+from datosLsApp.models import (CondicionPago, Documento, TipoDocTributario, Sucursal, TipoVenta, Vendedor, Producto, Bodega, Inventario, Item, SocioNegocio, Usuario, Contacto, Direccion, Comuna)
 
 #Modicaciones en administrador 
 admin.site.site_header = 'Led Studio'
@@ -64,6 +64,7 @@ admin.site.register(SocioNegocio,SocioNegocioper)
 admin.site.register(Usuario,Usuarioper)
 admin.site.register(Contacto, Contactoper)
 admin.site.register(Direccion,Direccionesper)
+admin.site.register(Comuna)
 
 
 
