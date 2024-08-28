@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function() {
             cardNAme: document.querySelector('[name="cardNAme"]').value,
            // salesEmployeeName: document.querySelector('[name="salesEmployeeName"]').value,
            // DocumentStatus: document.querySelector('[name="DocumentStatus"]').value,
-            docTotal: document.querySelector('[name="docTotal"]').value,
+           // docTotal: document.querySelector('[name="docTotal"]').value,
            // cancelled: document.querySelector('[name="cancelled"]').value
         };
     };

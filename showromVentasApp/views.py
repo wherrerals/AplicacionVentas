@@ -534,7 +534,7 @@ def quotate_items(request, docNum):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-@require_http_methods(["GET"])
+""" @require_http_methods(["GET"])
 def list_quotations_2(request):
     client = APIClient()
 
@@ -551,7 +551,7 @@ def list_quotations_2(request):
         return JsonResponse({'error': 'Invalid parameters'}, status=400)
 
     data = client.get_quotations(top=top, skip=skip)
-    return JsonResponse(data, safe=False)
+    return JsonResponse(data, safe=False) """
 
 @csrf_exempt
 @require_POST

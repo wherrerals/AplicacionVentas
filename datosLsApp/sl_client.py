@@ -1,5 +1,9 @@
 import requests
+import json
 from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 class APIClient:
     """
@@ -127,50 +131,7 @@ class APIClient:
         response = self.session.get(url, verify=False)
         response.raise_for_status()
         return response.json()
-
-    def post_data2(self, endpoint, data=None, headers=None):
-        
-        url = f"{self.base_url}{endpoint}"
-        try:
-            response = self.session.post(url, json=data, headers=headers, verify=False)
-            response.raise_for_status()
-            return response.json()
-        except requests.exceptions.HTTPError as http_err:
-            print(f"HTTP error occurred: {http_err}")
-        except requests.exceptions.ConnectionError as conn_err:
-            print(f"Connection error occurred: {conn_err}")
-        except requests.exceptions.Timeout as timeout_err:
-            print(f"Timeout error occurred: {timeout_err}")
-        except requests.exceptions.RequestException as req_err:
-            print(f"An error occurred: {req_err}")
-
-    def post_data(self, endpoint, data=None, headers=None):
-        url = f"{self.base_url}{endpoint}"
-        try:
-            response = self.session.post(url, json=data, headers=headers, verify=True)
-            response.raise_for_status()
-            return response.json()
-        except requests.exceptions.HTTPError as http_err:
-            error_msg = f"HTTP error occurred: {http_err}"
-            print(error_msg)
-            return {'error': error_msg}
-        except requests.exceptions.ConnectionError as conn_err:
-            error_msg = f"Connection error occurred: {conn_err}"
-            print(error_msg)
-            return {'error': error_msg}
-        except requests.exceptions.Timeout as timeout_err:
-            error_msg = f"Timeout error occurred: {timeout_err}"
-            print(error_msg)
-            return {'error': error_msg}
-        except requests.exceptions.RequestException as req_err:
-            error_msg = f"An error occurred: {req_err}"
-            print(error_msg)
-            return {'error': error_msg}
-        except ValueError as json_err:
-            error_msg = f"Error parsing JSON: {json_err}"
-            print(error_msg)
-            return {'error': error_msg}
-
+    
     def get_orders(self, order_number):
         select = "DocEntry,DocNum,FolioNumber,U_ReportPdf,DocObjectCode,DocumentSubType"
         url = f"{self.base_url}Invoices?$select={select}&$filter=U_LED_NROPSH eq '{order_number}'"
@@ -178,4 +139,59 @@ class APIClient:
         response.raise_for_status()
         print(url)
         return response.json()
+
+    def post_data(self, endpoint, data=None, headers=None):
+        """
+        permite la creacion de cotizaciones en la base de datos de SAP
+
+        Parámetros:
+            endpoint : str, opcional
+                El endpoint donde se creara la cotizacion (por defecto es '').
+            data : dict, opcional
+                Un diccionario de pares clave-valor para crear la cotizacion.
+            headers : dict, opcional
+                Un diccionario de pares clave-valor para los encabezados de la solicitud.
+        RETURNS:
+            si la creacion de la cotizacion es exitosa retorna un diccionario con la respuesta de la API en formato JSON.
+            si la creacion de la cotizacion no es exitosa retorna un diccionario con un mensaje de error.
+            si la conexion con la API falla retorna un diccionario con un mensaje de error.
+            si el tiempo de espera de la API se agota retorna un diccionario con un mensaje de error.
+            si la respuesta de la API contiene un error de estado retorna un diccionario con un mensaje de error.
+            si se produce un error al analizar JSON retorna un diccionario con un mensaje de error.
+        """
+        self.__login()
+        url = f"{self.base_url}{endpoint}"
+        try:
+
+                    # Imprimir el JSON y los headers para ver qué se está enviando
+            print(f"URL: {url}")
+            print(f"Data being sent: {json.dumps(data, indent=4)}")
+            print(f"Headers: {headers}")
+
+            response = self.session.post(url, json=data, headers=headers, verify=False)
+            print(response)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.HTTPError as http_err:
+            error_msg = f"HTTP error occurred2: {http_err}"
+            logger.error(error_msg)
+            return {'error': error_msg}
+        except requests.exceptions.ConnectionError as conn_err:
+            error_msg = f"Connection error occurred3: {conn_err}"
+            print(error_msg)
+            return {'error': error_msg}
+        except requests.exceptions.Timeout as timeout_err:
+            error_msg = f"Timeout error occurred4: {timeout_err}"
+            print(error_msg)
+            return {'error': error_msg}
+        except requests.exceptions.RequestException as req_err:
+            error_msg = f"An error occurred5: {req_err}"
+            print(error_msg)
+            return {'error': error_msg}
+        except ValueError as json_err:
+            error_msg = f"Error parsing JSON6: {json_err}"
+            print(error_msg)
+            return {'error': error_msg}
+
+
 
