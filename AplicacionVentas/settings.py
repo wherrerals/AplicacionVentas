@@ -96,7 +96,7 @@ COMPANY_DB = "TEST_LED_PROD"
 API_USERNAME = 'manager'
 API_PASSWORD = '1245LED98'
 
-#Base Vtex API
+# Base Vtex API
 VTEX_APP_KEY = 'vtexappkey-ledstudiocl-AJHPCL'
 VTEX_APP_TOKEN = 'WTEPUGSXUOIOMSAVTEIIJOCBMXTUZWTESEFDQHZSLHJZMJXAVHPGOPDKMUVMAPDBZXXDGDFJFNXCMFDNICGGSOCGFNKEHGSEWMEYRLHNCISFSILPJUYXMGKLZUXDKJLB'
 VTEX_BASE_URL = 'https://ledstudiocl.myvtex.com/api/'
@@ -138,7 +138,7 @@ USE_TZ = True
 
 
 
-LOGIN_REDIRECT_URL = '/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/showromVentasApp/templates/login'
+LOGIN_REDIRECT_URL = '/'
 #LOGIN_REDIRECT_URL = '/Users/Cuervo/Documents/AplicacionVentas/showromVentasApp/templates/login'
 
 
