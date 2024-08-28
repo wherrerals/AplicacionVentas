@@ -53,9 +53,9 @@ ROOT_URLCONF = 'AplicacionVentas.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        #'DIRS': ['/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
+        'DIRS': ['/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
         #'DIRS': ['/Users/Cuervo/Documents/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
-        'DIRS': ['/Users/nicor/Universidad/Practica/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
+        #'DIRS': ['/Users/nicor/Universidad/Practica/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
         
         
         'APP_DIRS': True,
@@ -81,9 +81,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
         'USER':'root',
-        #'PASSWORD':'Ea7hava5*', #led_studio
+        'PASSWORD':'Ea7hava5*', #led_studio
         #'PASSWORD':'Ea7hava5}', #home
-        'PASSWORD':'qwerty', #nicols
+        #'PASSWORD':'qwerty', #nicols
         'HOST':'localhost',
         'PORT':'3306',
     }
