@@ -64,14 +64,16 @@ class DireccionManager {
               </select>
             </div>
           </div>
+
           <div class="row">
             <div class="col-sm-4">
-              <label class="col-form-label" style="font-size: 13px;">ID</label>
+              <label class="col-form-label" style="font-size: 13px;">Nombre Dirección</label>
             </div>
             <div class="col">
-              <input class="form-control" type="text" name="nombreDireccion" style="border-color: rgb(159,168,175);font-size: 12px;">
+              <input class="form-control" type="text" name="nombre_direccion" id="nombre_direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
             </div>
           </div>
+
           <div class="row">
             <div class="col-sm-4">
               <label class="col-form-label" style="font-size: 13px;">País</label>
@@ -100,14 +102,16 @@ class DireccionManager {
               </select>
             </div>
           </div>
+
           <div class="row">
             <div class="col-sm-4">
               <label class="col-form-label" style="font-size: 13px;">Ciudad</label>
             </div>
             <div class="col">
-              <input class="form-control" type="text" name="pais" style="border-color: rgb(159,168,175);font-size: 12px;">
+              <input class="form-control" type="text" name="ciudad" id="ciudad" style="border-color: rgb(159,168,175);font-size: 12px;">
             </div>
           </div>
+
           <div class="row">
             <div class="col-sm-4">
               <label class="col-form-label" style="font-size: 13px;">Comuna</label>
@@ -123,14 +127,16 @@ class DireccionManager {
               </select>
             </div>
           </div>
+
           <div class="row">
             <div class="col-sm-4">
               <label class="col-form-label" style="font-size: 13px;">Dirección</label>
             </div>
             <div class="col">
-              <input class="form-control" type="text" name="pais" style="border-color: rgb(159,168,175);font-size: 12px;">
+              <input class="form-control" type="text" name="direccion" id="direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
             </div>
           </div>
+
           <div class="row">
             <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
           </div>

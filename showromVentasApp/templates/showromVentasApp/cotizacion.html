@@ -580,7 +580,7 @@
                               style="font-size: 12px;border-color: rgb(159,168,175);" readonly="">
                               <optgroup label="Tipo">
                                 <option value="12" selected="">Despacho</option>
-                                <option value="12" selected="">Facturacion</option>
+                                <option value="13" selected="">Facturacion</option>
                               </optgroup>
                             </select>
                           </div>
@@ -669,9 +669,9 @@
                             </label>
                           </div>
                           <div class="col">
-                            <input class="form-control" type="text" name="direccion" id="direccion"
-                              value="{{ direccion }}" style="border-color: rgb(159,168,175);font-size: 12px;">
-                          </div>
+                            <input class="form-control" type="text" name="direccion1" id="direccion"   
+                            value="{{ direccion }}" style="border-color: rgb(159,168,175);font-size: 12px;"> <!-- Hay que ver pq name-direccion genera problema y el resto no-->
+                          </div> 
                         </div>
 
                         <div class="row">

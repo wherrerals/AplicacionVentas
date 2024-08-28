@@ -86,8 +86,8 @@ function actualizarDirecciones(direcciones, selectId, tipoDireccion) {
         direccionesFiltradas.forEach(function(direccion) {
             let option = $('<option></option>');
             option.val(direccion.id); //Ver este valor que se quiere usar como id unico
-            option.text(direccion.region);
-            select.append(option);
+            option.text(direccion.nombreDireccion + ' - ' + direccion.ciudad + ', ' + direccion.comuna);
+            select.append(option); 
         });
     } else {
         // Si no hay direcciones disponibles después del filtro, agregar una opción indicando esto

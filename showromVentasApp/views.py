@@ -309,18 +309,23 @@ def mis_datos(request):
 @login_required
 def agregar_direccion(request, socio):
     if request.method == "POST":
-        nombredireccion = request.POST['id']
-        ciudad = request.POST['cuidad']
-        callenumero = request.POST['direccion']
+        print(request.POST) 
+        nombredireccion = request.POST.get('nombre_direccion')
+        ciudad = request.POST.get('ciudad')
+        callenumero = request.POST.get('direccion')
         tipo = request.POST['tipodireccion']
         pais = request.POST['pais']
         region = request.POST.get('region')
         comuna = request.POST.get('comuna')
+        
+        print(f"nombredireccion: {nombredireccion}")
+        print(f"ciudad: {ciudad}")
+        print(f"calle: {callenumero}")
+        print(f"tipo: {tipo}")
 
         fregion = Region.objects.get(numero=region)
         fcomuna = Comuna.objects.get(codigo=comuna)
         
-
         Direccion.objects.create(nombreDireccion=nombredireccion,
                                  ciudad=ciudad,
                                  calleNumero=callenumero,
@@ -330,6 +335,7 @@ def agregar_direccion(request, socio):
                                  SocioNegocio=socio,
                                  pais=pais)
     return redirect("/")
+
 
 @login_required
 def agregar_contacto(request,socio):
