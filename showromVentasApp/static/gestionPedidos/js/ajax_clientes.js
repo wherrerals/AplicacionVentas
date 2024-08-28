@@ -17,11 +17,12 @@ $(document).ready(function(){
                             clientesElemento.addClass('suggestion-item');
                             clientesElemento.attr('data-nombre', resultadosClientes.nombre);
                             clientesElemento.attr('data-apellido', resultadosClientes.apellido);
+                            clientesElemento.attr('data-rut', resultadosClientes.rut);
                             clientesElemento.text(resultadosClientes.nombre + ' ' + resultadosClientes.apellido);
                             console.log(clientesElemento);
 
                             $('#resultadosClientes').append(clientesElemento);
-                            console.log("Se agregó un elemento <option> al select #resultadosClientes.");
+                            console.log("Se agregó un elemento <option> al select #resultadosClientes: " + resultadosClientes.nombre + ' ' + resultadosClientes.apellido + ' ' + numero);
                         });
 
                     } else {
