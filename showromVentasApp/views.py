@@ -306,66 +306,6 @@ def mis_datos(request):
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 
 
-from django.db import transaction
-
-@login_required
-def agregar_editar_clientes(request):
-    if request.method == "POST":
-        
-        gruposn = request.POST.get('grupoSN')
-        rut = request.POST['rut']
-        giro = request.POST['giro']
-        telefono = request.POST['telefono']
-        email = request.POST['email']
-        
-        rut_original = rut
-
-        if "-" in rut:
-            rut_sn = rut.split("-")[0]
-        else:
-            rut_sn = rut
-
-        codigosn = rut_sn.replace(".", "") + 'c'
-        
-        gruposn1 = GrupoSN.objects.get(codigo=gruposn)
-        tipocliente = TipoCliente.objects.get(codigo = 'N')
-        if gruposn == '100':
-            tiposn = TipoSN.objects.get(codigo='C')
-        else:
-            tiposn = TipoSN.objects.get(codigo='I')
-        
-        with transaction.atomic():
-            if gruposn == '100':
-                nombre = request.POST['nombre']
-                apellido = request.POST['apellido']
-                cliente = SocioNegocio.objects.create(codigoSN=codigosn,
-                                                      nombre=nombre,
-                                                      apellido=apellido,
-                                                      rut=rut,
-                                                      giro=giro,
-                                                      telefono=telefono,
-                                                      email=email,
-                                                      grupoSN=gruposn1,
-                                                      tipoSN=tiposn,
-                                                      tipoCliente=tipocliente)
-            elif gruposn == '105':
-                razonsocial = request.POST['nombre']
-                cliente = SocioNegocio.objects.create(codigoSN=codigosn,
-                                                      razonSocial=razonsocial,
-                                                      rut=rut,
-                                                      giro=giro,
-                                                      telefono=telefono,
-                                                      email=email,
-                                                      grupoSN=gruposn1,
-                                                      tipoSN=tiposn,
-                                                      tipoCliente=tipocliente)
-
-            # Ahora llamas a agregar_direccion con el cliente recién creado
-            agregar_direccion(request, cliente)
-            agregar_contacto(request, cliente)
-
-        return redirect("/")
-
 @login_required
 def agregar_direccion(request, socio):
     if request.method == "POST":
@@ -519,41 +459,3 @@ def quotate_items(request, docEntry):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     
-def busquedaClientes(request):
-    if 'numero' in request.GET:
-        numero = request.GET.get('numero')
-        resultados_clientes = SocioNegocio.objects.filter(rut__icontains=numero)
-        resultados_formateados = []
-
-        for socio in resultados_clientes:
-            direcciones = Direccion.objects.filter(SocioNegocio=socio)
-            direcciones_formateadas = [{
-                'rowNum': direccion.rowNum,
-                'nombreDireccion': direccion.nombreDireccion,
-                'ciudad': direccion.ciudad,
-                'calleNumero': direccion.calleNumero,
-                'codigoImpuesto': direccion.codigoImpuesto,
-                'tipoDireccion': direccion.tipoDireccion,
-                'pais': direccion.pais,
-                'comuna': direccion.comuna.nombre,
-                'region': direccion.region.nombre
-            } for direccion in direcciones]
-
-            resultados_formateados.append({
-                'nombre': socio.nombre,
-                'apellido': socio.apellido,
-                'razonSocial': socio.razonSocial,
-                'rut': socio.rut,
-                'email': socio.email,
-                'telefono': socio.telefono,
-                'giro': socio.giro,
-                'condicionPago': socio.condicionPago,
-                'plazoReclamaciones': socio.plazoReclamaciones,
-                'clienteExportacion': socio.clienteExportacion,
-                'vendedor': socio.vendedor,
-                'direcciones': direcciones_formateadas
-            })
-        
-        return JsonResponse({'resultadosClientes': resultados_formateados})
-    else:
-        return JsonResponse({'error': 'No se proporcionó un número válido'})  

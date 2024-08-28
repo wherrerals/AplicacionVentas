@@ -17,7 +17,7 @@ urlpatterns = [
     path('registrarCuenta/', views.registrarCuenta),
     #path('funciones/<str:motor>/<str:accion>/<str:param>/', Funciones.as_view(), name="funciones"),
     path('buscar/', views.busquedaProductos, name='busquedaProductos'),
-    path('buscarc/', views.busquedaClientes, name='busquedaClientes'),
+    #path('buscarc/', views.busquedaClientes, name='busquedaClientes'),
     path('mis_datos/', views.mis_datos, name='mis_datos'),
     path('agregar_direccion/',views.agregar_direccion,name='agregar_direccion'),
     #path('ordenes/', views.cambio_ordenes, name='ordenes'),
