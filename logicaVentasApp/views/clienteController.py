@@ -96,7 +96,7 @@ class ClienteController(View):
 
                 # Ahora llamas a agregar_direccion con el cliente recién creado
                 agregar_direccion(request, cliente)
-                agregar_contacto(request, cliente)
+                #agregar_contacto(request, cliente)
 
             return redirect("/")
         
