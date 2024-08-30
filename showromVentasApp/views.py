@@ -388,7 +388,7 @@ def validar_contrasena(password):
     if len(password) < 8:
         mensajes.append("Su contraseña debe tener al menos 8 caracteres.")
 
-    return mensajes  
+    return mensajes
 
 
 """ @require_http_methods(["GET"])
@@ -446,6 +446,7 @@ def quotate_items(request, docEntry):
                         'Quantity': line.get('Quantity'),
                         'Price': line.get('Price'),
                     }
+                    
                     lines_data.append(line_data)
 
                 # Retornar respuesta JSON con las líneas de documentos encontradas

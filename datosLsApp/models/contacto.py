@@ -16,7 +16,7 @@ class Contacto(models.Model):
     email = models.EmailField(null = False)
     #tipotelefono = models.ForeignKey(TipoTelefono, on_delete=models.CASCADE, default=1)
     #tipoDireccion = models.ManyToManyField(SocioNegocio, related_name='SociosNegocio')
-    SocioNegocio = models.ManyToManyField('SocioNegocio', blank=True)
+    #SocioNegocio = models.ManyToManyField('SocioNegocio', blank=True)
 
     def __str__(self):
         return f"{self.nombreCompleto}"
