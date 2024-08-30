@@ -319,7 +319,7 @@ def agregar_direccion(request, socio):
         comuna = request.POST.get('comuna')
         
         print(f"nombredireccion: {nombredireccion}")
-        print(f"ciudad: {ciudad}")
+        print(f"ciudad: {ciudad}") 
         print(f"calle: {callenumero}")
         print(f"tipo: {tipo}")
 
@@ -338,24 +338,41 @@ def agregar_direccion(request, socio):
 
 
 @login_required
-def agregar_contacto(request,socio):
+def agregar_contacto(request, cliente):
     if request.method == "POST":
-        nombre = request.POST['nombre']
-        apellido = request.POST['apellido']
-        telefono = request.POST['telefono']
-        celular = request.POST.get('celular')
-        email = request.POST['email']
-        
+        try:
+            nombre = request.POST['nombre']
+            apellido = request.POST['apellido']
+            telefono = request.POST['telefono']  # Asegúrate de que esto está recibiendo el valor correcto
+            celular = request.POST.get('celular')
+            email = request.POST['email']  # Asegúrate de que esto está recibiendo el valor correcto
+            print(f"Teléfono: {telefono}, Email: {email} PERDON :(")  # Debug: Imprime los valores recibidos
+            nombreCompleto = f"{nombre} {apellido}"
 
-        Contacto.objects.create(nombre=nombre,
-                                apellido=apellido,
-                                telefono=telefono,
-                                celular=celular,
-                                email=email,
-                                SocioNegocio=socio)
-        
+            # Crear el contacto
+            contacto = Contacto.objects.create(
+                codigoInternoSap=1,
+                nombreCompleto=nombreCompleto,
+                nombre=nombre,
+                apellido=apellido,
+                telefono=telefono,
+                celular=celular,
+                email=email
+            )
+
+            # Asegúrate de que el cliente está guardado
+            if cliente.pk:
+                print("Cliente verificado!")
+                # Asignar el contacto al cliente utilizando la relación muchos a muchos
+                cliente.contacto_cliente.add(contacto)
+            else:
+                raise ValueError("El cliente no está guardado en la base de datos.")
+        except Exception as e:
+            # Manejar excepciones si algo falla
+            print(f"Error al agregar contacto: {e}")
 
     return redirect("/")
+
 
 
 @login_required
