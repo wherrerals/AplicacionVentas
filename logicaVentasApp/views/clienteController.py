@@ -5,7 +5,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from datosLsApp.models import (SocioNegocio, GrupoSN, TipoSN, TipoCliente, Direccion)
+from datosLsApp.models import (SocioNegocio, GrupoSN, TipoSN, TipoCliente, Direccion, Contacto)
 from django.db import transaction
 from showromVentasApp.views import agregar_direccion, agregar_contacto
 
@@ -47,10 +47,10 @@ class ClienteController(View):
         if request.method == "POST":
             
             gruposn = request.POST.get('grupoSN')
-            rut = request.POST['rut']
-            giro = request.POST['giro']
-            telefono = request.POST['telefono']
-            email = request.POST['email']
+            rut = request.POST['rutSN']
+            giro = request.POST['giroSN']
+            telefono = request.POST['telefonoSN']
+            email = request.POST['emailSN']
             
             rut_original = rut
 
@@ -70,8 +70,8 @@ class ClienteController(View):
             
             with transaction.atomic():
                 if gruposn == '100':
-                    nombre = request.POST['nombre']
-                    apellido = request.POST['apellido']
+                    nombre = request.POST['nombreSN']
+                    apellido = request.POST['apellidoSN']
                     cliente = SocioNegocio.objects.create(codigoSN=codigosn,
                                                         nombre=nombre,
                                                         apellido=apellido,
@@ -95,8 +95,8 @@ class ClienteController(View):
                                                         tipoCliente=tipocliente)
 
                 # Ahora llamas a agregar_direccion con el cliente recién creado
-                agregar_direccion(request, cliente)
-                #agregar_contacto(request, cliente)
+                #  agregar_direccion(request, cliente)
+                agregar_contacto(request, cliente)
 
             return redirect("/")
         
@@ -107,6 +107,7 @@ class ClienteController(View):
             resultados_formateados = []
 
             for socio in resultados_clientes:
+                # Obtener direcciones asociadas al socio
                 direcciones = Direccion.objects.filter(SocioNegocio=socio)
                 direcciones_formateadas = [{
                     'rowNum': direccion.rowNum,
@@ -120,6 +121,18 @@ class ClienteController(View):
                     'region': direccion.region.nombre
                 } for direccion in direcciones]
 
+                # Obtener contactos asociados al socio
+                contactos = Contacto.objects.filter(SocioNegocio=socio)
+                contactos_formateados = [{
+                    'codigoInternoSap': contacto.codigoInternoSap,
+                    'nombreCompleto': contacto.nombreCompleto,
+                    'nombre': contacto.nombre,
+                    'apellido': contacto.apellido,
+                    'email': contacto.email,
+                    'telefono': contacto.telefono,
+                    "celular": contacto.celular
+                } for contacto in contactos]
+
                 resultados_formateados.append({
                     'nombre': socio.nombre,
                     'apellido': socio.apellido,
@@ -132,9 +145,10 @@ class ClienteController(View):
                     'plazoReclamaciones': socio.plazoReclamaciones,
                     'clienteExportacion': socio.clienteExportacion,
                     'vendedor': socio.vendedor,
-                    'direcciones': direcciones_formateadas
+                    'direcciones': direcciones_formateadas,
+                    'contactos': contactos_formateados
                 })
             
             return JsonResponse({'resultadosClientes': resultados_formateados})
         else:
-            return JsonResponse({'error': 'No se proporcionó un número válido'})  
+            return JsonResponse({'error': 'No se proporcionó un número válido'})

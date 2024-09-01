@@ -30,8 +30,9 @@ function traerInformacionCliente(clienteId) {
 
                 // Toma el primer cliente de los resultados (si estás esperando un solo cliente)
                 const cliente = data.resultadosClientes[0];
-                console.log(cliente.contacto);
-                console.log(cliente)
+                console.log("informacion del cliente: ",cliente)
+                console.log('contacto de Cliente encontrado:', cliente.contacto);
+                console.log('direcciones de Cliente encontrado:', cliente.direcciones);
                 // Llamar a las funciones para actualizar contactos y direcciones
                 
                 actualizarContactos(cliente.contactos);
@@ -55,6 +56,7 @@ function actualizarContactos(contactos) {
 
     // Limpiar el select antes de agregar nuevos contactos
     selectContactos.empty();
+
     if (contactos && contactos.length > 0) {
         contactos.forEach(function(contacto) {
             let option = $('<option></option>');

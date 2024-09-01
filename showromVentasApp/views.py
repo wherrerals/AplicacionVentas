@@ -341,15 +341,18 @@ def agregar_direccion(request, socio):
 def agregar_contacto(request, cliente):
     if request.method == "POST":
         try:
-            nombre = request.POST['nombre']
-            apellido = request.POST['apellido']
-            telefono = request.POST['telefono']  # Asegúrate de que esto está recibiendo el valor correcto
+            nombre = request.POST.get('nombre')
+            apellido = request.POST.get('apellido')
+            telefono = request.POST.get('telefono')
             celular = request.POST.get('celular')
-            email = request.POST['email']  # Asegúrate de que esto está recibiendo el valor correcto
-            print(f"Teléfono: {telefono}, Email: {email} PERDON :(")  # Debug: Imprime los valores recibidos
+            email = request.POST.get('email')
             nombreCompleto = f"{nombre} {apellido}"
 
-            # Crear el contacto
+            print(f"Teléfono: {telefono}, Email: {email}, Celular: {celular}")
+            print(f"Nombre completo: {nombreCompleto}")
+            print(f"Cliente: {cliente}")
+
+            # Crear el contacto con la relación correcta a SocioNegocio
             contacto = Contacto.objects.create(
                 codigoInternoSap=1,
                 nombreCompleto=nombreCompleto,
@@ -357,18 +360,13 @@ def agregar_contacto(request, cliente):
                 apellido=apellido,
                 telefono=telefono,
                 celular=celular,
-                email=email
+                email=email,
+                SocioNegocio=cliente  # Aquí estamos utilizando la relación de muchos a uno
             )
 
-            # Asegúrate de que el cliente está guardado
-            if cliente.pk:
-                print("Cliente verificado!")
-                # Asignar el contacto al cliente utilizando la relación muchos a muchos
-                cliente.contacto_cliente.add(contacto)
-            else:
-                raise ValueError("El cliente no está guardado en la base de datos.")
+            print("Contacto creado con éxito")
+
         except Exception as e:
-            # Manejar excepciones si algo falla
             print(f"Error al agregar contacto: {e}")
 
     return redirect("/")

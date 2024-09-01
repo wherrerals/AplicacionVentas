@@ -64,7 +64,7 @@ class ContactoManager {
     
             </div>
             <div class="col">
-              <input class="form-control" type="tel" style="font-size: 12px;border-color: rgb(159,168,175);">
+              <input class="form-control" type="tel"  name="telefono" style="font-size: 12px;border-color: rgb(159,168,175);">
             </div>
           </div>
           <div class="row">
