@@ -56,7 +56,7 @@ class DireccionManager {
               <label class="col-form-label" style="font-size: 13px;">Tipo</label>
             </div>
             <div class="col">
-              <select class="form-select" style="font-size: 12px;border-color: rgb(159,168,175);">
+              <select class="form-select" name="tipodireccion[]" style="font-size: 12px;border-color: rgb(159,168,175);">
                 <optgroup label="Tipo">
                   <option value="12" selected="">Despacho</option>
                   <option value="13">Facturación</option>
@@ -67,10 +67,10 @@ class DireccionManager {
 
           <div class="row">
             <div class="col-sm-4">
-              <label class="col-form-label" style="font-size: 13px;">Nombre Dirección</label>
+              <label class="col-form-label" style="font-size: 13px;">Nombre Dirección</label> 
             </div>
             <div class="col">
-              <input class="form-control" type="text" name="nombre_direccion" id="nombre_direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
+              <input class="form-control" type="text" name="nombre_direccion[]" id="nombre_direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
             </div>
           </div>
 
@@ -79,19 +79,20 @@ class DireccionManager {
               <label class="col-form-label" style="font-size: 13px;">País</label>
             </div>
             <div class="col">
-              <select class="form-select" style="font-size: 12px;border-color: rgb(159,168,175);">
+              <select class="form-select" name="pais[]" style="font-size: 12px;border-color: rgb(159,168,175);">
                 <optgroup label="País">
                   <option value="12" selected="">Chile</option>
                 </optgroup>
               </select>
             </div>
           </div>
+
           <div class="row">
             <div class="col-sm-4">
               <label class="col-form-label" style="font-size: 13px;">Región</label>
             </div>
             <div class="col">
-              <select class="form-select" style="font-size: 12px;border-color: rgb(159,168,175);">
+              <select class="form-select" name="region[]" style="font-size: 12px;border-color: rgb(159,168,175);">
                 <optgroup label="Región">
                   <option value="12" selected="">Arica y Parinacota</option>
                   <option value="1">Tarapacá</option>
@@ -108,7 +109,7 @@ class DireccionManager {
               <label class="col-form-label" style="font-size: 13px;">Ciudad</label>
             </div>
             <div class="col">
-              <input class="form-control" type="text" name="ciudad" id="ciudad" style="border-color: rgb(159,168,175);font-size: 12px;">
+              <input class="form-control" type="text" name="ciudad[]" id="ciudad" style="border-color: rgb(159,168,175);font-size: 12px;">
             </div>
           </div>
 
@@ -117,7 +118,7 @@ class DireccionManager {
               <label class="col-form-label" style="font-size: 13px;">Comuna</label>
             </div>
             <div class="col">
-              <select class="form-select" style="font-size: 12px;border-color: rgb(159,168,175);">
+              <select class="form-select" name="comuna[]" style="font-size: 12px;border-color: rgb(159,168,175);">
                 <optgroup label="Comuna">
                   <option value="12" selected="">Arica</option>
                   <option value="2" selected="">Las Condes</option>
@@ -133,7 +134,7 @@ class DireccionManager {
               <label class="col-form-label" style="font-size: 13px;">Dirección</label>
             </div>
             <div class="col">
-              <input class="form-control" type="text" name="direccion" id="direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
+              <input class="form-control" type="text" name="direccion[]" id="direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
             </div>
           </div>
 
