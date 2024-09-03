@@ -44,6 +44,25 @@ class SocioNegocioController(View):
             return JsonResponse({'error': 'Invalid URL'}, status=404)
         
     def agregarSocioNegocio(self, request):
+
+        """
+        Metodo que permite la creacion de los socios de negocios
+
+        Args:
+            self: instancia de la clase
+            request: request que contiene los datos del socio de negocio
+        
+        Si el metodo es POST, se obtienen los datos del socio de negocio y se crea un nuevo registro en la base de datos
+        si - en el rut, se elimina y se crea un nuevo registro con el rut sin el guion
+        se crea el codigo del socio de negocio con el rut sin puntos y la letra c
+        se obtiene el grupo, tipo de cliente y tipo de socio de negocio
+        se crea el cliente con los datos obtenidos
+        se llama a la funcion agregar_direccion con el cliente recien creado
+        se llama a la funcion agregar_contacto con el cliente recien creado
+            
+        Returns:
+            redirecciona a la pagina principal
+        """
         if request.method == "POST":
             
             gruposn = request.POST.get('grupoSN')
@@ -99,46 +118,28 @@ class SocioNegocioController(View):
             return redirect("/")
         
     def busquedaSocioNegocio(self, request):
+        """
+        metodo que permite la busqueda de los socios de negocio
+
+        Args:
+            self: instancia de la clase
+            request: request que contiene el rut del socio de negocio
+        
+        si el metodo es GET, se obtiene el rut del socio de negocio
+        se busca el socio de negocio en la base de datos
+        se obtienen las direcciones asociadas al socio
+        se obtienen los contactos asociados al socio
+        se formatean los datos obtenidos y se retornan en un json
+
+        Returns:
+            json con los datos del socio de negocio
+        """
         if request.method == "GET":
             if 'numero' in request.GET:
                 numero = request.GET.get('numero')
                 resultados_clientes = SocioNegocio.objects.filter(rut__icontains=numero)
                 resultados_formateados = []
 
-<<<<<<< HEAD
-                for socio in resultados_clientes:
-                    direcciones = Direccion.objects.filter(SocioNegocio=socio)
-                    direcciones_formateadas = [{
-                        'rowNum': direccion.rowNum,
-                        'nombreDireccion': direccion.nombreDireccion,
-                        'ciudad': direccion.ciudad,
-                        'calleNumero': direccion.calleNumero,
-                        'codigoImpuesto': direccion.codigoImpuesto,
-                        'tipoDireccion': direccion.tipoDireccion,
-                        'pais': direccion.pais,
-                        'comuna': direccion.comuna.nombre,
-                        'region': direccion.region.nombre
-                    } for direccion in direcciones]
-
-                    resultados_formateados.append({
-                        'nombre': socio.nombre,
-                        'apellido': socio.apellido,
-                        'razonSocial': socio.razonSocial,
-                        'rut': socio.rut,
-                        'email': socio.email,
-                        'telefono': socio.telefono,
-                        'giro': socio.giro,
-                        'condicionPago': socio.condicionPago,
-                        'plazoReclamaciones': socio.plazoReclamaciones,
-                        'clienteExportacion': socio.clienteExportacion,
-                        'vendedor': socio.vendedor,
-                        'direcciones': direcciones_formateadas
-                    })
-                
-                return JsonResponse({'resultadosClientes': resultados_formateados})
-            else:
-                return JsonResponse({'error': 'No se proporcionó un número válido'})  
-=======
             for socio in resultados_clientes:
                 # Obtener direcciones asociadas al socio
                 direcciones = Direccion.objects.filter(SocioNegocio=socio)
@@ -185,4 +186,3 @@ class SocioNegocioController(View):
             return JsonResponse({'resultadosClientes': resultados_formateados})
         else:
             return JsonResponse({'error': 'No se proporcionó un número válido'})
->>>>>>> e5c20535e421447a3ea3ae61c9aa9d8ff99e2e4e
