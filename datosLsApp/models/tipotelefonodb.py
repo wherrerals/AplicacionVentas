@@ -1,6 +1,6 @@
 from django.db import models
 
-class TipoTelefono(models.Model):
+class TipoTelefonoDB(models.Model):
     class Meta:
         db_table = "TipoTelefono"
 

@@ -1,9 +1,9 @@
 from django.db import models
-from datosLsApp.models.region import Region
-from datosLsApp.models.comuna import Comuna
-from datosLsApp.models.socionegocio import SocioNegocio
+from datosLsApp.models.regiondb import RegionDB
+from datosLsApp.models.comunadb import ComunaDB
+from datosLsApp.models.socionegociodb import SocioNegocioDB
 
-class Direccion(models.Model):
+class DireccionDB(models.Model):
     class Meta:
         db_table = "Direccion"
 
@@ -18,9 +18,9 @@ class Direccion(models.Model):
     #tipoDireccion = models.ManyToManyField(TipoDireccion, related_name='directorios')
     tipoDireccion = models.CharField(max_length=10)
     pais = models.CharField(max_length=10, default ='Chile')
-    SocioNegocio = models.ForeignKey(SocioNegocio,on_delete=models.CASCADE, default=1) 
-    comuna = models.ForeignKey(Comuna,on_delete=models.CASCADE, default=1)
-    region = models.ForeignKey(Region,on_delete=models.CASCADE, default=1)
+    SocioNegocio = models.ForeignKey(SocioNegocioDB,on_delete=models.CASCADE, default=1) 
+    comuna = models.ForeignKey(ComunaDB,on_delete=models.CASCADE, default=1)
+    region = models.ForeignKey(RegionDB,on_delete=models.CASCADE, default=1)
 
     def __str__(self):
         return f"{self.rowNum}"

@@ -1,7 +1,7 @@
 from django.db import models
-from datosLsApp.models.socionegocio import SocioNegocio
+from datosLsApp.models.socionegociodb import SocioNegocioDB
 
-class Contacto(models.Model):
+class ContactoDB(models.Model):
     class Meta:
         db_table = "Contacto"
         
@@ -15,7 +15,7 @@ class Contacto(models.Model):
     telefono = models.CharField(max_length=10)
     celular = models.CharField(max_length=10,null = False)
     email = models.EmailField(null = False)
-    SocioNegocio = models.ForeignKey(SocioNegocio, on_delete=models.CASCADE, default=1, null=True)
+    SocioNegocio = models.ForeignKey(SocioNegocioDB, on_delete=models.CASCADE, default=1, null=True)
 
     def __str__(self):
         return f"{self.nombreCompleto}"

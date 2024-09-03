@@ -1,6 +1,6 @@
 from django.db import models
 
-class Sucursal(models.Model):
+class SucursalDB(models.Model):
     class Meta:
         db_table = 'Sucursal'
         verbose_name = 'Sucursal'

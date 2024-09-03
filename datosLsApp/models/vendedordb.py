@@ -1,7 +1,7 @@
 from django.db import models
-from datosLsApp.models.sucursal import Sucursal
+from datosLsApp.models.sucursaldb import SucursalDB
 
-class Vendedor(models.Model):
+class VendedorDB(models.Model):
     class Meta:
         db_table = 'Vendedor'
         verbose_name = 'Vendedor'
@@ -9,6 +9,6 @@ class Vendedor(models.Model):
 
     codigo = models.IntegerField()
     nombre = models.CharField(max_length=100,null = False)
-    sucursal = models.ForeignKey(Sucursal, on_delete=models.CASCADE, default=1)
+    sucursal = models.ForeignKey(SucursalDB, on_delete=models.CASCADE, default=1)
     def __str__(self):
         return f'{self.nombre}'

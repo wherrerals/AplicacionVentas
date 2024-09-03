@@ -1,6 +1,5 @@
 from django.urls import path
-from showromVentasApp import views
-from .views import  *
+from showromVentasApp.view import views
 
 urlpatterns = [
     path('', views.home, name="home"),
@@ -21,6 +20,6 @@ urlpatterns = [
     path('mis_datos/', views.mis_datos, name='mis_datos'),
     path('agregar_direccion/',views.agregar_direccion,name='agregar_direccion'),
     #path('ordenes/', views.cambio_ordenes, name='ordenes'),
-    path('generar_cotizacion/<str:docEntry>/', quotate_items, name='generar_cotizacion'),
+    path('generar_cotizacion/<str:docEntry>/', views.quotate_items, name='generar_cotizacion'),
 ]
 

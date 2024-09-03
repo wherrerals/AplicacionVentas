@@ -1,6 +1,6 @@
 from django.db import models
 
-class Region(models.Model):
+class RegionDB(models.Model):
     class Meta:
         db_table = "Region"
 

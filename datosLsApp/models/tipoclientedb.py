@@ -1,6 +1,6 @@
 from django.db import models
 
-class TipoCliente(models.Model):
+class TipoClienteDB(models.Model):
     class Meta:
         db_table = "TipoCliente"
         verbose_name = 'TipoCliente'

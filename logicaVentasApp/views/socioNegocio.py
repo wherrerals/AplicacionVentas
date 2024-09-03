@@ -5,20 +5,20 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from datosLsApp.models import (SocioNegocio, GrupoSN, TipoSN, TipoCliente, Direccion, Contacto)
+from datosLsApp.models import (SocioNegocioDB, GrupoSNDB, TipoSNDB, TipoClienteDB, DireccionDB, ContactoDB)
 from django.db import transaction
-from showromVentasApp.views import agregar_direccion, agregar_contacto
+from showromVentasApp.view.views import agregar_direccion, agregar_contacto
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 @method_decorator(require_http_methods(["GET", "POST"]), name="dispatch")
-class SocioNegocioController(View):
+class SocioNegocio(View):
     
     def post(self, request):
         # Definir un diccionario de rutas a métodos
         route_map = {
-            '/agregar_editar_clientes/': self.agregarSocioNegocio,
+            '/ventas/agregar_editar_clientes/': self.agregarSocioNegocio,
         }
 
         # Buscar el método basado en la ruta
@@ -32,7 +32,7 @@ class SocioNegocioController(View):
     def get(self, request):
         # Definir un diccionario de rutas a métodos
         route_map = {
-            '/buscarc/': self.busquedaSocioNegocio,
+            '/ventas/buscarc/': self.busquedaSocioNegocio,
         }
 
         # Buscar el método basado en la ruta
@@ -44,7 +44,6 @@ class SocioNegocioController(View):
             return JsonResponse({'error': 'Invalid URL'}, status=404)
         
     def agregarSocioNegocio(self, request):
-
         """
         Metodo que permite la creacion de los socios de negocios
 
@@ -78,18 +77,18 @@ class SocioNegocioController(View):
 
             codigosn = rut_sn.replace(".", "") + 'c'
             
-            gruposn1 = GrupoSN.objects.get(codigo=gruposn)
-            tipocliente = TipoCliente.objects.get(codigo = 'N')
+            gruposn1 = GrupoSNDB.objects.get(codigo=gruposn)
+            tipocliente = TipoClienteDB.objects.get(codigo = 'N')
             if gruposn == '100':
-                tiposn = TipoSN.objects.get(codigo='C')
+                tiposn = TipoSNDB.objects.get(codigo='C')
             else:
-                tiposn = TipoSN.objects.get(codigo='I')
+                tiposn = TipoSNDB.objects.get(codigo='I')
             
             with transaction.atomic():
                 if gruposn == '100':
                     nombre = request.POST['nombreSN']
                     apellido = request.POST['apellidoSN']
-                    cliente = SocioNegocio.objects.create(codigoSN=codigosn,
+                    cliente = SocioNegocioDB.objects.create(codigoSN=codigosn,
                                                         nombre=nombre,
                                                         apellido=apellido,
                                                         rut=rut,
@@ -101,7 +100,7 @@ class SocioNegocioController(View):
                                                         tipoCliente=tipocliente)
                 elif gruposn == '105':
                     razonsocial = request.POST['nombre']
-                    cliente = SocioNegocio.objects.create(codigoSN=codigosn,
+                    cliente = SocioNegocioDB.objects.create(codigoSN=codigosn,
                                                         razonSocial=razonsocial,
                                                         rut=rut,
                                                         giro=giro,
@@ -137,12 +136,12 @@ class SocioNegocioController(View):
         if request.method == "GET":
             if 'numero' in request.GET:
                 numero = request.GET.get('numero')
-                resultados_clientes = SocioNegocio.objects.filter(rut__icontains=numero)
+                resultados_clientes = SocioNegocioDB.objects.filter(rut__icontains=numero)
                 resultados_formateados = []
 
             for socio in resultados_clientes:
                 # Obtener direcciones asociadas al socio
-                direcciones = Direccion.objects.filter(SocioNegocio=socio)
+                direcciones = DireccionDB.objects.filter(SocioNegocio=socio)
                 direcciones_formateadas = [{
                     'rowNum': direccion.rowNum,
                     'nombreDireccion': direccion.nombreDireccion,
@@ -156,7 +155,7 @@ class SocioNegocioController(View):
                 } for direccion in direcciones]
 
                 # Obtener contactos asociados al socio
-                contactos = Contacto.objects.filter(SocioNegocio=socio)
+                contactos = ContactoDB.objects.filter(SocioNegocio=socio)
                 contactos_formateados = [{
                     'codigoInternoSap': contacto.codigoInternoSap,
                     'nombreCompleto': contacto.nombreCompleto,

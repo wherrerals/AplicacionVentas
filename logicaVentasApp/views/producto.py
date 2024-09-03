@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.views.generic import View
 from datosLsApp.sl_client import APIClient
 
-class ProductosController(View):
+class Productos(View):
 
     def get(self, request):
         # Definir un diccionario de rutas a métodos

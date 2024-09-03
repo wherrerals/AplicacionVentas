@@ -1,9 +1,9 @@
 from django.db import models
-from datosLsApp.models.tipocliente import TipoCliente
-from datosLsApp.models.tiposn import TipoSN
-from datosLsApp.models.gruposn import GrupoSN
+from datosLsApp.models.tipoclientedb import TipoClienteDB
+from datosLsApp.models.tiposndb import TipoSNDB
+from datosLsApp.models.gruposndb import GrupoSNDB
 
-class SocioNegocio(models.Model):
+class SocioNegocioDB(models.Model):
     class Meta:
         db_table = "SocioNegocio"
 
@@ -22,9 +22,9 @@ class SocioNegocio(models.Model):
     plazoReclamaciones = models.CharField(max_length=255, default="STANDAR")
     clienteExportacion = models.CharField(max_length=255, default="N")
     vendedor = models.IntegerField(default=-1)
-    grupoSN = models.ForeignKey(GrupoSN, on_delete=models.CASCADE, default=1)
-    tipoSN = models.ForeignKey(TipoSN,on_delete=models.CASCADE, default=1)
-    tipoCliente = models.ForeignKey(TipoCliente,on_delete=models.CASCADE, default=1)
+    grupoSN = models.ForeignKey(GrupoSNDB, on_delete=models.CASCADE, default=1)
+    tipoSN = models.ForeignKey(TipoSNDB,on_delete=models.CASCADE, default=1)
+    tipoCliente = models.ForeignKey(TipoClienteDB,on_delete=models.CASCADE, default=1)
     
     def __str__(self):
         return f"{self.rut}"

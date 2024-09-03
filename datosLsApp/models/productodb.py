@@ -1,6 +1,6 @@
 from django.db import models
 
-class Producto(models.Model):
+class ProductoDB(models.Model):
     class Meta:
         db_table = "Producto"
         verbose_name = 'Producto'
