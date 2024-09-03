@@ -13,12 +13,12 @@ from showromVentasApp.views import agregar_direccion, agregar_contacto
 @method_decorator(csrf_exempt, name='dispatch')
 @method_decorator(login_required, name='dispatch')
 @method_decorator(require_http_methods(["GET", "POST"]), name="dispatch")
-class ClienteController(View):
+class SocioNegocioController(View):
     
     def post(self, request):
         # Definir un diccionario de rutas a métodos
         route_map = {
-            '/agregar_editar_clientes/': self.agregar_editar_clientes,
+            '/agregar_editar_clientes/': self.agregarSocioNegocio,
         }
 
         # Buscar el método basado en la ruta
@@ -32,7 +32,7 @@ class ClienteController(View):
     def get(self, request):
         # Definir un diccionario de rutas a métodos
         route_map = {
-            '/buscarc/': self.busquedaClientes,
+            '/buscarc/': self.busquedaSocioNegocio,
         }
 
         # Buscar el método basado en la ruta
@@ -43,7 +43,7 @@ class ClienteController(View):
         else:
             return JsonResponse({'error': 'Invalid URL'}, status=404)
         
-    def agregar_editar_clientes(self, request):
+    def agregarSocioNegocio(self, request):
         if request.method == "POST":
             
             gruposn = request.POST.get('grupoSN')
@@ -52,8 +52,6 @@ class ClienteController(View):
             telefono = request.POST['telefono']
             email = request.POST['email']
             
-            rut_original = rut
-
             if "-" in rut:
                 rut_sn = rut.split("-")[0]
             else:
@@ -96,45 +94,46 @@ class ClienteController(View):
 
                 # Ahora llamas a agregar_direccion con el cliente recién creado
                 agregar_direccion(request, cliente)
-                agregar_contacto(request, cliente)
+                #agregar_contacto(request, cliente)
 
             return redirect("/")
         
-    def busquedaClientes(self, request):
-        if 'numero' in request.GET:
-            numero = request.GET.get('numero')
-            resultados_clientes = SocioNegocio.objects.filter(rut__icontains=numero)
-            resultados_formateados = []
+    def busquedaSocioNegocio(self, request):
+        if request.method == "GET":
+            if 'numero' in request.GET:
+                numero = request.GET.get('numero')
+                resultados_clientes = SocioNegocio.objects.filter(rut__icontains=numero)
+                resultados_formateados = []
 
-            for socio in resultados_clientes:
-                direcciones = Direccion.objects.filter(SocioNegocio=socio)
-                direcciones_formateadas = [{
-                    'rowNum': direccion.rowNum,
-                    'nombreDireccion': direccion.nombreDireccion,
-                    'ciudad': direccion.ciudad,
-                    'calleNumero': direccion.calleNumero,
-                    'codigoImpuesto': direccion.codigoImpuesto,
-                    'tipoDireccion': direccion.tipoDireccion,
-                    'pais': direccion.pais,
-                    'comuna': direccion.comuna.nombre,
-                    'region': direccion.region.nombre
-                } for direccion in direcciones]
+                for socio in resultados_clientes:
+                    direcciones = Direccion.objects.filter(SocioNegocio=socio)
+                    direcciones_formateadas = [{
+                        'rowNum': direccion.rowNum,
+                        'nombreDireccion': direccion.nombreDireccion,
+                        'ciudad': direccion.ciudad,
+                        'calleNumero': direccion.calleNumero,
+                        'codigoImpuesto': direccion.codigoImpuesto,
+                        'tipoDireccion': direccion.tipoDireccion,
+                        'pais': direccion.pais,
+                        'comuna': direccion.comuna.nombre,
+                        'region': direccion.region.nombre
+                    } for direccion in direcciones]
 
-                resultados_formateados.append({
-                    'nombre': socio.nombre,
-                    'apellido': socio.apellido,
-                    'razonSocial': socio.razonSocial,
-                    'rut': socio.rut,
-                    'email': socio.email,
-                    'telefono': socio.telefono,
-                    'giro': socio.giro,
-                    'condicionPago': socio.condicionPago,
-                    'plazoReclamaciones': socio.plazoReclamaciones,
-                    'clienteExportacion': socio.clienteExportacion,
-                    'vendedor': socio.vendedor,
-                    'direcciones': direcciones_formateadas
-                })
-            
-            return JsonResponse({'resultadosClientes': resultados_formateados})
-        else:
-            return JsonResponse({'error': 'No se proporcionó un número válido'})  
+                    resultados_formateados.append({
+                        'nombre': socio.nombre,
+                        'apellido': socio.apellido,
+                        'razonSocial': socio.razonSocial,
+                        'rut': socio.rut,
+                        'email': socio.email,
+                        'telefono': socio.telefono,
+                        'giro': socio.giro,
+                        'condicionPago': socio.condicionPago,
+                        'plazoReclamaciones': socio.plazoReclamaciones,
+                        'clienteExportacion': socio.clienteExportacion,
+                        'vendedor': socio.vendedor,
+                        'direcciones': direcciones_formateadas
+                    })
+                
+                return JsonResponse({'resultadosClientes': resultados_formateados})
+            else:
+                return JsonResponse({'error': 'No se proporcionó un número válido'})  

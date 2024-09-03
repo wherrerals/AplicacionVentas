@@ -73,7 +73,48 @@ class APIClient:
             response.raise_for_status()
             self.__autehnticated = False
 
-    def getData(self, endpoint="", top=0, skip=0, filters=None):
+    def getData(self, endpoint="", top=20, skip=0, filters=None):
+        """
+        Recupera una lista de datos desde un endpoint específico con filtros opcionales, paginación y expansión.
+
+        Parámetros:
+            endpoint : str, opcional
+                El endpoint desde donde recuperar los datos (por defecto es '').
+            top : int, opcional
+                El número máximo de registros a recuperar (por defecto es 0, lo que recupera todos los registros).
+            skip : int, opcional
+                El número de registros a omitir desde el inicio del conjunto de resultados (por defecto es 0).
+            filters : dict, opcional
+                Un diccionario de pares clave-valor para filtrar los resultados según condiciones específicas.
+            
+        Returns:
+            
+            dict
+                Un diccionario con la respuesta de la API en formato JSON.
+        """
+
+        self.__login()
+        crossjoin = f"{endpoint},SalesPersons"
+        expand = f"{endpoint}($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
+        filter_condition = f"{endpoint}/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
+
+        if filters:
+            for key, value in filters.items():
+                filter_condition += f" and {key} {value}"
+
+        headers = {
+            "Prefer": f"odata.maxpagesize={top}"
+        }
+
+        query_url = f"$crossjoin({crossjoin})?$expand={expand}&$filter={filter_condition}&$top={top}&$skip={skip}"
+        url = f"{self.base_url}{query_url}"
+
+        response = self.session.get(url, headers=headers, verify=False)
+        response.raise_for_status()
+        print(url)
+        return response.json()
+
+    def obtenerProductos(self, endpoint="", top=20, skip=0, filters=None):
         """
         Recupera una lista de datos desde un endpoint específico con filtros opcionales, paginación y expansión.
 
