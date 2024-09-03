@@ -309,47 +309,90 @@ def mis_datos(request):
 @login_required
 def agregar_direccion(request, socio):
     if request.method == "POST":
-        nombredireccion = request.POST['id']
-        ciudad = request.POST['cuidad']
-        callenumero = request.POST['direccion']
-        tipo = request.POST['tipodireccion']
-        pais = request.POST['pais']
-        region = request.POST.get('region')
-        comuna = request.POST.get('comuna')
+        nombredirecciones = request.POST.getlist('nombre_direccion[]')
+        ciudades = request.POST.getlist('ciudad[]')
+        callesnumeros = request.POST.getlist('direccion[]')
+        tipos = request.POST.getlist('tipodireccion[]')
+        paises = request.POST.getlist('pais[]')
+        regiones = request.POST.getlist('region[]')
+        comunas = request.POST.getlist('comuna[]')
+        print(f"nombre direccion: " , nombredirecciones)
+        print(f"nombres de cuidades: " , ciudades)
+        print(f"tipo de direcciones: " , tipos)
 
-        fregion = Region.objects.get(numero=region)
-        fcomuna = Comuna.objects.get(codigo=comuna)
-        
 
-        Direccion.objects.create(nombreDireccion=nombredireccion,
-                                 ciudad=ciudad,
-                                 calleNumero=callenumero,
-                                 comuna=fcomuna,
-                                 region=fregion,
-                                 tipoDireccion=tipo,
-                                 SocioNegocio=socio,
-                                 pais=pais)
+
+        for i in range(len(nombredirecciones)):
+            nombredireccion = nombredirecciones[i]
+            ciudad = ciudades[i]
+            callenumero = callesnumeros[i]
+            tipo = tipos[i]
+            pais = paises[i]
+            region = regiones[i]
+            comuna = comunas[i]
+
+            # Verificar si existe un campo requerido
+            if nombredireccion:
+                fregion = Region.objects.get(numero=region)
+                fcomuna = Comuna.objects.get(codigo=comuna)
+
+                Direccion.objects.create(
+                    nombreDireccion=nombredireccion,
+                    ciudad=ciudad,
+                    calleNumero=callenumero,
+                    comuna=fcomuna,
+                    region=fregion,
+                    tipoDireccion=tipo,
+                    SocioNegocio=socio,
+                    pais=pais
+                )
+                print(f"Dirección {i+1} creada con éxito")
+            else:
+                print(f"No se ha creado la dirección {i+1} porque algunos campos están vacíos.")
     return redirect("/")
+
+
+
 
 @login_required
-def agregar_contacto(request,socio):
+def agregar_contacto(request, cliente):
     if request.method == "POST":
-        nombre = request.POST['nombre']
-        apellido = request.POST['apellido']
-        telefono = request.POST['telefono']
-        celular = request.POST.get('celular')
-        email = request.POST['email']
-        
+        nombres = request.POST.getlist('nombre[]')
+        apellidos = request.POST.getlist('apellido[]')
+        telefonos = request.POST.getlist('telefono[]')
+        celulares = request.POST.getlist('celular[]')
+        emails = request.POST.getlist('email[]')
 
-        Contacto.objects.create(nombre=nombre,
-                                apellido=apellido,
-                                telefono=telefono,
-                                celular=celular,
-                                email=email,
-                                SocioNegocio=socio)
-        
+        print(f"contactos recibidos: " ,nombres)
+        print(f"contactos recibidos: " ,apellidos)
 
+        for i in range(len(nombres)):
+            nombre = nombres[i]
+            apellido = apellidos[i]
+            telefono = telefonos[i]
+            celular = celulares[i]
+            email = emails[i]
+
+            # Verificar si los campos requeridos están completos
+            if nombre and apellido:
+                nombreCompleto = f"{nombre} {apellido}"
+
+                Contacto.objects.create(
+                    codigoInternoSap=1,  # Aquí deberías manejar la lógica del código interno si es variable
+                    nombreCompleto=nombreCompleto,
+                    nombre=nombre,
+                    apellido=apellido,
+                    telefono=telefono,
+                    celular=celular,
+                    email=email,
+                    SocioNegocio=cliente
+                )
+                print(f"Contacto {i+1} creado con éxito")
+            else:
+                print(f"No se ha creado el contacto {i+1} porque algunos campos están vacíos.")
     return redirect("/")
+
+
 
 
 @login_required

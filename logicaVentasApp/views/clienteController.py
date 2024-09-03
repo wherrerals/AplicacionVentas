@@ -5,7 +5,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from datosLsApp.models import (SocioNegocio, GrupoSN, TipoSN, TipoCliente, Direccion)
+from datosLsApp.models import (SocioNegocio, GrupoSN, TipoSN, TipoCliente, Direccion, Contacto)
 from django.db import transaction
 from showromVentasApp.views import agregar_direccion, agregar_contacto
 
@@ -47,10 +47,10 @@ class SocioNegocioController(View):
         if request.method == "POST":
             
             gruposn = request.POST.get('grupoSN')
-            rut = request.POST['rut']
-            giro = request.POST['giro']
-            telefono = request.POST['telefono']
-            email = request.POST['email']
+            rut = request.POST['rutSN']
+            giro = request.POST['giroSN']
+            telefono = request.POST['telefonoSN']
+            email = request.POST['emailSN']
             
             if "-" in rut:
                 rut_sn = rut.split("-")[0]
@@ -68,8 +68,8 @@ class SocioNegocioController(View):
             
             with transaction.atomic():
                 if gruposn == '100':
-                    nombre = request.POST['nombre']
-                    apellido = request.POST['apellido']
+                    nombre = request.POST['nombreSN']
+                    apellido = request.POST['apellidoSN']
                     cliente = SocioNegocio.objects.create(codigoSN=codigosn,
                                                         nombre=nombre,
                                                         apellido=apellido,
@@ -94,7 +94,7 @@ class SocioNegocioController(View):
 
                 # Ahora llamas a agregar_direccion con el cliente recién creado
                 agregar_direccion(request, cliente)
-                #agregar_contacto(request, cliente)
+                agregar_contacto(request, cliente)
 
             return redirect("/")
         
@@ -105,6 +105,7 @@ class SocioNegocioController(View):
                 resultados_clientes = SocioNegocio.objects.filter(rut__icontains=numero)
                 resultados_formateados = []
 
+<<<<<<< HEAD
                 for socio in resultados_clientes:
                     direcciones = Direccion.objects.filter(SocioNegocio=socio)
                     direcciones_formateadas = [{
@@ -137,3 +138,51 @@ class SocioNegocioController(View):
                 return JsonResponse({'resultadosClientes': resultados_formateados})
             else:
                 return JsonResponse({'error': 'No se proporcionó un número válido'})  
+=======
+            for socio in resultados_clientes:
+                # Obtener direcciones asociadas al socio
+                direcciones = Direccion.objects.filter(SocioNegocio=socio)
+                direcciones_formateadas = [{
+                    'rowNum': direccion.rowNum,
+                    'nombreDireccion': direccion.nombreDireccion,
+                    'ciudad': direccion.ciudad,
+                    'calleNumero': direccion.calleNumero,
+                    'codigoImpuesto': direccion.codigoImpuesto,
+                    'tipoDireccion': direccion.tipoDireccion,
+                    'pais': direccion.pais,
+                    'comuna': direccion.comuna.nombre,
+                    'region': direccion.region.nombre
+                } for direccion in direcciones]
+
+                # Obtener contactos asociados al socio
+                contactos = Contacto.objects.filter(SocioNegocio=socio)
+                contactos_formateados = [{
+                    'codigoInternoSap': contacto.codigoInternoSap,
+                    'nombreCompleto': contacto.nombreCompleto,
+                    'nombre': contacto.nombre,
+                    'apellido': contacto.apellido,
+                    'email': contacto.email,
+                    'telefono': contacto.telefono,
+                    "celular": contacto.celular
+                } for contacto in contactos]
+
+                resultados_formateados.append({
+                    'nombre': socio.nombre,
+                    'apellido': socio.apellido,
+                    'razonSocial': socio.razonSocial,
+                    'rut': socio.rut,
+                    'email': socio.email,
+                    'telefono': socio.telefono,
+                    'giro': socio.giro,
+                    'condicionPago': socio.condicionPago,
+                    'plazoReclamaciones': socio.plazoReclamaciones,
+                    'clienteExportacion': socio.clienteExportacion,
+                    'vendedor': socio.vendedor,
+                    'direcciones': direcciones_formateadas,
+                    'contactos': contactos_formateados
+                })
+            
+            return JsonResponse({'resultadosClientes': resultados_formateados})
+        else:
+            return JsonResponse({'error': 'No se proporcionó un número válido'})
+>>>>>>> e5c20535e421447a3ea3ae61c9aa9d8ff99e2e4e
