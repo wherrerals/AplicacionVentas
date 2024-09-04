@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.views.generic import View
 from django.shortcuts import redirect, HttpResponse, render
 from django.http import JsonResponse
@@ -71,9 +72,11 @@ class SocioNegocio(View):
             email = request.POST['emailSN']
 
             # Validación previa a cualquier operación de base de datos
-            if not all([gruposn, rut, giro, telefono, email]):
-                mensaje1 = 'Debe completar todos los campos'
-                return render(request, "cotizacion.html", {'mensaje1': mensaje1})
+            if not all([gruposn, rut, email]):
+                print('Faltan datos obligatorios')
+                messages.error(request, 'Faltan datos obligatorios')
+                #return JsonResponse({'error': 'Faltan datos obligatorios'}, status=400)
+                
 
             # Eliminar el guion del RUT si existe
             if "-" in rut:
@@ -89,14 +92,17 @@ class SocioNegocio(View):
                 gruposn1 = GrupoSNDB.objects.get(codigo=gruposn)
                 tipocliente = TipoClienteDB.objects.get(codigo='N')
             except (GrupoSNDB.DoesNotExist, TipoClienteDB.DoesNotExist) as e:
-                mensaje2 = f"Error al obtener datos: {str(e)}"
-                return render(request, "cotizacion.html", {'mensaje2': mensaje2})
+                print('GrupoSN o TipoCliente no encontrados')
+                #messages.error(request, 'GrupoSN o TipoCliente no encontrados')
+                return JsonResponse({'error': 'GrupoSN o TipoCliente no encontrados'}, status=404)
 
             # Verificar si ya existe un cliente con el mismo RUT
             try:
                 SocioNegocioDB.objects.get(rut=rut)
-                mensaje2 = 'Ya existe un cliente con ese RUT'
-                return render(request, "cotizacion.html", {'mensaje2': mensaje2})
+                print('Ya existe un cliente con el mismo RUT')
+                messages.error(request, 'Ya existe un cliente con el mismo RUT')
+                return JsonResponse({'error': 'Ya existe un cliente con el mismo RUT'}, status=400)
+            
             except SocioNegocioDB.DoesNotExist:
                 pass
 
@@ -140,19 +146,22 @@ class SocioNegocio(View):
                 # Agregar dirección
                 if 'nombreDireccion' in request.POST:
                     agregar_direccion(request, cliente)
+                    #messages.success(request, 'Cliente creado exitosamente')
                 else:
-                    mensaje3 = 'Debe agregar al menos una dirección'
-                    return render(request, "cotizacion.html", {'mensaje3': mensaje3})
+                    print('Debe agregar al menos una dirección')
+                    #messages.error(request, 'Debe agregar al menos una dirección')
+                    return JsonResponse({'error': 'Debe agregar al menos una dirección'}, status=400)
 
                 # Agregar contacto
                 if 'nombreCompleto' in request.POST:
                     agregar_contacto(request, cliente)
+                    #messages.success(request, 'Cliente creado exitosamente')
                 else:
-                    mensaje4 = 'Debe agregar al menos un contacto'
-                    return render(request, "cotizacion.html", {'mensaje4': mensaje4})
-
+                    print('Debe agregar al menos un contacto')
+                    #messages.error(request, 'Debe agregar al menos un contacto')
+                    return JsonResponse({'error': 'Debe agregar al menos un contacto'}, status=400)
             # Redirigir si todo fue exitoso
-            return redirect('/')
+            #return redirect('/')
 
     def busquedaSocioNegocio(self, request):
         """
