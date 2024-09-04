@@ -688,7 +688,17 @@
 
                     </div>
                   </div>
-
+                  {% if mensaje1 %}
+                  <div role="alert">{{mensaje1}}</div>
+                  {% endif %}
+              
+                  {% if mensaje2 %}
+                  <div role="alert">{{mensaje2}}</div>
+                  {% endif %}
+              
+                  {% if mensaje3 %}
+                  <div role="alert">{{mensaje3}}</div>
+                  {% endif %}
                   <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cerrar</button>
                     <button class="btn btn-primary" type="button">Grabar</button>

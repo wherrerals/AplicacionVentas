@@ -363,6 +363,12 @@ def agregar_contacto(request, cliente):
         celulares = request.POST.getlist('celular[]')
         emails = request.POST.getlist('email[]')
 
+        clienteNoIncluido = None
+
+        if cliente is None:
+            clienteNoIncluido = "No se ha incluido el cliente en la solicitud."
+
+
         print(f"contactos recibidos: " ,nombres)
         print(f"contactos recibidos: " ,apellidos)
 
@@ -390,7 +396,7 @@ def agregar_contacto(request, cliente):
                 print(f"Contacto {i+1} creado con éxito")
             else:
                 print(f"No se ha creado el contacto {i+1} porque algunos campos están vacíos.")
-    return redirect("/")
+    return render(request, "cotizacion.html", {'clienteNoIncluido': clienteNoIncluido})
 
 
 
