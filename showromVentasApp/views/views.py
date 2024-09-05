@@ -10,7 +10,7 @@ from django.http import JsonResponse, HttpResponse
 #Modulos Diseñados
 from datosLsApp.models.usuariodb import User 
 from datosLsApp.models import (ProductoDB, SocioNegocioDB, UsuarioDB, RegionDB, GrupoSNDB, TipoSNDB, TipoClienteDB, DireccionDB, ComunaDB, ContactoDB)
-from datosLsApp.sl_client import APIClient
+from adapters.sl_client import APIClient
 #librerias Python usadas
 import requests
 import json
@@ -307,7 +307,7 @@ def mis_datos(request):
 
 
 @login_required
-def agregar_direccion(request, socio):
+def agregarDireccion(request, socio):
     if request.method == "POST":
         nombredirecciones = request.POST.getlist('nombre_direccion[]')
         ciudades = request.POST.getlist('ciudad[]')
@@ -355,7 +355,7 @@ def agregar_direccion(request, socio):
 
 
 @login_required
-def agregar_contacto(request, cliente):
+def agregarContacto(request, cliente):
     if request.method == "POST":
         nombres = request.POST.getlist('nombre[]')
         apellidos = request.POST.getlist('apellido[]')

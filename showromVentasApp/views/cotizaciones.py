@@ -1,6 +1,6 @@
 from django.http import JsonResponse
-from logicaVentasApp.views.documento import Documento
-from datosLsApp.sl_client import APIClient
+from showromVentasApp.views.documento import Documento
+from adapters.sl_client import APIClient
 import json
 import logging
 

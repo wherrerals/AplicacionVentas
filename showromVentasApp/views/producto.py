@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.views.generic import View
-from datosLsApp.sl_client import APIClient
+from adapters.sl_client import APIClient
 
 class Productos(View):
 
