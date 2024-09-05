@@ -2,30 +2,30 @@ from django.urls import path
 from showromVentasApp.views.cotizaciones import Cotizaciones
 from showromVentasApp.views.socioNegocio import SocioNegocio
 from showromVentasApp.views.producto import Productos
-from showromVentasApp import views
+from showromVentasApp.views import view
 
 urlpatterns = [
-    path('', views.home, name="home"),
+    path('', view.home, name="home"),
     path('listado_Cotizaciones/', Cotizaciones.as_view(), name='listado_Cotizaciones'),
     path('listado_Cotizaciones_filtrado/', Cotizaciones.as_view(), name='crearCotizacion'),
     path('crear_cotizacion/', Cotizaciones.as_view(), name='create_quotation'),
-    path('ventas/agregar_editar_clientes/', SocioNegocio.as_view(), name='agregar_editar_clientes'),
-    path('ventas/buscarc/', SocioNegocio.as_view(), name='busquedaClientes'),
+    path('agregar_editar_clientes/', SocioNegocio.as_view(), name='agregar_editar_clientes'),
+    path('buscarc/', SocioNegocio.as_view(), name='busquedaClientes'),
     path('listado_productos/', Productos.as_view(), name='listado_productos'),
     # Rutas adicionales
-    path('lista_cotizaciones/', list_quotations, name="lista_cotizaciones"),
-    path('generar_cotizacion/', views.quotations, name="generar_cotizacion"),
-    path('lista_ovs/', views.lista_ovs, name='lista_ovs'),
-    path('lista_solic_devoluciones/', views.lista_solic_devoluciones, name='lista_solic_devoluciones'),
-    path('lista_clientes/', views.lista_clientes, name='lista_clientes'),
-    path('creacion_clientes/', views.creacion_clientes, name='creacion_clientes'),
-    path('reporte_stock/', views.reporte_stock, name='reporte_stock'),
-    path('micuenta/', views.micuenta, name='micuenta'),
-    path('lista_usuarios/', views.lista_usuarios, name='lista_usuarios'),
-    path('salir/', views.userLogout, name='salir'),
-    path('registrarCuenta/', views.registrarCuenta, name='registrarCuenta'),
-    path('buscar/', views.busquedaProductos, name='busquedaProductos'),
-    path('mis_datos/', views.mis_datos, name='mis_datos'),
-    path('agregar_direccion/', views.agregar_direccion, name='agregar_direccion'),
-    path('generar_cotizacion/<str:docEntry>/', views.quotate_items, name='generar_cotizacion'),
+    path('lista_cotizaciones/', view.list_quotations, name="lista_cotizaciones"),
+    path('generar_cotizacion/', view.quotations, name="generar_cotizacion"),
+    path('lista_ovs/', view.lista_ovs, name='lista_ovs'),
+    path('lista_solic_devoluciones/', view.lista_solic_devoluciones, name='lista_solic_devoluciones'),
+    path('lista_clientes/', view.lista_clientes, name='lista_clientes'),
+    path('creacion_clientes/', view.creacion_clientes, name='creacion_clientes'),
+    path('reporte_stock/', view.reporte_stock, name='reporte_stock'),
+    path('micuenta/', view.micuenta, name='micuenta'),
+    path('lista_usuarios/', view.lista_usuarios, name='lista_usuarios'),
+    path('salir/', view.userLogout, name='salir'),
+    path('registrarCuenta/', view.registrarCuenta, name='registrarCuenta'),
+    path('buscar/', view.busquedaProductos, name='busquedaProductos'),
+    path('mis_datos/', view.mis_datos, name='mis_datos'),
+    path('agregar_direccion/', view.agregarDireccion, name='agregar_direccion'),
+    path('generar_cotizacion/<str:docEntry>/', view.quotate_items, name='generar_cotizacion'),
 ]

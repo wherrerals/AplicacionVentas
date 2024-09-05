@@ -7,6 +7,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('ventas/', include('showromVentasApp.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('', include('logicaVentasApp.urls')),
+    #path('', include('logicaVentasApp.urls')),
 
 ]
