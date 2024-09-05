@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from showromVentasApp.views.documento import Documento
+from showromVentasApp.views.documentoview import Documento
 from adapters.sl_client import APIClient
 import json
 import logging
@@ -10,9 +10,9 @@ class Cotizaciones(Documento):
     
     def get_route_map(self):
         return {
-            '/listado_Cotizaciones_filtrado/': self.filter_quotations,
-            '/crear_cotizacion/': self.crear,
-            '/obtener_detalles_cotizacion/': self.obtenerDetallesCotizacion,
+            '/ventas/listado_Cotizaciones_filtrado/': self.filter_quotations,
+            '/ventas/crear_cotizacion/': self.crear,
+            '/ventas/obtener_detalles_cotizacion/': self.obtenerDetallesCotizacion,
         }
 
     def get_required_fields(self):

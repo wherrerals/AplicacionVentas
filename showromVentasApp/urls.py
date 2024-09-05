@@ -1,7 +1,7 @@
 from django.urls import path
-from showromVentasApp.views.cotizaciones import Cotizaciones
-from showromVentasApp.views.socioNegocio import SocioNegocio
-from showromVentasApp.views.producto import Productos
+from showromVentasApp.views.cotizacionesview import Cotizaciones
+from showromVentasApp.views.socionegocioview import SocioNegocioView
+from showromVentasApp.views.productoview import Productos
 from showromVentasApp.views import view
 
 urlpatterns = [
@@ -9,8 +9,8 @@ urlpatterns = [
     path('listado_Cotizaciones/', Cotizaciones.as_view(), name='listado_Cotizaciones'),
     path('listado_Cotizaciones_filtrado/', Cotizaciones.as_view(), name='crearCotizacion'),
     path('crear_cotizacion/', Cotizaciones.as_view(), name='create_quotation'),
-    path('agregar_editar_clientes/', SocioNegocio.as_view(), name='agregar_editar_clientes'),
-    path('buscarc/', SocioNegocio.as_view(), name='busquedaClientes'),
+    path('agregar_editar_clientes/', SocioNegocioView.as_view(), name='agregar_editar_clientes'),
+    path('buscar_clientes/', SocioNegocioView.as_view(), name='busquedaClientes'),
     path('listado_productos/', Productos.as_view(), name='listado_productos'),
     # Rutas adicionales
     path('lista_cotizaciones/', view.list_quotations, name="lista_cotizaciones"),
@@ -24,7 +24,7 @@ urlpatterns = [
     path('lista_usuarios/', view.lista_usuarios, name='lista_usuarios'),
     path('salir/', view.userLogout, name='salir'),
     path('registrarCuenta/', view.registrarCuenta, name='registrarCuenta'),
-    path('buscar/', view.busquedaProductos, name='busquedaProductos'),
+    path('buscarproductos/', view.busquedaProductos, name='busquedaProductos'),
     path('mis_datos/', view.mis_datos, name='mis_datos'),
     path('agregar_direccion/', view.agregarDireccion, name='agregar_direccion'),
     path('generar_cotizacion/<str:docEntry>/', view.quotate_items, name='generar_cotizacion'),

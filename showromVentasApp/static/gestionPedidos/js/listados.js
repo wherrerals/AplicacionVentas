@@ -1,9 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const baseURL = 'listado_Cotizaciones/';
-
+    // Define la URL base correctamente, utilizando la raíz del sitio
+    let baseURL = '/ventas/listado_Cotizaciones/';
+    
     const fetchAndDisplayInitialData = (params) => {
-        const url = `${window.location.origin}/${baseURL}?top=${params.top}&skip=${params.skip}`;
-
+        // Asegúrate de que la URL base comience desde la raíz
+        const url = `${window.location.origin}${baseURL}?top=${params.top}&skip=${params.skip}`;
+        
         fetch(url)
             .then(response => {
                 if (!response.ok) {
@@ -26,7 +28,10 @@ document.addEventListener("DOMContentLoaded", function() {
             ...filters
         };
 
-        fetch('listado_Cotizaciones_filtrado/', {
+        // Ajusta esta URL para que no se repita
+        let listado_Cotizaciones_filtrado = '/ventas/listado_Cotizaciones_filtrado/';
+        
+        fetch(listado_Cotizaciones_filtrado, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -55,26 +60,26 @@ document.addEventListener("DOMContentLoaded", function() {
     const displayQuotations = (quotations) => {
         const tbody = document.querySelector('#listadoCotizaciones');
         tbody.innerHTML = '';
-    
+
         if (!Array.isArray(quotations)) {
             console.error('Error: Expected quotations to be an array');
             return;
         }
-    
+
         quotations.forEach(entry => {
             const quotation = entry.Quotations || {};
             const salesPerson = entry.SalesPersons || {};
-    
+
             const vatSumFormatted = quotation.DocTotalNeto.toLocaleString('es-ES', {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 2
             });
-    
+
             const docTotalFormatted = quotation.DocTotal.toLocaleString('es-ES', {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 2
             });
-    
+
             const getStatus = (quotation) => {
                 if (quotation.Cancelled === 'Y') {
                     return 'Cancelado';
@@ -86,13 +91,13 @@ document.addEventListener("DOMContentLoaded", function() {
                     return 'Activo';
                 }
             };
-    
+
             const status = getStatus(quotation);
-    
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><a href="generar_cotizacion?docNum=${quotation.DocEntry}" data-doc-entry="${quotation.DocNum}" data-document-lines="[]">${quotation.DocEntry}</a></td>
-                <td><a href="cliente.html">${quotation.CardName}</a></td>
+                <td><a href="/ventas/generar_cotizacion?docNum=${quotation.DocEntry}" data-doc-entry="${quotation.DocNum}" data-document-lines="[]">${quotation.DocEntry}</a></td>
+                <td><a href="/cliente.html">${quotation.CardName}</a></td>
                 <td>${salesPerson.SalesEmployeeName || ''}</td>
                 <td>${quotation.DocDate}</td>
                 <td>${status}</td>
@@ -102,18 +107,13 @@ document.addEventListener("DOMContentLoaded", function() {
             tbody.appendChild(tr);
         });
     };
-    
+
     const getFilterData = () => {
         return {
             fecha_inicio: document.querySelector('[name="fecha_inicio"]').value,
             fecha_fin: document.querySelector('[name="fecha_fin"]').value,
             docNum: document.querySelector('[name="docNum"]').value,
-           // carCode: document.querySelector('[name="carCode"]').value,
-            cardNAme: document.querySelector('[name="cardNAme"]').value,
-           // salesEmployeeName: document.querySelector('[name="salesEmployeeName"]').value,
-           // DocumentStatus: document.querySelector('[name="DocumentStatus"]').value,
-           // docTotal: document.querySelector('[name="docTotal"]').value,
-           // cancelled: document.querySelector('[name="cancelled"]').value
+            cardNAme: document.querySelector('[name="cardNAme"]').value
         };
     };
 

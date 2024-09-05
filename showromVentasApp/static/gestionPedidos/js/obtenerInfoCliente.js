@@ -18,10 +18,13 @@ $(document).ready(function(){
 
 // Función para traer información completa del cliente (modularizada)
 function traerInformacionCliente(clienteId) {
+
+    let buscarClientesUrl = '/ventas/buscar_clientes/'; // URL para buscar clientes
     $.ajax({
-        url: 'buscarc/', // Asegúrate de que esta URL sea correcta
+
+        url: buscarClientesUrl, // URL de la solicitud
         data: {
-            'numero': clienteId  // Usa 'numero' para coincidir con lo que el backend espera
+            'numero': clienteId  // numero es el rut del cliente
         },
         dataType: 'json',
         

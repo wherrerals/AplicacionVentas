@@ -2,8 +2,11 @@ $(document).ready(function(){
     $('#inputCliente').on('input', function(){
         let numero = $(this).val().trim(); // Trim para eliminar espacios en blanco al inicio y al final
         if(numero){ // Verificar si el número no está vacío
+            // Define la URL directamente en el archivo JavaScript
+            let buscarClientesUrl = '/ventas/buscar_clientes/';
+
             $.ajax({
-                url: 'buscarc/',
+                url: buscarClientesUrl,
                 data:{
                     'numero': numero
                 },
@@ -24,7 +27,6 @@ $(document).ready(function(){
                             $('#resultadosClientes').append(clientesElemento);
                             console.log("Se agregó un elemento <option> al select #resultadosClientes: " + resultadosClientes.nombre + ' ' + resultadosClientes.apellido + ' ' + numero);
                         });
-
                     } else {
                         $('#resultadosClientes').html('No se encontraron resultados'); // Utilizar html() en lugar de text()
                     }
@@ -38,4 +40,5 @@ $(document).ready(function(){
         }
     });
 });
+
 
