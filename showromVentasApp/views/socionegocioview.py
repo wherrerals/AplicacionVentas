@@ -62,3 +62,4 @@ class SocioNegocioView(FormView):
                 return JsonResponse({'resultadosClientes': resultados_formateados})
             return JsonResponse({'error': 'No se proporcionó un número válido'})
         return JsonResponse({'error': 'Método no permitido'}, status=405)
+    

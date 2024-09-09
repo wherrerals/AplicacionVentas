@@ -24,16 +24,22 @@ class SocioNegocio:
         self.giro = request.POST.get('giroSN')
         self.telefono = request.POST.get('telefonoSN')
         
-        self.validarDatosObligatorios()
         
     def validarDatosObligatorios(self):
-        if not all([self.gruposn, self.rut, self.email]):
-            print("Datos obligatorios faltantes")
-            raise ValidationError("Faltan datos obligatorios")
+        """
+        Metodo para validar los datos obligatorios
+        """
+        print("Validando datos obligatorios...")
+        self.validarGrupoSN()
+        self.validarRut()
+        self.validarEmail()
 
     def crearOActualizarCliente(self):
 
         try:
+            self.validarDatosObligatorios()
+
+
             # Eliminar guion del RUT y crear código SN
             codigosn = SocioNegocio.generarCodigoSN(self.rut)
             print(f"Código SN generado: {codigosn}")
@@ -66,14 +72,14 @@ class SocioNegocio:
             print("Creando cliente...")
             with transaction.atomic():
                 if self.gruposn == '100':
-                    cliente = self.crearClientePersona(self, codigosn, tiposn, tipoCliente, grupoSN)
+                    cliente = self.crearClientePersona(self, codigosn, self.rut, tiposn, tipoCliente, self.email, grupoSN)
                 elif self.gruposn == '105':
                     cliente = self.crearClienteEmpresa(self, codigosn, tiposn, grupoSN, tipoCliente)
                 else:
                     raise ValidationError(f"Grupo de cliente no válido: {self.gruposn}")
 
                 print(f"Cliente creado/actualizado: {cliente}")
-                SocioNegocio.agregarDireccionYContacto(cliente)
+                SocioNegocio.agregarDireccionYContacto(self.request, cliente)
 
             return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
 
@@ -89,7 +95,7 @@ class SocioNegocio:
         print(f"Creando cliente persona - Nombre: {self.nombre}, Apellido: {self.apellido}, RUT: {self.rut}, Email: {self.email}")
 
         return SocioNegocioRepository.crearCliente(
-            codigoSN=self.codigosn, nombre=self.nombre, apellido=self.apellido, rut=rut, giro=self.giro,
+            codigoSN=codigosn, nombre=self.nombre, apellido=self.apellido, rut=rut, giro=self.giro,
             telefono=self.telefono, email=email, grupoSN=grupoSN, tipoSN=tiposn,
             tipoCliente=tipocliente
         )
@@ -100,7 +106,7 @@ class SocioNegocio:
         return SocioNegocioRepository.crearCliente(
             codigoSN=codigosn, razonSocial=self.razon_social, rut=self.rut, giro=self.giro,
             telefono=self.telefono, email=self.email, grupoSN=grupoSN, tipoSN=tiposn,
-            tipoCliente=self.tipoCliente
+            tipoCliente=tipoCliente
         )
 
 
@@ -183,3 +189,15 @@ class SocioNegocio:
             })
 
         return resultados_formateados
+    
+    def validarGrupoSN(self):
+        if not self.gruposn:
+            raise ValidationError("Grupo de socio de negocio no encontrado")
+    
+    def validarRut(self):
+        if not self.rut:
+            raise ValidationError("RUT no encontrado")
+        
+    def validarEmail(self):
+        if not self.email:
+            raise ValidationError("Email no encontrado")
