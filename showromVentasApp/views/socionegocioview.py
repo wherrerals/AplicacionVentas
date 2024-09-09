@@ -1,9 +1,9 @@
 from django.http import JsonResponse
-from django.views.generic import View
+from django.views.generic import View, FormView
 from logicaVentasApp.services.socionegocio import SocioNegocio
 from django.core.exceptions import ValidationError
 
-class SocioNegocioView(View):
+class SocioNegocioView(FormView):
 
     def post(self, request):
         # Definir un diccionario de rutas a métodos POST
