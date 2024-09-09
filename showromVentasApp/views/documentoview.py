@@ -10,6 +10,7 @@ import requests
 import re
 import json
 import logging
+#
 
 logger = logging.getLogger(__name__)
 
@@ -73,26 +74,3 @@ class Documento(View, ABC):
             logger.error(f"Error en crear: {str(e)}")
             return self.handle_error(e)
 
-    @abstractmethod
-    def get_required_fields(self):
-        """
-        Define los campos requeridos para crear un documento.
-        Debe ser implementado por las clases hijas.
-        """
-        pass
-
-    @abstractmethod
-    def prepare_json_data(self, data):
-        """
-        Prepara los datos JSON para la creación del documento.
-        Debe ser implementado por las clases hijas.
-        """
-        pass
-
-    @abstractmethod
-    def get_endpoint(self):
-        """
-        Define el endpoint para la creación del documento.
-        Debe ser implementado por las clases hijas.
-        """
-        pass

@@ -55,7 +55,7 @@ class APIClient:
             response = self.session.post(login_url, json=auth_data, verify=False)
             response.raise_for_status()
             self.__autehnticated = True
-            return print("esta es la respuesta", response)
+            return print('Autenticado con exito')
     
     def logout(self):
         """

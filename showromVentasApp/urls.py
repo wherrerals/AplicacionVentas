@@ -1,14 +1,14 @@
 from django.urls import path
-from showromVentasApp.views.cotizacionesview import Cotizaciones
+from showromVentasApp.views.cotizacionview import CotizacionView
 from showromVentasApp.views.socionegocioview import SocioNegocioView
 from showromVentasApp.views.productoview import Productos
 from showromVentasApp.views import view
 
 urlpatterns = [
     path('', view.home, name="home"),
-    path('listado_Cotizaciones/', Cotizaciones.as_view(), name='listado_Cotizaciones'),
-    path('listado_Cotizaciones_filtrado/', Cotizaciones.as_view(), name='crearCotizacion'),
-    path('crear_cotizacion/', Cotizaciones.as_view(), name='create_quotation'),
+    path('listado_Cotizaciones/', CotizacionView.as_view(), name='listado_Cotizaciones'),
+    path('listado_Cotizaciones_filtrado/', CotizacionView.as_view(), name='listado_Cotizaciones_filtrado'),
+    path('crear_cotizacion/', CotizacionView.as_view(), name='create_quotation'),
     path('agregar_editar_clientes/', SocioNegocioView.as_view(), name='agregar_editar_clientes'),
     path('buscar_clientes/', SocioNegocioView.as_view(), name='busquedaClientes'),
     path('listado_productos/', Productos.as_view(), name='listado_productos'),
