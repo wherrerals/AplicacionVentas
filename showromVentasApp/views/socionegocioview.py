@@ -31,12 +31,28 @@ class SocioNegocioView(View):
 
     def agregarSocioNegocio(self, request):
         try:
+            # Obtener los datos del formulario
+            datos = {
+                'grupoSN': request.POST.get('grupoSN'),
+                'rut': request.POST.get('rutSN'),
+                'email': request.POST.get('emailSN'),
+                'nombre': request.POST.get('nombreSN'),
+                'apellido': request.POST.get('apellidoSN'),
+                'razon_social': request.POST.get('grupoSN'),
+                'giro': request.POST.get('giroSN'),
+                'telefono': request.POST.get('telefonoSN')
+            }
+
+            socio_negocio = SocioNegocio(request)
             # Llamar al método y devolver directamente el JsonResponse generado
-            response = SocioNegocio.crearOActualizarCliente(request)
-            print(response)
-            return response  # Aquí devolvemos la respuesta generada por la lógica de negocio
+            response = socio_negocio.crearOActualizarCliente()
+            return response
+            print(f"Response: {response}")
+
         except ValidationError as e:
             return JsonResponse({'error': str(e)}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': 'Error inesperado: {}'.format(str(e))}, status=500)
 
     def busquedaSocioNegocio(self, request):
         if request.method == "GET":

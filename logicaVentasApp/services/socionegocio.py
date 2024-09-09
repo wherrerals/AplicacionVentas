@@ -9,21 +9,40 @@ from datosLsApp.models import DireccionDB, ContactoDB
 
 class SocioNegocio:
 
-    @staticmethod
-    def crearOActualizarCliente(request):
-        try:
-            # Validar datos obligatorios
-            gruposn, rut, email = SocioNegocio.validardatosObligatorios(request)
-            print(f"Datos obligatorios - GrupoSN: {gruposn}, RUT: {rut}, Email: {email}")
+    def __init__(self, request):
+        
+        self.request = request
 
+        print(f"Request: {request.POST}")
+
+        self.gruposn = request.POST.get('grupoSN')
+        self.rut = request.POST.get('rutSN')
+        self.email = request.POST.get('emailSN')
+        self.nombre = request.POST.get('nombreSN')
+        self.apellido = request.POST.get('apellidoSN')
+        self.razon_social = request.POST.get('grupoSN')
+        self.giro = request.POST.get('giroSN')
+        self.telefono = request.POST.get('telefonoSN')
+        
+        self.validarDatosObligatorios()
+        
+    def validarDatosObligatorios(self):
+        if not all([self.gruposn, self.rut, self.email]):
+            print("Datos obligatorios faltantes")
+            raise ValidationError("Faltan datos obligatorios")
+
+    def crearOActualizarCliente(self):
+
+        try:
             # Eliminar guion del RUT y crear código SN
-            codigosn = SocioNegocio.generarCodigoSN(rut)
+            codigosn = SocioNegocio.generarCodigoSN(self.rut)
             print(f"Código SN generado: {codigosn}")
 
             # Obtener grupo
-            grupoSN = GrupoSNRepository.obtenerGrupoSNPorCodigo(gruposn)
+            grupoSN = GrupoSNRepository.obtenerGrupoSNPorCodigo(self.gruposn)
+
             if not grupoSN:
-                raise ValidationError(f"Grupo de socio de negocio no encontrado para el código: {gruposn}")
+                raise ValidationError(f"Grupo de socio de negocio no encontrado para el código: {self.gruposn}")
             print(f"Grupo de socio de negocio: {grupoSN}")
 
             # Obtener tipo de cliente
@@ -33,28 +52,28 @@ class SocioNegocio:
             print(f"Tipo de cliente: {tipoCliente}")
 
             # Verificar si el cliente ya existe
-            cliente_existente = SocioNegocioRepository.obtenerPorRut(rut)
+            cliente_existente = SocioNegocioRepository.obtenerPorRut(self.rut)
             if cliente_existente:
                 raise ValidationError("Ya existe un cliente con el mismo RUT")
 
             # Determinar tipo de socio de negocio
-            tiposn = TipoSNRepository.obtenerTipoSnPorCodigo('C' if gruposn == '100' else 'I')
+            tiposn = TipoSNRepository.obtenerTipoSnPorCodigo('C' if self.gruposn == '100' else 'I')
             if not tiposn:
-                raise ValidationError(f"Tipo de socio de negocio no encontrado para el código: {'C' if gruposn == '100' else 'I'}")
+                raise ValidationError(f"Tipo de socio de negocio no encontrado para el código: {'C' if self.gruposn == '100' else 'I'}")
             print(f"Tipo de socio de negocio: {tiposn}")
 
             # Crear o actualizar cliente dentro de una transacción
             print("Creando cliente...")
             with transaction.atomic():
-                if gruposn == '100':
-                    cliente = SocioNegocio.crearClientePersona(request, codigosn, rut, tiposn, tipoCliente, email, grupoSN)
-                elif gruposn == '105':
-                    cliente = SocioNegocio.crearClienteEmpresa(request, codigosn, rut, tiposn, grupoSN, tipoCliente, email)
+                if self.gruposn == '100':
+                    cliente = self.crearClientePersona(self, codigosn, tiposn, tipoCliente, grupoSN)
+                elif self.gruposn == '105':
+                    cliente = self.crearClienteEmpresa(self, codigosn, tiposn, grupoSN, tipoCliente)
                 else:
-                    raise ValidationError(f"Grupo de cliente no válido: {gruposn}")
+                    raise ValidationError(f"Grupo de cliente no válido: {self.gruposn}")
 
                 print(f"Cliente creado/actualizado: {cliente}")
-                SocioNegocio.agregarDireccionYContacto(request, cliente)
+                SocioNegocio.agregarDireccionYContacto(cliente)
 
             return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
 
@@ -66,38 +85,30 @@ class SocioNegocio:
             return JsonResponse({'success': False, 'message': 'Error al crear el cliente'}, status=500)
 
     @staticmethod
-    def crearClientePersona(request, codigosn, rut, tiposn, tipocliente, email, grupoSN):
-        nombre = request.POST.get('nombreSN')
-        apellido = request.POST.get('apellidoSN')
-        giro = request.POST.get('giroSN')
-        telefono = request.POST.get('telefonoSN')
+    def crearClientePersona(self, codigosn, rut, tiposn, tipocliente, email, grupoSN):
+        print(f"Creando cliente persona - Nombre: {self.nombre}, Apellido: {self.apellido}, RUT: {self.rut}, Email: {self.email}")
 
-        print(f"Creando cliente persona - Nombre: {nombre}, Apellido: {apellido}, RUT: {rut}, Email: {email}")
         return SocioNegocioRepository.crearCliente(
-            codigoSN=codigosn, nombre=nombre, apellido=apellido, rut=rut, giro=giro,
-            telefono=telefono, email=email, grupoSN=grupoSN, tipoSN=tiposn,
+            codigoSN=self.codigosn, nombre=self.nombre, apellido=self.apellido, rut=rut, giro=self.giro,
+            telefono=self.telefono, email=email, grupoSN=grupoSN, tipoSN=tiposn,
             tipoCliente=tipocliente
         )
 
     @staticmethod
-    def crearClienteEmpresa(request, codigosn, rut, tiposn, grupoSN, tipocliente, email):
-        razon_social = request.POST.get('nombre')
-        giro = request.POST.get('giroSN')
-        telefono = request.POST.get('telefonoSN')
-
-        print(f"Creando cliente empresa - Razón Social: {razon_social}, RUT: {rut}, Email: {email}")
+    def crearClienteEmpresa(self, codigosn, tiposn, grupoSN, tipoCliente):
+        print(f"Creando cliente empresa - Razón Social: {self.razon_social}, RUT: {self.rut}, Email: {self.email}")
         return SocioNegocioRepository.crearCliente(
-            codigoSN=codigosn, razonSocial=razon_social, rut=rut, giro=giro,
-            telefono=telefono, email=email, grupoSN=grupoSN, tipoSN=tiposn,
-            tipoCliente=tipocliente
+            codigoSN=codigosn, razonSocial=self.razon_social, rut=self.rut, giro=self.giro,
+            telefono=self.telefono, email=self.email, grupoSN=grupoSN, tipoSN=tiposn,
+            tipoCliente=self.tipoCliente
         )
 
 
     @staticmethod
-    def validardatosObligatorios(request):
-        gruposn = request.POST.get('grupoSN')
-        rut = request.POST.get('rutSN')
-        email = request.POST.get('emailSN')
+    def validardatosObligatorios(self):
+        gruposn = self.request.POST.get('grupoSN')
+        rut = self.request.POST.get('rutSN')
+        email = self.request.POST.get('emailSN')
 
         if not all([gruposn, rut, email]):
             print("Datos obligatorios faltantes")
