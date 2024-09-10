@@ -96,6 +96,7 @@ class APIClient:
         self.__login()
         crossjoin = f"{endpoint},SalesPersons"
         expand = f"{endpoint}($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
+        order_by = f"DocNum desc"
         filter_condition = f"{endpoint}/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
 
         if filters:
@@ -106,7 +107,7 @@ class APIClient:
             "Prefer": f"odata.maxpagesize={top}"
         }
 
-        query_url = f"$crossjoin({crossjoin})?$expand={expand}&$filter={filter_condition}&$top={top}&$skip={skip}"
+        query_url = f"$crossjoin({crossjoin})?$expand={expand}&$orderby={order_by}&$filter={filter_condition}&$top={top}&$skip={skip}"
         url = f"{self.base_url}{query_url}"
 
         response = self.session.get(url, headers=headers, verify=False)

@@ -44,50 +44,38 @@ class Cotizacion(Documento):
         if missing_fields:
             raise ValueError(f"Campos requeridos faltantes: {', '.join(missing_fields)}")
     
-    """     
-def prepare_filters(self, data):
-        filters = []
+    def construirFiltrosCotizaciones(data):
+        """
+        Construye los filtros para la consulta de cotizaciones basados en los datos proporcionados.
+        """
 
-        # Asegurarse de que data sea un diccionario
-        if isinstance(data, str):
-            try:
-                data = json.loads(data)
-            except json.JSONDecodeError:
-                print("Error: Invalid JSON string")
-                return ''
+        filters = {}
 
-        # Mapeo de campos a sus respectivos filtros
-        filter_mapping = {
-            'fecha_inicio': ('Quotations/DocDate ge', str),
-            'fecha_fin': ('Quotations/DocDate le', str),
-            'docNum': ('contains(Quotations/DocNum,', int),
-            'carCode': ('contains(Quotations/CardCode,', str),
-            'cardName': ('contains(Quotations/CardName,', str),
-            'salesEmployeeName': ('contains(SalesPersons/SalesEmployeeName,', str),
-            'DocumentStatus': ('Quotations/DocumentStatus eq', str),
-            'docTotal': ('contains(Quotations/DocTotal,', float),
-            'cancelled': ('Quotations/Cancelled eq', str)
-        }
+        if data.get('fecha_inicio'):
+            filters['Quotations/DocDate ge'] = str(f"'{data.get('fecha_inicio')}'")
+        if data.get('fecha_fin'):
+            filters['Quotations/DocDate le'] = str(f"'{data.get('fecha_fin')}'")
+        if data.get('docNum'):
+            docum = int(data.get('docNum'))
+            filters['contains(Quotations/DocNum,'] = f"{docum})"
+        if data.get('carCode'):
+            filters['contains(Quotations/CardCode,'] = f"'{data.get('carCode')}'"
+        if data.get('cardNAme'):
+            filters['contains(Quotations/CardName,'] = f"'{data.get('cardNAme')}')"
+        if data.get('salesEmployeeName'):
+            filters['contains(SalesPersons/SalesEmployeeName,'] = f"'{data.get('salesEmployeeName')}'"
+        if data.get('DocumentStatus'):
+            filters['Quotations/DocumentStatus eq'] = f"'{data.get('DocumentStatus')}'"
+        if data.get('docTotal'):
+            filters['contains(Quotations/DocTotal,'] = data.get('docTotal')
+        if data.get('cancelled'):
+            filters['Quotations/Cancelled eq'] = f"'{data.get('cancelled')}'"
 
-        for field, (filter_key, value_type) in filter_mapping.items():
-            value = data.get(field)
-            if value:
-                try:
-                    value = value_type(value)
-                    # Construye el filtro para campos que usan "contains" o filtros de igualdad
-                    if 'contains' in filter_key:
-                        filters.append(f"{filter_key}{value})")
-                    elif 'eq' in filter_key:
-                        filters.append(f"{filter_key} '{value}'")
-                    else:
-                        filters.append(f"{filter_key} {value}")
-                except (ValueError, TypeError):
-                    print(f"Error: Unable to convert {field} to {value_type}")
-                    continue
+        # Limpiar filtros vacíos o inválidos
+        filters = {k: v for k, v in filters.items() if v and v != "''"}
 
-        # Limpieza de filtros vacíos
-        return ' and '.join(filters) 
-    """
+        return filters
+
         
     def obtenerCotizaciones(self, client, docEntry):
         all_quotations = []

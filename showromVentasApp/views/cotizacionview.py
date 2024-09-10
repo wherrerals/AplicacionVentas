@@ -89,8 +89,11 @@ class CotizacionView(View):
         except Exception as e:
             logger.error(f"Error listing quotations: {str(e)}")
             return self.handle_error(e)
-    
+        
     def filtrarCotizaciones(self, request):
+        """
+        Maneja la solicitud para filtrar cotizaciones, delegando la lógica de construcción de filtros a una función separada.
+        """
         print("Request body:", request.body)  # Verifica el cuerpo de la solicitud JSON recibida
         
         client = APIClient()
@@ -101,49 +104,28 @@ class CotizacionView(View):
         except json.JSONDecodeError as e:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
-        filters = {}
+        # Construir filtros usando la lógica de negocio
+        filters = Cotizacion.construirFiltrosCotizaciones(data)
 
-        # Agregar filtros solo si se proporcionan datos válidos
-        if data.get('fecha_inicio'):
-            filters['Quotations/DocDate ge'] = f"'{data.get('fecha_inicio')}')"
-        if data.get('fecha_fin'):
-            filters['Quotations/DocDate le'] = f"'{data.get('fecha_fin')}')"
-        if data.get('docNum'):
-            docum = int(data.get('docNum'))
-            filters['contains(Quotations/DocNum,'] = f"{docum})"
-        if data.get('carCode'):
-            filters['contains(Quotations/CardCode,'] = f"'{data.get('carCode')}'"
-        if data.get('cardNAme'):
-            filters['contains(Quotations/CardName,'] = f"'{data.get('cardNAme')}')"
-        if data.get('salesEmployeeName'):
-            filters['contains(SalesPersons/SalesEmployeeName,'] = f"'{data.get('salesEmployeeName')}'"
-        if data.get('DocumentStatus'):
-            filters['Quotations/DocumentStatus eq'] = f"'{data.get('DocumentStatus')}'"
-        if data.get('docTotal'):
-            filters['contains(Quotations/DocTotal,'] = data.get('docTotal')
-        if data.get('cancelled'):
-            filters['Quotations/Cancelled eq'] = f"'{data.get('cancelled')}'"
-
-        # Limpiar los filtros vacíos o con valores inválidos
-        filters = {k: v for k, v in filters.items() if v and v != "''"}
-
+        # Validar los parámetros de paginación
         try:
             top = int(data.get('top', 20))
             skip = int(data.get('skip', 0))
         except ValueError:
             return JsonResponse({'error': 'Invalid parameters'}, status=400)
 
-        print("Applying filters:", filters)# Verifica los filtros aplicados
+        print("Applying filters:", filters)  # Verifica los filtros aplicados
         print("-" * 10)  
         print(filters)
-        
 
+        # Manejar la solicitud de datos
         try:
-            data = client.getData(top=top, skip=skip, filters=filters)
+            data = client.getData(endpoint=self.get_endpoint(), top=top, skip=skip, filters=filters)
             return JsonResponse({'data': data}, safe=False)
         except Exception as e:
             print("Error:", e)  # Verifica el error específico que está ocurriendo
             return JsonResponse({'error': str(e)}, status=500)
+
 
     def obtenerDetallesCotizacion(self, request, docEntry):
         try:
