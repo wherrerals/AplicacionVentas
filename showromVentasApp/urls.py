@@ -4,6 +4,8 @@ from showromVentasApp.views.socionegocioview import SocioNegocioView
 from showromVentasApp.views.productoview import Productos
 from showromVentasApp.views import view
 
+cotizacionView = CotizacionView()
+
 urlpatterns = [
     path('', view.home, name="home"),
     path('listado_Cotizaciones/', CotizacionView.as_view(), name='listado_Cotizaciones'),
@@ -27,5 +29,5 @@ urlpatterns = [
     path('buscarproductos/', view.busquedaProductos, name='busquedaProductos'),
     path('mis_datos/', view.mis_datos, name='mis_datos'),
     path('agregar_direccion/', view.agregarDireccion, name='agregar_direccion'),
-    path('generar_cotizacion/<str:docEntry>/', view.quotate_items, name='generar_cotizacion'),
+    path('generar_cotizacion/<int:docEntry>/', cotizacionView.obtenerDetallesCotizacion, name='generar_cotizacion'),
 ]

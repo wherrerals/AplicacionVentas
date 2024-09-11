@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
+
+    console.log('Documento cargado. JS activo.');
     // Función para obtener el valor de un parámetro de consulta y convertirlo a entero
     function getQueryParamInt(param) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -10,8 +12,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const docEntry = getQueryParamInt('docEntry'); // Aquí obtenemos el docNum como entero
+    console.log('docEntry obtenido:', docEntry);
 
     if (docEntry !== null) { // Verificamos que docNum no sea null antes de usarlo
+        console.log('docEntry:', docEntry);
         fetch(`generar_cotizacion/${docEntry}`)
             .then(response => {
                 if (!response.ok) {
@@ -20,8 +24,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 return response.json();
             })
             .then(data => {
+                console.log('Datos recibidos:', data);
                 if (data && data.DocumentLines && data.DocumentLines.length > 0) {
                     const documentLines = data.DocumentLines;
+                    console.log('Procesando líneas de documentos...');
 
                     documentLines.forEach(line => {
 
@@ -130,6 +136,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Error fetching data:', error);
             });
     } else {
-        console.error('El parámetro docNum no se encontró en la URL o no es un número válido');
+        console.error('El parámetro docEntry no se encontró en la URL o no es un número válido');
     }
 });
+
+const productosTable = document.getElementById('productos');
+if (productosTable) {
+    productosTable.appendChild(newRow);
+} else {
+    console.error('No se encontró el elemento con id "productos" en el DOM');
+}

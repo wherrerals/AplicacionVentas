@@ -75,22 +75,40 @@ class Cotizacion(Documento):
         filters = {k: v for k, v in filters.items() if v and v != "''"}
 
         return filters
-
         
-    def obtenerCotizaciones(self, client, docEntry):
-        all_quotations = []
-        page = 1
-        while True:
-            data = client.get_quotations_items('Quotations', docEntry, top=20, skip=(page - 1) * 20)
-            if 'value' not in data or not data['value']:
-                break
-            all_quotations.extend(data['value'])
-            if 'odata.nextLink' not in data:
-                break
-            page += 1
-        return all_quotations
+    @staticmethod
+    def fetch_quotation_items(doc_entry):
+        try:
+            print("DocEntry:", doc_entry)
+            print("-" * 10)
+            print("Fetching quotation items...")
+            # Lógica para obtener los datos
+            client = APIClient()
+            data = client.get_quotations_items('Quotations', doc_entry)
+            print("Data:", data)
+            print("-" * 10)
+            if 'value' not in data:
+                return None, 'No se encontraron datos de cotización'
+            
+            quotations = data['value']
+            doc_entry_int = int(doc_entry)
+            found_quotation = next((q for q in quotations if q.get('DocEntry') == doc_entry_int), None)
+            print("Found quotation:", found_quotation)
+            
+            if not found_quotation:
+                return None, 'No se encontró la cotización con el DocEntry proporcionado'
+            
+            document_lines = found_quotation.get('DocumentLines', [])
+            lines_data = Cotizacion.prepararLineasIternas(document_lines)
+            
+            return lines_data, None
+        
+        except Exception as e:
+            logger.error(f"Error al obtener detalles de la cotización: {str(e)}")
+            return None, 'Error interno del servidor'
+
     
-    def prepararLineasItemas(self, document_lines):
+    def prepararLineasIternas(self, document_lines):
         return [
             {
                 'LineNum': line.get('LineNum'),
@@ -124,7 +142,7 @@ class Cotizacion(Documento):
             'condi_pago': self.condi_pago,
             'tipoentrega': self.tipoentrega,
             'tipoobjetoSap': self.tipoobjetoSap,
-            'items': self.prepararLineasItemas(self.items),
+            'items': self.prepararLineasIternas(self.items),
         }
         return data
     

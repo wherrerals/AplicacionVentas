@@ -43,6 +43,7 @@ class Documento(ABC):
         if not self.fechaDocumento or not self.fechaEntrega or not self.codigoVenta:
             raise ValueError("Faltan datos obligatorios para el documento.")
 
+    @abstractmethod
     def crearOActualizarDocumento(self):
         """
         Método para crear o actualizar un documento.

@@ -464,7 +464,7 @@ def quotate_items(request, docEntry):
     client = APIClient()  
 
     try:
-        data = client.get_quotations_items('Quotations')  # Ajusta según el método de cliente API
+        data = client.get_quotations_items('Quotations', docEntry)  # Ajusta según el método de cliente API
 
         # Verificar si hay datos y procesarlos
         if 'value' in data:

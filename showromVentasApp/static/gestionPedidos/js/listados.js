@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Define la URL base correctamente, utilizando la raíz del sitio
-    let baseURL = '/ventas/listado_Cotizaciones/';
+    const baseURL = '/ventas/listado_Cotizaciones/';
     
     const fetchAndDisplayInitialData = (params) => {
         // Asegúrate de que la URL base comience desde la raíz
@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 displayQuotations(data.value || []);
                 nextPageLink = data['odata.nextLink'] || null;
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => console.error('Error fetching data:', error));
     };
 
     const applyFiltersAndFetchData = (filters) => {
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function() {
         };
 
         // Ajusta esta URL para que no se repita
-        let listado_Cotizaciones_filtrado = '/ventas/listado_Cotizaciones_filtrado/';
+        const listado_Cotizaciones_filtrado = '/ventas/listado_Cotizaciones_filtrado/';
         
         fetch(listado_Cotizaciones_filtrado, {
             method: 'POST',
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 displayQuotations([]);
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => console.error('Error applying filters:', error));
     };
 
     const displayQuotations = (quotations) => {
@@ -70,16 +70,18 @@ document.addEventListener("DOMContentLoaded", function() {
             const quotation = entry.Quotations || {};
             const salesPerson = entry.SalesPersons || {};
 
-            const vatSumFormatted = quotation.DocTotalNeto.toLocaleString('es-ES', {
+            // Formatear los valores monetarios
+            const vatSumFormatted = Number(quotation.DocTotalNeto).toLocaleString('es-ES', {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 2
             });
 
-            const docTotalFormatted = quotation.DocTotal.toLocaleString('es-ES', {
+            const docTotalFormatted = Number(quotation.DocTotal).toLocaleString('es-ES', {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 2
             });
 
+            // Obtener el estado del documento
             const getStatus = (quotation) => {
                 if (quotation.Cancelled === 'Y') {
                     return 'Cancelado';
@@ -93,13 +95,16 @@ document.addEventListener("DOMContentLoaded", function() {
             };
 
             const status = getStatus(quotation);
+            console.log(quotation.DocEntry)
+            let urlModel = `/ventas/generar_cotizacion/${quotation.DocEntry}/`;
 
+            // Crear una fila de la tabla
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><a href="/ventas/generar_cotizacion?docNum=${quotation.DocEntry}" data-doc-entry="${quotation.DocNum}" data-document-lines="[]">${quotation.DocEntry}</a></td>
-                <td><a href="/cliente.html">${quotation.CardName}</a></td>
-                <td>${salesPerson.SalesEmployeeName || ''}</td>
-                <td>${quotation.DocDate}</td>
+                <td><a href="${urlModel}" data-doc-entry="${quotation.DocNum}" data-document-lines="${quotation.DocumentLines ? JSON.stringify(quotation.DocumentLines) : '[]'}">${quotation.DocEntry}</a></td>
+                <td><a href="/cliente.html">${quotation.CardName || 'Cliente Desconocido'}</a></td>
+                <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
+                <td>${new Date(quotation.DocDate).toLocaleDateString()}</td>
                 <td>${status}</td>
                 <td style="text-align: right;">$ ${vatSumFormatted}</td>
                 <td style="text-align: right;">$ ${docTotalFormatted}</td>
@@ -108,17 +113,20 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     };
 
+    // Obtener datos de los filtros
     const getFilterData = () => {
         return {
             fecha_inicio: document.querySelector('[name="fecha_inicio"]').value,
             fecha_fin: document.querySelector('[name="fecha_fin"]').value,
             docNum: document.querySelector('[name="docNum"]').value,
-            cardNAme: document.querySelector('[name="cardNAme"]').value
+            cardName: document.querySelector('[name="cardName"]').value // corregido 'cardNAme' a 'cardName'
         };
     };
 
+    // Cargar datos iniciales
     fetchAndDisplayInitialData({ top: 20, skip: 0 });
 
+    // Manejar el botón de filtro
     const filterButton = document.querySelector('#filterButton');
     if (filterButton) {
         filterButton.addEventListener('click', () => {
@@ -127,6 +135,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
+    // Manejar el botón de siguiente página
     const nextButton = document.querySelector('#nextButton');
     if (nextButton) {
         nextButton.addEventListener('click', () => {

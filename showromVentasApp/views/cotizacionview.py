@@ -58,11 +58,12 @@ class CotizacionView(View):
             '/ventas/listado_Cotizaciones': self.listarCotizaciones,
             '/ventas/obtener_detalles_cotizacion': self.obtenerDetallesCotizacion,
         }
-    
+
     def post_route_map(self):
         return {
             '/ventas/listado_Cotizaciones_filtrado': self.filtrarCotizaciones,
             '/ventas/crear_cotizacion': self.crearDocumento,
+            'generar_cotizacion': self.quotate_items,
         }
 
     def handle_invalid_route(self, request):
@@ -127,52 +128,23 @@ class CotizacionView(View):
             return JsonResponse({'error': str(e)}, status=500)
 
 
-    def obtenerDetallesCotizacion(self, request, docEntry):
-        try:
-            client = APIClient()
-            doc_num_int = int(docEntry)
-            all_quotations = Cotizacion.obtenerCotizaciones(client, docEntry)
-            found_quotation = next((q for q in all_quotations if q.get('docEntry') == doc_num_int), None)
+    def obtenerDetallesCotizacion(self, request, *args, **kwargs):
+        docEntry = kwargs.get('docEntry')
+        if not docEntry:
+            return JsonResponse({'error': 'DocEntry no proporcionado'}, status=400)
+        
+        # Llamar al servicio de cotización
+        lines_data, error = Cotizacion.fetch_quotation_items(docEntry)
+        
+        # Verificar si se encontró un error
+        if error:
+            return JsonResponse({'error': error}, status=404 if 'No se encontró' in error else 500)
+        
+        # Devolver los datos si no hay error
+        return JsonResponse({'DocumentLines': lines_data}, status=200)
 
-            if not found_quotation:
-                logger.warning(f"No se encontró la cotización con DocEntry: {docEntry}")
-                return JsonResponse({'error': 'No se encontró la cotización especificada'}, status=404)
 
-            document_lines = found_quotation.get('DocumentLines', [])
-            lines_data = Cotizacion.prepararLineasItemas(document_lines)
-            return JsonResponse({'DocumentLines': lines_data}, status=200)
-        except ValueError as e:
-            logger.error(f"Error de valor: {str(e)}")
-            return JsonResponse({'error': 'DocEntry inválido'}, status=400)
-        except Exception as e:
-            logger.error(f"Error al obtener detalles de cotización: {str(e)}")
-            return self.handle_error(e)
 
-    def quotate_items(self, request, docNum):
-        try:
-            client = APIClient()
-            data = client.get_quotations_items('Quotations')
-            if 'value' not in data:
-                logger.warning("No se encontraron datos de cotizaciones")
-                return JsonResponse({'error': 'No se encontraron datos de cotizaciones'}, status=404)
-
-            quotations = data['value']
-            doc_num_int = int(docNum)
-            found_quotation = next((q for q in quotations if q.get('DocNum') == doc_num_int), None)
-
-            if not found_quotation:
-                logger.warning(f"No se encontró la cotización con DocNum: {docNum}")
-                return JsonResponse({'error': 'No se encontró la cotización especificada'}, status=404)
-
-            document_lines = found_quotation.get('DocumentLines', [])
-            lines_data = Cotizacion.prepararLineasItemas(document_lines)
-            return JsonResponse({'DocumentLines': lines_data}, status=200)
-        except ValueError as e:
-            logger.error(f"Error de valor: {str(e)}")
-            return JsonResponse({'error': 'DocNum inválido'}, status=400)
-        except Exception as e:
-            logger.error(f"Error al cotizar items: {str(e)}")
-            return self.handle_error(e)
 
     def crearDocumento(self, request):
         try:
