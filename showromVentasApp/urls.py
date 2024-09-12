@@ -29,5 +29,5 @@ urlpatterns = [
     path('buscarproductos/', view.busquedaProductos, name='busquedaProductos'),
     path('mis_datos/', view.mis_datos, name='mis_datos'),
     path('agregar_direccion/', view.agregarDireccion, name='agregar_direccion'),
-    path('generar_cotizacion/<int:docEntry>/', cotizacionView.obtenerDetallesCotizacion, name='generar_cotizacion'),
+    path('obtener_detalles_cotizacion/<int:docEntry>/', cotizacionView.obtenerDetallesCotizacion, name='obtener_detalles_cotizacion'),
 ]

@@ -1,4 +1,5 @@
 import logging
+from django.shortcuts import render
 from django.views.generic import View
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
@@ -128,33 +129,55 @@ class CotizacionView(View):
             return JsonResponse({'error': str(e)}, status=500)
 
 
+    """      
     def obtenerDetallesCotizacion(self, request, *args, **kwargs):
         docEntry = kwargs.get('docEntry')
+        print("DocEntry:", docEntry)
+        
         if not docEntry:
             return JsonResponse({'error': 'DocEntry no proporcionado'}, status=400)
         
         # Llamar al servicio de cotización
-        lines_data, error = Cotizacion.fetch_quotation_items(docEntry)
+        lines_data, error = Cotizacion.buscarDocumentosCotizacion(docEntry)
         
         # Verificar si se encontró un error
         if error:
             return JsonResponse({'error': error}, status=404 if 'No se encontró' in error else 500)
         
         # Devolver los datos si no hay error
-        return JsonResponse({'DocumentLines': lines_data}, status=200)
+        #return JsonResponse({'DocumentLines': lines_data}, status=200)
+        render (request, 'cotizacion.html', {'DocumentLines': lines_data}) 
+        """
+    
+    def obtenerDetallesCotizacion(self, request, *args, **kwargs):
+        docEntry = kwargs.get('docEntry')
+        print("DocEntry:", docEntry)
+        
+        if not docEntry:
+            return JsonResponse({'error': 'DocEntry no proporcionado'}, status=400)
+        
+        # Llamar al servicio de cotización
+        lines_data, error = Cotizacion.buscarDocumentosCotizacion(docEntry)
 
-
-
+        print("*" * 10)
+        print("Lines data:", lines_data)  # Verificar los datos de las líneas de documento
+        
+        # Verificar si se encontró un error
+        if error:
+            return render(request, 'error.html', {'error': error}, status=404 if 'No se encontró' in error else 500)
+        
+        # Renderizar la página HTML con los datos
+        #return JsonResponse({'DocumentLines': lines_data}, status=200)
+        return render(request,'cotizacion.html', {'DocumentLines': lines_data})
 
     def crearDocumento(self, request):
         try:
             data = json.loads(request.body)
-            cotizacion = Cotizacion()
-            result = cotizacion.crearDocumento(data, self.get_endpoint())
-            return JsonResponse(result, safe=False)
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON inválido: {str(e)}")
+            client = APIClient()
+            response = client.crearDocumento(endpoint=self.get_endpoint(), data=data)
+            return JsonResponse(response, status=201)
+        except json.JSONDecodeError:
             return JsonResponse({'error': 'JSON inválido'}, status=400)
         except Exception as e:
-            logger.error(f"Error al crear documento: {str(e)}")
             return self.handle_error(e)
+            

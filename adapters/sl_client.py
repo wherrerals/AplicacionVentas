@@ -158,17 +158,15 @@ class APIClient:
 
     
     
-    def get_quotations_items(self, endpoint, docEntry, top=20, skip=0):
+    def obtenerCotizacionesDE(self, endpoint, docEntry, top=20, skip=0):
         
         self.__login()
 
-        crossjoin = f"({endpoint},SalesPersons,BusinessPartners/ContactEmployees)"
+        crossjoin = f"({endpoint},Quotations/DocumentLines,Items/ItemWarehouseInfoCollection)"
 
-        expand_fields = ("Quotations($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address, Address2,DocDate,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto)"
-                         ",SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
-                         )
+        expand_fields = (f"{endpoint}/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)")
         
-        filter_condition = f"Quotations/DocEntry eq {docEntry} and Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Quotations/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode"
+        filter_condition = f"{endpoint}/DocEntry eq {docEntry} and {endpoint}/DocumentLines/DocEntry eq {endpoint}/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq {endpoint}/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq Quotations/DocumentLines/WarehouseCode"
 
         # Construir la URL con el endpoint y la consulta
         queryUrl = (
@@ -195,7 +193,7 @@ class APIClient:
         return response.json()
     
 
-    def post_data(self, endpoint, data=None, headers=None):
+    def crearCotizacion(self, endpoint, data=None, headers=None):
         """
         permite la creacion de cotizaciones en la base de datos de SAP
 

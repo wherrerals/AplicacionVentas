@@ -96,12 +96,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
             const status = getStatus(quotation);
             console.log(quotation.DocEntry)
-            let urlModel = `/ventas/generar_cotizacion/${quotation.DocEntry}/`;
+            let urlModel = `/ventas/obtener_detalles_cotizacion/${quotation.DocEntry}/`;
 
             // Crear una fila de la tabla
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><a href="${urlModel}" data-doc-entry="${quotation.DocNum}" data-document-lines="${quotation.DocumentLines ? JSON.stringify(quotation.DocumentLines) : '[]'}">${quotation.DocEntry}</a></td>
+                <td><a href="${urlModel}" data-doc-entry="${quotation.DocEntry}" data-doc-num="${quotation.DocNum}" data-document-lines="${quotation.DocumentLines ? JSON.stringify(quotation.DocumentLines) : '[]'}">${quotation.DocEntry}</a></td>
                 <td><a href="/cliente.html">${quotation.CardName || 'Cliente Desconocido'}</a></td>
                 <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
                 <td>${new Date(quotation.DocDate).toLocaleDateString()}</td>
