@@ -1,80 +1,71 @@
 from django.contrib import admin
-from datosLsApp.models import (CondicionPago, Documento, TipoDocTributario, Sucursal, TipoVenta, Vendedor, Producto, Bodega, Inventario, Item, SocioNegocio, Usuario, Contacto, Direccion, Comuna)
+from datosLsApp.models import (
+    CondicionPagoDB, DocumentoDB, TipoDocTributarioDB, SucursalDB, 
+    TipoVentaDB, VendedorDB, ProductoDB, BodegaDB, InventarioDB, 
+    ItemDB, SocioNegocioDB, UsuarioDB, ContactoDB, DireccionDB, ComunaDB
+)
 
-#Modicaciones en administrador 
+# Modificaciones en administrador
 admin.site.site_header = 'Led Studio'
 admin.site.site_title = 'Led Studio Admin'
 admin.site.index_title = 'Aplicacion Ventas Led Studio'
 
-#mejora interfaz modelos
-class TipoDocTributarioper(admin.ModelAdmin): #revisar
-    list_display = ('codigo','nombre')
+# Mejora interfaz modelos
+class TipoDocTributarioDBper(admin.ModelAdmin):
+    list_display = ('codigo', 'nombre')
 
-class Sucursalper(admin.ModelAdmin):
-    list_display = ('codigo','nombre')
+class SucursalDBper(admin.ModelAdmin):
+    list_display = ('codigo', 'nombre')
 
-class TipoVentaper(admin.ModelAdmin):
-    list_display = ('codigo','nombre')
+class TipoVentaDBper(admin.ModelAdmin):
+    list_display = ('codigo', 'nombre')
 
-class bodegaper(admin.ModelAdmin):
-    list_display = ('codigo','nombre','descripcion')
+class BodegaDBper(admin.ModelAdmin):
+    list_display = ('codigo', 'nombre', 'descripcion')
 
-class condicionPagoper(admin.ModelAdmin):
-    list_display = ('codigo','nombre')
+class CondicionPagoper(admin.ModelAdmin):
+    list_display = ('codigo', 'nombre')
 
-class vendedorper(admin.ModelAdmin):
-    list_display = ('codigo','nombre','sucursal')
+class VendedorDBper(admin.ModelAdmin):
+    list_display = ('codigo', 'nombre', 'sucursal')
 
-class documentoper(admin.ModelAdmin): 
-    list_display = ('docEntry','folio','totalAntesDelDescuento','totalDocumento','vendedor')
+class DocumentoDBper(admin.ModelAdmin):
+    list_display = ('docEntry', 'folio', 'totalAntesDelDescuento', 'totalDocumento', 'vendedor')
 
-class Inventarioper(admin.ModelAdmin):
-    list_display = ('producto','bodega')
+class InventarioDBper(admin.ModelAdmin):
+    list_display = ('producto', 'bodega')
 
-class productosper(admin.ModelAdmin):
-    list_display = ('codigo','nombre','stockTotal','precioLista','precioVenta')
+class Productosper(admin.ModelAdmin):
+    list_display = ('codigo', 'nombre', 'stockTotal', 'precioLista', 'precioVenta')
 
-class itemper(admin.ModelAdmin):
-    list_display = ('producto','cantidad','descuento')
+class ItemDBper(admin.ModelAdmin):
+    list_display = ('producto', 'cantidad', 'descuento')
 
-class SocioNegocioper(admin.ModelAdmin):
-    list_display = ('nombre','razonSocial','email','telefono','condicionPago')
+class SocioNegocioDBper(admin.ModelAdmin):
+    list_display = ('nombre', 'razonSocial', 'email', 'telefono', 'condicionPago')
 
-class Usuarioper(admin.ModelAdmin):
-    list_display = ('nombre', 'email','telefono')
+class UsuarioDBper(admin.ModelAdmin):
+    list_display = ('nombre', 'email', 'telefono')
 
-class Contactoper(admin.ModelAdmin):
+class ContactoDBper(admin.ModelAdmin):
     list_display = ('nombreCompleto',)
-
-class Direccionesper(admin.ModelAdmin):
-    list_display = ('nombreDireccion','region','SocioNegocio')
+ 
+class DireccionDBper(admin.ModelAdmin):
+    list_display = ('nombre', 'region', 'socioNegocio')
 
 # Register your models here.
-admin.site.register(TipoDocTributario,TipoDocTributarioper)
-admin.site.register(Sucursal,Sucursalper)
-admin.site.register(TipoVenta,TipoVentaper)
-admin.site.register(Vendedor,vendedorper)
-admin.site.register(Documento,documentoper)
-admin.site.register(CondicionPago,condicionPagoper)
-admin.site.register(Producto,productosper)
-admin.site.register(Bodega,bodegaper)
-admin.site.register(Inventario,Inventarioper)
-admin.site.register(Item,itemper)
-admin.site.register(SocioNegocio,SocioNegocioper)
-admin.site.register(Usuario,Usuarioper)
-admin.site.register(Contacto, Contactoper)
-admin.site.register(Direccion,Direccionesper)
-admin.site.register(Comuna)
-
-
-
-
-
-
-
-
-
-
-
-
-
+admin.site.register(TipoDocTributarioDB, TipoDocTributarioDBper)
+admin.site.register(SucursalDB, SucursalDBper)
+admin.site.register(TipoVentaDB, TipoVentaDBper)
+admin.site.register(VendedorDB, VendedorDBper)
+admin.site.register(DocumentoDB, DocumentoDBper)
+admin.site.register(CondicionPagoDB, CondicionPagoper)
+admin.site.register(ProductoDB, Productosper)
+admin.site.register(BodegaDB, BodegaDBper)
+admin.site.register(InventarioDB, InventarioDBper)
+admin.site.register(ItemDB, ItemDBper)
+admin.site.register(SocioNegocioDB, SocioNegocioDBper)
+admin.site.register(UsuarioDB, UsuarioDBper)
+admin.site.register(ContactoDB, ContactoDBper)
+#admin.site.register(DireccionDB, DireccionDBper)
+admin.site.register(ComunaDB)

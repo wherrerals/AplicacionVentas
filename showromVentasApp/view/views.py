@@ -8,8 +8,8 @@ from django.views.decorators.http import require_POST, require_http_methods
 from django.db import transaction
 from django.http import JsonResponse, HttpResponse
 #Modulos Diseñados
-from datosLsApp.models.usuario import User 
-from datosLsApp.models import (Producto, SocioNegocio, Usuario, Region, GrupoSN, TipoSN, TipoCliente, Direccion, Comuna, Contacto)
+from datosLsApp.models.usuariodb import User 
+from datosLsApp.models import (ProductoDB, SocioNegocioDB, UsuarioDB, RegionDB, GrupoSNDB, TipoSNDB, TipoClienteDB, DireccionDB, ComunaDB, ContactoDB)
 from datosLsApp.sl_client import APIClient
 #librerias Python usadas
 import requests
@@ -92,7 +92,7 @@ def quotations(request):
     
         doc_num = request.GET.get('docNum', None)
 
-        regiones = Region.objects.all()
+        regiones = RegionDB.objects.all()
 
 
         context = {
@@ -247,7 +247,7 @@ def registrarCuenta(request):
             return render(request, "micuenta.html", {'email': email, "nombre": nombre, "telefono": telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
 
         usuario_login = User.objects.create(username=username, password=make, email=email, first_name= nombre)
-        cuenta = Usuario.objects.create(nombre=nombre, email=email, telefono=telefono, usuarios = usuario_login)
+        cuenta = UsuarioDB.objects.create(nombre=nombre, email=email, telefono=telefono, usuarios = usuario_login)
         return redirect('/')
         
     elif password != rep_password:
@@ -260,7 +260,7 @@ def registrarCuenta(request):
 @login_required
 def mis_datos(request):
 
-    usuario = Usuario.objects.get(usuarios=request.user)
+    usuario = UsuarioDB.objects.get(usuarios=request.user)
     user = request.user
 
     if request.method == "POST":
@@ -286,7 +286,7 @@ def mis_datos(request):
                 mensaje2 = "Las contraseñas no coinciden"
                 return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje, "mensaje_error_repcontrasena": mensaje2})
             
-            usuario = Usuario.objects.get(usuarios=user)
+            usuario = UsuarioDB.objects.get(usuarios=user)
             usuario.telefono = telefono
             usuario.nombre = nombre
             usuario.save()
@@ -333,10 +333,10 @@ def agregar_direccion(request, socio):
 
             # Verificar si existe un campo requerido
             if nombredireccion:
-                fregion = Region.objects.get(numero=region)
-                fcomuna = Comuna.objects.get(codigo=comuna)
+                fregion = RegionDB.objects.get(numero=region)
+                fcomuna = ComunaDB.objects.get(codigo=comuna)
 
-                Direccion.objects.create(
+                DireccionDB.objects.create(
                     nombreDireccion=nombredireccion,
                     ciudad=ciudad,
                     calleNumero=callenumero,
@@ -377,7 +377,7 @@ def agregar_contacto(request, cliente):
             if nombre and apellido:
                 nombreCompleto = f"{nombre} {apellido}"
 
-                Contacto.objects.create(
+                ContactoDB.objects.create(
                     codigoInternoSap=1,  # Aquí deberías manejar la lógica del código interno si es variable
                     nombreCompleto=nombreCompleto,
                     nombre=nombre,
@@ -400,7 +400,7 @@ def busquedaProductos(request):
     if request.method == 'GET' and 'numero' in request.GET:
         numero = request.GET.get('numero')
         # Realiza la consulta a la base de datos para obtener los resultados
-        resultados = Producto.objects.filter(codigo__icontains=numero)
+        resultados = ProductoDB.objects.filter(codigo__icontains=numero)
         # Convierte los resultados en una lista de diccionarios
         resultados_formateados = [{'codigo': producto.codigo,
                                    'nombre': producto.nombre,
@@ -431,7 +431,7 @@ def validar_contrasena(password):
     if len(password) < 8:
         mensajes.append("Su contraseña debe tener al menos 8 caracteres.")
 
-    return mensajes  
+    return mensajes
 
 
 """ @require_http_methods(["GET"])
@@ -489,6 +489,7 @@ def quotate_items(request, docEntry):
                         'Quantity': line.get('Quantity'),
                         'Price': line.get('Price'),
                     }
+                    
                     lines_data.append(line_data)
 
                 # Retornar respuesta JSON con las líneas de documentos encontradas

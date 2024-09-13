@@ -1,7 +1,7 @@
 from django.db import models
 
     
-class CondicionPago(models.Model):        
+class CondicionPagoDB(models.Model):        
     class Meta:
         db_table = "CondicionPago"
         verbose_name = 'CondicionPago'

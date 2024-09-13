@@ -1,7 +1,7 @@
 from django.db import models
-from datosLsApp.models.region import Region
+from datosLsApp.models.regiondb import RegionDB
 
-class Comuna(models.Model):
+class ComunaDB(models.Model):
     class Meta:
         db_table = "Comuna"
 
@@ -10,5 +10,5 @@ class Comuna(models.Model):
         
     codigo = models.CharField(max_length=50,null = False)
     nombre = models.CharField(max_length=50,null = False)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE, default=1)
+    region = models.ForeignKey(RegionDB, on_delete=models.CASCADE, default=1)
     #El parametro to_field='atributo_En_otro_modelo' es solo necesario si la relacion es con algo que no sea la llave primaria

@@ -1,11 +1,11 @@
 from django.db import models
-from datosLsApp.models.vendedor import Vendedor
-from datosLsApp.models.condicionpago import CondicionPago
-from datosLsApp.models.tipodoctributario import TipoDocTributario
-from datosLsApp.models.tipoentrega import TipoEntrega
-from datosLsApp.models.tipoobjetosap import TipoObjetoSap
+from datosLsApp.models.vendedordb import VendedorDB
+from datosLsApp.models.condicionpagodb import CondicionPagoDB
+from datosLsApp.models.tipodoctributariodb import TipoDocTributarioDB
+from datosLsApp.models.tipoentregadb import TipoEntregaDB
+from datosLsApp.models.tipoobjetosapdb import TipoObjetoSapDB
 
-class Documento(models.Model):
+class DocumentoDB(models.Model):
     class Meta:
         db_table = 'Documento'
         verbose_name = 'Documento'
@@ -24,11 +24,11 @@ class Documento(models.Model):
     descuento = models.FloatField(default=0) 
     totalDocumento = models.FloatField(null = False)
     codigoVenta = models.IntegerField(null = False)
-    tipo_documento = models.ForeignKey(TipoDocTributario, on_delete=models.CASCADE)
-    vendedor = models.ForeignKey(Vendedor, on_delete=models.CASCADE, default=1)
-    condi_pago = models.ForeignKey(CondicionPago, on_delete=models.CASCADE, default=1)
-    tipoentrega = models.ForeignKey(TipoEntrega, on_delete=models.CASCADE, default=1)
-    tipoobjetoSap = models.ForeignKey(TipoObjetoSap, on_delete=models.CASCADE, default=1)    
+    tipo_documento = models.ForeignKey(TipoDocTributarioDB, on_delete=models.CASCADE)
+    vendedor = models.ForeignKey(VendedorDB, on_delete=models.CASCADE, default=1)
+    condi_pago = models.ForeignKey(CondicionPagoDB, on_delete=models.CASCADE, default=1)
+    tipoentrega = models.ForeignKey(TipoEntregaDB, on_delete=models.CASCADE, default=1)
+    tipoobjetoSap = models.ForeignKey(TipoObjetoSapDB, on_delete=models.CASCADE, default=1)    
     # Otros campos que puedas tener
     
     def __str__(self):
