@@ -121,8 +121,7 @@
                                 <label id="nombreLabel" class="col-form-label" style="font-size: 13px;">Nombre</label>
                               </div>
                               <div class="col-sm-3 col-md-3" style="text-align: left;width: 80%;">
-                                <input class="form-control" type="text" name="nombreSN" id="nombreSN" value="{{ nombre }}"
-                                  style="border-color: rgb(159,168,175);font-size: 12px;">
+                                <input class="form-control" type="text" name="nombreSN" id="nombreSN" value="{{ nombre }}" style="border-color: rgb(159,168,175);font-size: 12px;">
                               </div>
                             </div>
 
@@ -138,38 +137,18 @@
 
                           <div class="col-sm-2" style="width: 25%;">
                             <div class="form-check">
-                              <input class="form-check-input" type="radio" id="formCheck-5" name="grupoSN" value="100" style="border-color: rgb(159,168,175);" checked="" onchange="cambiarLabel()">
+                              <input class="form-check-input" type="radio" id="formCheck-5" name="grupoSN" value="100" style="border-color: rgb(159,168,175);" checked="" 
+                              onchange="cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow')">
                               <label class="form-check-label" for="formCheck-5">Persona</label>
                             </div>
 
                             <div class="form-check">
                               <input class="form-check-input" type="radio" id="formCheck-6" name="grupoSN" value="105"
-                                style="border-color: rgb(159,168,175);" onchange="cambiarLabel()">
+                                style="border-color: rgb(159,168,175);" onchange="cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow')">
                               <label class="form-check-label" for="formCheck-6">Empresa</label>
                             </div>
                           </div>
                         </div>
-
-                        <script>
-                          function cambiarLabel() { //Codigo para mostrar y ocultar apellido y mostrar razon social
-                            var razonSocialRadio = document.getElementsByName('grupoSN');
-                            var nombreLabel = document.getElementById('nombreLabel');
-                            var apellidoInput = document.getElementById('apellido');
-                            var apellidolabel = document.getElementById('apellidorow')
-
-                            if (razonSocialRadio[0].checked) {
-                              nombreLabel.textContent = 'Nombre';
-                              apellidoInput.style.display = 'block'; // Asegurarse de que el input de apellido esté visible
-                              apellidolabel.style.display = 'block'
-                            } else if (razonSocialRadio[1].checked) {
-                              nombreLabel.textContent = 'R. Social';
-                              apellidoInput.style.display = 'none'; // Ocultar el input de apellido
-                              apellidolabel.style.display = 'none'
-                            }
-                          }
-                        </script>
-
-
 
 
                         <div class="row" style="background: #f0f2f5;">
@@ -178,8 +157,7 @@
                             <label class="col-form-label" style="font-size: 13px;">RUT</label>
                           </div>
                           <div class="col-sm-3 col-md-3" style="text-align: left;width: 30%;">
-                            <input class="form-control" type="text" name="rutSN" id="rutSN" value="{{ rut }}"
-                              style="border-color: rgb(159,168,175);font-size: 12px;">
+                            <input class="form-control" type="text" name="rutSN" id="rutSN" value="{{ rut }}" style="border-color: rgb(159,168,175);font-size: 12px;">
                           </div>
 
                           <div class="col-sm-3 col-md-2" style="text-align: right;width: 20%;">
@@ -246,15 +224,9 @@
                                   <div class="row" style="margin-right: 0px;margin-left: 0px;">
                                     <div class="col-sm-12" style="width: 100%;">
                                       <a class="navbar-brand d-flex align-items-center" style="width: 107px;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"
-                                          fill="currentColor" viewBox="0 0 16 16" class="bi bi-building-fill-add"
-                                          style="font-size: 45px;" id="agregar_dir">
-                                          <path
-                                            d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0">
-                                          </path>
-                                          <path
-                                            d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7.256A4.493 4.493 0 0 0 12.5 8a4.493 4.493 0 0 0-3.59 1.787A.498.498 0 0 0 9 9.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .39-.187A4.476 4.476 0 0 0 8.027 12H6.5a.5.5 0 0 0-.5.5V16H3a1 1 0 0 1-1-1zm2 1.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m3 0v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z">
-                                          </path>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em"  fill="currentColor" viewBox="0 0 16 16" class="bi bi-building-fill-add" style="font-size: 45px;" id="agregar_dir">
+                                          <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0"> </path>
+                                          <path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7.256A4.493 4.493 0 0 0 12.5 8a4.493 4.493 0 0 0-3.59 1.787A.498.498 0 0 0 9 9.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .39-.187A4.476 4.476 0 0 0 8.027 12H6.5a.5.5 0 0 0-.5.5V16H3a1 1 0 0 1-1-1zm2 1.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m3 0v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"> </path>
                                         </svg>
                                       </a>
                                     </div>
@@ -1100,12 +1072,13 @@
   
   <script src="{% static 'gestionPedidos/js/botones.js' %}"></script>  <!-- evaluar si se puede quitar, igual todo en botones esta comentado -->
   <script src="{% static 'gestionPedidos/js/gestorDirecciones.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/gestorContacto.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/prueba.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/interfazUsuario.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/interactividadUsuario.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/productos.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/productosInteraccion.js' %}"></script>
-  <script src="{% static 'gestionPedidos/js/gestorContacto.js' %}"></script>
+
   <script src="{% static 'gestionPedidos/js/obtenerInfoCliente.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/ajax_solicitudes.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/ajax_clientes.js' %}"></script>
