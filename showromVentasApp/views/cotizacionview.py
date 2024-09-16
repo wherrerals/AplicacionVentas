@@ -64,7 +64,6 @@ class CotizacionView(View):
         return {
             '/ventas/listado_Cotizaciones_filtrado': self.filtrarCotizaciones,
             '/ventas/crear_cotizacion': self.crearDocumento,
-            'generar_cotizacion': self.quotate_items,
         }
 
     def handle_invalid_route(self, request):
@@ -154,7 +153,7 @@ class CotizacionView(View):
         print("DocEntry:", docEntry)
         
         if not docEntry:
-            return JsonResponse({'error': 'DocEntry no proporcionado'}, status=400)
+            return JsonResponse({'error': 'DocEntry no proporcionado'}, status=400) 
         
         # Llamar al servicio de cotización
         lines_data, error = Cotizacion.buscarDocumentosCotizacion(docEntry)
@@ -166,18 +165,13 @@ class CotizacionView(View):
         if error:
             return render(request, 'error.html', {'error': error}, status=404 if 'No se encontró' in error else 500)
         
+        print("*" * 10)
+        print(lines_data)
+        
         # Renderizar la página HTML con los datos
         #return JsonResponse({'DocumentLines': lines_data}, status=200)
         return render(request,'cotizacion.html', {'DocumentLines': lines_data})
 
     def crearDocumento(self, request):
-        try:
-            data = json.loads(request.body)
-            client = APIClient()
-            response = client.crearDocumento(endpoint=self.get_endpoint(), data=data)
-            return JsonResponse(response, status=201)
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'JSON inválido'}, status=400)
-        except Exception as e:
-            return self.handle_error(e)
+        pass # Implementar la creación de documentos de cotización
             

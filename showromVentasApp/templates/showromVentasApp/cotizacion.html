@@ -79,8 +79,9 @@
         <p>Estado:&nbsp;<strong></strong></p>
       </div>
     </div>
-    <form id="forCrearPedidos" method="POST" action="{% url 'agregar_editar_clientes' %}"> {% csrf_token %}
-      <!--form  id="form_agregar_editar_cliente" method="POST" action="/agregar_editar_clientes/"> {% csrf_token %} Cambiar para probar distinto form-->
+      <form id="forCrearPedidos" method="POST" action="{% url 'crear_cotizacion' %}"> {% csrf_token %}
+<!--<form id="forCrearPedidos" method="POST" action="{% url 'agregar_editar_clientes' %}"> {% csrf_token %}-->      
+<!--form  id="form_agregar_editar_cliente" method="POST" action="/agregar_editar_clientes/"> {% csrf_token %} Cambiar para probar distinto form-->
       <div class="row" style="background: #f0f2f5;">
         <div class="col-sm-8 col-md-1 text-nowrap" style="width: 75%;">
           <div class="row">
@@ -1003,6 +1004,10 @@
                     Total</th>
                 </tr>
               </thead>
+              {% if DocumentLines %}
+              <!--<p>DocumentLines: {{ DocumentLines|default:"No data" }}</p>-->       
+                      {% include 'tabla_document_lines.html' %}
+                  {% endif %}      
             </table>
           </div>
         </div>
