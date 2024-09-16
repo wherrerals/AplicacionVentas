@@ -12,7 +12,7 @@ $(document).ready(function(){
                 },
                 dataType: 'json',
                 success: function(data){
-                    console.log(data);
+                    console.log("estos son los datos del cliente",data);
                     $('#resultadosClientes').empty();
                     if(data.resultadosClientes && data.resultadosClientes.length > 0){
                         data.resultadosClientes.forEach(function(resultadosClientes) {
