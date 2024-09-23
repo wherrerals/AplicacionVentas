@@ -64,6 +64,7 @@ class CotizacionView(View):
         return {
             '/ventas/listado_Cotizaciones_filtrado': self.filtrarCotizaciones,
             '/ventas/crear_cotizacion': self.crearCotizacion,
+            '/ventas/cambiar_estado_cotizacion': self.actualizarEstadosCotizacion,
         }
 
     def handle_invalid_route(self, request):
@@ -183,6 +184,24 @@ class CotizacionView(View):
                 creacion = cotizacion.crearDocumento(data)
                 print("Creacion:", creacion)
                 return JsonResponse(creacion, status=201)
+            except json.JSONDecodeError as e:
+                return JsonResponse({'error': 'JSON inválido'}, status=400)
+    
+    
+    def actualizarEstadosCotizacion(self, request):
+        if request.method == 'POST':
+            try:
+                print("Actualizando estado de cotización")
+                print("Request body:", request.body)
+                print("-" * 10)
+                data = json.loads(request.body)
+                docNum = data.get('DocEntry')
+                estado = data.get('Estado')
+                if docNum is None or estado is None:
+                    return JsonResponse({'error': 'Faltan parámetros'}, status=400)
+                cotizacion = Cotizacion()
+                cambio = cotizacion.actualizarEstadoDocumento(docNum, estado)
+                return JsonResponse(cambio, status=200)
             except json.JSONDecodeError as e:
                 return JsonResponse({'error': 'JSON inválido'}, status=400)
     

@@ -209,3 +209,25 @@ class Cotizacion(Documento):
             logger.error(f"Error al crear la cotización: {str(e)}")
             return {'error': str(e)}
 
+    def eliminarDocumento(self, docEntry):
+        """
+        Elimina una cotización.
+        """
+        try:
+            response = self.client.eliminarDocumentoSL(self.get_endpoint(), docEntry)
+            return response
+        except Exception as e:
+            logger.error(f"Error al eliminar la cotización: {str(e)}")
+            return {'error': str(e)}
+
+    def actualizarEstadoDocumento(self, docNum, estado):
+        """
+        Actualiza el estado de una cotización.
+        """
+        print("Actualizando estado de la cotización...")
+        try:
+            response = self.client.actualizarEstadoDocumentoSL(self.get_endpoint(), docNum, estado)
+            return response
+        except Exception as e:
+            logger.error(f"Error al actualizar el estado de la cotización: {str(e)}")
+            return {'error': str(e)}

@@ -228,3 +228,38 @@ class APIClient:
         except requests.exceptions.RequestException as e:
             print(f"Error en la solicitud a la API: {e}")
             raise
+    
+    def actualizarEstadoDocumentoSL(self, endpoint, docNum, estado):
+        """
+        permite cambiar el estado de un documento en la base de datos de SAP
+
+        Parámetros:
+            endpoint : str, opcional
+                El endpoint donde se creara la cotizacion (por defecto es '').
+            docNum : int, opcional
+                El numero de documento a cambiar de estado.
+            estado : str, opcional
+                El estado al que se cambiara el documento.
+        """
+
+        print(f"Endpoint: {endpoint}")
+        print(f"DocNum: {docNum}")
+        print(f"Estado: {estado}")
+        self.__login()
+
+        url = f"{self.base_url}{endpoint}({docNum})/{estado}"
+        response = self.session.post(url, verify=False)
+        response.raise_for_status()
+
+        print(response)
+        print(url)
+        if response.status_code == 204:
+            return {'message': 'Estado actualizado correctamente'}
+
+            
+
+
+
+
+
+
