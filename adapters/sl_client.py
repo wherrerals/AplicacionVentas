@@ -193,7 +193,7 @@ class APIClient:
         return response.json()
     
 
-    def crearCotizacion(self, endpoint, data=None, headers=None):
+    def crearCotizacionSL(self, endpoint, data=None, headers=None):
         """
         permite la creacion de cotizaciones en la base de datos de SAP
 
@@ -216,7 +216,7 @@ class APIClient:
         url = f"{self.base_url}{endpoint}"
         try:
 
-                    # Imprimir el JSON y los headers para ver qué se está enviando
+        # Imprimir el JSON y los headers para ver qué se está enviando
             print(f"URL: {url}")
             print(f"Data being sent: {json.dumps(data, indent=4)}")
             print(f"Headers: {headers}")
@@ -225,27 +225,6 @@ class APIClient:
             print(response)
             response.raise_for_status()
             return response.json()
-        except requests.exceptions.HTTPError as http_err:
-            error_msg = f"HTTP error occurred2: {http_err}"
-            logger.error(error_msg)
-            return {'error': error_msg}
-        except requests.exceptions.ConnectionError as conn_err:
-            error_msg = f"Connection error occurred3: {conn_err}"
-            print(error_msg)
-            return {'error': error_msg}
-        except requests.exceptions.Timeout as timeout_err:
-            error_msg = f"Timeout error occurred4: {timeout_err}"
-            print(error_msg)
-            return {'error': error_msg}
-        except requests.exceptions.RequestException as req_err:
-            error_msg = f"An error occurred5: {req_err}"
-            print(error_msg)
-            return {'error': error_msg}
-        except ValueError as json_err:
-            error_msg = f"Error parsing JSON6: {json_err}"
-            print(error_msg)
-            return {'error': error_msg}
-
-
-
-type(APIClient)
+        except requests.exceptions.RequestException as e:
+            print(f"Error en la solicitud a la API: {e}")
+            raise

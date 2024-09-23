@@ -10,7 +10,6 @@ urlpatterns = [
     path('', view.home, name="home"),
     path('listado_Cotizaciones/', CotizacionView.as_view(), name='listado_Cotizaciones'),
     path('listado_Cotizaciones_filtrado/', CotizacionView.as_view(), name='listado_Cotizaciones_filtrado'),
-    path('crear_cotizacion/', CotizacionView.as_view(), name='create_quotation'),
     path('agregar_editar_clientes/', SocioNegocioView.as_view(), name='agregar_editar_clientes'),
     path('buscar_clientes/', SocioNegocioView.as_view(), name='busquedaClientes'),
     path('listado_productos/', Productos.as_view(), name='listado_productos'),

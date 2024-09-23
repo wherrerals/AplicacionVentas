@@ -122,7 +122,7 @@ class Cotizacion(Documento):
 
 
     @staticmethod
-    def prepararLineasInternas(document_lines):
+    def prepararLineasInternas(documentLines):
         return [
             {
                 'docEntry': line.get('DocEntry'),
@@ -147,55 +147,65 @@ class Cotizacion(Documento):
                 "BaseLine": line.get('BaseLine'),
                 "LineStatus": line.get('LineStatus'),
             }
-            for line in document_lines
+            for line in documentLines
         ]
-    
-    def prepararJsonData(self):
+
+    def prepararJsonCotizacion(self, jsonData):
         """
         Prepara los datos JSON específicos de la cotización.
         """
-        data = {
-            'docEntry': self.docEntry,
-            'docNum': self.docNum,
-            'folio': self.folio,
-            'fechaDocumento': self.fechaDocumento,
-            'fechaEntrega': self.fechaEntrega,
-            'horarioEntrega': self.horarioEntrega,
-            'referencia': self.referencia,
-            'comentario': self.comentario,
-            'totalAntesDelDescuento': self.totalAntesDelDescuento,
-            'descuento': self.descuento,
-            'totalDocumento': self.totalDocumento,
-            'codigoVenta': self.codigoVenta,
-            'tipo_documento': self.tipo_documento,
-            'vendedor': self.vendedor,
-            'condi_pago': self.condi_pago,
-            'tipoentrega': self.tipoentrega,
-            'tipoobjetoSap': self.tipoobjetoSap,
-            'items': self.prepararLineasIternas(self.items),
+        # Datos de la cabecera
+        cabecera = {
+            'DocDate': jsonData.get('DocDate'),
+            'DocDueDate': jsonData.get('DocDueDate'),
+            'TaxDate': jsonData.get('TaxDate'),
+            'CardCode': jsonData.get('CardCode'),
+            'PaymentGroupCode': jsonData.get('PaymentGroupCode'),
+            'SalesPersonCode': jsonData.get('SalesPersonCode'),
+            'TransportationCode': jsonData.get('TransportationCode'),
+            'U_LED_NROPSH': jsonData.get('U_LED_NROPSH'),
+            'U_LED_TIPVTA': jsonData.get('U_LED_TIPVTA'),
+            'U_LED_TIPDOC': jsonData.get('U_LED_TIPDOC'),
+            'U_LED_FORENV': jsonData.get('U_LED_FORENV'),
         }
-        return data
-    
-    def prepararJsonCotizacion(self):
-        return [
-            
+
+        # Datos de las líneas
+        lineas = jsonData.get('DocumentLines', [])
+        lineas_json = [
+            {
+                'lineNum': linea.get('lineNum'),
+                'ItemCode': linea.get('ItemCode'),
+                'Quantity': linea.get('Quantity'),
+                'ShipDate': linea.get('ShipDate'),
+                'DiscountPercent': linea.get('DiscountPercent'),
+                'WarehouseCode': linea.get('WarehouseCode'),
+                'CostingCode': linea.get('CostingCode'),
+                'ShippingMethod': linea.get('ShippingMethod'),
+                'COGSCostingCode': linea.get('COGSCostingCode'),
+                'CostingCode2': linea.get('CostingCode2'),
+                'COGSCostingCode2': linea.get('COGSCostingCode2'),
+                'UnitPrice': linea.get('UnitPrice'),
+            }
+            for linea in lineas
         ]
+
+        # Combina cabecera y líneas en un solo diccionario
+        return {
+            **cabecera,
+            'DocumentLines': lineas_json,
+        }
+
+
     
-    def getdocumentlines(self):
-        """
-        Método abstracto para obtener las líneas del documento.
-        Debe ser implementado por las subclases.
-        """
-        pass
-    
-    def crearDocumento(self):
+    def crearDocumento(self, data):
         """
         Crea una nueva cotización.
         """
         try:
-            json_data = self.prepararJsonCotizacion()
-            response = self.client.crearCotizacion('Quotations', json_data)
+            jsonData = self.prepararJsonCotizacion(data)
+            response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
             return response
         except Exception as e:
             logger.error(f"Error al crear la cotización: {str(e)}")
             return {'error': str(e)}
+

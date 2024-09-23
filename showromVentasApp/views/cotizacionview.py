@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 class CotizacionView(View):
     
     @method_decorator(csrf_exempt)
-    @method_decorator(login_required)
+    #@method_decorator(login_required)
     @method_decorator(require_http_methods(["GET", "POST"]))
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -63,7 +63,7 @@ class CotizacionView(View):
     def post_route_map(self):
         return {
             '/ventas/listado_Cotizaciones_filtrado': self.filtrarCotizaciones,
-            '/ventas/crear_cotizacion': self.crearDocumento,
+            '/ventas/crear_cotizacion': self.crearCotizacion,
         }
 
     def handle_invalid_route(self, request):
@@ -172,6 +172,17 @@ class CotizacionView(View):
         #return JsonResponse({'DocumentLines': lines_data}, status=200)
         return render(request,'cotizacion.html', {'DocumentLines': lines_data})
 
-    def crearDocumento(self, request):
-        pass # Implementar la creación de documentos de cotización
-            
+    @csrf_exempt
+    def crearCotizacion(self, request):
+        print("probando")
+        if request.method == 'POST':
+            try:
+                other = None
+                data = json.loads(request.body)
+                cotizacion = Cotizacion()
+                creacion = cotizacion.crearDocumento(data)
+                print("Creacion:", creacion)
+                return JsonResponse(creacion, status=201)
+            except json.JSONDecodeError as e:
+                return JsonResponse({'error': 'JSON inválido'}, status=400)
+    

@@ -27,7 +27,7 @@ class Documento(ABC):
         # Otros atributos comunes a todos los documentos
 
 
-    @abstractmethod
+
     def get_endpoint(self):
         """
         Método abstracto para obtener el endpoint específico del documento.
@@ -43,7 +43,6 @@ class Documento(ABC):
         if not self.fechaDocumento or not self.fechaEntrega or not self.codigoVenta:
             raise ValueError("Faltan datos obligatorios para el documento.")
 
-    @abstractmethod
     def crearOActualizarDocumento(self):
         """
         Método para crear o actualizar un documento.
@@ -123,7 +122,6 @@ class Documento(ABC):
             logger.error(f"Error al filtrar documentos: {e}")
             raise
 
-    @abstractmethod
     def getdocumentlines(self):
         """
         Método abstracto para obtener las líneas del documento.
@@ -132,7 +130,6 @@ class Documento(ABC):
         pass
     
 
-    @abstractmethod
     def prepararJsonData(self, data):
         """
         Prepara los datos JSON para la creación del documento.
@@ -140,7 +137,6 @@ class Documento(ABC):
         """
         pass
 
-    @abstractmethod
     def get_endpoint(self):
         """
         Define el endpoint para la creación del documento.
