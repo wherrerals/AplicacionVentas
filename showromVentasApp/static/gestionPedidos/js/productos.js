@@ -14,6 +14,7 @@ class Producto {
     // Método para crear una fila en la tabla de productos
     crearFila(contprod) {
       let newRow = document.createElement('tbody');
+      newRow.className = 'product-row';
       newRow.innerHTML = `
         <tr>
           <td style="font-size: 12px; background: transparent; border-style: none; padding-bottom: 0px;" rowspan="2">
