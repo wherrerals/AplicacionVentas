@@ -1,30 +1,34 @@
 from django.urls import path
-from showromVentasApp import views
-from .views import  *
+from showromVentasApp.views.cotizacionview import CotizacionView
+from showromVentasApp.views.socionegocioview import SocioNegocioView
+from showromVentasApp.views.productoview import Productos
+from showromVentasApp.views import view
+
+cotizacionView = CotizacionView()
 
 urlpatterns = [
-    path('', views.home, name="home"),
-    path('lista_cotizaciones', views.list_quotations, name="lista_cotizaciones"),
-    path('generar_cotizacion', views.quotations, name="generar_cotizacion"),
-    path('lista_ovs', views.lista_ovs, name='lista_ovs'),
-    path('generar_cotizacion/<str:docNum>/', quotate_items, name='generar_cotizacion'),
-    path('post-quotations/', post_quotations, name='post_quotations'),
-    path('lista_solic_devoluciones', views.lista_solic_devoluciones, name='lista_solic_devoluciones'),
-    path('lista_clientes', views.lista_clientes, name='lista_clientes'),
-    path('creacion_clientes/', views.creacion_clientes, name='creacion_clientes'),
-    path('reporte_stock', views.reporte_stock, name='reporte_stock'),
-    path('micuenta', views.micuenta, name='micuenta'),
-    path('lista_usuarios', views.lista_usuarios, name='lista_usuarios'),
-    path('salir/', views.userLogout, name='salir'),
-    path('registrarCuenta/', views.registrarCuenta),
-    #path('funciones/<str:motor>/<str:accion>/<str:param>/', Funciones.as_view(), name="funciones"),
-    path('buscar/', views.busquedaProductos, name='busquedaProductos'),
-    path('buscarc/', views.busquedaClientes, name='busquedaClientes'),
-    path('mis_datos/', views.mis_datos, name='mis_datos'),
-    path('agregar_editar_clientes/',views.agregar_editar_clientes,name='agregar_editar_clientes'),
-    path('agregar_direccion/',views.agregar_direccion,name='agregar_direccion'),
-    #path('listado_Cotizaciones/', views.list_quotations_2, name='listado_Cotizaciones'),
-    #path('ordenes/', views.cambio_ordenes, name='ordenes'),
-    path('probandoVtex/', views.oredenes, name='probandoVtex'),
+    path('', view.home, name="home"),
+    path('listado_Cotizaciones/', CotizacionView.as_view(), name='listado_Cotizaciones'),
+    path('listado_Cotizaciones_filtrado/', CotizacionView.as_view(), name='listado_Cotizaciones_filtrado'),
+    path('agregar_editar_clientes/', SocioNegocioView.as_view(), name='agregar_editar_clientes'),
+    path('buscar_clientes/', SocioNegocioView.as_view(), name='busquedaClientes'),
+    path('listado_productos/', Productos.as_view(), name='listado_productos'),
+    path('crear_cotizacion/', CotizacionView.as_view(), name='crear_cotizacion'),
+    path('cambiar_estado_cotizacion/', CotizacionView.as_view(), name='cambiar_estado_cotizacion'),
+    # Rutas adicionales
+    path('lista_cotizaciones/', view.list_quotations, name="lista_cotizaciones"),
+    path('generar_cotizacion/', view.quotations, name="generar_cotizacion"),
+    path('lista_ovs/', view.lista_ovs, name='lista_ovs'),
+    path('lista_solic_devoluciones/', view.lista_solic_devoluciones, name='lista_solic_devoluciones'),
+    path('lista_clientes/', view.lista_clientes, name='lista_clientes'),
+    path('creacion_clientes/', view.creacion_clientes, name='creacion_clientes'),
+    path('reporte_stock/', view.reporte_stock, name='reporte_stock'),
+    path('micuenta/', view.micuenta, name='micuenta'),
+    path('lista_usuarios/', view.lista_usuarios, name='lista_usuarios'),
+    path('salir/', view.userLogout, name='salir'),
+    path('registrarCuenta/', view.registrarCuenta, name='registrarCuenta'),
+    path('buscarproductos/', view.busquedaProductos, name='busquedaProductos'),
+    path('mis_datos/', view.mis_datos, name='mis_datos'),
+    path('agregar_direccion/', view.agregarDireccion, name='agregar_direccion'),
+    path('obtener_detalles_cotizacion/<int:docEntry>/', cotizacionView.obtenerDetallesCotizacion, name='obtener_detalles_cotizacion'),
 ]
-

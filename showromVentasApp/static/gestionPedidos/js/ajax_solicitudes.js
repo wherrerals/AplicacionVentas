@@ -2,8 +2,9 @@ $(document).ready(function(){
     $('#inputNumero').on('input', function(){ //escucha el evento de entrada en input con #inputNumero
         let numero = $(this).val();
         if(numero){
+            let buscarProductosUrl = '/ventas/buscarproductos/'; // URL para buscar productos
             $.ajax({ // realiza una solicitud ajax al servidor a la url buscar/
-                url: 'buscar/', 
+                url: buscarProductosUrl, 
                 data: {
                     'numero': numero //envia los datos ingresados por el usuario al servidor (sku)
                 },

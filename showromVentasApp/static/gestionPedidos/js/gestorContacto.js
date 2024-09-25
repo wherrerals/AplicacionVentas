@@ -47,7 +47,7 @@ class ContactoManager {
               <label class="col-form-label" style="font-size: 13px;">Nombre</label>
             </div>
             <div class="col">
-              <input class="form-control" type="text" name="nombre" style="border-color: rgb(159,168,175);font-size: 12px;">
+              <input class="form-control" type="text" name="nombre[]" style="border-color: rgb(159,168,175);font-size: 12px;">
             </div>
           </div>
           <div class="row">
@@ -55,33 +55,37 @@ class ContactoManager {
               <label class="col-form-label" style="font-size: 13px;">Apellido</label>
             </div>
             <div class="col">
-              <input class="form-control" type="text" name="apellido" style="border-color: rgb(159,168,175);font-size: 12px;">
+              <input class="form-control" type="text" name="apellido[]" style="border-color: rgb(159,168,175);font-size: 12px;">
             </div>
           </div>
+
           <div class="row">
             <div class="col-sm-4">
-              <label class="col-form-label" style="font-size: 13px;">Teléfono</label>
+              <label class="col-form-label"  name="telefono" id="telefono"  style="font-size: 13px;">Teléfono</label>
             </div>
             <div class="col">
-              <input class="form-control" type="tel" style="font-size: 12px;border-color: rgb(159,168,175);">
+              <input class="form-control" type="tel"  name="telefono[]" style="font-size: 12px;border-color: rgb(159,168,175);">
             </div>
           </div>
+
           <div class="row">
             <div class="col-sm-4">
               <label class="col-form-label" style="font-size: 13px;">Celular</label>
             </div>
             <div class="col">
-              <input class="form-control" type="tel" style="font-size: 12px;border-color: rgb(159,168,175);">
+              <input class="form-control" name="celular[]" type="tel" style="font-size: 12px;border-color: rgb(159,168,175);">
             </div>
           </div>
+
           <div class="row">
             <div class="col-sm-4">
               <label class="col-form-label" style="font-size: 13px;">Email</label>
             </div>
             <div class="col">
-              <input class="form-control" type="email" style="font-size: 12px;border-color: rgb(159,168,175);">
+              <input class="form-control" type="email" name="email[]" id="email" style="font-size: 12px;border-color: rgb(159,168,175);">
             </div>
           </div>
+
           <div class="row">
             <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
           </div>

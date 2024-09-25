@@ -1,0 +1,25 @@
+Data: {'odata.metadata': '$metadata#Collection(Edm.ComplexType)', 'value': [
+        {'Quotations/DocumentLines': {'DocEntry': 188509, 'LineNum': 0, 'ItemCode': 'C17900153', 'ItemDescription': 'PANEL SLIM/EMBUTIDO REDONDO NEGRO LED STUDIO 18W 4000K IP54 1450LM Ø22X2.2CM', 'WarehouseCode': 'LC', 'Quantity': 17.0, 'UnitPrice': 3277.3109, 'GrossPrice': 3900.0, 'DiscountPercent': 0.0, 'Price': 3277.3109, 'PriceAfterVAT': 3900.0, 'LineTotal': 55714.0, 'GrossTotal': 66300.0, 'ShipDate': None, 'Address': 'Av. Las Condes 7363\r\rSANTIAGO\rCHILE', 'ShippingMethod': 5, 'FreeText': '', 'BaseType': -1, 'GrossBuyPrice': 3700.2941, 'BaseEntry': None, 'BaseLine': None, 'LineStatus': 'O'
+            }, 'Items/ItemWarehouseInfoCollection': {'WarehouseCode': 'LC', 'InStock': 17.0, 'Committed': 0.0, 'SalesStock': '17.000000'
+            }
+        },
+        {'Quotations/DocumentLines': {'DocEntry': 188509, 'LineNum': 1, 'ItemCode': 'C17900153', 'ItemDescription': 'PANEL SLIM/EMBUTIDO REDONDO NEGRO LED STUDIO 18W 4000K IP54 1450LM Ø22X2.2CM', 'WarehouseCode': 'PH', 'Quantity': 36.0, 'UnitPrice': 3277.3109, 'GrossPrice': 3900.0, 'DiscountPercent': 0.0, 'Price': 3277.3109, 'PriceAfterVAT': 3900.0, 'LineTotal': 117983.0, 'GrossTotal': 140400.0, 'ShipDate': None, 'Address': 'Av. Padre Hurtado Norte 1199\r\rSANTIAGO\rCHILE', 'ShippingMethod': 5, 'FreeText': '', 'BaseType': -1, 'GrossBuyPrice': 3700.3056, 'BaseEntry': None, 'BaseLine': None, 'LineStatus': 'O'
+            }, 'Items/ItemWarehouseInfoCollection': {'WarehouseCode': 'PH', 'InStock': 36.0, 'Committed': 0.0, 'SalesStock': '36.000000'
+            }
+        },
+        {'Quotations/DocumentLines': {'DocEntry': 188509, 'LineNum': 2, 'ItemCode': 'C17900195', 'ItemDescription': 'PLAFÓN LED STUDIO ALUM REDONDO 18W LUZ NEUTRA IP20 Ø22.5x3.2CM NEGRO', 'WarehouseCode': 'ME', 'Quantity': 11.0, 'UnitPrice': 6638.6555, 'GrossPrice': 7900.0, 'DiscountPercent': 10.0, 'Price': 5974.79, 'PriceAfterVAT': 7110.0001, 'LineTotal': 65723.0, 'GrossTotal': 78210.0, 'ShipDate': None, 'Address': '', 'ShippingMethod': 5, 'FreeText': '', 'BaseType': -1, 'GrossBuyPrice': 2375.2727, 'BaseEntry': None, 'BaseLine': None, 'LineStatus': 'O'
+            }, 'Items/ItemWarehouseInfoCollection': {'WarehouseCode': 'ME', 'InStock': 157.0, 'Committed': 78.0, 'SalesStock': '79.000000'
+            }
+        },
+        {'Quotations/DocumentLines': {'DocEntry': 188509, 'LineNum': 3, 'ItemCode': 'C21900001', 'ItemDescription': 'DRIVER DE EMERGENCIA LED STUDIO EXTERNO 3W A 40W GRIS', 'WarehouseCode': 'ME', 'Quantity': 64.0, 'UnitPrice': 20084.0336, 'GrossPrice': 23900.0, 'DiscountPercent': 0.0, 'Price': 20084.0336, 'PriceAfterVAT': 23900.0, 'LineTotal': 1285379.0, 'GrossTotal': 1529600.0, 'ShipDate': None, 'Address': '', 'ShippingMethod': 5, 'FreeText': '', 'BaseType': -1, 'GrossBuyPrice': 7749.0625, 'BaseEntry': None, 'BaseLine': None, 'LineStatus': 'O'
+            }, 'Items/ItemWarehouseInfoCollection': {'WarehouseCode': 'ME', 'InStock': 201.0, 'Committed': 145.0, 'SalesStock': '56.000000'
+            }
+        }
+    ]
+}
+----------
+Found quotation: {'DocEntry': 188509, 'LineNum': 0, 'ItemCode': 'C17900153', 'ItemDescription': 'PANEL SLIM/EMBUTIDO REDONDO NEGRO LED STUDIO 18W 4000K IP54 1450LM Ø22X2.2CM', 'WarehouseCode': 'LC', 'Quantity': 17.0, 'UnitPrice': 3277.3109, 'GrossPrice': 3900.0, 'DiscountPercent': 0.0, 'Price': 3277.3109, 'PriceAfterVAT': 3900.0, 'LineTotal': 55714.0, 'GrossTotal': 66300.0, 'ShipDate': None, 'Address': 'Av. Las Condes 7363\r\rSANTIAGO\rCHILE', 'ShippingMethod': 5, 'FreeText': '', 'BaseType': -1, 'GrossBuyPrice': 3700.2941, 'BaseEntry': None, 'BaseLine': None, 'LineStatus': 'O'
+}
+[
+    12/Sep/2024 11: 59: 13
+] "GET /ventas/obtener_detalles_cotizacion/188509/ HTTP/1.1"200 21

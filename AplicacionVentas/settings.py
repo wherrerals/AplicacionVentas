@@ -14,7 +14,8 @@ SECRET_KEY = 'django-insecure-fexe1oq@sx@j&x3m#tw(#x(r!g32fylgea=whky=#ge^vn5f*h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.3.41']
+ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.3.41']
 #python manage.py runserver 192.168.3.41:8000
 
 
@@ -81,9 +82,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
         'USER':'root',
-        'PASSWORD':'Ea7hava5*', #led_studio
         #'PASSWORD':'Ea7hava5}', #home
-        #'PASSWORD':'qwerty', #nicols
+        'PASSWORD':'Ea7hava5*', #led_studio
         'HOST':'localhost',
         'PORT':'3306',
     }
@@ -96,7 +96,7 @@ COMPANY_DB = "TEST_LED_PROD"
 API_USERNAME = 'manager'
 API_PASSWORD = '1245LED98'
 
-#Base Vtex API
+# Base Vtex API
 VTEX_APP_KEY = 'vtexappkey-ledstudiocl-AJHPCL'
 VTEX_APP_TOKEN = 'WTEPUGSXUOIOMSAVTEIIJOCBMXTUZWTESEFDQHZSLHJZMJXAVHPGOPDKMUVMAPDBZXXDGDFJFNXCMFDNICGGSOCGFNKEHGSEWMEYRLHNCISFSILPJUYXMGKLZUXDKJLB'
 VTEX_BASE_URL = 'https://ledstudiocl.myvtex.com/api/'
@@ -138,7 +138,7 @@ USE_TZ = True
 
 
 
-LOGIN_REDIRECT_URL = '/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/showromVentasApp/templates/login'
+LOGIN_REDIRECT_URL = '/ventas'
 #LOGIN_REDIRECT_URL = '/Users/Cuervo/Documents/AplicacionVentas/showromVentasApp/templates/login'
 
 
