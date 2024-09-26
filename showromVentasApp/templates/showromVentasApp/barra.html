@@ -12,22 +12,31 @@
 
 <body>
     <nav class="navbar navbar-expand-md bg-body py-3">
-        <div class="container"><a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
-            <span class="bs-icon-sm bs-icon-rounded bs-icon-primary d-flex justify-content-center align-items-center me-2 bs-icon" style="background: #caaa74;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-cart2">
-                        <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5M3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0m9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0">
-                        </path>
-                    </svg></span><span>Ventas Showroom</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-2"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
-            <div class="collapse navbar-collapse" id="navcol-2">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link active"
-                            href="{% url 'lista_cotizaciones' %}">Cotizaciones</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'lista_ovs' %}">Órdenes de Venta</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'lista_solic_devoluciones' %}">Solicitudes de
-                            Devolución</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'lista_clientes' %}">Clientes</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Reportes</a></li>
-                </ul>
-            </div>
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'home' %}">
+                <span class="bs-icon-sm bs-icon-rounded bs-icon-primary d-flex justify-content-center align-items-center me-2 bs-icon" style="background: #caaa74;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-cart2">
+                    <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5M3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0m9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0"> </path>
+                </svg></span><span>Ventas Showroom</span></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-2"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navcol-2">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'lista_cotizaciones' %}">Cotizaciones</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'lista_ovs' %}">Órdenes de Venta</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'lista_solic_devoluciones' %}">Solicitudes de Devolución</a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'lista_clientes' %}">Clientes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Reportes</a>
+                        </li>
+                    </ul>
+                </div>
+            </a>
         </div>
     </nav>
 </body>
