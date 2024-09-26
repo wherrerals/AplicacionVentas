@@ -132,3 +132,4 @@ function submitForm() {
         return document.querySelector('[name=csrfmiddlewaretoken]').value;
     }
 });
+
