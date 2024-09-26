@@ -123,6 +123,15 @@ class Cotizacion(Documento):
 
     @staticmethod
     def prepararLineasInternas(documentLines):
+        """
+        Prepara las líneas de documento de la cotización para ser mostradas en la vista de detalle.
+
+        Args:
+            documentLines (list): Líneas de documento de la cotización.
+
+        Returns:
+            list: Líneas de documento preparadas para ser mostradas en la vista de detalle.
+        """
         return [
             {
                 'docEntry': line.get('DocEntry'),
@@ -153,7 +162,14 @@ class Cotizacion(Documento):
     def prepararJsonCotizacion(self, jsonData):
         """
         Prepara los datos JSON específicos de la cotización.
+
+        Args:
+            jsonData (dict): Datos de la cotización.
+        
+        Returns:
+            dict: Datos de la cotización preparados para ser enviados a SAP.
         """
+        
         # Datos de la cabecera
         cabecera = {
             'DocDate': jsonData.get('DocDate'),
@@ -184,7 +200,6 @@ class Cotizacion(Documento):
                 'COGSCostingCode': linea.get('COGSCostingCode'),
                 'CostingCode2': linea.get('CostingCode2'),
                 'COGSCostingCode2': linea.get('COGSCostingCode2'),
-                'UnitPrice': linea.get('UnitPrice'),
             }
             for linea in lineas
         ]
@@ -194,7 +209,7 @@ class Cotizacion(Documento):
             **cabecera,
             'DocumentLines': lineas_json,
         }
-
+    
 
     
     def crearDocumento(self, data):
