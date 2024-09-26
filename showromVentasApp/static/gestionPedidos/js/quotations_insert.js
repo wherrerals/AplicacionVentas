@@ -95,7 +95,33 @@ function submitForm() {
         .then(data => {
             console.log('Documento creado exitosamente:', data);
             // Puedes hacer algo aquí como redirigir al usuario o mostrar un mensaje de éxito
+            if (data.success) {
+                // Mostrar el número de documento y el mensaje de éxito en un popup bonito
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Cotización creada',
+                    text: `Número de documento: ${data.docNum}`,
+                    confirmButtonText: 'Aceptar'
+                });
+
+                const numeroCotizacion = document.getElementById('numero_cotizacion');
+                
+                if (numeroCotizacion) {
+                    numeroCotizacion.textContent = `Nº ${data.docNum}`;
+                }
+
+            } else {
+                // Mostrar el mensaje de error en un popup
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `Error al crear la cotización: ${data.message}`,
+                    confirmButtonText: 'Aceptar'
+                });
+            }
         })
+
+
         .catch(error => {
             console.error('Hubo un error al crear el documento:', error);
         });

@@ -16,12 +16,6 @@
   {% include "barra.html" %}
   <!-- End: Navbar Right Links -->
    
-  <div id="loader" style="display: none; text-align: center; padding: 20px;">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Cargando...</span>
-    </div>
-    <p>Cargando cotizaciones...</p>
-  </div>
   
   <div class="row" style="color: var(--bs-secondary-color);background: var(--bs-body-color);">
     <div class="col-sm-12"
@@ -118,6 +112,14 @@
                 
               </tbody>
             </table>
+            <tbody id="listadoCotizaciones">
+                
+              <div id="loader" style="display: none; text-align: center; padding: 20px;">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p>Cargando cotizaciones...</p>
+              </div>
           </div>
         </div>
       </div>
