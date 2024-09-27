@@ -11,13 +11,13 @@ document.addEventListener('DOMContentLoaded', function() {
       let mes = formatNumber(tresDiasDespues.getMonth() + 1);
       let año = tresDiasDespues.getFullYear();
   
-      let fechaFormateada = dia + '/' + mes + '/' + año;
+      let fechaFormateada = año + '-' + dia + '-' + mes;
   
-      let diasVencidosLabel = document.getElementById('dias_vencidos');
+      let diasVencidosLabel = document.getElementById('docDueDate');
       if (diasVencidosLabel) {
         diasVencidosLabel.textContent = fechaFormateada;
       } else {
-        console.error('Elemento con ID "dias_vencidos" no encontrado.');
+        console.error('Elemento con ID "docDueDate" no encontrado.');
       }
     }
   
