@@ -20,6 +20,7 @@ $(document).ready(function(){
                             clientesElemento.addClass('suggestion-item');
                             clientesElemento.attr('data-nombre', resultadosClientes.nombre);
                             clientesElemento.attr('data-apellido', resultadosClientes.apellido);
+                            clientesElemento.attr('data-codigoSN', resultadosClientes.codigoSN);
                             clientesElemento.attr('data-rut', resultadosClientes.rut);
                             clientesElemento.text(resultadosClientes.nombre + ' ' + resultadosClientes.apellido);
                             console.log(clientesElemento);

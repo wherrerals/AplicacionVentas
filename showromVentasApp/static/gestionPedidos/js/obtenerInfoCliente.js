@@ -5,13 +5,20 @@ $(document).ready(function(){
         let nombre = $(this).attr('data-nombre');
         let apellido = $(this).attr('data-apellido');
         let clienteId = $(this).attr('data-rut');
+        let codigoSN = $(this).attr('data-codigoSN');
 
         // Rellenar el campo de entrada con el nombre y apellido del cliente seleccionado
-        $('#inputCliente').val(nombre + ' ' + apellido);
+        $('#inputCliente').val(codigoSN + " - " + nombre + ' ' + apellido);
 
+        // Asignar el rut como atributo data-rut del input
+        $('#inputCliente').attr('data-rut', clienteId);
+
+        // Asignar el rut como atributo data-rut del input
+        console.log("rut del cliente seleccionado: ",clienteId)
+        
         // Limpiar la lista de sugerencias
         $('#resultadosClientes').empty();
-
+ 
         traerInformacionCliente(clienteId);
     });
 });

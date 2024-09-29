@@ -123,6 +123,15 @@ class Cotizacion(Documento):
 
     @staticmethod
     def prepararLineasInternas(documentLines):
+        """
+        Prepara las líneas de documento de la cotización para ser mostradas en la vista de detalle.
+
+        Args:
+            documentLines (list): Líneas de documento de la cotización.
+
+        Returns:
+            list: Líneas de documento preparadas para ser mostradas en la vista de detalle.
+        """
         return [
             {
                 'docEntry': line.get('DocEntry'),
@@ -153,7 +162,14 @@ class Cotizacion(Documento):
     def prepararJsonCotizacion(self, jsonData):
         """
         Prepara los datos JSON específicos de la cotización.
+
+        Args:
+            jsonData (dict): Datos de la cotización.
+        
+        Returns:
+            dict: Datos de la cotización preparados para ser enviados a SAP.
         """
+        
         # Datos de la cabecera
         cabecera = {
             'DocDate': jsonData.get('DocDate'),
@@ -184,7 +200,6 @@ class Cotizacion(Documento):
                 'COGSCostingCode': linea.get('COGSCostingCode'),
                 'CostingCode2': linea.get('CostingCode2'),
                 'COGSCostingCode2': linea.get('COGSCostingCode2'),
-                'UnitPrice': linea.get('UnitPrice'),
             }
             for linea in lineas
         ]
@@ -194,20 +209,46 @@ class Cotizacion(Documento):
             **cabecera,
             'DocumentLines': lineas_json,
         }
-
+    
 
     
     def crearDocumento(self, data):
         """
-        Crea una nueva cotización.
+        Crea una nueva cotización y maneja las excepciones según el código de respuesta.
         """
         try:
+            # Preparar el JSON para la cotización
             jsonData = self.prepararJsonCotizacion(data)
+            
+            # Realizar la solicitud a la API
             response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
-            return response
+            
+            # Verificar si response es un diccionario
+            if isinstance(response, dict):
+                # Si contiene DocEntry, es un éxito
+                if 'DocEntry' in response:
+                    doc_num = response.get('DocNum')
+
+                    return {
+                        'success': 'Cotización creada exitosamente',
+                        'docNum': doc_num
+                    }
+                
+                # Si contiene un mensaje de error, manejarlo
+                elif 'error' in response:
+                    error_message = response.get('error', 'Error desconocido')
+                    return {'error': f"Error: {error_message}"}
+                else:
+                    return {'error': 'Respuesta inesperada de la API.'}
+            
+            else:
+                return {'error': 'La respuesta de la API no es válida.'}
+        
         except Exception as e:
+            # Manejo de excepciones generales
             logger.error(f"Error al crear la cotización: {str(e)}")
             return {'error': str(e)}
+
 
     def eliminarDocumento(self, docEntry):
         """
