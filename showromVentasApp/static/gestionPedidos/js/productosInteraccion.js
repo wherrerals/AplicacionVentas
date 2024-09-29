@@ -118,3 +118,5 @@ function agregarInteractividad(newRow, codigoProducto) {
 
   window.agregarInteractividad = agregarInteractividad;
 }
+
+

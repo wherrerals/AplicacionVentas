@@ -219,12 +219,11 @@ class APIClient:
         # Imprimir el JSON y los headers para ver qué se está enviando
             print(f"URL: {url}")
             print(f"Data being sent: {json.dumps(data, indent=4)}")
-            print(f"Headers: {headers}")
 
             response = self.session.post(url, json=data, headers=headers, verify=False)
-            print(response)
             response.raise_for_status()
             return response.json()
+        
         except requests.exceptions.RequestException as e:
             print(f"Error en la solicitud a la API: {e}")
             raise

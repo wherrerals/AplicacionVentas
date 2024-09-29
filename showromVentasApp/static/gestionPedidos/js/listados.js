@@ -1,9 +1,10 @@
 document.addEventListener("DOMContentLoaded", function() {
     // Define la URL base correctamente, utilizando la raíz del sitio
     const baseURL = '/ventas/listado_Cotizaciones/';
-    
+
     const fetchAndDisplayInitialData = (params) => {
-        // Asegúrate de que la URL base comience desde la raíz
+        showLoader(); // Invocación de la función para mostrar el loader
+
         const url = `${window.location.origin}${baseURL}?top=${params.top}&skip=${params.skip}`;
         
         fetch(url)
@@ -17,18 +18,23 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.log(data);
                 displayQuotations(data.value || []);
                 nextPageLink = data['odata.nextLink'] || null;
+                hideLoader(); // Ocultamos el loader cuando finaliza la carga
             })
-            .catch(error => console.error('Error fetching data:', error));
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                hideLoader(); // En caso de error, ocultamos el loader también
+            });
     };
 
     const applyFiltersAndFetchData = (filters) => {
+        showLoader(); // Invocación de la función para mostrar el loader
+
         const filterData = {
             top: 20,
             skip: 0,
             ...filters
         };
 
-        // Ajusta esta URL para que no se repita
         const listado_Cotizaciones_filtrado = '/ventas/listado_Cotizaciones_filtrado/';
         
         fetch(listado_Cotizaciones_filtrado, {
@@ -53,8 +59,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.error('Error: Expected data.data.value to be an array');
                 displayQuotations([]);
             }
+            hideLoader(); // Ocultamos el loader cuando los datos ya están cargados
         })
-        .catch(error => console.error('Error applying filters:', error));
+        .catch(error => {
+            console.error('Error applying filters:', error);
+            hideLoader(); // En caso de error, ocultamos el loader
+        });
     };
 
     const displayQuotations = (quotations) => {
@@ -95,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function() {
             };
 
             const status = getStatus(quotation);
-            console.log(quotation.DocEntry)
+            console.log(quotation.DocEntry);
             let urlModel = `/ventas/obtener_detalles_cotizacion/${quotation.DocEntry}/`;
 
             // Crear una fila de la tabla
@@ -119,7 +129,7 @@ document.addEventListener("DOMContentLoaded", function() {
             fecha_inicio: document.querySelector('[name="fecha_inicio"]').value,
             fecha_fin: document.querySelector('[name="fecha_fin"]').value,
             docNum: document.querySelector('[name="docNum"]').value,
-            cardName: document.querySelector('[name="cardName"]').value // corregido 'cardNAme' a 'cardName'
+            cardName: document.querySelector('[name="cardName"]').value
         };
     };
 
