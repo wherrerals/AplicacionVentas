@@ -41,7 +41,7 @@ function traerInformacionCliente(clienteId) {
                 // Toma el primer cliente de los resultados (si estás esperando un solo cliente)
                 const cliente = data.resultadosClientes[0];
                 console.log("informacion del cliente: ",cliente)
-                console.log('contacto de Cliente encontrado:', cliente.contacto);
+                console.log('contacto de Cliente encontrado:', cliente.contactos);
                 console.log('direcciones de Cliente encontrado:', cliente.direcciones);
                 // Llamar a las funciones para actualizar contactos y direcciones
                 
