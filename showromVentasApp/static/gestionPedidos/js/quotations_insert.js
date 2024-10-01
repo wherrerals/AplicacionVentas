@@ -107,8 +107,10 @@ function submitForm() {
                 const numeroCotizacion = document.getElementById('numero_cotizacion');
                 
                 if (numeroCotizacion) {
-                    numeroCotizacion.textContent = `Nº ${data.docNum}`;
+                    numeroCotizacion.textContent = `${data.docNum}`;
                 }
+
+                bloquearCampos();
 
             } else {
                 // Mostrar el mensaje de error en un popup

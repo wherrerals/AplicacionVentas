@@ -57,7 +57,7 @@ TEMPLATES = [
         'DIRS': [os.path.join(BASE_DIR, 'showromVentasApp/templates/showromVentasApp')],
         #'DIRS': ['/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
         #'DIRS': ['/Users/Cuervo/Documents/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
-        'DIRS': ['/Users/nicor/Universidad/Practica/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
+        #'DIRS': ['/Users/nicor/Universidad/Practica/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
         
         
         'APP_DIRS': True,
@@ -85,8 +85,8 @@ DATABASES = {
         'NAME': 'led_studio',
         'USER':'root',
         #'PASSWORD':'Ea7hava5}', #home
-        #'PASSWORD':'Ea7hava5*', #led_studio
-        'PASSWORD':'qwerty', #nico
+        'PASSWORD':'Ea7hava5*', #led_studio
+        #'PASSWORD':'qwerty', #nico
         'HOST':'localhost',
         'PORT':'3306',
     }
@@ -154,7 +154,7 @@ AUTHENTICATION_BACKENDS = [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 
 # Default primary key field type
