@@ -159,3 +159,132 @@ class DireccionManager {
   // Crear una instancia de DireccionManager al cargar la página
   document.addEventListener('DOMContentLoaded', () => new DireccionManager());
   
+  class DireccionManager2 {
+    constructor() {
+        this.init();
+    }
+
+    // Inicializa los eventos y configuraciones
+    init() {
+        $(document).ready(() => {
+            // Evento para abrir el modal de despacho
+            $('#dirDespModal').on('show.bs.modal', () => {
+                let clienteRut = $('#inputCliente').attr('data-rut');
+                console.log("RUT del cliente:", clienteRut);
+                if (clienteRut) {
+                    this.cargarDirecciones(clienteRut, "12", '#listaDireccionDespacho'); // Cargar solo direcciones de despacho (tipo 12)
+                } else {
+                    $('#listaDireccionDespacho').html('<p>No se ha seleccionado un cliente.</p>');
+                }
+            });
+
+            // Evento para abrir el modal de facturación
+            $('#dirFactModal').on('show.bs.modal', () => {
+                let clienteRut = $('#inputCliente').attr('data-rut');
+                console.log("RUT del cliente:", clienteRut);
+                if (clienteRut) {
+                    this.cargarDirecciones(clienteRut, "13", '#listaDireccionFacturacion'); // Cargar solo direcciones de facturación (tipo 13)
+                } else {
+                    $('#listaDireccionFacturacion').html('<p>No se ha seleccionado un cliente.</p>');
+                }
+            });
+        });
+    }
+
+    // Función para cargar direcciones del cliente seleccionado
+    cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
+        let buscarClientesUrl = '/ventas/buscar_clientes/';
+
+        $.ajax({
+            url: buscarClientesUrl,
+            data: { 'numero': clienteRut },
+            dataType: 'json',
+            success: (data) => {
+                $(listaSelector).empty(); // Limpiar el contenido previo
+
+                if (data.resultadosClientes && data.resultadosClientes.length > 0) {
+                    const cliente = data.resultadosClientes[0];
+                    const direcciones = cliente.direcciones || [];
+                    console.log("Direcciones encontradas:", direcciones);
+
+                    // Filtrar direcciones por tipo
+                    const direccionesFiltradas = direcciones.filter(direccion => direccion.tipoDireccion === tipoDireccion);
+                    
+                    if (direccionesFiltradas.length > 0) {
+                        direccionesFiltradas.forEach((direccion, index) => {
+                            let direccionElemento = `
+                                <div class="col-sm-5 mx-auto" style="font-size: 12px; background: #f0f2f5; width: 230px;">
+                                    <div class="row">
+                                        <div class="col-sm-12" style="height: 15px; background: transparent;"><span>&nbsp;</span></div>
+                                        <div class="col" style="text-align: center;">
+                                            <span style="font-weight: bold;">Dirección Nº${index + 1}</span>
+                                        </div>
+                                        <div class="col-sm-12" style="height: 5px; background: transparent;"><span>&nbsp;</span></div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Tipo</label></div>
+                                        <div class="col">
+                                            <select class="form-select" value="${direccion.tipoDireccion}" style="font-size: 12px; border-color: rgb(159,168,175);" disabled>
+                                                <optgroup label="Tipo">
+                                                    <option value="12" ${direccion.tipoDireccion === "12" ? "selected" : ""}>Despacho</option>
+                                                    <option value="13" ${direccion.tipoDireccion === "13" ? "selected" : ""}>Facturación</option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">ID</label></div>
+                                        <div class="col"><input class="form-control" type="text" value="${direccion.id}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">País</label></div>
+                                        <div class="col"><input class="form-control" type="text" value="${direccion.pais}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Región</label></div>
+                                        <div class="col"><input class="form-control" type="text" value="${direccion.region}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Ciudad</label></div>
+                                        <div class="col"><input class="form-control" type="text" value="${direccion.ciudad}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Comuna</label></div>
+                                        <div class="col"><input class="form-control" type="text" value="${direccion.comuna}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Dirección</label></div>
+                                        <div class="col"><input class="form-control" type="text" value="${direccion.nombreDireccion}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                    </div>
+                                </div>
+                            `;
+                            $(listaSelector).append(direccionElemento); // Agregar la dirección al modal correspondiente
+                        });
+                    } else {
+                        console.log(`No hay direcciones de tipo ${tipoDireccion} para este cliente`);
+                        $(listaSelector).html(`<p>No hay direcciones disponibles de este tipo.</p>`);
+                    }
+                } else {
+                    console.log("No se encontraron clientes con el RUT proporcionado");
+                    $(listaSelector).html('<p>Error al cargar direcciones.</p>');
+                }
+            },
+            error: (xhr, status, error) => {
+                console.error('Error al obtener las direcciones del cliente:', error);
+                $(listaSelector).html('<p>Error al cargar direcciones.</p>');
+            }
+        });
+    }
+}
+
+// Crear una instancia de DireccionManager al cargar la página
+$(document).ready(() => {
+    new DireccionManager2();
+});
