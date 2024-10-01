@@ -52,10 +52,10 @@
         <p id="numero_cotizacion" style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);"></p>
       </div>
       <div class="col" style="text-align: right;padding-top: 12px;">
-        <p style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);">Estado:</p>
+        <p style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);" ></p><!-- Estados -->
       </div>
-      <div class="col" style="text-align: left;padding-top: 12px;padding-bottom: 0px;">
-        <p style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);">Abierta</p>
+      <div class="col" style="text-align: left;padding-top: 12px;padding-bottom: 0px;"><!-- Estados -->
+        <p style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);"></p>
       </div>
     </div>
     <div class="row" style="background: #f0f2f5;">
@@ -67,18 +67,18 @@
       <div class="col-sm-5">
         <p>Vendedor:&nbsp;
           {% if username %}
-          <strong> {{ username }}</strong>&nbsp;
+          <strong> {{ nombreuser }}</strong>&nbsp;
         </p>
-        {% else %}
-        <p>No has iniciado sesión.</p>
-        {% endif %}
       </div>
       <div class="col">
-        <p>Showroom:&nbsp;<strong></strong></p>
+        <p>Showroom:&nbsp;<strong>{{ sucursal }}</strong></p>
       </div>
       <div class="col">
-        <p>Estado:&nbsp;<strong></strong></p>
+        <p>Estado:&nbsp;<strong data-estado="bost_Open">Abierta</strong></p>
       </div>
+      {% else %}
+      <p>No has iniciado sesión.</p>
+      {% endif %}
     </div>
       <form id="forCrearPedidos" method="POST" action="{% url 'crear_cotizacion' %}"> {% csrf_token %}
 <!--<form id="forCrearPedidos" method="POST" action="{% url 'agregar_editar_clientes' %}"> {% csrf_token %}-->      

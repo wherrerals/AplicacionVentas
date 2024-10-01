@@ -12,7 +12,8 @@ class UsuarioDB(models.Model):
     nombre = models.CharField(max_length=50)
     email = models.EmailField()
     telefono = models.CharField(max_length=15)
-    usuarios = models.OneToOneField(User,on_delete=models.CASCADE)
+    usuarios = models.OneToOneField(User, on_delete=models.CASCADE)
+    sucursal = models.ForeignKey('SucursalDB', on_delete=models.CASCADE, default=1)
     
     def __str__(self):
         return f'{self.nombre}'

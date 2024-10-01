@@ -10,3 +10,6 @@ class RegionDB(models.Model):
     numero = models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=50,null = False)
     #pais = models.ForeignKey(Pais, on_delete=models.CASCADE, default=1) Al eliminar pais, esto queda comentado 
+
+    def __str__(self):
+        return f'{self.nombre}'
