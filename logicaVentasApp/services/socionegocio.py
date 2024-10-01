@@ -176,6 +176,7 @@ class SocioNegocio:
                 'nombre': socio.nombre,
                 'apellido': socio.apellido,
                 'razonSocial': socio.razonSocial,
+                'codigoSN': socio.codigoSN,
                 'rut': socio.rut,
                 'email': socio.email,
                 'telefono': socio.telefono,
