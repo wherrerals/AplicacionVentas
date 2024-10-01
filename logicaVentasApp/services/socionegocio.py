@@ -124,7 +124,7 @@ class SocioNegocio:
     @staticmethod
     def generarCodigoSN(rut):
         rut_sn = rut.split("-")[0] if "-" in rut else rut
-        return rut_sn.replace(".", "") + 'c'
+        return rut_sn.replace(".", "") + 'C'
 
     @staticmethod
     def agregarDireccionYContacto(request, cliente):
