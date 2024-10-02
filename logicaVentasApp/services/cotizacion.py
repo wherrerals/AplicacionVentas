@@ -7,7 +7,35 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Cotizacion(Documento):
+    """
+    Clase para manejar las cotizaciones en la aplicación.
+
+    Attributes:
+        request (dict): Datos de la cotización.
+        client (APIClient): Cliente de la API.
+        cliente (dict): Datos del cliente.
+        items (list): Líneas de la cotización.
+    
+    Methods:
+        get_endpoint: Obtiene el endpoint específico de la cotización.
+        validarDatosObligatorios: Valida los datos obligatorios de la cotización.
+        crearOActualizarCotizacion: Crea o actualiza una cotización.
+        validarDatosObligatorios: Valida los datos obligatorios de la cotización.
+        construirFiltrosCotizaciones: Construye los filtros para la consulta de cotizaciones.
+        buscarDocumentosCotizacion: Busca los detalles de una cotización basada en el DocEntry.
+        prepararLineasInternas: Prepara las líneas de documento de la cotización para ser mostradas en la vista de detalle.
+        prepararJsonCotizacion: Prepara los datos JSON específicos de la cotización.
+        crearDocumento: Crea una nueva cotización y maneja las excepciones según el código de respuesta.
+        eliminarDocumento: Elimina una cotización.
+        actualizarEstadoDocumento: Actualiza el estado de una cotización.
+    """
     def __init__(self, request=None):
+        """
+        Inicializa una nueva instancia de la clase Cotizacion.
+
+        Args:
+            request (dict): Datos de la cotización.
+        """
         super().__init__(request)
         self.client = APIClient()
         self.cliente = None
@@ -17,12 +45,24 @@ class Cotizacion(Documento):
     def get_endpoint(self):
         """
         Obtiene el endpoint específico de la cotización.
+
+        args:
+            None
+
+        Returns:
+            str: Endpoint de la cotización.
         """
         return 'Quotations'
     
     def validarDatosObligatorios(self):
         """
         Valida los datos obligatorios de la cotización.
+
+        args:
+            request (dict): Datos de la cotización.
+
+        Raises:
+            ValueError: Si faltan datos obligatorios.
         """
         super().validarDatosObligatorios()
         if not self.cliente or not self.items:
@@ -31,6 +71,12 @@ class Cotizacion(Documento):
     def crearOActualizarCotizacion(self):
         """
         Crea o actualiza una cotización.
+
+        Returns:
+            dict: Respuesta de la API.
+
+        Raises:
+            ValueError: Si faltan datos obligatorios.
         """
         self.validarDatosObligatorios()
         if self.docEntry:
@@ -40,13 +86,30 @@ class Cotizacion(Documento):
     
     
     def validarDatosObligatorios(self, data, required_fields):
+        """
+        Valida que los datos obligatorios estén presentes en la solicitud.
+
+        Args:
+            data (dict): Datos de la solicitud.
+            required_fields (list): Campos requeridos.
+
+        Raises:
+            ValueError: Si faltan campos requeridos en la solicitud.
+        """
         missing_fields = [field for field in required_fields if field not in data]
         if missing_fields:
             raise ValueError(f"Campos requeridos faltantes: {', '.join(missing_fields)}")
     
     def construirFiltrosCotizaciones(data):
+
         """
         Construye los filtros para la consulta de cotizaciones basados en los datos proporcionados.
+
+        Args:
+            data (dict): Datos de la consulta.
+
+        Returns:
+            dict: Filtros para la consulta de cotizaciones.
         """
 
         filters = {}
@@ -67,7 +130,8 @@ class Cotizacion(Documento):
         if data.get('DocumentStatus'):
             filters['Quotations/DocumentStatus eq'] = f"'{data.get('DocumentStatus')}'"
         if data.get('docTotal'):
-            filters['contains(Quotations/DocTotal,'] = data.get('docTotal')
+            docTotal = float(data.get('docTotal'))
+            filters['contains(Quotations/DocTotal,'] = f"{docTotal})"
         if data.get('cancelled'):
             filters['Quotations/Cancelled eq'] = f"'{data.get('cancelled')}'"
 
@@ -78,6 +142,15 @@ class Cotizacion(Documento):
         
     @staticmethod
     def buscarDocumentosCotizacion(doc_entry):
+        """
+        Busca los detalles de una cotización basada en el DocEntry.
+
+        Args:
+            doc_entry (str): DocEntry de la cotización.
+        
+        Returns:
+            tuple: Líneas de documento de la cotización, mensaje de error.
+        """
         try:
             print("-" * 10)
             print(f"Fetching quotation items for DocEntry: {doc_entry}")
@@ -215,6 +288,12 @@ class Cotizacion(Documento):
     def crearDocumento(self, data):
         """
         Crea una nueva cotización y maneja las excepciones según el código de respuesta.
+
+        Args:
+            data (dict): Datos de la cotización.
+
+        Returns:
+            dict: Respuesta de la API.
         """
         try:
             # Preparar el JSON para la cotización
@@ -253,6 +332,12 @@ class Cotizacion(Documento):
     def eliminarDocumento(self, docEntry):
         """
         Elimina una cotización.
+
+        Args:
+            docEntry (str): DocEntry de la cotización a eliminar.
+
+        Returns:
+            dict: Respuesta de la API.
         """
         try:
             response = self.client.eliminarDocumentoSL(self.get_endpoint(), docEntry)
@@ -264,6 +349,13 @@ class Cotizacion(Documento):
     def actualizarEstadoDocumento(self, docNum, estado):
         """
         Actualiza el estado de una cotización.
+
+        Args:
+            docNum (str): Número de documento de la cotización.
+            estado (str): Estado de la cotización.  
+        
+        Returns:
+            dict: Respuesta de la API.
         """
         print("Actualizando estado de la cotización...")
         try:

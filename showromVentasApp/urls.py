@@ -6,12 +6,14 @@ from showromVentasApp.views import view
 
 cotizacionView = CotizacionView()
 
+
 urlpatterns = [
     path('', view.home, name="home"),
     path('listado_Cotizaciones/', CotizacionView.as_view(), name='listado_Cotizaciones'),
     path('listado_Cotizaciones_filtrado/', CotizacionView.as_view(), name='listado_Cotizaciones_filtrado'),
     path('agregar_editar_clientes/', SocioNegocioView.as_view(), name='agregar_editar_clientes'),
     path('buscar_clientes/', SocioNegocioView.as_view(), name='busquedaClientes'),
+    path('verificar_cliente/', SocioNegocioView.as_view(), name='verificar_cliente'),
     path('listado_productos/', Productos.as_view(), name='listado_productos'),
     path('crear_cotizacion/', CotizacionView.as_view(), name='crear_cotizacion'),
     path('cambiar_estado_cotizacion/', CotizacionView.as_view(), name='cambiar_estado_cotizacion'),

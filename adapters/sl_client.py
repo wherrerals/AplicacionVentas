@@ -254,11 +254,27 @@ class APIClient:
         print(url)
         if response.status_code == 204:
             return {'message': 'Estado actualizado correctamente'}
+        
+    
+    def verificarCliente(self, endpoint, cardCode):
+        """
+        Verifica si un cliente existe en la base de datos de SAP
 
-            
+        Parámetros:
+            endpoint : str, opcional
+                El endpoint donde se creara la cotizacion (por defecto es '').
+            cardCode : str, opcional
+                El codigo de cliente a verificar.
+        """
+        print("Probando la conexión con la API...")
 
+        self.__login()
+        select = "CardCode"
+        url = f"{self.base_url}{endpoint}('{cardCode}')?$select={select}"
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print(url)
+        print(response)
 
-
-
-
-
+        return response.json()
+    

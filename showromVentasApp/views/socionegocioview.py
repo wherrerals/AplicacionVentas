@@ -21,6 +21,7 @@ class SocioNegocioView(FormView):
         # Definir un diccionario de rutas a métodos GET
         route_map = {
             '/ventas/buscar_clientes/': self.busquedaSocioNegocio,
+            '/ventas/verificar_cliente/': self.verificarSapSocio,
         }
 
         # Buscar el método basado en la ruta
@@ -63,3 +64,25 @@ class SocioNegocioView(FormView):
             return JsonResponse({'error': 'No se proporcionó un número válido'})
         return JsonResponse({'error': 'Método no permitido'}, status=405)
     
+        
+    def verificarSapSocio(self, request):
+
+        print("Verificando Socio de Negocio")
+
+        if request.method == "GET":
+            cardCode = request.GET.get('data-rut')  # Usar en producción
+            
+            # Valor por defecto para pruebas
+
+            if cardCode:
+                socio_existe = SocioNegocio.verificarSocioNegocioSap(cardCode) 
+                 # Corregido el nombre del método
+                if socio_existe == True:
+                    return JsonResponse({"success": True, "message": "Socio de negocio encontrado."})
+                else:
+                    return JsonResponse({"success": False, "message": "Socio de negocio no encontrado."})
+            
+            return JsonResponse({"success": False, "message": "Código de socio no proporcionado."}, status=400)
+        
+        return JsonResponse({"error": "Método no permitido."}, status=405)
+

@@ -6,15 +6,14 @@ from datosLsApp.repositories.gruposnrepository import GrupoSNRepository
 from datosLsApp.repositories.tipoclienterepository import TipoClienteRepository
 from datosLsApp.repositories.tiposnrepository import TipoSNRepository
 from datosLsApp.models import DireccionDB, ContactoDB
+from adapters.sl_client import APIClient
+
 
 class SocioNegocio:
 
     def __init__(self, request):
-        
+
         self.request = request
-
-        print(f"Request: {request.POST}")
-
         self.gruposn = request.POST.get('grupoSN')
         self.rut = request.POST.get('rutSN')
         self.email = request.POST.get('emailSN')
@@ -202,3 +201,24 @@ class SocioNegocio:
     def validarEmail(self):
         if not self.email:
             raise ValidationError("Email no encontrado")
+        
+        
+    def verificarSocioNegocioSap(cardCode):
+        client = APIClient()
+
+        try:
+            print("Verificando socio de negocio en SAP...")
+            
+            response = client.verificarCliente(endpoint="BusinessPartners", cardCode=cardCode)
+            print(f"Response: {response}")
+
+            # Verifica si la respuesta contiene el 'CardCode'
+            if 'CardCode' in response:
+                print(f"Socio de negocio encontrado: {response['CardCode']}")
+                return True
+            else:
+                print("Socio de negocio no encontrado.")
+                return False
+        except Exception as e:
+            print(f"Error al verificar socio de negocio en SAP: {str(e)}")
+            return False
