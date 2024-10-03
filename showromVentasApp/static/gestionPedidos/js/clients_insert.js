@@ -2,23 +2,24 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("grabar-btn").addEventListener("click", submitForm);
-
+    
     function submitForm() {
         // Capturar los datos del documento
 
-        const name = document.getElementById("nombreSN").textContent;
-        const apellido = document.getElementById("apellidoSN").textContent;
+        const name = document.getElementById("nombreSN").value;
+        const apellido = document.getElementById("apellidoSN").value;
         const nombre_completo = name + ' ' + apellido; // Agregar un espacio entre nombre y apellido
-        const rut = document.getElementById("rutSN").textContent;
-        const telefono = document.getElementById("telefonoSN").textContent;
-        const salesPersonCode = document.getElementById("salesPersonCode").getAttribute("data-salespersoncode");
+        const rut = document.getElementById("rutSN").value;
+        const telefono = document.getElementById("telefonoSN").value;
+        const salesPersonCode = "-1";
+        //const salesPersonCode = document.getElementById("salesPersonCode").getAttribute("data-salespersoncode");
 
         // Capturando el valor del radio button seleccionado
         const grupoSNSeleccionado = document.querySelector('input[name="grupoSN"]:checked').value;
         let tipoDoc = grupoSNSeleccionado === "100" ? "100" : "105"; // Asignar "Persona" o "Empresa"
 
-        const giro = document.getElementById("giroSN").textContent;
-        const email = document.getElementById("emailSN").textContent;
+        const giro = document.getElementById("giroSN").value;
+        const email = document.getElementById("emailSN").value;
 
 
         // Captura las líneas del documento
@@ -30,12 +31,12 @@ document.addEventListener("DOMContentLoaded", function () {
         dirRows.forEach((row) => {
             const direccionSelecionada = document.querySelector('input[name="tipodireccion"]:checked').value;
             let tipoDir = direccionSelecionada === "12" ? "Despacho" : "Facturación"; // Asignar "Despacho" o "Facturación"
-            const nameDir = row.querySelector("[name='nombre_direccion']").value;
-            const paisDir = row.querySelector("[name='pais']").value;
-            const regionDir = row.querySelector("[name='region']").value;
-            const ciudadDir = row.querySelector("[name='ciudad']").value;
-            const comunaDir = row.querySelector("[name='comuna']").value;
-            const calleDir = row.querySelector("[name='direccion']").value;
+            const nameDir = row.querySelector("[name='nombre_direccion[]'").value;
+            const paisDir = row.querySelector("[name='pais[]']").value;
+            const regionDir = row.querySelector("[name='region[]']").value;
+            const ciudadDir = row.querySelector("[name='ciudad[]']").value;
+            const comunaDir = row.querySelector("[name='comuna[]']").value;
+            const calleDir = row.querySelector("[name='direccion[]']").value;
 
             // Crea un objeto con los datos direcion
             const dir = {
@@ -104,6 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Convertir a JSON
         const jsonData = JSON.stringify(documentData);
+        console.log(jsonData);
 
         // Enviar los datos al backend usando fetch
         fetch('/ventas/crear_cliente/', {

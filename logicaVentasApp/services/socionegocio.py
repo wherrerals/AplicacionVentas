@@ -78,7 +78,6 @@ class SocioNegocio:
                 else:
                     raise ValidationError(f"Grupo de cliente no válido: {self.gruposn}")
 
-                print(f"Cliente creado/actualizado: {cliente}")
                 SocioNegocio.agregarDireccionYContacto(self.request, cliente)
 
             return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
@@ -128,14 +127,16 @@ class SocioNegocio:
 
     @staticmethod
     def agregarDireccionYContacto(request, cliente):
+        print("Agregando dirección y contacto...")
+        print(f"dirección: {request.POST.get('nombre_direccion[]')}")
         from showromVentasApp.views.view import agregarDireccion, agregarContacto
 
-        if 'nombreDireccion' not in request.POST:
+        if 'nombre_direccion[]' not in request.POST:
             print("Dirección faltante")
             raise ValidationError("Debe agregar al menos una dirección")
         agregarDireccion(request, cliente)
 
-        if 'nombres' not in request.POST:
+        if 'nombre' not in request.POST:
             agregarContacto(request, cliente)
         else:
             print("Contacto faltante")
@@ -236,15 +237,19 @@ class SocioNegocio:
         """
         
         # Datos de la cabecera
-
+        print("Preparando JSON para el socio de negocio...")
+        print(f"Datos recibidos: {jsonData}")
         cardCode = jsonData.get('CardCode')
+        print(f"CardCode: {cardCode}")
+
+        cardCodeSinGuion = self.generarCodigoSN(cardCode)
         
         if not cardCode:
             raise ValueError("El campo 'CardCode' es obligatorio.")
 
 
         cabecera = {
-            'CardCode': jsonData.get('CardCode'),
+            'CardCode': cardCodeSinGuion,
             'CardName': jsonData.get('CardName'),
             'CardType': jsonData.get('CardType'),
             'GroupCode': jsonData.get('GroupCode'),
