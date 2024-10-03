@@ -129,7 +129,7 @@ class SocioNegocio:
     def agregarDireccionYContacto(request, cliente):
         from showromVentasApp.views.view import agregarDireccion, agregarContacto
 
-        if 'nombreDireccion' not in request.POST:
+        if 'nombre_Direccion[]' not in request.POST:
             print("Dirección faltante")
             raise ValidationError("Debe agregar al menos una dirección")
         agregarDireccion(request, cliente)

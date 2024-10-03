@@ -76,7 +76,7 @@ class SocioNegocioView(FormView):
 
             if cardCode:
                 socio_existe = SocioNegocio.verificarSocioNegocioSap(cardCode) 
-                 # Corregido el nombre del método
+
                 if socio_existe == True:
                     return JsonResponse({"success": True, "message": "Socio de negocio encontrado."})
                 else:
