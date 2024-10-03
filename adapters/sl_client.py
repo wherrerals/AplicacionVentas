@@ -254,11 +254,53 @@ class APIClient:
         print(url)
         if response.status_code == 204:
             return {'message': 'Estado actualizado correctamente'}
+        
+    
+    def verificarCliente(self, endpoint, cardCode):
+        """
+        Verifica si un cliente existe en la base de datos de SAP
 
-            
+        Parámetros:
+            endpoint : str, opcional
+                El endpoint donde se creara la cotizacion (por defecto es '').
+            cardCode : str, opcional
+                El codigo de cliente a verificar.
+        """
+        print("Probando la conexión con la API...")
 
+        self.__login()
+        select = "CardCode"
+        url = f"{self.base_url}{endpoint}('{cardCode}')?$select={select}"
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print(url)
+        print(response)
 
+        return response.json()
 
+    def crearCliente(self, data):
+        """
+        permite la creacion de clientes en la base de datos de SAP
+        
+        Parámetros:
+            data : dict, opcional
+                Un diccionario de pares clave-valor para crear el cliente.
+        returns:
+            si la creacion del cliente es exitosa retorna un diccionario con la respuesta de la API en formato JSON.
+            si la creacion del cliente no es exitosa retorna un diccionario con un mensaje de error.
+            si la conexion con la API falla retorna un diccionario con un mensaje de error.
+            si el tiempo de espera de la API se agota retorna un diccionario con un mensaje de error.
+            si la respuesta de la API contiene un error de estado retorna un diccionario con un mensaje de error.
+            si se produce un error al analizar JSON retorna un diccionario con un mensaje de error.
+        """
 
-
-
+        self.__login()
+        url = f"{self.base_url}BusinessPartners"
+        try:
+            response = self.session.post(url, json=data, verify=False)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error en la solicitud a la API: {e}")
+            raise
+    

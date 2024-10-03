@@ -11,7 +11,7 @@ function submitForm() {
     const docDueDate = document.getElementById("docDueDate").textContent;
     const taxDate = fechaSolo;
     const rut = document.getElementById("inputCliente").getAttribute("data-rut");
-    const cardCode = rut + "C";
+    const cardCode = rut;
     const pgc = -1;
     const spc = 41; //document.getElementById("salesPersonCode").value;
     const trnasp = 1; //document.getElementById("transportationCode").value;

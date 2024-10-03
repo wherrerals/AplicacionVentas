@@ -1146,3 +1146,68 @@
     },
     "DocumentReferences": []
 }
+
+{
+    "CardCode": "100880883C",
+    "CardName": "Leonardo Silva Piña",
+    "CardType": "cCustomer",
+    "GroupCode": 105,
+    "Phone1": "+56293092776",
+    "Phone2": "+56233092776",
+    "Notes": "Persona",
+    "PayTermsGrpCode": -1,
+    "FederalTaxID": "10880683-4",
+    "SalesPersonCode": -1,
+    "Cellular": "+56993092776",
+    "EmailAddress": "lsilvapina@gmail.com",
+    "CardForeignName": "LEONARDO SILVA",
+    "ShipToDefault": "DESPACHO",
+    "BilltoDefault": "FACTURACION",
+    "DunningTerm": "ESTANDAR",
+    "CompanyPrivate": "cPrivate",
+    "AliasName": "Leonardo Silva Piña",
+    "U_Tipo": "N",
+    "U_FE_Export": "N",
+    "BPAddresses": [
+        {
+            "AddressName": "DESPACHO",
+            "Street": "Andrés Bello 2365",
+            "City": "Santiago",
+            "County": "Providencia",
+            "Country": "CL",
+            "State": "13",
+            "FederalTaxID": "10880683-4",
+            "TaxCode": "IVA",
+            "AddressType": "bo_ShipTo"
+        },
+        {
+            "AddressName": "FACTURACION",
+            "Street": "Avenida Kennedy 7031",
+            "City": "Santiago",
+            "County": "Las Condes",
+            "Country": "CL",
+            "State": "13",
+            "FederalTaxID": None,
+            "TaxCode": "IVA",
+            "AddressType": "bo_BillTo"
+        }
+    ],
+    "ContactEmployees": [
+        {
+            "Name": "Leo",
+            "Phone1": "+56293092776",
+            "MobilePhone": "+56993092776",
+            "E_Mail": "lsilvapina@gmail.com",
+            "FirstName": "Leonardo",
+            "LastName": "Silva"
+        },
+        {
+            "Name": "William",
+            "Phone1": "+56293096666",
+            "MobilePhone": "+56993094444",
+            "E_Mail": "william@gmail.com",
+            "FirstName": "William",
+            "LastName": "Herrera"
+        }
+    ]
+}

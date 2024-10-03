@@ -52,6 +52,9 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(data => {
             console.log(data);
+            
+            document.querySelector('#listadoCotizaciones').innerHTML = '';
+
             if (data && data.data && Array.isArray(data.data.value)) {
                 displayQuotations(data.data.value);
                 nextPageLink = data.data['odata.nextLink'] || null;
@@ -111,10 +114,10 @@ document.addEventListener("DOMContentLoaded", function() {
             // Crear una fila de la tabla
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><a href="${urlModel}" data-doc-entry="${quotation.DocEntry}" data-doc-num="${quotation.DocNum}" data-document-lines="${quotation.DocumentLines ? JSON.stringify(quotation.DocumentLines) : '[]'}">${quotation.DocEntry}</a></td>
+                <td><a href="${urlModel}" data-doc-entry="${quotation.DocEntry}" data-doc-num="${quotation.DocNum}" data-document-lines="${quotation.DocumentLines ? JSON.stringify(quotation.DocumentLines) : '[]'}">${quotation.DocNum}</a></td>
                 <td><a href="/cliente.html">${quotation.CardName || 'Cliente Desconocido'}</a></td>
                 <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
-                <td>${new Date(quotation.DocDate).toLocaleDateString()}</td>
+                <td>${quotation.DocDate}</td>
                 <td>${status}</td>
                 <td style="text-align: right;">$ ${vatSumFormatted}</td>
                 <td style="text-align: right;">$ ${docTotalFormatted}</td>
@@ -129,7 +132,10 @@ document.addEventListener("DOMContentLoaded", function() {
             fecha_inicio: document.querySelector('[name="fecha_inicio"]').value,
             fecha_fin: document.querySelector('[name="fecha_fin"]').value,
             docNum: document.querySelector('[name="docNum"]').value,
-            cardName: document.querySelector('[name="cardName"]').value
+            cardNAme: document.querySelector('[name="cardNAme"]').value,
+            salesEmployeeName: document.querySelector('[name="salesEmployeeName"]').value,
+            //DocumentStatus: document.querySelector('[name="DocumentStatus"]').value,
+            docTotal: document.querySelector('[name="docTotal"]').value
         };
     };
 

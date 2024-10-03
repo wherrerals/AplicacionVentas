@@ -45,6 +45,8 @@ class ItemDBper(admin.ModelAdmin):
 
 class SocioNegocioDBper(admin.ModelAdmin):
     list_display = ('nombre', 'razonSocial', 'email', 'telefono', 'condicionPago')
+    search_fields = ['codigoSN', 'nombre']
+
 
 class UsuarioDBper(admin.ModelAdmin):
     list_display = ('nombre', 'email', 'telefono', 'sucursal', 'usuarios')
