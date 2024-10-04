@@ -1,27 +1,28 @@
 class DireccionManager {
-    constructor() {
-      this.contdir = 0;
-      this.init();
-    }
-  
-    // Inicializa los eventos y configuraciones
-    init() {
-      window.addEventListener('DOMContentLoaded', () => {
-        const botonAgregarDirecciones = document.getElementById('agregar_dir');
-        if (botonAgregarDirecciones) {
-          botonAgregarDirecciones.addEventListener('click', () => this.agregarDireccion());
-        }
-      });
-    }
-  
-    // Agrega una nueva dirección
-    agregarDireccion() {
-      const newRow = document.createElement('div');
-      this.contdir++;
-      newRow.className = "col-sm-1 .dir-row";
-      newRow.style = "padding: 0px;width: 280px";
-  
-      newRow.innerHTML = `
+  constructor() {
+    this.contdir = 0; // Inicializamos el contador
+    this.initializeEvents();
+  }
+
+  initializeEvents() {
+    // Evento para agregar dirección en la pestaña principal
+    document.getElementById('agregar_dir').addEventListener('click', () => this.agregarDireccion('dir'));
+
+    // Evento para agregar dirección dentro del modal de facturación
+    document.getElementById('agregar_dir_facturacion').addEventListener('click', () => this.agregarDireccion('listaDireccionFacturacion'));
+
+    // Evento para agregar dirección dentro del modal de despacho
+    document.getElementById('agregar_dir_despacho').addEventListener('click', () => this.agregarDireccion('listaDireccionDespacho'));
+  }
+
+  agregarDireccion(containerId) {
+    this.contdir++;  // Incrementa el contador cada vez que se agrega una nueva dirección
+
+    // Crear una nueva fila para la dirección
+    let newRow = document.createElement('div');
+    newRow.className = "col-sm-5";
+    newRow.style = "font-size: 12px;background: #f0f2f5;width: 230px; margin-right: 10px;";
+    newRow.innerHTML = `
         <div class="col-sm-12" style="width: 100%;height: 10px;"><span>&nbsp;</span></div>
         <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 250px;">
           <div class="row">
@@ -145,13 +146,14 @@ class DireccionManager {
         <div class="col-sm-1" style="padding: 0px;width: 20px;"><span></span></div>
       `;
   
-      const tab1 = document.getElementById('dir');
-      tab1.style.display = "flex";
-      tab1.style.flexDirection = "row";
-      tab1.style.overflowX = "auto";
-      tab1.style.maxWidth = "100%";
-  
-      tab1.appendChild(newRow);
+      // Agregar la nueva fila al contenedor indicado
+    let container = document.getElementById(containerId);
+    container.style.display = "flex";
+    container.style.flexDirection = "row";
+    container.style.overflowX = "auto"; // Permitir desplazamiento horizontal
+    container.appendChild(newRow);
+      
+      container.appendChild(newRow);
       newRow.querySelector('#eliminar_dir').addEventListener('click', () => newRow.remove());
     }
   }

@@ -98,8 +98,7 @@ def quotations(request):
             nombreUser = usuario.nombre  # Accede al nombre del usuario a través del modelo UsuarioDB
 
         except UsuarioDB.DoesNotExist:
-            # Maneja el caso en que no se encuentre el usuario relacionado
-            return redirect('inicio')  # Redirige a la página de inicio si no se encuentra el usuario
+            pass
 
         # Obtiene el parámetro DocNum de la URL, o None si no está presente
         doc_num = request.GET.get('docNum', None)
@@ -119,8 +118,7 @@ def quotations(request):
         # Renderiza el template con el contexto
         return render(request, 'cotizacion.html', context)
 
-    # Si no está autenticado, redirige al inicio
-    return redirect('inicio')
+
 
 @login_required
 def lista_ovs(request):
