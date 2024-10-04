@@ -2,10 +2,13 @@ import json
 from django.http import JsonResponse
 from django.db import transaction
 from django.core.exceptions import ValidationError
+from datosLsApp.models.socionegociodb import SocioNegocioDB
 from datosLsApp.repositories.socionegociorepository import SocioNegocioRepository
 from datosLsApp.repositories.gruposnrepository import GrupoSNRepository
 from datosLsApp.repositories.tipoclienterepository import TipoClienteRepository
 from datosLsApp.repositories.tiposnrepository import TipoSNRepository
+from datosLsApp.repositories.direccionrepository import DireccionRepository
+from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.models import DireccionDB, ContactoDB
 from adapters.sl_client import APIClient
 
@@ -191,6 +194,7 @@ class SocioNegocio:
             })
 
         return resultados_formateados
+
     
     def validarGrupoSN(self):
         if not self.gruposn:
@@ -205,7 +209,7 @@ class SocioNegocio:
             raise ValidationError("Email no encontrado")
         
         
-    def verificarSocioNegocioSap(cardCode):
+    def verificarSocioNegocioSap(self, cardCode):
         client = APIClient()
 
         try:
@@ -239,67 +243,85 @@ class SocioNegocio:
         # Datos de la cabecera
         print("Preparando JSON para el socio de negocio...")
         print(f"Datos recibidos: {jsonData}")
-        cardCode = jsonData.get('CardCode')
+        cardCode = jsonData.get('rut')
         print(f"CardCode: {cardCode}")
 
+        nombre = jsonData.get('nombre')
+        apellido = jsonData.get('apellido')
+
+        # Obtener cliente
+        try:
+            cliente = SocioNegocioDB.objects.get(rut=cardCode)  # Asumiendo que 'rut' es el identificador único
+            print(f"Cliente: {cliente}")
+        except SocioNegocioDB.DoesNotExist:
+            raise ValueError(f"No se encontró el cliente con RUT: {cardCode}")
+
+        # Instancia del repositorio de direcciones
+        direccion_repo = DireccionRepository()
+        
+        # Obtener direcciones y contactos
+        direcciones = direccion_repo.obtenerDireccionesPorCliente(cliente)
+        contactos = ContactoRepository().obtenerContactosPorCliente(cliente)
+
+        nombreCompleto = "{nombre} {apellido}".format(nombre=nombre, apellido=apellido)
         cardCodeSinGuion = self.generarCodigoSN(cardCode)
         
         if not cardCode:
             raise ValueError("El campo 'CardCode' es obligatorio.")
 
-
+        # Preparar cabecera
         cabecera = {
             'CardCode': cardCodeSinGuion,
-            'CardName': jsonData.get('CardName'),
-            'CardType': jsonData.get('CardType'),
-            'GroupCode': jsonData.get('GroupCode'),
-            'Phone1': jsonData.get('Phone1'),
-            'Phone2': jsonData.get('Phone2'),
-            'Notes': jsonData.get('Notes'),
-            'PayTermsGrpCode': jsonData.get('PayTermsGrpCode'),
-            'FederalTaxID': jsonData.get('FederalTaxID'),
-            'SalesPersonCode': jsonData.get('SalesPersonCode'),
-            'Cellular': jsonData.get('Cellular'),
-            'EmailAddress': jsonData.get('EmailAddress'),
-            'CardForeignName': jsonData.get('CardForeignName'),
-            'ShipToDefault': jsonData.get('ShipToDefault'),
-            'BilltoDefault': jsonData.get('BilltoDefault'),
-            'DunningTerm': jsonData.get('DunningTerm'),
-            'CompanyPrivate': jsonData.get('CompanyPrivate'),
-            'AliasName': jsonData.get('AliasName'),
-            'U_Tipo': jsonData.get('U_Tipo'),
-            'U_FE_Export': jsonData.get('U_FE_Export'),
+            'CardName': nombreCompleto,
+            'CardType': "C",
+            'GroupCode': jsonData.get('grupoSN'),
+            'Phone1': jsonData.get('telefono'),
+            'Phone2': jsonData.get('telefono'),
+            'Notes': "Persona",
+            'PayTermsGrpCode': -1,
+            'FederalTaxID': jsonData.get('rut'),
+            'SalesPersonCode': -1,  # Cambiar por el código de vendedor
+            'Cellular': jsonData.get('telefono'),
+            'EmailAddress': jsonData.get('email'),
+            'CardForeignName': nombreCompleto,
+            'ShipToDefault': "DESPACHO",
+            'BilltoDefault': "FACTURACION",
+            'DunningTerm': "ESTANDAR",
+            'CompanyPrivate': "cPrivate",
+            'AliasName': jsonData.get('nombre'),
+            'U_Tipo': "N",
+            'U_FE_Export': "N",
         }
 
-        # Datos de las líneas
-        bp_addresses  = jsonData.get('BPAddresses', [])
-        bp_addresses_json  = [
-            {
-                'AddressName': addr.get('AddressName'),
-                'Street': addr.get('Street'),
-                'City': addr.get('City'),
-                'County': addr.get('County'),
-                'Country': addr.get('Country'),
-                'State': addr.get('State'),
-                'FederalTaxID': addr.get('FederalTaxID'),
-                'TaxCode': addr.get('TaxCode'),
-                'AddressType': addr.get('AddressType'),
-            }
-            for addr  in bp_addresses
-        ]
-
-        contact_employees  = jsonData.get('ContactEmployees', [])
-        contact_employees_json  = [
-            {
-                'Name': contact.get('Name'),
-                'Phone1': contact.get('Phone1'),
-                'MobilePhone': contact.get('MobilePhone'),
-                'E_Mail': contact.get('E_Mail'),
-                'FirstName': contact.get('FirstName'),
-                'LastName': contact.get('LastName'),
-            }
+        # Preparar direcciones
+        bp_addresses_json = []
+        for direccion in direcciones:
+            tipoDireccion = 'bo_BillTo' if direccion.tipoDireccion == 'F' else 'bo_ShipTo'
             
-            for contact  in contact_employees
+            # Crear un diccionario por cada dirección
+            bp_addresses_json.append({
+                'AddressName': direccion.nombreDireccion,
+                'Street': direccion.calleNumero,
+                'City': direccion.codigoImpuesto,
+                'County': direccion.pais,
+                'Country': "CL", # Cambiar por el código de país
+                'State': direccion.region.numero,
+                'FederalTaxID': direccion.SocioNegocio.rut,
+                'TaxCode': "IVA", # Cambiar por el código de impuesto
+                'AddressType': tipoDireccion,
+            })
+
+        # Preparar contactos
+        contact_employees_json = [
+            {
+                'Name': contacto.nombreCompleto,
+                'Phone1': contacto.telefono,
+                'MobilePhone': contacto.celular,
+                'E_Mail': contacto.email,
+                'FirstName': contacto.nombre,
+                'LastName': contacto.apellido,
+            }
+            for contacto in contactos
         ]
 
         # Combina cabecera y líneas en un solo diccionario
@@ -308,6 +330,7 @@ class SocioNegocio:
             'BPAddresses': bp_addresses_json,
             'ContactEmployees': contact_employees_json
         }
+
     
     def creacionSocioSAP(self, data):
         client = APIClient()

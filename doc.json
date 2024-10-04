@@ -1211,3 +1211,190 @@
         }
     ]
 }
+
+{
+    "CardCode": "454563111C",
+    "CardName": "William Alexis  Herrera",
+    "CardType": None,
+    "GroupCode": None,
+    "Phone1": None,
+    "Phone2": None,
+    "Notes": None,
+    "PayTermsGrpCode": None,
+    "FederalTaxID": None,
+    "SalesPersonCode": None,
+    "Cellular": None,
+    "EmailAddress": "w.282@gmil.com",
+    "CardForeignName": None,
+    "ShipToDefault": None,
+    "BilltoDefault": None,
+    "DunningTerm": None,
+    "CompanyPrivate": None,
+    "AliasName": None,
+    "U_Tipo": None,
+    "U_FE_Export": None,
+    "BPAddresses": [
+        {
+            "AddressName": "asdasdas",
+            "Street": "adsdsad",
+            "City": "iva",
+            "County": "12",
+            "Country": "12",
+            "State": "Región Metropolitana de Santiago",
+            "FederalTaxID": "454563111-1",
+            "TaxCode": "iva",
+            "AddressType": "12"
+        }
+    ],
+    "ContactEmployees": [
+        {
+            "Name": "asasdasd adasdas",
+            "Phone1": "adasdas",
+            "MobilePhone": "adasdasd",
+            "E_Mail": "adasdasda@g.com",
+            "FirstName": "asasdasd",
+            "LastName": "adasdas"
+        }
+    ]
+}
+
+
+{
+    "CardCode": "54789111C",
+    "CardName": "William Alexis  Herrera",
+    "CardType": "CardType",
+    "GroupCode": "100",
+    "Phone1": "12213212",
+    "Phone2": "12213212",
+    "Notes": "Persona",
+    "PayTermsGrpCode": -1,
+    "FederalTaxID": "54789111-1",
+    "SalesPersonCode": -1,
+    "Cellular": "12213212",
+    "EmailAddress": "w.282@gmil.com",
+    "CardForeignName": "William Alexis  Herrera",
+    "ShipToDefault": "DESPACHO",
+    "BilltoDefault": "FACTURACION",
+    "DunningTerm": "ESTANDAR",
+    "CompanyPrivate": "cPrivate",
+    "AliasName": "William Alexis",
+    "U_Tipo": "N",
+    "U_FE_Export": "N",
+    "BPAddresses": [
+        {
+            "AddressName": "asdasdas",
+            "Street": "adsdsad",
+            "City": "iva",
+            "County": "12",
+            "Country": "12",
+            "State": "Región Metropolitana de Santiago",
+            "FederalTaxID": "54789111-1",
+            "TaxCode": "iva",
+            "AddressType": "12"
+        }
+    ],
+    "ContactEmployees": [
+        {
+            "Name": "asasdasd adasdas",
+            "Phone1": "adasdas",
+            "MobilePhone": "adasdasd",
+            "E_Mail": "adasdasda@g.com",
+            "FirstName": "asasdasd",
+            "LastName": "adasdas"
+        }
+    ]
+}
+
+
+{
+    "CardCode": "44448966631C",
+    "CardName": "William Alexis  Herrera",
+    "CardType": "CardType",
+    "GroupCode": "100",
+    "Phone1": "12213212",
+    "Phone2": "12213212",
+    "Notes": "Persona",
+    "PayTermsGrpCode": -1,
+    "FederalTaxID": "44448966631-1",
+    "SalesPersonCode": -1,
+    "Cellular": "12213212",
+    "EmailAddress": "w.282@gmil.com",
+    "CardForeignName": "William Alexis  Herrera",
+    "ShipToDefault": "DESPACHO",
+    "BilltoDefault": "FACTURACION",
+    "DunningTerm": "ESTANDAR",
+    "CompanyPrivate": "cPrivate",
+    "AliasName": "William Alexis",
+    "U_Tipo": "N",
+    "U_FE_Export": "N",
+    "BPAddresses": [
+        {
+            "AddressName": "asdasdas",
+            "Street": "adsdsad",
+            "City": "iva",
+            "County": "12",
+            "Country": "12",
+            "State": "Región Metropolitana de Santiago",
+            "FederalTaxID": "44448966631-1",
+            "TaxCode": "iva",
+            "AddressType": "bo_ShipTo"
+        }
+    ],
+    "ContactEmployees": [
+        {
+            "Name": "asasdasd adasdas",
+            "Phone1": "adasdas",
+            "MobilePhone": "adasdasd",
+            "E_Mail": "adasdasda@g.com",
+            "FirstName": "asasdasd",
+            "LastName": "adasdas"
+        }
+    ]
+}
+
+
+{
+    "CardCode": "3348966631C",
+    "CardName": "William Alexis  Herrera",
+    "CardType": "cCustomer",
+    "GroupCode": "100",
+    "Phone1": "12213212",
+    "Phone2": "12213212",
+    "Notes": "Persona",
+    "PayTermsGrpCode": -1,
+    "FederalTaxID": "3348966631-1",
+    "SalesPersonCode": -1,
+    "Cellular": "12213212",
+    "EmailAddress": "w.282@gmil.com",
+    "CardForeignName": "William Alexis  Herrera",
+    "ShipToDefault": "DESPACHO",
+    "BilltoDefault": "FACTURACION",
+    "DunningTerm": "ESTANDAR",
+    "CompanyPrivate": "cPrivate",
+    "AliasName": "William Alexis",
+    "U_Tipo": "N",
+    "U_FE_Export": "N",
+    "BPAddresses": [
+        {
+            "AddressName": "asdasdas",
+            "Street": "adsdsad",
+            "City": "iva",
+            "County": "12",
+            "Country": "12",
+            "State": 13,
+            "FederalTaxID": "3348966631-1",
+            "TaxCode": "iva",
+            "AddressType": "bo_ShipTo"
+        }
+    ],
+    "ContactEmployees": [
+        {
+            "Name": "asasdasd adasdas",
+            "Phone1": "adasdas",
+            "MobilePhone": "adasdasd",
+            "E_Mail": "adasdasda@g.com",
+            "FirstName": "asasdasd",
+            "LastName": "adasdas"
+        }
+    ]
+}
