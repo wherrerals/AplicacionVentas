@@ -11,6 +11,8 @@ from django.http import JsonResponse, HttpResponse
 from datosLsApp.models.usuariodb import User 
 from datosLsApp.models import (ProductoDB, SocioNegocioDB, UsuarioDB, RegionDB, GrupoSNDB, TipoSNDB, TipoClienteDB, DireccionDB, ComunaDB, ContactoDB)
 from adapters.sl_client import APIClient
+
+
 #librerias Python usadas
 import requests
 import json
@@ -415,7 +417,55 @@ def agregarContacto(request, cliente):
                 print(f"No se ha creado el contacto {i+1} porque algunos campos están vacíos.")
     return render(request, "cotizacion.html", {'clienteNoIncluido': clienteNoIncluido})
 
+"""
+Este metodo sirve para poder guardar los contactos de un cliente en la base de datos a traves de una peticion AJAX
+        creada en los modales, cuando se desea agregar un contacto o editar un contacto de un cliente ya existente.
+        Con este estaba probando pero no lo logre. (no empece con el de direcciones)
+@login_required
+def guardarContactosAJAX(request):
+    
+    if request.method == "POST":
+        # Parsear los datos de contactos desde el request
+        contactos_json = request.POST.get('contactos')
+        contactos = json.loads(contactos_json)
 
+        cliente_id = request.POST.get('cliente')
+        cliente = SocioNegocioDB.objects.get(rut=cliente_id)
+
+        # Verificar que el cliente exista
+        if not cliente:
+            return JsonResponse({'success': False, 'message': 'Cliente no encontrado'})
+
+        # Iterar sobre los contactos recibidos
+        for contacto in contactos:
+            nombre = contacto['nombre']
+            apellido = contacto['apellido']
+            telefono = contacto.get('telefono')
+            celular = contacto.get('celular')
+            email = contacto.get('email')
+
+            # Verificar si los campos requeridos están completos
+            if nombre and apellido:
+                nombreCompleto = f"{nombre} {apellido}"
+
+                # Crear o actualizar el contacto
+                ContactoDB.objects.create(
+                    codigoInternoSap=1,  # Aquí deberías manejar la lógica del código interno si es variable
+                    nombreCompleto=nombreCompleto,
+                    nombre=nombre,
+                    apellido=apellido,
+                    telefono=telefono,
+                    celular=celular,
+                    email=email,
+                    SocioNegocio=cliente
+                )
+                print(f"Contacto {nombreCompleto} creado con éxito")
+            else:
+                print(f"No se ha creado el contacto porque algunos campos están vacíos.")
+
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'message': 'Método no permitido'})
+"""
 
 
 @login_required

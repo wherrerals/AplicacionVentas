@@ -150,7 +150,10 @@ class SocioNegocio:
 
         for socio in resultados_clientes:
             direcciones = DireccionDB.objects.filter(SocioNegocio=socio)
+            for direccion in direcciones:
+                print(f"ID: {direccion.id}, Nombre: {direccion.nombreDireccion}")
             direcciones_formateadas = [{
+                "id": direccion.id,
                 'rowNum': direccion.rowNum,
                 'nombreDireccion': direccion.nombreDireccion,
                 'ciudad': direccion.ciudad,
@@ -163,7 +166,11 @@ class SocioNegocio:
             } for direccion in direcciones]
 
             contactos = ContactoDB.objects.filter(SocioNegocio=socio)
+            for contacto in contactos:
+                print(f"ID: {contacto.id}, Nombre: {contacto.nombre}")
+
             contactos_formateados = [{
+                'id': contacto.id,
                 'codigoInternoSap': contacto.codigoInternoSap,
                 'nombreCompleto': contacto.nombreCompleto,
                 'nombre': contacto.nombre,
@@ -171,7 +178,7 @@ class SocioNegocio:
                 'email': contacto.email,
                 'telefono': contacto.telefono,
                 'celular': contacto.celular
-            } for contacto in contactos]
+            } for contacto in contactos ]
 
             resultados_formateados.append({
                 'nombre': socio.nombre,

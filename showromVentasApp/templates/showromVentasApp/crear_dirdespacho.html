@@ -4,6 +4,8 @@
 </div>
 
 <div class="modal-body" style="padding: 9px;">
+    <form id="form-dirdespacho" method="POST" action="{% url 'guardar_contactos_ajx' %}">
+        {% csrf_token %}
     <div class="row" style="margin-right: 0px;margin-left: 0px;">
         <div class="col-sm-12" style="width: 100%;"> 
             <a class="navbar-brand d-flex align-items-center" href="#" style="width: 107px;" id="agregar_dir_despacho">
@@ -21,7 +23,7 @@
         </div>
     </div>
     
-  </div>
+  
   {% if mensaje1 %}
   <div role="alert">{{mensaje1}}</div>
   {% endif %}
@@ -35,5 +37,8 @@
   {% endif %}
   <div class="modal-footer">
     <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cerrar</button>
-    <button class="btn btn-primary" type="button">Grabar</button>
+    <button class="btn btn-primary" id="btn-grabar-direcciones-despacho" type="button">Grabar</button>
+
   </div>
+</form>
+</div>

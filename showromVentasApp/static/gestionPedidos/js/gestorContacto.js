@@ -94,13 +94,14 @@ $(document).ready(function() {
                   if (data.resultadosClientes && data.resultadosClientes.length > 0) {
                       const cliente = data.resultadosClientes[0];
                       const contactos = cliente.contactos;
+                      console.log('contacto de Cliente encontrado: ', contactos);
 
                       contactos.forEach(function(contacto, index) {
                           let contactoElemento = `
                           <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 230px; margin-right: 10px;">
                               <div class="row">
                                   <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
-                                  <div class="col" style="text-align: center;">
+                                  <div class="col" style="text-align: center;"> 
                                       <span style="font-weight: bold;">Contacto Nº${index + 1}</span>
                                   </div>
                                   <div class="col-sm-12" style="height: 5px;background: transparent;"><span>&nbsp;</span></div>
@@ -126,25 +127,28 @@ $(document).ready(function() {
                               <div class="col-sm-12" style="height: 10px;background: transparent;"><span>&nbsp;</span></div>
                               </div>
 
+                              <input type="hidden" name="contacto_id[]" value="${contacto.id}" id="contacto_id_${index}">
+
+
                               <div class="row">
                                   <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Nombre</label></div>
-                                  <div class="col"><input class="form-control" type="text" value="${contacto.nombre}" id="nombre_${index}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                  <div class="col"><input class="form-control" type="text" name="nombre_static[]" value="${contacto.nombre}" id="nombre_${index}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
                               </div>
                               <div class="row">
                                   <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Apellido</label></div>
-                                  <div class="col"><input class="form-control" type="text" value="${contacto.apellido}" id="apellido_${index}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                  <div class="col"><input class="form-control" type="text" name="apellido_static[]" value="${contacto.apellido}" id="apellido_${index}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
                               </div>
                               <div class="row">
                                   <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Teléfono</label></div>
-                                  <div class="col"><input class="form-control" type="text" value="${contacto.telefono}" id="telefono_${index}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                  <div class="col"><input class="form-control" type="text" name="telefono_static[]" value="${contacto.telefono}" id="telefono_${index}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
                               </div>
                               <div class="row">
                                   <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Celular</label></div>
-                                  <div class="col"><input class="form-control" type="text" value="${contacto.celular}" id="celular_${index}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                  <div class="col"><input class="form-control" type="text" name="celular_static[]" value="${contacto.celular}" id="celular_${index}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
                               </div>
                               <div class="row">
                                   <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Email</label></div>
-                                  <div class="col"><input class="form-control" type="email" value="${contacto.email}" id="email_${index}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                  <div class="col"><input class="form-control" type="email" name="email_static[]" value="${contacto.email}" id="email_${index}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
                               </div>
                           </div>
                           `;
@@ -153,13 +157,21 @@ $(document).ready(function() {
 
                           // Evento para habilitar la edición
                           $(`#editar_contacto_${index}`).on('click', function() {
-                              // Hacer los campos editables
-                              $(`#nombre_${index}`).prop('disabled', false);
-                              $(`#apellido_${index}`).prop('disabled', false);
-                              $(`#telefono_${index}`).prop('disabled', false);
-                              $(`#celular_${index}`).prop('disabled', false);
-                              $(`#email_${index}`).prop('disabled', false);
-                          });
+                            // Hacer los campos editables
+                            $(`#nombre_${index}`).prop('disabled', false);
+                            $(`#apellido_${index}`).prop('disabled', false);
+                            $(`#telefono_${index}`).prop('disabled', false);
+                            $(`#celular_${index}`).prop('disabled', false);
+                            $(`#email_${index}`).prop('disabled', false);
+                        
+                            // Cambiar el nombre para capturar solo si han sido modificados
+                            $(`#nombre_${index}`).attr('name', 'nombre[]');
+                            $(`#apellido_${index}`).attr('name', 'apellido[]');
+                            $(`#telefono_${index}`).attr('name', 'telefono[]');
+                            $(`#celular_${index}`).attr('name', 'celular[]');
+                            $(`#email_${index}`).attr('name', 'email[]');
+                            $(`#contacto_id_${index}`).attr('name', 'contacto_id[]');
+                        });
 
                           // Evento para eliminar con confirmación
                           $(`#eliminar_contacto_${index}`).on('click', function() {

@@ -124,7 +124,7 @@ class DireccionManager {
 
           <div class="row">
             <div class="col-sm-4">
-              <label class="col-form-label" style="font-size: 13px;">Dirección</label>
+              <label clas s="col-form-label" style="font-size: 13px;">Dirección</label>
             </div>
             <div class="col">
               <input class="form-control" type="text" name="direccion[]" id="direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
@@ -232,12 +232,14 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                   <div class="col-sm-12" style="height: 10px;background: transparent;"><span>&nbsp;</span></div>
                                 </div>
 
+                                <input type="hidden" name="contacto_id[]" value="${direccion.id}" id="contacto_id_${index}">
+
                                 <div class="row">
                                     <div class="col-sm-4">
                                       <label class="col-form-label" style="font-size: 13px;">Tipo</label>
                                     </div>
                                     <div class="col">
-                                        <select class="form-select" id=tipoDireccion_${index} value="${direccion.tipoDireccion}" style="font-size: 12px; border-color: rgb(159,168,175);" disabled>
+                                        <select class="form-select" name="tipoDireccion_static[]" id=tipoDireccion_${index} value="${direccion.tipoDireccion}" style="font-size: 12px; border-color: rgb(159,168,175);" disabled>
                                             <optgroup label="Tipo">
                                                 <option value="12" ${direccion.tipoDireccion === "12" ? "selected" : ""}>Despacho</option>
                                                 <option value="13" ${direccion.tipoDireccion === "13" ? "selected" : ""}>Facturación</option>
@@ -251,7 +253,7 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                       <label class="col-form-label" style="font-size: 13px;">ID</label>
                                       </div>
                                     <div class="col">
-                                    <input class="form-control" id=direccion_${index} type="text" value="${direccion.id}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled>
+                                    <input class="form-control" name="direccion_static[]" id=direccion_${index} type="text" value="${direccion.id}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled>
                                     </div>
                                 </div>
 
@@ -260,7 +262,7 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                     <label class="col-form-label" style="font-size: 13px;">País</label>
                                   </div>
                                   <div class="col">
-                                    <select class="form-select" id=pais_${index} name="pais[]" style="font-size: 12px; border-color: rgb(159,168,175);" disabled>
+                                    <select class="form-select" id=pais_${index} name="pais_static[]" style="font-size: 12px; border-color: rgb(159,168,175);" disabled>
                                       <optgroup label="País">
                                         <option value="${direccion.pais}" selected>chile</option>
                                       </optgroup>
@@ -274,7 +276,7 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                   <label class="col-form-label" style="font-size: 13px;">Región</label>
                                 </div>
                                 <div class="col">
-                                  <select class="form-select" id=region_${index} name="region[]" style="font-size: 12px; border-color: rgb(159,168,175);"disabled>
+                                  <select class="form-select" id=region_${index} name="region_static[]" style="font-size: 12px; border-color: rgb(159,168,175);"disabled>
                                     <optgroup label="Región">
                                       <option value="12" ${direccion.region === "Arica y Parinacota" ? "selected" : ""}>Arica y Parinacota</option>
                                       <option value="1" ${direccion.region === "Tarapacá" ? "selected" : ""}>Tarapacá</option>
@@ -289,7 +291,7 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
 
                                 <div class="row">
                                     <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Ciudad</label></div>
-                                    <div class="col"><input id=ciudad_${index} class="form-control" type="text" value="${direccion.ciudad}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                    <div class="col"><input id=ciudad_${index} name="cuidad_static[]" class="form-control" type="text" value="${direccion.ciudad}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
                                 </div>
 
                                 <div class="row">
@@ -297,7 +299,7 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                     <label class="col-form-label" style="font-size: 13px;">Comuna</label>
                                   </div>
                                   <div class="col">
-                                    <select class="form-select" id=comuna_${index} name="comuna[]" style="font-size: 12px; border-color: rgb(159,168,175);"disabled>
+                                    <select class="form-select" id=comuna_${index} name="comuna_static[]" style="font-size: 12px; border-color: rgb(159,168,175);"disabled>
                                       <optgroup label="Comuna">
                                         <option value="12" ${direccion.comuna === "Arica" ? "selected" : ""}>Arica</option>
                                         <option value="2" ${direccion.comuna === "Las Condes" ? "selected" : ""}>Las Condes</option>
@@ -311,7 +313,7 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
 
                                 <div class="row">
                                     <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Dirección</label></div>
-                                    <div class="col"><input id=nombreDireccion_${index} class="form-control" type="text" value="${direccion.nombreDireccion}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                    <div class="col"><input id=nombreDireccion_${index} name="nombreDireccion_static[]" class="form-control" type="text" value="${direccion.nombreDireccion}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
                                 </div>
                             </div>
                         `;
@@ -326,6 +328,15 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                           $(`#ciudad_${index}`).prop('disabled', false);
                           $(`#comuna_${index}`).prop('disabled', false);
                           $(`#nombreDireccion_${index}`).prop('disabled', false);
+                          
+                          $(`#tipoDireccion_${index}`).attr('name', 'tipodireccion[]');
+                          $(`#direccion_${index}`).attr('name', 'nombre_direccion[]');
+                          $(`#pais_${index}`).attr('name', 'pais[]');
+                          $(`#region_${index}`).attr('name', 'region[]');
+                          $(`#ciudad_${index}`).attr('name', 'ciudad[]');
+                          $(`#comuna_${index}`).attr('name', 'comuna[]');
+                          $(`#nombreDireccion_${index}`).attr('name', 'direccion[]');
+                          $(`#direccion_id${index}`).attr('name', 'direccionid[]');
                       });
 
                         $(`#eliminar_dir_${index}`).on('click', function() {
