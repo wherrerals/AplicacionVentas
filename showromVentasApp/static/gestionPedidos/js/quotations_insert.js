@@ -10,7 +10,7 @@ function submitForm() {
     const docDate = fechaSolo;
     const docDueDate = document.getElementById("docDueDate").textContent;
     const taxDate = fechaSolo;
-    const rut = document.getElementById("inputCliente").getAttribute("data-rut");
+    const rut = document.getElementById("inputCliente").getAttribute("data-codigoSN");
     const cardCode = rut;
     const pgc = -1;
     const spc = 41; //document.getElementById("salesPersonCode").value;

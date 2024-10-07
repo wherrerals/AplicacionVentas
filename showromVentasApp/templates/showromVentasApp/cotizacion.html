@@ -90,7 +90,7 @@
               <label class="col-form-label" style="font-size: 13px;">Cliente</label>
             </div>
             <div class="col-sm-6 col-md-6" style="text-align: left;width: 58%;padding-right: 0px;">
-              <input class="form-control" type="text" name="cliente" style="border-color: rgb(159,168,175);font-size: 12px;" id="inputCliente" data-rut="">
+              <input class="form-control" type="text" name="cliente" style="border-color: rgb(159,168,175);font-size: 12px;" id="inputCliente" data-rut="" data-codigoSN="">
                 <div id="resultadosClientes" style="font-size: 11px;"></div>
             </div>
             
@@ -438,8 +438,8 @@
               </thead>
               {% if DocumentLines %}
               <!--<p>DocumentLines: {{ DocumentLines|default:"No data" }}</p>-->       
-                      {% include 'tabla_document_lines.html' %}
-                  {% endif %}      
+                {% include 'tabla_document_lines.html' %}
+              {% endif %}      
             </table>
           </div>
         </div>
