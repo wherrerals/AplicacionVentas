@@ -51,22 +51,56 @@ class SocioNegocioView(FormView):
                 'email': request.POST.get('emailSN'),
                 'nombre': request.POST.get('nombreSN'),
                 'apellido': request.POST.get('apellidoSN'),
-                'razon_social': request.POST.get('grupoSN'),
+                'razon_social': request.POST.get('razonSN'),  # corregido aquí
                 'giro': request.POST.get('giroSN'),
                 'telefono': request.POST.get('telefonoSN')
             }
 
+            print(f"Datos: {datos}")
+
             socio_negocio = SocioNegocio(request)
-            # Llamar al método y devolver directamente el JsonResponse generado
+            
+            # Llamar al método y obtener la respuesta
             response = socio_negocio.crearOActualizarCliente()
-            return response
+            
             print(f"Response: {response}")
+
+            # Verificar si la respuesta fue exitosa
+            if response.status_code == 200:
+                # Aquí puedes continuar con la creación en Service Layer
+                # Por ejemplo, llamando a `creacionSocioSAP` y pasando los datos necesarios
+                service_layer_response = socio_negocio.creacionSocioSAP(datos)
+                return JsonResponse(service_layer_response, status=201)
+
+            return response  # Si no fue exitosa, simplemente devuelve la respuesta original
 
         except ValidationError as e:
             return JsonResponse({'error': str(e)}, status=400)
         except Exception as e:
             return JsonResponse({'error': 'Error inesperado: {}'.format(str(e))}, status=500)
 
+    @csrf_exempt
+    def creacionCionSocioNeocio(self, request):
+        print("probando Creacion")
+        if request.method == 'POST':
+            try:
+                other = None
+                data = json.loads(request.body)
+                print("Data:", data)
+                socio_negocio = SocioNegocio(request)
+                carcode = data['CardCode']
+                verificacion = socio_negocio.verificarSocioNegocioSap(carcode)
+                print("Verificacion:", verificacion)
+                if verificacion == True:
+                    return JsonResponse({'error': 'Socio de negocio ya existe'}, status=400)
+                else:
+                    creacion = socio_negocio.creacionSocioSAP(data)
+                    print("Creacion:", creacion)
+                    return JsonResponse(creacion, status=201)
+            except json.JSONDecodeError as e:
+                return JsonResponse({'error': 'JSON inválido'}, status=400)
+
+            
     def busquedaSocioNegocio(self, request):
         if request.method == "GET":
             numero = request.GET.get('numero')
@@ -99,17 +133,5 @@ class SocioNegocioView(FormView):
         
         return JsonResponse({"error": "Método no permitido."}, status=405)
 
-    @csrf_exempt
-    def creacionCionSocioNeocio(self, request):
-        print("probando Creacion")
-        if request.method == 'POST':
-            try:
-                other = None
-                data = json.loads(request.body)
-                socio_negocio = SocioNegocio(request)
-                creacion = socio_negocio.creacionSocioSAP(data)
-                print("Creacion:", creacion)
-                return JsonResponse(creacion, status=201)
-            except json.JSONDecodeError as e:
-                return JsonResponse({'error': 'JSON inválido'}, status=400)
+
 

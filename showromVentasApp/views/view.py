@@ -98,8 +98,8 @@ def quotations(request):
             usuario = UsuarioDB.objects.get(usuarios=request.user)
             sucurs = usuario.sucursal  # Accede a la sucursal a través del modelo UsuarioDB
             nombreUser = usuario.nombre  # Accede al nombre del usuario a través del modelo UsuarioDB
-
-        except UsuarioDB.DoesNotExist:
+        
+        except UsuarioDB.DoesNotExist: 
             pass
 
         # Obtiene el parámetro DocNum de la URL, o None si no está presente
@@ -119,7 +119,6 @@ def quotations(request):
 
         # Renderiza el template con el contexto
         return render(request, 'cotizacion.html', context)
-
 
 
 @login_required
@@ -421,6 +420,8 @@ def agregarContacto(request, cliente):
 Este metodo sirve para poder guardar los contactos de un cliente en la base de datos a traves de una peticion AJAX
         creada en los modales, cuando se desea agregar un contacto o editar un contacto de un cliente ya existente.
         Con este estaba probando pero no lo logre. (no empece con el de direcciones)
+"""
+
 @login_required
 def guardarContactosAJAX(request):
     
@@ -465,7 +466,6 @@ def guardarContactosAJAX(request):
 
         return JsonResponse({'success': True})
     return JsonResponse({'success': False, 'message': 'Método no permitido'})
-"""
 
 
 @login_required
@@ -524,7 +524,8 @@ def list_quotations_2(request):
         return JsonResponse({'error': 'Invalid parameters'}, status=400)
 
     data = client.get_quotations(top=top, skip=skip)
-    return JsonResponse(data, safe=False) """
+    return JsonResponse(data, safe=False) 
+"""
 
 
 def quotate_items(request, docEntry):
