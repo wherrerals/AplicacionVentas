@@ -14,9 +14,10 @@ SECRET_KEY = 'django-insecure-fexe1oq@sx@j&x3m#tw(#x(r!g32fylgea=whky=#ge^vn5f*h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '192.168.3.41', '192.168.3.42']
+
+#En este se debe colocar la ip de la maquina en la que se esta trabajando o la ip de la maquina en la que se va a desplegar la aplicacion
+ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '192.168.3.41', '192.168.3.42', '127.0.0.1']
 #ALLOWED_HOSTS = []
-#ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.3.41']
 #python manage.py runserver 192.168.3.41:8000
 
 
@@ -28,7 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'AplicacionVentas',
+    'config',
     'datosLsApp',
     'logicaVentasApp',
     'showromVentasApp'    
@@ -45,7 +46,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'AplicacionVentas.urls'
+ROOT_URLCONF = 'config.urls'
 
 #/Users/Cuervo/Documents/AplicacionVentas/showromVentasApp/templates/showromVentasApp
 #/Users/nicor/Universidad/Practica/AplicacionVentas/showromVentasApp/templates/showromVentasApp
@@ -73,14 +74,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'AplicacionVentas.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
-""" DATABASES = {
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
@@ -92,11 +93,11 @@ WSGI_APPLICATION = 'AplicacionVentas.wsgi.application'
         'PORT':'3306',
     }
 }
- """
 
-# settings.py
 
-DATABASES = {
+#Configuracion para docker
+
+""" DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',         # Nombre de la base de datos
@@ -106,7 +107,7 @@ DATABASES = {
         'PORT': '3306',               # Puerto por defecto de MySQL
     }
 }
-
+ """
 
 # Base service Layer
 API_BASE_URL = 'https://182.160.29.24:50003/b1s/v1/'
