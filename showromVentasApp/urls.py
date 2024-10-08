@@ -16,7 +16,7 @@ urlpatterns = [
     path('verificar_cliente/', SocioNegocioView.as_view(), name='verificar_cliente'),
     path('listado_productos/', Productos.as_view(), name='listado_productos'),
     path('crear_cotizacion/', CotizacionView.as_view(), name='crear_cotizacion'),
-    path('crear_cliente/', SocioNegocioView.as_view(), name='crear_cliente'),
+    #path('crear_cliente/', SocioNegocioView.as_view(), name='crear_cliente'),
     path('cambiar_estado_cotizacion/', CotizacionView.as_view(), name='cambiar_estado_cotizacion'),
     # Rutas adicionales
     path('lista_cotizaciones/', view.list_quotations, name="lista_cotizaciones"),
