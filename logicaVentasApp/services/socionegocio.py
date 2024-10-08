@@ -1,10 +1,14 @@
+import json
 from django.http import JsonResponse
 from django.db import transaction
 from django.core.exceptions import ValidationError
+from datosLsApp.models.socionegociodb import SocioNegocioDB
 from datosLsApp.repositories.socionegociorepository import SocioNegocioRepository
 from datosLsApp.repositories.gruposnrepository import GrupoSNRepository
 from datosLsApp.repositories.tipoclienterepository import TipoClienteRepository
 from datosLsApp.repositories.tiposnrepository import TipoSNRepository
+from datosLsApp.repositories.direccionrepository import DireccionRepository
+from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.models import DireccionDB, ContactoDB
 from adapters.sl_client import APIClient
 
@@ -77,7 +81,6 @@ class SocioNegocio:
                 else:
                     raise ValidationError(f"Grupo de cliente no válido: {self.gruposn}")
 
-                print(f"Cliente creado/actualizado: {cliente}")
                 SocioNegocio.agregarDireccionYContacto(self.request, cliente)
 
             return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
@@ -127,14 +130,16 @@ class SocioNegocio:
 
     @staticmethod
     def agregarDireccionYContacto(request, cliente):
+        print("Agregando dirección y contacto...")
+        print(f"dirección: {request.POST.get('nombre_direccion[]')}")
         from showromVentasApp.views.view import agregarDireccion, agregarContacto
 
-        if 'nombre_Direccion[]' not in request.POST:
+        if 'nombre_direccion[]' not in request.POST:
             print("Dirección faltante")
             raise ValidationError("Debe agregar al menos una dirección")
         agregarDireccion(request, cliente)
 
-        if 'nombres' not in request.POST:
+        if 'nombre' not in request.POST:
             agregarContacto(request, cliente)
         else:
             print("Contacto faltante")
@@ -189,6 +194,7 @@ class SocioNegocio:
             })
 
         return resultados_formateados
+
     
     def validarGrupoSN(self):
         if not self.gruposn:
@@ -203,7 +209,7 @@ class SocioNegocio:
             raise ValidationError("Email no encontrado")
         
         
-    def verificarSocioNegocioSap(cardCode):
+    def verificarSocioNegocioSap(self, cardCode):
         client = APIClient()
 
         try:
@@ -222,3 +228,167 @@ class SocioNegocio:
         except Exception as e:
             print(f"Error al verificar socio de negocio en SAP: {str(e)}")
             return False
+    
+    def prepararJsonCliente(self, jsonData):
+        """
+        Prepara los datos JSON específicos de la cotización.
+
+        Args:
+            jsonData (dict): Datos de la cotización.
+        
+        Returns:
+            dict: Datos de la cotización preparados para ser enviados a SAP.
+        """
+        
+        # Datos de la cabecera
+        print("Preparando JSON para el socio de negocio...")
+        print(f"Datos recibidos: {jsonData}")
+        cardCode = jsonData.get('rut')
+        print(f"CardCode: {cardCode}")
+
+        nombre = jsonData.get('nombre')
+        apellido = jsonData.get('apellido')
+
+        # Obtener cliente
+        try:
+            cliente = SocioNegocioDB.objects.get(rut=cardCode)  # Asumiendo que 'rut' es el identificador único
+            print(f"Cliente: {cliente}")
+        except SocioNegocioDB.DoesNotExist:
+            raise ValueError(f"No se encontró el cliente con RUT: {cardCode}")
+
+        # Instancia del repositorio de direcciones
+        direccion_repo = DireccionRepository()
+        
+        # Obtener direcciones y contactos
+        direcciones = direccion_repo.obtenerDireccionesPorCliente(cliente)
+        contactos = ContactoRepository().obtenerContactosPorCliente(cliente)
+
+        nombreCompleto = "{nombre} {apellido}".format(nombre=nombre, apellido=apellido)
+        cardCodeSinGuion = self.generarCodigoSN(cardCode)
+        
+        if not cardCode:
+            raise ValueError("El campo 'CardCode' es obligatorio.")
+
+        # Preparar cabecera
+        cabecera = {
+            'CardCode': cardCodeSinGuion,
+            'CardName': nombreCompleto,
+            'CardType': "C",
+            'GroupCode': jsonData.get('grupoSN'),
+            'Phone1': jsonData.get('telefono'),
+            'Phone2': jsonData.get('telefono'),
+            'Notes': "Persona",
+            'PayTermsGrpCode': -1,
+            'FederalTaxID': jsonData.get('rut'),
+            'SalesPersonCode': -1,  # Cambiar por el código de vendedor
+            'Cellular': jsonData.get('telefono'),
+            'EmailAddress': jsonData.get('email'),
+            'CardForeignName': nombreCompleto,
+            'ShipToDefault': "DESPACHO",
+            'BilltoDefault': "FACTURACION",
+            'DunningTerm': "ESTANDAR",
+            'CompanyPrivate': "cPrivate",
+            'AliasName': jsonData.get('nombre'),
+            'U_Tipo': "N",
+            'U_FE_Export': "N",
+        }
+
+        # Preparar direcciones
+        bp_addresses_json = []
+        for direccion in direcciones:
+            tipoDireccion = 'bo_BillTo' if direccion.tipoDireccion == 'F' else 'bo_ShipTo'
+            
+            # Crear un diccionario por cada dirección
+            bp_addresses_json.append({
+                'AddressName': direccion.nombreDireccion,
+                'Street': direccion.calleNumero,
+                'City': direccion.codigoImpuesto,
+                'County': direccion.pais,
+                'Country': "CL", # Cambiar por el código de país
+                'State': direccion.region.numero,
+                'FederalTaxID': direccion.SocioNegocio.rut,
+                'TaxCode': "IVA", # Cambiar por el código de impuesto
+                'AddressType': tipoDireccion,
+            })
+
+        # Preparar contactos
+        contact_employees_json = [
+            {
+                'Name': contacto.nombreCompleto,
+                'Phone1': contacto.telefono,
+                'MobilePhone': contacto.celular,
+                'E_Mail': contacto.email,
+                'FirstName': contacto.nombre,
+                'LastName': contacto.apellido,
+            }
+            for contacto in contactos
+        ]
+
+        # Combina cabecera y líneas en un solo diccionario
+        return {
+            **cabecera,
+            'BPAddresses': bp_addresses_json,
+            'ContactEmployees': contact_employees_json
+        }
+
+    
+    def creacionSocioSAP(self, data):
+        client = APIClient()
+        
+        try:
+            print("Creando socio de negocio en SAP...")
+
+            # Preparar JSON
+            json_data = self.prepararJsonCliente(data)
+            print(f"JSON preparado para enviar: {json_data}")
+
+            # Enviar solicitud a SAP
+            response = client.crearCliente(json_data)
+            print(f"Respuesta de la API: {response}")
+            
+            if isinstance(response, dict):
+                # Verificar si la respuesta contiene un 'CardCode'
+                if 'CardCode' in response:
+                    card_code = response.get('CardCode')
+                    print(f"Socio de negocio creado exitosamente con CardCode: {card_code}")
+                    
+                    # Extraer BPAddresses si está presente
+                    bp_addresses = response.get('BPAddresses', [])
+                    row_nums = [address.get('RowNum') for address in bp_addresses if 'RowNum' in address]
+                    
+                    # Extraer ContactEmployees si está presente
+                    contact_employees = response.get('ContactEmployees', [])
+                    internal_codes = [employee.get('InternalCode') for employee in contact_employees if 'InternalCode' in employee]
+
+
+                    return {
+                        'success': 'Socio de negocio creado exitosamente',
+                        'CardCode': card_code,
+                        'RowNums': row_nums,  # Lista con los RowNum extraídos
+                        'InternalCodes': internal_codes  # Lista con los InternalCode extraídos
+
+                    }
+                
+                # Manejar el mensaje de error si lo hay
+                elif 'error' in response:
+                    error_message = response.get('error', 'Error desconocido')
+                    print(f"Error devuelto por la API: {error_message}")
+                    return {'error': f"Error: {error_message}"}
+                else:
+                    print("Respuesta inesperada de la API.")
+                    return {'error': 'Respuesta inesperada de la API.'}
+            
+            else:
+                print("La respuesta de la API no es válida o no es un diccionario.")
+                return {'error': 'La respuesta de la API no es válida.'}
+
+        except json.JSONDecodeError as e:
+            print(f"Error al decodificar el JSON: {str(e)}")
+            return {'error': 'Error al decodificar el JSON.'}
+        except ConnectionError as e:
+            print(f"Error de conexión con SAP: {str(e)}")
+            return {'error': 'Error de conexión con SAP.'}
+        except Exception as e:
+            print(f"Error general al crear socio de negocio en SAP: {str(e)}")
+            return {'error': f"Error inesperado: {str(e)}"}
+

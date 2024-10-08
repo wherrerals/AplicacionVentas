@@ -88,7 +88,17 @@ def quotations(request):
 
     if request.user.is_authenticated:
         username = request.user.username
-    
+
+        # Intenta obtener el objeto UsuarioDB relacionado con el usuario autenticado
+        try:
+            usuario = UsuarioDB.objects.get(usuarios=request.user)
+            sucurs = usuario.sucursal  # Accede a la sucursal a través del modelo UsuarioDB
+            nombreUser = usuario.nombre  # Accede al nombre del usuario a través del modelo UsuarioDB
+        
+        except UsuarioDB.DoesNotExist: 
+            pass
+
+        # Obtiene el parámetro DocNum de la URL, o None si no está presente
         doc_num = request.GET.get('docNum', None)
 
         regiones = RegionDB.objects.all()
@@ -101,6 +111,7 @@ def quotations(request):
         }
 
         return render(request, 'cotizacion.html', context)
+
 
 @login_required
 def lista_ovs(request):

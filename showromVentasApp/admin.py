@@ -5,6 +5,7 @@ from datosLsApp.models import (
     ItemDB, SocioNegocioDB, UsuarioDB, ContactoDB, DireccionDB, ComunaDB,
     GrupoSNDB, TipoSNDB, TipoClienteDB
 )
+from datosLsApp.models.regiondb import RegionDB
 
 # Modificaciones en administrador
 admin.site.site_header = 'Led Studio'
@@ -45,6 +46,8 @@ class ItemDBper(admin.ModelAdmin):
 
 class SocioNegocioDBper(admin.ModelAdmin):
     list_display = ('nombre', 'razonSocial', 'email', 'telefono', 'condicionPago')
+    search_fields = ['codigoSN', 'nombre']
+
 
 class UsuarioDBper(admin.ModelAdmin):
     list_display = ('nombre', 'email', 'telefono', 'sucursal', 'usuarios')
@@ -84,3 +87,4 @@ admin.site.register(TipoSNDB, TipoSNDBper)
 admin.site.register(TipoClienteDB, TipoClienteDBper)
 #admin.site.register(DireccionDB, DireccionDBper)
 admin.site.register(ComunaDB)
+admin.site.register(RegionDB)

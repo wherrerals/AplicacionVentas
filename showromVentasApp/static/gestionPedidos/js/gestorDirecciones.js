@@ -18,7 +18,7 @@ class DireccionManager {
     agregarDireccion() {
       const newRow = document.createElement('div');
       this.contdir++;
-      newRow.className = "col-sm-1";
+      newRow.className = "col-sm-1 .dir-row";
       newRow.style = "padding: 0px;width: 280px";
   
       newRow.innerHTML = `
