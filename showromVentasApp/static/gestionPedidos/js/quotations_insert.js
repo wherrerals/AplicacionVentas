@@ -10,8 +10,8 @@ function submitForm() {
     const docDate = fechaSolo;
     const docDueDate = document.getElementById("docDueDate").textContent;
     const taxDate = fechaSolo;
-    const rut = document.getElementById("inputCliente").getAttribute("data-rut");
-    const cardCode = rut + "C";
+    const rut = document.getElementById("inputCliente").getAttribute("data-codigoSN");
+    const cardCode = rut;
     const pgc = -1;
     const spc = 41; //document.getElementById("salesPersonCode").value;
     const trnasp = 1; //document.getElementById("transportationCode").value;
@@ -107,8 +107,10 @@ function submitForm() {
                 const numeroCotizacion = document.getElementById('numero_cotizacion');
                 
                 if (numeroCotizacion) {
-                    numeroCotizacion.textContent = `Nº ${data.docNum}`;
+                    numeroCotizacion.textContent = `${data.docNum}`;
                 }
+
+                bloquearCampos();
 
             } else {
                 // Mostrar el mensaje de error en un popup
@@ -133,3 +135,4 @@ function submitForm() {
     }
 });
 
+    

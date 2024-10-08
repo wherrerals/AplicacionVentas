@@ -6,14 +6,17 @@ from showromVentasApp.views import view
 
 cotizacionView = CotizacionView()
 
+
 urlpatterns = [
     path('', view.home, name="home"),
     path('listado_Cotizaciones/', CotizacionView.as_view(), name='listado_Cotizaciones'),
     path('listado_Cotizaciones_filtrado/', CotizacionView.as_view(), name='listado_Cotizaciones_filtrado'),
     path('agregar_editar_clientes/', SocioNegocioView.as_view(), name='agregar_editar_clientes'),
     path('buscar_clientes/', SocioNegocioView.as_view(), name='busquedaClientes'),
+    path('verificar_cliente/', SocioNegocioView.as_view(), name='verificar_cliente'),
     path('listado_productos/', Productos.as_view(), name='listado_productos'),
     path('crear_cotizacion/', CotizacionView.as_view(), name='crear_cotizacion'),
+    path('crear_cliente/', SocioNegocioView.as_view(), name='crear_cliente'),
     path('cambiar_estado_cotizacion/', CotizacionView.as_view(), name='cambiar_estado_cotizacion'),
     # Rutas adicionales
     path('lista_cotizaciones/', view.list_quotations, name="lista_cotizaciones"),
@@ -31,4 +34,9 @@ urlpatterns = [
     path('mis_datos/', view.mis_datos, name='mis_datos'),
     path('agregar_direccion/', view.agregarDireccion, name='agregar_direccion'),
     path('obtener_detalles_cotizacion/<int:docEntry>/', cotizacionView.obtenerDetallesCotizacion, name='obtener_detalles_cotizacion'),
+    path('guardar_contactos/', view.guardarContactosAJAX, name='guardar_contactos_ajx'), 
 ]
+
+""" Este es el path que estaba probando
+    path('guardar_contactos/', view.guardarContactosAJAX, name='guardar_contactos_ajx'), 
+"""

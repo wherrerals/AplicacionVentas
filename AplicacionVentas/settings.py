@@ -14,7 +14,8 @@ SECRET_KEY = 'django-insecure-fexe1oq@sx@j&x3m#tw(#x(r!g32fylgea=whky=#ge^vn5f*h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '192.168.3.41', '192.168.3.42']
+#ALLOWED_HOSTS = []
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.3.41']
 #python manage.py runserver 192.168.3.41:8000
 
@@ -54,7 +55,8 @@ ROOT_URLCONF = 'AplicacionVentas.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
+        'DIRS': [os.path.join(BASE_DIR, 'showromVentasApp/templates/showromVentasApp')],
+        #'DIRS': ['/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
         #'DIRS': ['/Users/Cuervo/Documents/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
         #'DIRS': ['/Users/nicor/Universidad/Practica/AplicacionVentas/showromVentasApp/templates/showromVentasApp'],
         
@@ -77,7 +79,8 @@ WSGI_APPLICATION = 'AplicacionVentas.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
+
+""" DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
@@ -89,6 +92,21 @@ DATABASES = {
         'PORT':'3306',
     }
 }
+ """
+
+# settings.py
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'led_studio',         # Nombre de la base de datos
+        'USER': 'root',               # Usuario de la base de datos
+        'PASSWORD': 'Ea7hava5*',     # Contraseña del usuario
+        'HOST': 'db',                 # Nombre del servicio en docker-compose
+        'PORT': '3306',               # Puerto por defecto de MySQL
+    }
+}
+
 
 # Base service Layer
 API_BASE_URL = 'https://182.160.29.24:50003/b1s/v1/'
@@ -152,7 +170,7 @@ AUTHENTICATION_BACKENDS = [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 
 # Default primary key field type

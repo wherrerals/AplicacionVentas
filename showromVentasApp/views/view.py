@@ -11,6 +11,8 @@ from django.http import JsonResponse, HttpResponse
 from datosLsApp.models.usuariodb import User 
 from datosLsApp.models import (ProductoDB, SocioNegocioDB, UsuarioDB, RegionDB, GrupoSNDB, TipoSNDB, TipoClienteDB, DireccionDB, ComunaDB, ContactoDB)
 from adapters.sl_client import APIClient
+
+
 #librerias Python usadas
 import requests
 import json
@@ -71,37 +73,53 @@ def list_quotations(request):
     return render(request, "lista_cotizaciones.html")
 
 @login_required
-
 def quotations(request):
     """
     Renderiza la pagina de cotizaciones y muestra el nombre de usuario.
 
-    Captura de la url el parametro DocNum y, si este no esta presente, lo establece en null
+    Captura de la url el parametro DocNum y, si este no esta presente, lo establece en null.
     También obtiene todas las instancias del modelo 'Region' para ser utilizadas en el template.
 
-    Args: 
-        request (HttpsRequest): La peticion HTTP recibida
+    Args:
+        request (HttpRequest): La petición HTTP recibida.
     
-    Returns: 
-        HttpResponse: Renderiza el template 'cotizacion.html' con el nombre de usuario y el DocNum
-        HttpResponse: Si el usuario no esta autenticado redirige a el template del inicio.
+    Returns:
+        HttpResponse: Renderiza el template 'cotizacion.html' con el nombre de usuario y el DocNum.
+        HttpResponse: Si el usuario no está autenticado, redirige al template del inicio.
     """
 
+    # Verifica si el usuario está autenticado
     if request.user.is_authenticated:
+        # Obtiene el nombre de usuario del modelo User de Django
         username = request.user.username
-    
+
+        # Intenta obtener el objeto UsuarioDB relacionado con el usuario autenticado
+        try:
+            usuario = UsuarioDB.objects.get(usuarios=request.user)
+            sucurs = usuario.sucursal  # Accede a la sucursal a través del modelo UsuarioDB
+            nombreUser = usuario.nombre  # Accede al nombre del usuario a través del modelo UsuarioDB
+        
+        except UsuarioDB.DoesNotExist: 
+            pass
+
+        # Obtiene el parámetro DocNum de la URL, o None si no está presente
         doc_num = request.GET.get('docNum', None)
 
+        # Obtiene todas las regiones de la base de datos
         regiones = RegionDB.objects.all()
 
-
+        # Contexto para renderizar el template
         context = {
             'docnum': doc_num,
             'username': username,
-            'regiones': regiones
+            'regiones': regiones,
+            'sucursal': sucurs,
+            'nombreuser': nombreUser
         }
 
+        # Renderiza el template con el contexto
         return render(request, 'cotizacion.html', context)
+
 
 @login_required
 def lista_ovs(request):
@@ -398,7 +416,56 @@ def agregarContacto(request, cliente):
                 print(f"No se ha creado el contacto {i+1} porque algunos campos están vacíos.")
     return render(request, "cotizacion.html", {'clienteNoIncluido': clienteNoIncluido})
 
+"""
+Este metodo sirve para poder guardar los contactos de un cliente en la base de datos a traves de una peticion AJAX
+        creada en los modales, cuando se desea agregar un contacto o editar un contacto de un cliente ya existente.
+        Con este estaba probando pero no lo logre. (no empece con el de direcciones)
+"""
 
+@login_required
+def guardarContactosAJAX(request):
+    
+    if request.method == "POST":
+        # Parsear los datos de contactos desde el request
+        contactos_json = request.POST.get('contactos')
+        contactos = json.loads(contactos_json)
+
+        cliente_id = request.POST.get('cliente')
+        cliente = SocioNegocioDB.objects.get(rut=cliente_id)
+
+        # Verificar que el cliente exista
+        if not cliente:
+            return JsonResponse({'success': False, 'message': 'Cliente no encontrado'})
+
+        # Iterar sobre los contactos recibidos
+        for contacto in contactos:
+            nombre = contacto['nombre']
+            apellido = contacto['apellido']
+            telefono = contacto.get('telefono')
+            celular = contacto.get('celular')
+            email = contacto.get('email')
+
+            # Verificar si los campos requeridos están completos
+            if nombre and apellido:
+                nombreCompleto = f"{nombre} {apellido}"
+
+                # Crear o actualizar el contacto
+                ContactoDB.objects.create(
+                    codigoInternoSap=1,  # Aquí deberías manejar la lógica del código interno si es variable
+                    nombreCompleto=nombreCompleto,
+                    nombre=nombre,
+                    apellido=apellido,
+                    telefono=telefono,
+                    celular=celular,
+                    email=email,
+                    SocioNegocio=cliente
+                )
+                print(f"Contacto {nombreCompleto} creado con éxito")
+            else:
+                print(f"No se ha creado el contacto porque algunos campos están vacíos.")
+
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'message': 'Método no permitido'})
 
 
 @login_required
@@ -457,7 +524,8 @@ def list_quotations_2(request):
         return JsonResponse({'error': 'Invalid parameters'}, status=400)
 
     data = client.get_quotations(top=top, skip=skip)
-    return JsonResponse(data, safe=False) """
+    return JsonResponse(data, safe=False) 
+"""
 
 
 def quotate_items(request, docEntry):

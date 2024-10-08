@@ -2,8 +2,10 @@ from django.contrib import admin
 from datosLsApp.models import (
     CondicionPagoDB, DocumentoDB, TipoDocTributarioDB, SucursalDB, 
     TipoVentaDB, VendedorDB, ProductoDB, BodegaDB, InventarioDB, 
-    ItemDB, SocioNegocioDB, UsuarioDB, ContactoDB, DireccionDB, ComunaDB
+    ItemDB, SocioNegocioDB, UsuarioDB, ContactoDB, DireccionDB, ComunaDB,
+    GrupoSNDB, TipoSNDB, TipoClienteDB
 )
+from datosLsApp.models.regiondb import RegionDB
 
 # Modificaciones en administrador
 admin.site.site_header = 'Led Studio'
@@ -37,21 +39,33 @@ class InventarioDBper(admin.ModelAdmin):
 
 class Productosper(admin.ModelAdmin):
     list_display = ('codigo', 'nombre', 'stockTotal', 'precioLista', 'precioVenta')
+    search_fields = ['codigo', 'nombre']
 
 class ItemDBper(admin.ModelAdmin):
     list_display = ('producto', 'cantidad', 'descuento')
 
 class SocioNegocioDBper(admin.ModelAdmin):
     list_display = ('nombre', 'razonSocial', 'email', 'telefono', 'condicionPago')
+    search_fields = ['codigoSN', 'nombre']
+
 
 class UsuarioDBper(admin.ModelAdmin):
-    list_display = ('nombre', 'email', 'telefono')
+    list_display = ('nombre', 'email', 'telefono', 'sucursal', 'usuarios')
 
 class ContactoDBper(admin.ModelAdmin):
     list_display = ('nombreCompleto',)
  
 class DireccionDBper(admin.ModelAdmin):
-    list_display = ('nombre', 'region', 'socioNegocio')
+    list_display = ('rowNum', 'nombreDireccion')
+
+class GrupoSnDBper(admin.ModelAdmin):
+    list_display = ('codigo', 'nombre')
+
+class TipoSNDBper(admin.ModelAdmin):
+    list_display = ('codigo', 'nombre')
+
+class TipoClienteDBper(admin.ModelAdmin):
+    list_display = ('codigo', 'nombre')
 
 # Register your models here.
 admin.site.register(TipoDocTributarioDB, TipoDocTributarioDBper)
@@ -67,5 +81,10 @@ admin.site.register(ItemDB, ItemDBper)
 admin.site.register(SocioNegocioDB, SocioNegocioDBper)
 admin.site.register(UsuarioDB, UsuarioDBper)
 admin.site.register(ContactoDB, ContactoDBper)
+admin.site.register(DireccionDB, DireccionDBper)
+admin.site.register(GrupoSNDB, GrupoSnDBper)
+admin.site.register(TipoSNDB, TipoSNDBper)
+admin.site.register(TipoClienteDB, TipoClienteDBper)
 #admin.site.register(DireccionDB, DireccionDBper)
 admin.site.register(ComunaDB)
+admin.site.register(RegionDB)
