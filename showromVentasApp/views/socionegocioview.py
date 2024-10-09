@@ -14,9 +14,30 @@ class SocioNegocioView(FormView):
     #@method_decorator(login_required)
     @method_decorator(require_http_methods(["GET", "POST"]))
     def dispatch(self, request, *args, **kwargs):
+        """
+        Sobreescribir el método `dispatch` para manejar las rutas GET y POST
+        
+        args:
+            request: HttpRequest
+            args: tuple
+            kwargs: dict
+        
+        return: 
+            HttpResponse
+        """
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request):
+        """
+        Método POST para manejar las rutas de la API
+
+        args:
+            request: HttpRequest
+
+        return:
+            JsonResponse con la respuesta de la API
+        """
+
         # Definir un diccionario de rutas a métodos POST
         route_map = {
             '/ventas/agregar_editar_clientes/': self.agregarSocioNegocio,
@@ -30,6 +51,15 @@ class SocioNegocioView(FormView):
         return JsonResponse({'error': 'Invalid URL'}, status=404)
     
     def get(self, request):
+        """
+        Método GET para manejar las rutas de la API
+
+        args:
+            request: HttpRequest
+
+        return:
+            JsonResponse con la respuesta de la API
+        """
         # Definir un diccionario de rutas a métodos GET
         route_map = {
             '/ventas/buscar_clientes/': self.busquedaSocioNegocio,
@@ -43,6 +73,16 @@ class SocioNegocioView(FormView):
         return JsonResponse({'error': 'Invalid URL'}, status=404)
 
     def agregarSocioNegocio(self, request):
+        """
+        Método para agregar un socio de negocio
+        
+        args:
+            request: HttpRequest
+        
+        return:
+            JsonResponse con la respuesta de la API
+        """
+
         try:
             # Obtener los datos del formulario
             datos = {
@@ -114,6 +154,15 @@ class SocioNegocioView(FormView):
 
             
     def busquedaSocioNegocio(self, request):
+        """
+        Método para buscar un socio de negocio
+        
+        args: 
+            request: HttpRequest
+
+        return:
+            JsonResponse con la respuesta de la base de datos
+        """
         if request.method == "GET":
             nombre = request.GET.get('nombre')
             numero = request.GET.get('numero')
@@ -144,6 +193,15 @@ class SocioNegocioView(FormView):
     
         
     def verificarSapSocio(self, request):
+        """
+        Método para verificar si un socio de negocio existe en SAP
+
+        args:
+            request: HttpRequest
+
+        return:
+            JsonResponse con la respuesta de la API
+        """
 
         print("Verificando Socio de Negocio")
 

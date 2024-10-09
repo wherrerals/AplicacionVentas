@@ -17,6 +17,23 @@ from adapters.sl_client import APIClient
 class SocioNegocio:
 
     def __init__(self, request):
+        """
+        Constructor de la clase SocioNegocio
+
+        Args:
+            request (HttpRequest): Request de la vista.
+
+        Attributes:
+            request (HttpRequest): Request de la vista.
+            gruposn (str): Código del grupo de socio de negocio.
+            rut (str): RUT del cliente.
+            email (str): Email del cliente.
+            nombre (str): Nombre del cliente.
+            apellido (str): Apellido del cliente.
+            razon_social (str): Razón social del cliente.
+            giro (str): Giro del cliente.
+            telefono (str): Teléfono del cliente.
+        """
 
         self.request = request
         self.gruposn = request.POST.get('grupoSN')
@@ -32,14 +49,27 @@ class SocioNegocio:
     def validarDatosObligatorios(self):
         """
         Metodo para validar los datos obligatorios
+
+        Raises:
+            ValidationError: Si algún dato obligatorio no se encuentra.
         """
-        print("Validando datos obligatorios...")
+
         self.validarGrupoSN()
         self.validarRut()
         self.validarEmail()
 
     def crearOActualizarCliente(self):
+        """
+        Método para crear o actualizar un cliente en la base de datos.
 
+        args:
+            request (HttpRequest): Request de la vista.
+
+        Returns:
+            Si el cliente se creó exitosamente, retorna un JsonResponse con un mensaje de éxito.
+            Si hubo un error, retorna un JsonResponse con un mensaje de error y un código de estado 400 o 500.
+        """
+        
         try:
             self.validarDatosObligatorios()
 
@@ -93,9 +123,24 @@ class SocioNegocio:
             print(f"Error inesperado: {str(e)}")
             return JsonResponse({'success': False, 'message': 'Error al crear el cliente'}, status=500)
 
+
     @staticmethod
     def crearClientePersona(self, codigosn, rut, tiposn, tipocliente, email, grupoSN):
-        print(f"Creando cliente persona - Nombre: {self.nombre}, Apellido: {self.apellido}, RUT: {self.rut}, Email: {self.email}")
+        """
+        Método para crear un cliente persona.
+        
+        Args:
+            codigosn (str): Código del socio de negocio.
+            rut (str): RUT del cliente.
+            tiposn (TipoSNDB): Tipo de socio de negocio.
+            tipocliente (TipoClienteDB): Tipo de cliente.
+            email (str): Email del cliente.
+            grupoSN (GrupoSNDB): Grupo de socio de negocio.
+
+        Returns:
+            Si el cliente se creó exitosamente, retorna un JsonResponse con un mensaje de éxito.
+            Si hubo un error, retorna un JsonResponse con un mensaje de error y un código de estado 400 o 500.
+        """
 
         return SocioNegocioRepository.crearCliente(
             codigoSN=codigosn, nombre=self.nombre, apellido=self.apellido, rut=rut, giro=self.giro,
@@ -105,6 +150,20 @@ class SocioNegocio:
 
     @staticmethod
     def crearClienteEmpresa(self, codigosn, tiposn, grupoSN, tipoCliente):
+        """
+        Método para crear un cliente empresa.
+
+        Args:
+            codigosn (str): Código del socio de negocio.
+            tiposn (TipoSNDB): Tipo de socio de negocio.
+            grupoSN (GrupoSNDB): Grupo de socio de negocio.
+            tipoCliente (TipoClienteDB): Tipo de cliente.
+
+        Returns:
+            Si el cliente se creó exitosamente, retorna un JsonResponse con un mensaje de éxito.
+            Si hubo un error, retorna un JsonResponse con un mensaje de error y un código de estado
+        """
+
         print(f"Creando cliente empresa - Razón Social: {self.razon_social}, RUT: {self.rut}, Email: {self.email}")
         return SocioNegocioRepository.crearCliente(
             codigoSN=codigosn, razonSocial=self.razon_social, rut=self.rut, giro=self.giro,
@@ -115,6 +174,19 @@ class SocioNegocio:
 
     @staticmethod
     def validardatosObligatorios(self):
+        """
+        Método para validar los datos obligatorios.
+
+        args:
+            request (HttpRequest): Request de la vista.
+
+        Raises:
+            ValidationError: Si algún dato obligatorio no se encuentra.
+
+        Returns:
+            Tuple: Tupla con los datos obligatorios.
+        """
+
         gruposn = self.request.POST.get('grupoSN')
         rut = self.request.POST.get('rutSN')
         email = self.request.POST.get('emailSN')
@@ -126,11 +198,37 @@ class SocioNegocio:
 
     @staticmethod
     def generarCodigoSN(rut):
+
+        """
+        Método para generar el código de socio de negocio.
+
+        Args:
+            rut (str): RUT del cliente.
+        
+        Returns:
+            str: Código de socio de
+        """
+
         rut_sn = rut.split("-")[0] if "-" in rut else rut
         return rut_sn.replace(".", "") + 'C'
 
     @staticmethod
     def agregarDireccionYContacto(request, cliente):
+        """
+        Método para agregar una dirección y un contacto a un cliente.
+
+        Args:
+            request (HttpRequest): Request de la vista.
+            cliente (SocioNegocioDB): Cliente al que se le agregará la dirección y el contacto.
+        
+        Raises:
+            ValidationError: Si no se encuentra la dirección o el contacto.
+
+        Returns:
+            si la dirección y el contacto se agregaron exitosamente, retorna un JsonResponse con un mensaje de éxito.
+            Si hubo un error, retorna un JsonResponse con un mensaje de error y un código de estado 400 o 500.
+        """
+
         print("Agregando dirección y contacto...")
         print(f"dirección: {request.POST.get('nombre_direccion[]')}")
         from showromVentasApp.views.view import agregarDireccion, agregarContacto
@@ -148,6 +246,18 @@ class SocioNegocio:
 
 
     def buscarSocioNegocio(identificador, buscar_por_nombre=False):
+        """
+        Método para buscar un socio de negocio por nombre o rut.
+
+        Args:
+            identificador (str): Nombre o rut del socio de negocio.
+            buscar_por_nombre (bool): Indica si se busca por nombre o por rut.
+
+        Returns:
+            Si se encontraron resultados, retorna un diccionario con los datos de los socios de negocio.
+            Si no se encontraron resultados, retorna una lista vacía.
+        """
+
         try:
             if buscar_por_nombre:
                 # Si se busca por nombre, usa el repositorio que busca por nombre
@@ -199,6 +309,16 @@ class SocioNegocio:
 
     @staticmethod
     def formatear_direcciones(direcciones):
+        """
+        Método para formatear las direcciones de un socio de negocio.
+
+        Args:
+            direcciones (QuerySet): Direcciones del socio de negocio.
+
+        Returns:
+            List: Lista con las direcciones formateadas.
+        """
+
         return [{
             "id": direccion.id,
             'rowNum': direccion.rowNum,
@@ -214,6 +334,16 @@ class SocioNegocio:
 
     @staticmethod
     def formatear_contactos(contactos):
+        """
+        Método para formatear los contactos de un socio de negocio.
+
+        Args:
+            contactos (QuerySet): Contactos del socio de negocio.
+
+        Returns:
+            List: Lista con los contactos formateados.
+        """
+
         return [{
             'id': contacto.id,
             'codigoInternoSap': contacto.codigoInternoSap,
@@ -228,19 +358,51 @@ class SocioNegocio:
 
     
     def validarGrupoSN(self):
+        """
+        Método para validar el grupo de socio de negocio.
+
+        Raises:
+            ValidationError: Si el grupo de socio de negocio no se encuentra.
+        """
+
         if not self.gruposn:
             raise ValidationError("Grupo de socio de negocio no encontrado")
     
     def validarRut(self):
+        """
+        Método para validar el RUT del cliente.
+        
+        Raises:
+            ValidationError: Si el RUT no se encuentra.
+        """
+
         if not self.rut:
             raise ValidationError("RUT no encontrado")
         
     def validarEmail(self):
+        """
+        Metodo para validar el email del cliente.
+
+        Raises:
+            ValidationError: Si el email no se encuentra.
+        """
+
         if not self.email:
             raise ValidationError("Email no encontrado")
         
         
     def verificarSocioNegocioSap(self, cardCode):
+        """
+        
+        Método para verificar si un socio de negocio existe en SAP.
+        
+        Args:
+            cardCode (str): Código del socio de negocio.
+            
+        Returns:
+            bool: True si el socio de negocio existe, False si no.            
+        """
+
         client = APIClient()
 
         try:
@@ -364,6 +526,17 @@ class SocioNegocio:
 
     
     def creacionSocioSAP(self, data):
+        """
+        Método para crear un socio de negocio en SAP.
+
+        Args:
+            data (dict): Datos del socio de negocio.
+
+        Returns:
+            si el socio de negocio se creó exitosamente, retorna un diccionario con un mensaje de éxito y el 'CardCode'.
+            Si hubo un error, retorna un diccionario con un mensaje de error.
+        """
+
         client = APIClient()
         
         try:
