@@ -17,10 +17,13 @@ document.getElementById('forCrearPedidos').addEventListener('submit', function(e
     })
     .then(response => {
         // Habilitar el botón nuevamente después de la respuesta
+
+        
         submitButton.disabled = false;
 
         if (!response.ok) {
             // Manejar errores del servidor
+            
             return response.json().then(data => {
                 throw new Error(data.error || 'Error desconocido');
             });
@@ -42,11 +45,13 @@ document.getElementById('forCrearPedidos').addEventListener('submit', function(e
     .catch(error => {
         // Habilitar el botón en caso de error
         submitButton.disabled = false;
+        
         console.error('Error en la solicitud:', error);
         mostrarMensaje(error.message || 'Ocurrió un error desconocido', 'error');
     });
 });
 
+// Función para limpiar mensajes de error o éxito
 function limpiarMensajes() {
     const mensajes = document.getElementsByClassName('mensaje');
     while (mensajes[0]) {
@@ -54,6 +59,7 @@ function limpiarMensajes() {
     }
 }
 
+// Función para mostrar mensajes de error o éxito
 function mostrarMensaje(mensaje, tipo) {
     const div = document.createElement('div');
     div.className = `mensaje ${tipo}`;

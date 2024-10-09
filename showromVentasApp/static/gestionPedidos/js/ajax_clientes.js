@@ -1,18 +1,24 @@
 $(document).ready(function(){
     $('#inputCliente').on('input', function(){
-        let numero = $(this).val().trim(); // Trim para eliminar espacios en blanco al inicio y al final
-        if(numero){ // Verificar si el número no está vacío
+        let inputValue = $(this).val().trim(); // Captura el valor ingresado y elimina espacios en blanco
+
+        // Solo realizar la búsqueda si el valor tiene al menos 3 caracteres
+        if(inputValue.length >= 3){
+            let numero = inputValue; // Puedes usar el mismo valor tanto para número como para nombre
+            let nombre = inputValue; // Si ingresan nombre en lugar de número, igual capturamos el input
+
             // Define la URL directamente en el archivo JavaScript
             let buscarClientesUrl = '/ventas/buscar_clientes/';
 
             $.ajax({
                 url: buscarClientesUrl,
-                data:{
-                    'numero': numero
+                data: {
+                    'numero': numero || '', // Enviar número si está disponible, de lo contrario enviar vacío
+                    'nombre': nombre || ''  // Enviar nombre si está disponible, de lo contrario enviar vacío
                 },
                 dataType: 'json',
                 success: function(data){
-                    console.log("estos son los datos del cliente",data);
+                    console.log("estos son los datos del cliente", data);
                     $('#resultadosClientes').empty();
                     if(data.resultadosClientes && data.resultadosClientes.length > 0){
                         data.resultadosClientes.forEach(function(resultadosClientes) {
@@ -22,7 +28,7 @@ $(document).ready(function(){
                             clientesElemento.attr('data-apellido', resultadosClientes.apellido);
                             clientesElemento.attr('data-codigoSN', resultadosClientes.codigoSN);
                             clientesElemento.attr('data-rut', resultadosClientes.rut);
-                            clientesElemento.text(resultadosClientes.nombre + ' ' + resultadosClientes.apellido);
+                            clientesElemento.text(resultadosClientes.codigoSN + ' - ' + resultadosClientes.nombre + ' ' + resultadosClientes.apellido);
                             console.log(clientesElemento);
 
                             $('#resultadosClientes').append(clientesElemento);
@@ -37,9 +43,7 @@ $(document).ready(function(){
                 }
             });
         } else {
-            $('#resultadosClientes').empty(); // Limpiar el contenedor si el número está vacío
+            $('#resultadosClientes').empty(); // Limpiar el contenedor si el input tiene menos de 3 caracteres
         }
     });
 });
-
-

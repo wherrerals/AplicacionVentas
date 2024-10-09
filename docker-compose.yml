@@ -1,0 +1,31 @@
+#version: '3.8'  #agregar esto solo se necesita especificar la versión
+
+services:
+  db:
+    image: mysql:9.0.1
+    environment:
+      MYSQL_ROOT_PASSWORD: Ea7hava5*
+      MYSQL_DATABASE: led_studio
+      #MYSQL_USER: root
+      MYSQL_PASSWORD: Ea7hava5*
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+
+  web:
+    build:
+      context: .
+      dockerfile: dockerfile.app
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:
+
+

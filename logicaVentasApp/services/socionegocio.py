@@ -1,4 +1,5 @@
 import json
+import logging
 from django.http import JsonResponse
 from django.db import transaction
 from django.core.exceptions import ValidationError
@@ -145,55 +146,85 @@ class SocioNegocio:
             print("Contacto faltante")
             raise ValidationError("Debe agregar al menos un contacto")
 
-    
+
+    def buscarSocioNegocio(identificador, buscar_por_nombre=False):
+        try:
+            if buscar_por_nombre:
+                # Si se busca por nombre, usa el repositorio que busca por nombre
+                resultados_clientes = SocioNegocioRepository.buscarClientesPorNombre(identificador)
+            else:
+                # Si no, se busca por rut (número)
+                resultados_clientes = SocioNegocioRepository.buscarClientesPorRut(identificador)
+
+            if not resultados_clientes:
+                logging.info(f"No se encontraron resultados para el identificador: {identificador}")
+                return []
+
+            resultados_formateados = []
+
+            for socio in resultados_clientes:
+                # Prefetch de direcciones y contactos para evitar consultas N+1
+                direcciones = DireccionDB.objects.filter(SocioNegocio=socio).select_related('comuna', 'region')
+                contactos = ContactoDB.objects.filter(SocioNegocio=socio)
+
+                # Función para formatear las direcciones
+                direcciones_formateadas = SocioNegocio.formatear_direcciones(direcciones)
+                
+                # Función para formatear los contactos
+                contactos_formateados = SocioNegocio.formatear_contactos(contactos)
+
+                # Agregar el socio formateado al resultado
+                resultados_formateados.append({
+                    'nombre': socio.nombre,
+                    'apellido': socio.apellido,
+                    'razonSocial': socio.razonSocial,
+                    'codigoSN': socio.codigoSN,
+                    'rut': socio.rut,
+                    'email': socio.email,
+                    'telefono': socio.telefono,
+                    'giro': socio.giro,
+                    'condicionPago': socio.condicionPago,
+                    'plazoReclamaciones': socio.plazoReclamaciones,
+                    'clienteExportacion': socio.clienteExportacion,
+                    'vendedor': socio.vendedor,
+                    'direcciones': direcciones_formateadas,
+                    'contactos': contactos_formateados
+                })
+
+            return resultados_formateados
+        
+        except Exception as e:
+            logging.error(f"Error al buscar socio negocio: {e}")
+            return {'error': 'Ocurrió un error al realizar la búsqueda'}
+
     @staticmethod
-    def buscarSocioNegocio(numero):
-        resultados_clientes = SocioNegocioRepository.buscarClientesPorRut(numero)
-        resultados_formateados = []
+    def formatear_direcciones(direcciones):
+        return [{
+            "id": direccion.id,
+            'rowNum': direccion.rowNum,
+            'nombreDireccion': direccion.nombreDireccion,
+            'ciudad': direccion.ciudad,
+            'calleNumero': direccion.calleNumero,
+            'codigoImpuesto': direccion.codigoImpuesto,
+            'tipoDireccion': direccion.tipoDireccion,
+            'pais': direccion.pais,
+            'comuna': direccion.comuna.nombre,
+            'region': direccion.region.nombre
+        } for direccion in direcciones]
 
-        for socio in resultados_clientes:
-            direcciones = DireccionDB.objects.filter(SocioNegocio=socio)
-            direcciones_formateadas = [{
-                'rowNum': direccion.rowNum,
-                'nombreDireccion': direccion.nombreDireccion,
-                'ciudad': direccion.ciudad,
-                'calleNumero': direccion.calleNumero,
-                'codigoImpuesto': direccion.codigoImpuesto,
-                'tipoDireccion': direccion.tipoDireccion,
-                'pais': direccion.pais,
-                'comuna': direccion.comuna.nombre,
-                'region': direccion.region.nombre
-            } for direccion in direcciones]
+    @staticmethod
+    def formatear_contactos(contactos):
+        return [{
+            'id': contacto.id,
+            'codigoInternoSap': contacto.codigoInternoSap,
+            'nombreCompleto': contacto.nombreCompleto,
+            'nombre': contacto.nombre,
+            'apellido': contacto.apellido,
+            'email': contacto.email,
+            'telefono': contacto.telefono,
+            'celular': contacto.celular
+        } for contacto in contactos]
 
-            contactos = ContactoDB.objects.filter(SocioNegocio=socio)
-            contactos_formateados = [{
-                'codigoInternoSap': contacto.codigoInternoSap,
-                'nombreCompleto': contacto.nombreCompleto,
-                'nombre': contacto.nombre,
-                'apellido': contacto.apellido,
-                'email': contacto.email,
-                'telefono': contacto.telefono,
-                'celular': contacto.celular
-            } for contacto in contactos]
-
-            resultados_formateados.append({
-                'nombre': socio.nombre,
-                'apellido': socio.apellido,
-                'razonSocial': socio.razonSocial,
-                'codigoSN': socio.codigoSN,
-                'rut': socio.rut,
-                'email': socio.email,
-                'telefono': socio.telefono,
-                'giro': socio.giro,
-                'condicionPago': socio.condicionPago,
-                'plazoReclamaciones': socio.plazoReclamaciones,
-                'clienteExportacion': socio.clienteExportacion,
-                'vendedor': socio.vendedor,
-                'direcciones': direcciones_formateadas,
-                'contactos': contactos_formateados
-            })
-
-        return resultados_formateados
 
     
     def validarGrupoSN(self):

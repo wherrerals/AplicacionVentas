@@ -40,7 +40,7 @@ class Producto {
                     </select>
                   </div>
                   <div class="col" style="text-align: center;">
-                      <small style="font-size: 12px;" name="stock_total">Stock:${this.stockTotal}</small>
+                      <small style="font-size: 12px;" name="stock_total">Stock: ${this.stockTotal}</small>
                   </div>
               </div>
           </td>

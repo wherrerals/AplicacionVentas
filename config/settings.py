@@ -14,8 +14,10 @@ SECRET_KEY = 'django-insecure-fexe1oq@sx@j&x3m#tw(#x(r!g32fylgea=whky=#ge^vn5f*h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-#ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.3.41']
+
+#En este se debe colocar la ip de la maquina en la que se esta trabajando o la ip de la maquina en la que se va a desplegar la aplicacion
+ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '192.168.3.41', '192.168.3.42', '127.0.0.1']
+#ALLOWED_HOSTS = []
 #python manage.py runserver 192.168.3.41:8000
 
 
@@ -27,7 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'AplicacionVentas',
+    'config',
     'datosLsApp',
     'logicaVentasApp',
     'showromVentasApp'    
@@ -44,7 +46,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'AplicacionVentas.urls'
+ROOT_URLCONF = 'config.urls'
 
 #/Users/Cuervo/Documents/AplicacionVentas/showromVentasApp/templates/showromVentasApp
 #/Users/nicor/Universidad/Practica/AplicacionVentas/showromVentasApp/templates/showromVentasApp
@@ -72,7 +74,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'AplicacionVentas.wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # Database
@@ -84,13 +86,27 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
         'USER':'root',
-        #'PASSWORD':'Ea7hava5}', #home
         'PASSWORD':'Ea7hava5*', #led_studio
+        #'PASSWORD':'Ea7hava5}', #home
         #'PASSWORD':'qwerty', #nico
         'HOST':'localhost',
         'PORT':'3306',
     }
 }
+
+
+#Configuracion para docker
+""" DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'led_studio',         # Nombre de la base de datos
+        'USER': 'root',               # Usuario de la base de datos
+        'PASSWORD': 'Ea7hava5*',     # Contraseña del usuario
+        'HOST': 'db',                 # Nombre del servicio en docker-compose
+        'PORT': '3306',               # Puerto por defecto de MySQL
+    }
+}
+ """
 
 # Base service Layer
 API_BASE_URL = 'https://182.160.29.24:50003/b1s/v1/'
@@ -148,7 +164,6 @@ LOGIN_REDIRECT_URL = '/ventas'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
-
 
 
 # Static files (CSS, JavaScript, Images)
