@@ -73,55 +73,37 @@ class SocioNegocioView(FormView):
         return JsonResponse({'error': 'Invalid URL'}, status=404)
 
     def agregarSocioNegocio(self, request):
-        """
-        Método para agregar un socio de negocio
-        
-        args:
-            request: HttpRequest
-        
-        return:
-            JsonResponse con la respuesta de la API
-        """
-
         try:
-            # Obtener los datos del formulario
+            # Recolectar datos del formulario y pasarlos al service
             datos = {
                 'grupoSN': request.POST.get('grupoSN'),
                 'rut': request.POST.get('rutSN'),
                 'email': request.POST.get('emailSN'),
                 'nombre': request.POST.get('nombreSN'),
                 'apellido': request.POST.get('apellidoSN'),
-                'razon_social': request.POST.get('razonSN'),  # corregido aquí
+                'razon_social': request.POST.get('razonSN'),
                 'giro': request.POST.get('giroSN'),
                 'telefono': request.POST.get('telefonoSN')
             }
-
-            print(f"Datos: {datos}")
-
-            socio_negocio = SocioNegocio(request)
             
-            # Llamar al método y obtener la respuesta
-            response = socio_negocio.crearOActualizarCliente()
-            
-            print(f"Response: {response}")
+            # Crear instancia del socio de negocio y llamar al servicio
+            socio_negocio_service = SocioNegocio(request)
+            response = socio_negocio_service.crearOActualizarCliente()
 
-            # Verificar si la respuesta fue exitosa
-            if response.status_code == 200:
-                # Aquí puedes continuar con la creación en Service Layer
-                # Por ejemplo, llamando a `creacionSocioSAP` y pasando los datos necesarios
-                service_layer_response = socio_negocio.creacionSocioSAP(datos)
-                print("este es el json de respuesta", JsonResponse)
-                return JsonResponse(service_layer_response, status=201)
-            
-
-            return response  # Si no fue exitosa, simplemente devuelve la respuesta original
+            # Manejar la respuesta del service
+            if response.get('success'):
+                return JsonResponse({'success': True, 'message': 'Cliente creado o actualizado con éxito', 'codigoSN': response.get('codigoSN')}, status=201)
+            else:
+                return JsonResponse({'success': False, 'message': response.get('error')}, status=400)
 
         except ValidationError as e:
-            print("este es el json de respuesta", JsonResponse)
             return JsonResponse({'error': str(e)}, status=400)
+            
         except Exception as e:
-            print("este es el json de respuesta", JsonResponse)
+            # Loggear el error para depuración
+            print(f"Error inesperado: {str(e)}")
             return JsonResponse({'error': 'Error inesperado: {}'.format(str(e))}, status=500)
+
 
 
     """     

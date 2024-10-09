@@ -93,9 +93,19 @@ class SocioNegocio:
 
             # Verificar si el cliente ya existe
             cliente_existente = SocioNegocioRepository.obtenerPorRut(self.rut)
+            
             if cliente_existente:
-                raise ValidationError("Ya existe un cliente con el mismo RUT")
+                # Si el cliente ya existe, verifica si existe en SAP
+                verificacionSap = self.verificarSocioNegocioSap(codigosn)
+                
+                if verificacionSap == True:
+                    return JsonResponse({'success': True, 'message': 'Cliente ya existe en SAP y en la base de datos'})
 
+                else:
+                    data = self.prepararJsonCliente(self.request.POST)
+                    self.creacionSocioSAP(data)
+                    return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
+                
             # Determinar tipo de socio de negocio
             tiposn = TipoSNRepository.obtenerTipoSnPorCodigo('C' if self.gruposn == '100' else 'I')
             if not tiposn:
@@ -122,6 +132,7 @@ class SocioNegocio:
         except Exception as e:
             print(f"Error inesperado: {str(e)}")
             return JsonResponse({'success': False, 'message': 'Error al crear el cliente'}, status=500)
+
 
 
     @staticmethod
