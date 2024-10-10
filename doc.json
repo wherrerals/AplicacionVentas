@@ -1,56 +1,45 @@
 {
-    "CardCode": "333666363C",
-    "CardName": "Prueba 125 Herrera",
+    "CardCode": "689265566C",
+    "CardName": "Jaime Lopez",
     "CardType": "C",
     "GroupCode": "100",
-    "Phone1": "12213212",
-    "Phone2": "12213212",
+    "Phone1": "3246379561",
+    "Phone2": "3246379561",
     "Notes": "Persona",
     "PayTermsGrpCode": -1,
-    "FederalTaxID": "333666363-9",
+    "FederalTaxID": "689265566",
     "SalesPersonCode": -1,
-    "Cellular": "12213212",
-    "EmailAddress": "wherrera.282@gmail.com",
-    "CardForeignName": "Prueba 125 Herrera",
+    "Cellular": "3246379561",
+    "EmailAddress": "wherrera@ledstudio.cl",
+    "CardForeignName": "Jaime Lopez",
     "ShipToDefault": "DESPACHO",
     "BilltoDefault": "FACTURACION",
     "DunningTerm": "ESTANDAR",
     "CompanyPrivate": "cPrivate",
-    "AliasName": "Prueba 125",
+    "AliasName": "Jaime",
     "U_Tipo": "N",
     "U_FE_Export": "N",
     "BPAddresses": [
         {
-            "AddressName": "catedral 3058",
-            "Street": "Las condes 56987",
+            "AddressName": "Catedral 3058",
+            "Street": "Catedral 3058",
             "City": "iva",
             "County": "12",
             "Country": "CL",
             "State": 13,
-            "FederalTaxID": "333666363-9",
-            "TaxCode": "IVA",
-            "AddressType": "bo_ShipTo"
-        },
-        {
-            "AddressName": "catedral 3058",
-            "Street": "Las condes 56987",
-            "City": "iva",
-            "County": "12",
-            "Country": "CL",
-            "State": 13,
-            "FederalTaxID": "333666363-9",
+            "FederalTaxID": "689265566",
             "TaxCode": "IVA",
             "AddressType": "bo_ShipTo"
         }
     ],
     "ContactEmployees": [
         {
-            "Name": "William Alexis Herrera",
-            "Phone1": "3216987",
-            "MobilePhone": "3216547965",
-            "E_Mail": "w.282@gmail.com",
-            "FirstName": "William Alexis",
-            "LastName": "Herrera"
+            "Name": "will herrera",
+            "Phone1": "3246379561",
+            "MobilePhone": "364365856",
+            "E_Mail": "wherrera.282@gmail.com",
+            "FirstName": "will",
+            "LastName": "herrera"
         }
     ]
 }

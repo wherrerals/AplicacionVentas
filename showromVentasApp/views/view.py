@@ -1,5 +1,5 @@
 #Django modulos
-from django.shortcuts import render, redirect  
+from django.shortcuts import get_object_or_404, render, redirect  
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib.auth.hashers import make_password
@@ -72,23 +72,26 @@ def list_quotations(request):
     
     return render(request, "lista_cotizaciones.html")
 
+
 @login_required
 def quotations(request):
     """
     Renderiza la pagina de cotizaciones y muestra el nombre de usuario.
 
-    Captura de la url el parametro DocNum y, si este no esta presente, lo establece en null
+    Captura de la url el parametro DocNum y, si este no esta presente, lo establece en null.
     También obtiene todas las instancias del modelo 'Region' para ser utilizadas en el template.
 
-    Args: 
-        request (HttpsRequest): La peticion HTTP recibida
+    Args:
+        request (HttpRequest): La petición HTTP recibida.
     
-    Returns: 
-        HttpResponse: Renderiza el template 'cotizacion.html' con el nombre de usuario y el DocNum
-        HttpResponse: Si el usuario no esta autenticado redirige a el template del inicio.
+    Returns:
+        HttpResponse: Renderiza el template 'cotizacion.html' con el nombre de usuario y el DocNum.
+        HttpResponse: Si el usuario no está autenticado, redirige al template del inicio.
     """
 
+    # Verifica si el usuario está autenticado
     if request.user.is_authenticated:
+        # Obtiene el nombre de usuario del modelo User de Django
         username = request.user.username
 
         # Intenta obtener el objeto UsuarioDB relacionado con el usuario autenticado
@@ -96,22 +99,27 @@ def quotations(request):
             usuario = UsuarioDB.objects.get(usuarios=request.user)
             sucurs = usuario.sucursal  # Accede a la sucursal a través del modelo UsuarioDB
             nombreUser = usuario.nombre  # Accede al nombre del usuario a través del modelo UsuarioDB
-        
-        except UsuarioDB.DoesNotExist: 
-            pass
+
+        except UsuarioDB.DoesNotExist:
+            # Maneja el caso en que no se encuentre el usuario relacionado
+            JsonResponse({'error': 'No se encontró el usuario relacionado con el usuario autenticado'}, status=404)
 
         # Obtiene el parámetro DocNum de la URL, o None si no está presente
         doc_num = request.GET.get('docNum', None)
 
+        # Obtiene todas las regiones de la base de datos
         regiones = RegionDB.objects.all()
 
-
+        # Contexto para renderizar el template
         context = {
             'docnum': doc_num,
             'username': username,
-            'regiones': regiones
+            'regiones': regiones,
+            'sucursal': sucurs,
+            'nombreuser': nombreUser
         }
 
+        # Renderiza el template con el contexto
         return render(request, 'cotizacion.html', context)
 
 
@@ -318,8 +326,80 @@ def mis_datos(request):
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 
 
+def actualizarAgregarDirecion(request, socio):
+    print("estos son los datos",request.POST)
+    if request.method == "POST":
+        try:
+            # Obtener listas de datos
+            direccionID = request.POST.getlist('nombreDireccion')
+            namedire = request.POST.getlist('ciudad')
+            ciudad = request.POST.getlist('ciudad')
+            direccion = request.POST.getlist('direccion')
+            tipo = request.POST.getlist('tipodireccion')
+            pais = request.POST.getlist('pais')
+            region = request.POST.getlist('region')
+            comuna = request.POST.getlist('comuna')
+
+            # Verificar que todas las listas tienen la misma longitud
+            print(f"ID de dirección: {direccionID}")
+            if not all(len(lst) == len(namedire) for lst in [ciudad, direccion, tipo, pais, region, comuna, direccionID]):
+                return JsonResponse({'success': False, 'message': 'Las listas deben tener la misma longitud.'}, status=400)
+
+            for i in range(len(namedire)):
+                print(f"Datos de dirección {i+1}:")
+                nombredire = namedire[i].strip()  # Eliminar espacios en blanco
+                if nombredire:  # Comprobar que el nombre de dirección no esté vacío
+                    fregion = get_object_or_404(RegionDB, numero=region[i])
+                    fcomuna = get_object_or_404(ComunaDB, codigo=comuna[i])
+
+                    # Buscar la dirección existente por ID
+                    direccion_obj = None
+                    if direccionID[i]:  # Asegurarse de que el ID no esté vacío
+                        print(f"ID de dirección: {direccionID[i]}")
+                        direccion_obj = DireccionDB.objects.filter(id=direccionID[i]).first()
+
+                    # Si la dirección existe, actualizarla; si no, crearla
+                    if direccion_obj:
+                        # Actualizar la dirección existente
+                        direccion_obj.nombreDireccion = nombredire
+                        direccion_obj.ciudad = ciudad[i]
+                        direccion_obj.calleNumero = direccion[i]
+                        direccion_obj.comuna = fcomuna
+                        direccion_obj.region = fregion
+                        direccion_obj.tipoDireccion = tipo[i]
+                        direccion_obj.pais = pais[i]
+                        direccion_obj.save()  # Guardar cambios
+                        print(f"Dirección {i+1} actualizada con éxito")
+                    else:
+                        # Crear una nueva dirección si no existe
+                        DireccionDB.objects.create(
+                            nombreDireccion=nombredire,
+                            ciudad=ciudad[i],
+                            calleNumero=direccion[i],
+                            comuna=fcomuna,
+                            region=fregion,
+                            tipoDireccion=tipo[i],
+                            SocioNegocio=socio,
+                            pais=pais[i]
+                        )
+                        print(f"Dirección {i+1} creada con éxito")
+                else:
+                    print(f"No se ha creado ni actualizado la dirección {i+1} porque el nombre está vacío.")
+            
+            return JsonResponse({'success': True, 'message': 'Direcciones actualizadas o creadas con éxito.'})
+
+        except KeyError as e:
+            return JsonResponse({'success': False, 'message': f'Falta el campo: {str(e)}'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+    return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
+
+
 @login_required
 def agregarDireccion(request, socio):
+    print(f"RUT del socio: {socio}")
+    print("data recibida: ", request.POST)
     if request.method == "POST":
         nombredirecciones = request.POST.getlist('nombre_direccion[]')
         ciudades = request.POST.getlist('ciudad[]')

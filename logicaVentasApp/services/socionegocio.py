@@ -88,7 +88,7 @@ class SocioNegocio:
 
             if clienteExistente is not None:
                 print("Cliente existente encontrado")
-                return self.procesarClienteExistente(self.rut)
+                return self.procesarClienteExistente(codigosn)
 
             tiposn = self.obtenerTipoSN()
 
@@ -523,8 +523,8 @@ class SocioNegocio:
             'Cellular': jsonData.get('telefonoSN'),
             'EmailAddress': jsonData.get('emailSN'),
             'CardForeignName': nombreCompleto,
-            'ShipToDefault': "DESPACHO",
-            'BilltoDefault': "FACTURACION",
+            'ShipToDefault': jsonData.get('nombre_direccion[]'),
+            'BilltoDefault': jsonData.get('nombre_direccion[]'),
             'DunningTerm': "ESTANDAR",
             'CompanyPrivate': "cPrivate",
             'AliasName': jsonData.get('nombreSN'),
