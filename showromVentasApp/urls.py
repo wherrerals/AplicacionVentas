@@ -35,6 +35,8 @@ urlpatterns = [
     path('agregar_direccion/', view.agregarDireccion, name='agregar_direccion'),
     path('obtener_detalles_cotizacion/<int:docEntry>/', cotizacionView.obtenerDetallesCotizacion, name='obtener_detalles_cotizacion'),
     path('guardar_contactos/', view.guardarContactosAJAX, name='guardar_contactos_ajx'), 
+    path('guardar_direcciones/<str:socio>/', view.actualizarAgregarDirecion, name='guardar_direccion'),
+    path('guardar_contactos/<str:socio>/', view.agregarContacto, name='guardar_contactos'),
 ]
 
 """ Este es el path que estaba probando

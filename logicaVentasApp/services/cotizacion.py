@@ -114,6 +114,9 @@ class Cotizacion(Documento):
 
         filters = {}
 
+        if data.get('fecha_doc'):
+            filters['Quotations/DocDate ge'] = str(f"'{data.get('fecha_doc')}'")
+            filters['Quotations/DocDate le'] = str(f"'{data.get('fecha_doc')}'")
         if data.get('fecha_inicio'):
             filters['Quotations/DocDate ge'] = str(f"'{data.get('fecha_inicio')}'")
         if data.get('fecha_fin'):

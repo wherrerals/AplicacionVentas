@@ -14,9 +14,30 @@ class SocioNegocioView(FormView):
     #@method_decorator(login_required)
     @method_decorator(require_http_methods(["GET", "POST"]))
     def dispatch(self, request, *args, **kwargs):
+        """
+        Sobreescribir el método `dispatch` para manejar las rutas GET y POST
+        
+        args:
+            request: HttpRequest
+            args: tuple
+            kwargs: dict
+        
+        return: 
+            HttpResponse
+        """
         return super().dispatch(request, *args, **kwargs)
 
     def post(self, request):
+        """
+        Método POST para manejar las rutas de la API
+
+        args:
+            request: HttpRequest
+
+        return:
+            JsonResponse con la respuesta de la API
+        """
+
         # Definir un diccionario de rutas a métodos POST
         route_map = {
             '/ventas/agregar_editar_clientes/': self.agregarSocioNegocio,
@@ -30,6 +51,15 @@ class SocioNegocioView(FormView):
         return JsonResponse({'error': 'Invalid URL'}, status=404)
     
     def get(self, request):
+        """
+        Método GET para manejar las rutas de la API
+
+        args:
+            request: HttpRequest
+
+        return:
+            JsonResponse con la respuesta de la API
+        """
         # Definir un diccionario de rutas a métodos GET
         route_map = {
             '/ventas/buscar_clientes/': self.busquedaSocioNegocio,
@@ -43,45 +73,62 @@ class SocioNegocioView(FormView):
         return JsonResponse({'error': 'Invalid URL'}, status=404)
 
     def agregarSocioNegocio(self, request):
-        try:
-            # Obtener los datos del formulario
-            datos = {
-                'grupoSN': request.POST.get('grupoSN'),
-                'rut': request.POST.get('rutSN'),
-                'email': request.POST.get('emailSN'),
-                'nombre': request.POST.get('nombreSN'),
-                'apellido': request.POST.get('apellidoSN'),
-                'razon_social': request.POST.get('razonSN'),  # corregido aquí
-                'giro': request.POST.get('giroSN'),
-                'telefono': request.POST.get('telefonoSN')
-            }
+        if request.method == 'POST':
 
-            print(f"Datos: {datos}")
+            print("Agregando Socio de Negocio")
+            print(f"Request: {request.POST}")
 
-            socio_negocio = SocioNegocio(request)
-            
-            # Llamar al método y obtener la respuesta
-            response = socio_negocio.crearOActualizarCliente()
-            
-            print(f"Response: {response}")
+            try:
+                request.POST = request.POST.copy()
 
-            # Verificar si la respuesta fue exitosa
-            if response.status_code == 200:
-                # Aquí puedes continuar con la creación en Service Layer
-                # Por ejemplo, llamando a `creacionSocioSAP` y pasando los datos necesarios
-                service_layer_response = socio_negocio.creacionSocioSAP(datos)
-                print("este es el json de respuesta", JsonResponse)
-                return JsonResponse(service_layer_response, status=201)
-            
+                # Crear instancia del socio de negocio y llamar al servicio
+                socioNegoService = SocioNegocio(request)
 
-            return response  # Si no fue exitosa, simplemente devuelve la respuesta original
+                # Llamar al servicio para crear o actualizar el cliente
+                response = socioNegoService.crearOActualizarCliente()
 
-        except ValidationError as e:
-            print("este es el json de respuesta", JsonResponse)
-            return JsonResponse({'error': str(e)}, status=400)
-        except Exception as e:
-            print("este es el json de respuesta", JsonResponse)
-            return JsonResponse({'error': 'Error inesperado: {}'.format(str(e))}, status=500)
+                print(f"Respuesta de crear o actualizar Cliente: {response.content}")
+
+                # Si la respuesta es un JsonResponse, obtenemos su contenido
+                response_data = json.loads(response.content)
+
+                # Manejar la respuesta según el valor de 'success'
+                if response_data.get('success'):
+                    return JsonResponse(
+                        {
+                            'success': True,
+                            'message': response_data.get('message', 'Cliente creado o actualizado con éxito'),
+                            'codigoSN': response_data.get('codigoSN')  # Este campo es opcional
+                        },
+                        status=201
+                    )
+
+                else:
+                    # Si 'success' es False, enviamos un mensaje de error
+                    return JsonResponse(
+                        {
+                            'success': False,
+                            'message': response_data.get('message', 'Error al crear o actualizar el cliente'),
+                            'details': response_data.get('details', 'Detalles no disponibles')  # Si hay más detalles
+                        },
+                        status=400
+                    )
+
+            except ValidationError as e:
+                # Error de validación, retornamos un mensaje claro
+                return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+            except KeyError as e:
+                # Error por campo faltante en la solicitud
+                return JsonResponse({'success': False, 'error': f"Falta el campo requerido: {str(e)}"}, status=400)
+
+            except Exception as e:
+                # Error inesperado, se loguea y se informa al usuario de forma genérica
+                print(f"Error inesperado: {str(e)}")
+                return JsonResponse({'success': False, 'error': 'Error inesperado, contacte con soporte'}, status=500)
+
+
+
 
 
     """     
@@ -114,6 +161,15 @@ class SocioNegocioView(FormView):
 
             
     def busquedaSocioNegocio(self, request):
+        """
+        Método para buscar un socio de negocio
+        
+        args: 
+            request: HttpRequest
+
+        return:
+            JsonResponse con la respuesta de la base de datos
+        """
         if request.method == "GET":
             nombre = request.GET.get('nombre')
             numero = request.GET.get('numero')
@@ -144,6 +200,15 @@ class SocioNegocioView(FormView):
     
         
     def verificarSapSocio(self, request):
+        """
+        Método para verificar si un socio de negocio existe en SAP
+
+        args:
+            request: HttpRequest
+
+        return:
+            JsonResponse con la respuesta de la API
+        """
 
         print("Verificando Socio de Negocio")
 

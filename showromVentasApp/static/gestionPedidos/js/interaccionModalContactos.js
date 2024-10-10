@@ -44,9 +44,14 @@ $(document).ready(function() {
         let clienteRut = $('#inputCliente').data('rut');
         console.log('Cliente RUT capturado:', clienteRut);
 
+        const rutCliemte = document.getElementById("inputCliente").getAttribute("data-codigoSN");
+
+
         // Enviar los contactos al backend mediante AJAX
+
+        let urlguardarCont = `/ventas/guardar_contactos/${rutCliemte}/`;
         $.ajax({
-            url: '/guardar_contactos/',  // URL del endpoint en Django
+            url: urlguardarCont,  // URL del endpoint en Django
             type: 'POST',
             data: {
                 'contactos': JSON.stringify(contactos),

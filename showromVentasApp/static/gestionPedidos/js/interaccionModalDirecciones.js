@@ -100,9 +100,12 @@ $(document).ready(function() {
         let clienteRut = $('#inputCliente').data('rut');
         console.log('Cliente RUT capturado:', clienteRut);
 
+        const rutCliemte = document.getElementById("inputCliente").getAttribute("data-codigoSN");
+
         // Enviar las direcciones al backend mediante AJAX
+        let urlguardarDir = `/ventas/guardar_direcciones/${rutCliemte}/`;
         $.ajax({
-            url: '/guardar_direcciones/',
+            url: urlguardarDir,
             type: 'POST',
             data: {
                 'direcciones': JSON.stringify(direcciones),
@@ -116,7 +119,7 @@ $(document).ready(function() {
                 if (response.success) {
                     alert('Direcciones guardadas correctamente');
                     $('.modal').modal('hide');  // Ocultar cualquier modal que esté abierto
-                    location.reload();
+                    //location.reload();
                 } else {
                     alert('Error al guardar direcciones: ' + response.message);
                 }
