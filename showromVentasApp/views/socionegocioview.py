@@ -73,36 +73,61 @@ class SocioNegocioView(FormView):
         return JsonResponse({'error': 'Invalid URL'}, status=404)
 
     def agregarSocioNegocio(self, request):
-        try:
-            # Recolectar datos del formulario y pasarlos al service
-            datos = {
-                'grupoSN': request.POST.get('grupoSN'),
-                'rut': request.POST.get('rutSN'),
-                'email': request.POST.get('emailSN'),
-                'nombre': request.POST.get('nombreSN'),
-                'apellido': request.POST.get('apellidoSN'),
-                'razon_social': request.POST.get('razonSN'),
-                'giro': request.POST.get('giroSN'),
-                'telefono': request.POST.get('telefonoSN')
-            }
-            
-            # Crear instancia del socio de negocio y llamar al servicio
-            socio_negocio_service = SocioNegocio(request)
-            response = socio_negocio_service.crearOActualizarCliente()
+        if request.method == 'POST':
 
-            # Manejar la respuesta del service
-            if response.get('success'):
-                return JsonResponse({'success': True, 'message': 'Cliente creado o actualizado con éxito', 'codigoSN': response.get('codigoSN')}, status=201)
-            else:
-                return JsonResponse({'success': False, 'message': response.get('error')}, status=400)
+            print("Agregando Socio de Negocio")
+            print(f"Request: {request.POST}")
 
-        except ValidationError as e:
-            return JsonResponse({'error': str(e)}, status=400)
-            
-        except Exception as e:
-            # Loggear el error para depuración
-            print(f"Error inesperado: {str(e)}")
-            return JsonResponse({'error': 'Error inesperado: {}'.format(str(e))}, status=500)
+            try:
+                request.POST = request.POST.copy()
+
+                # Crear instancia del socio de negocio y llamar al servicio
+                socioNegoService = SocioNegocio(request)
+
+                # Llamar al servicio para crear o actualizar el cliente
+                response = socioNegoService.crearOActualizarCliente()
+
+                print(f"Respuesta de crear o actualizar Cliente: {response.content}")
+
+                # Si la respuesta es un JsonResponse, obtenemos su contenido
+                response_data = json.loads(response.content)
+
+                # Manejar la respuesta según el valor de 'success'
+                if response_data.get('success'):
+                    return JsonResponse(
+                        {
+                            'success': True,
+                            'message': response_data.get('message', 'Cliente creado o actualizado con éxito'),
+                            'codigoSN': response_data.get('codigoSN')  # Este campo es opcional
+                        },
+                        status=201
+                    )
+
+                else:
+                    # Si 'success' es False, enviamos un mensaje de error
+                    return JsonResponse(
+                        {
+                            'success': False,
+                            'message': response_data.get('message', 'Error al crear o actualizar el cliente'),
+                            'details': response_data.get('details', 'Detalles no disponibles')  # Si hay más detalles
+                        },
+                        status=400
+                    )
+
+            except ValidationError as e:
+                # Error de validación, retornamos un mensaje claro
+                return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+            except KeyError as e:
+                # Error por campo faltante en la solicitud
+                return JsonResponse({'success': False, 'error': f"Falta el campo requerido: {str(e)}"}, status=400)
+
+            except Exception as e:
+                # Error inesperado, se loguea y se informa al usuario de forma genérica
+                print(f"Error inesperado: {str(e)}")
+                return JsonResponse({'success': False, 'error': 'Error inesperado, contacte con soporte'}, status=500)
+
+
 
 
 
