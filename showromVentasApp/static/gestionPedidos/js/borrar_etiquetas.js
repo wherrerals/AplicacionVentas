@@ -21,6 +21,9 @@ document.addEventListener("DOMContentLoaded", function () {
         eliminarEtiquetaPorId("dirmens1"); // Eliminar el <p> con id="dirmens1"
     });
     
+    document.getElementById("agregar_cont_modal").addEventListener("click", function () {
+        eliminarEtiquetaPorId("elimcontac"); // Eliminar el <p> con id="dirmens1"
+    });
 
     // Opción para reutilizar la función en otros enlaces en el futuro
     function agregarEventoEliminarEnlace(idEnlace, idElementoAEliminar) {

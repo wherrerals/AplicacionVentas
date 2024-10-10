@@ -17,6 +17,9 @@ $(document).ready(function() {
             let direccion = $(this).find('input[name="direccion[]"]').val();
             let direccionId = $(this).find('input[name="direccionid[]"]').val();
 
+            console.log('diccionario: ', tipoDireccion, nombreDireccion, pais, region, ciudad, comuna, direccion, direccionId);
+
+
             // Validar que todos los campos obligatorios tengan valores
             if (tipoDireccion && nombreDireccion && pais && region && ciudad && comuna && direccion) {
                 direcciones.push({
@@ -64,6 +67,7 @@ $(document).ready(function() {
             let comuna = $(this).find('select[name="comuna[]"]').val();
             let direccion = $(this).find('input[name="direccion[]"]').val();
             let direccionId = $(this).find('input[name="direccionid[]"]').val();
+
 
             // Validar que todos los campos obligatorios tengan valores
             if (tipoDireccion && nombreDireccion && pais && region && ciudad && comuna && direccion) {

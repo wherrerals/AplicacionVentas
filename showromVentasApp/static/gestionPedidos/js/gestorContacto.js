@@ -185,15 +185,15 @@ $(document).ready(function() {
                       contactoManager.contcon = contactos.length;
 
                   } else {
-                      $('#listaContactos').html('<p>No hay contactos disponibles para este cliente.</p>');
+                      $('#listaContactos').html('<p id="elimcontac">No hay contactos disponibles para este cliente.</p>');
                   }
               },
               error: function(xhr, status, error) {
-                  $('#listaContactos').html('<p>Error al cargar contactos.</p>');
+                  $('#listaContactos').html('<p id="elimcontac">Error al cargar contactos.</p>');
               }
           });
       } else {
-          $('#listaContactos').html('<p>No se ha seleccionado un cliente.</p>');
+          $('#listaContactos').html('<p id="elimcontac">No se ha seleccionado un cliente.</p>');
       }
   });
 });
