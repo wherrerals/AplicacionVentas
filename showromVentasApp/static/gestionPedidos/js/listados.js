@@ -131,10 +131,11 @@ document.addEventListener("DOMContentLoaded", function() {
         return {
             fecha_inicio: document.querySelector('[name="fecha_inicio"]').value,
             fecha_fin: document.querySelector('[name="fecha_fin"]').value,
+            fecha_doc: document.querySelector('[name="fecha_documento"]').value,
             docNum: document.querySelector('[name="docNum"]').value,
             cardNAme: document.querySelector('[name="cardNAme"]').value,
             salesEmployeeName: document.querySelector('[name="salesEmployeeName"]').value,
-            //DocumentStatus: document.querySelector('[name="DocumentStatus"]').value,
+            DocumentStatus: document.querySelector('[name="DocumentStatus"]').value,
             docTotal: document.querySelector('[name="docTotal"]').value
         };
     };
