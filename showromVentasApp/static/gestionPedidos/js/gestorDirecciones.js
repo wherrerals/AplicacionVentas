@@ -57,6 +57,16 @@ class DireccionManager {
               </select>
             </div>
           </div>
+
+          <div class="row">
+            <div class="col-sm-4">
+              <label class="col-form-label" style="font-size: 13px;">ID</label> 
+            </div>
+            <div class="col">
+              <input class="form-control" type="text" name="nombre_direccion[]" id="nombre_direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
+            </div>
+          </div>
+
           <div class="row">
             <div class="col-sm-4">
               <label class="col-form-label" style="font-size: 13px;">País</label>
@@ -118,21 +128,6 @@ class DireccionManager {
             </div>
             <div class="col">
               <input class="form-control" type="text" name="direccion[]" id="direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
-            </div>
-          </div>
-        
-          <div class="row">
-            <div class="col-sm-12" style="height: 1px;background: transparent;"><span>&nbsp;</span></div>
-          </div>
-      
-        <div class="col-sm-1" style="padding: 0px;width: 20px;"><span></span></div>
-
-          <div class="row">
-            <div class="col-sm-4">
-              <label clas s="col-form-label" style="font-size: 13px;">#Calle</label>
-            </div>
-            <div class="col">
-              <input class="form-control" type="text" name="nombre_direccion[]" id="nombre_direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
             </div>
           </div>
 
@@ -258,7 +253,7 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                       <label class="col-form-label" style="font-size: 13px;">ID</label>
                                       </div>
                                     <div class="col">
-                                    <input class="form-control" name="direccion_static[]" id=direccionId_${index} type="text" value="${direccion.id}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled>
+                                    <input class="form-control" name="direccion_static[]" id=direccion_${index} type="text" value="${direccion.id}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled>
                                     </div>
                                 </div>
 
@@ -317,21 +312,8 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
 
 
                                 <div class="row">
-                                    <div class="col-sm-4">
-                                    <label class="col-form-label" style="font-size: 13px;">Dirección</label>
-                                    </div>
-                                    <div class="col">
-                                    <input id=direccion_${index} name="direccion_static[]" class="form-control" type="text" value="${direccion.nombreDireccion}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                    <label class="col-form-label" style="font-size: 13px;">Calle</label>
-                                    </div>
-                                    <div class="col">
-                                    <input id=nombreDireccion_${index} name="nombreDireccion_static[]" class="form-control" type="text" value="${direccion.calleNumero}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled>
-                                    </div>
+                                    <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Dirección</label></div>
+                                    <div class="col"><input id=nombreDireccion_${index} name="nombreDireccion_static[]" class="form-control" type="text" value="${direccion.nombreDireccion}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
                                 </div>
                             </div>
                         `;
@@ -340,22 +322,21 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                         $(`#editar_dir_${index}`).on('click', function() {
                           // Hacer los campos editables
                           $(`#tipoDireccion_${index}`).prop('disabled', false);
+                          $(`#direccion_${index}`).prop('disabled', false);
                           $(`#pais_${index}`).prop('disabled', false);
                           $(`#region_${index}`).prop('disabled', false);
                           $(`#ciudad_${index}`).prop('disabled', false);
                           $(`#comuna_${index}`).prop('disabled', false);
                           $(`#nombreDireccion_${index}`).prop('disabled', false);
-                          $(`#direccion_${index}`).prop('disabled', false);
                           
                           $(`#tipoDireccion_${index}`).attr('name', 'tipodireccion[]');
                           $(`#direccion_${index}`).attr('name', 'nombre_direccion[]');
-                          $(`#direccion_${index}`).attr('name', 'direccion[]');
                           $(`#pais_${index}`).attr('name', 'pais[]');
                           $(`#region_${index}`).attr('name', 'region[]');
                           $(`#ciudad_${index}`).attr('name', 'ciudad[]');
                           $(`#comuna_${index}`).attr('name', 'comuna[]');
                           $(`#nombreDireccion_${index}`).attr('name', 'direccion[]');
-                          $(`#direccion_${index}`).attr('name', 'direccionid[]');
+                          $(`#direccion_id${index}`).attr('name', 'direccionid[]');
                       });
 
                         $(`#eliminar_dir_${index}`).on('click', function() {
