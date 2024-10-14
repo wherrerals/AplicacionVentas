@@ -16,4 +16,5 @@ class DireccionRepository:
         """
         return DireccionDB.objects.filter(SocioNegocio=cliente)
 
-
+    def prueba(self):
+        pass
