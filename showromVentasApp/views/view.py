@@ -17,6 +17,8 @@ from adapters.sl_client import APIClient
 import requests
 import json
 
+from logicaVentasApp.services.comuna import Comuna
+
 #Inicio vistas Renderizadoras
 
 """
@@ -72,6 +74,28 @@ def list_quotations(request):
     
     return render(request, "lista_cotizaciones.html")
 
+def enlazarComunas(request):
+    """
+    Obtiene las comunas de una región y las devuelve en formato JSON.
+
+    Args:
+        request (HttpRequest): La petición HTTP recibida.
+
+    Returns:
+        JsonResponse: Si no se proporciona un ID de región, devuelve un error 400.
+        JsonResponse: Las comunas de la región solicitada en formato JSON.
+    """
+
+    print("Enlazando comunas")
+    if request.method == 'GET':
+        id_Region = request.GET.get('idRegion')
+        
+        if not id_Region:
+            return JsonResponse({'error': 'No se proporcionó un ID de región'}, status=400)
+        
+        comuna_service = Comuna()
+
+    return comuna_service.obtenerComunas(id_Region)
 
 @login_required
 def quotations(request):
@@ -324,38 +348,60 @@ def mis_datos(request):
 
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 
-
+# Para guardar solo las direcciones
 def actualizarAgregarDirecion(request, socio):
-    print("estos son los datos",request.POST)
+    print("Estos son los datos:", request.POST)
+    
     if request.method == "POST":
         try:
-            # Obtener listas de datos
-            direccionID = request.POST.getlist('nombreDireccion')
-            namedire = request.POST.getlist('ciudad')
-            ciudad = request.POST.getlist('ciudad')
-            direccion = request.POST.getlist('direccion')
-            tipo = request.POST.getlist('tipodireccion')
-            pais = request.POST.getlist('pais')
-            region = request.POST.getlist('region')
-            comuna = request.POST.getlist('comuna')
+            # Obtener el campo 'direcciones' que es una lista con un JSON como cadena
+            direcciones_json = request.POST.getlist('direcciones')
+            
+            # Verificar si el campo no es nulo y luego deserializar el JSON
+            if direcciones_json:
+                direcciones = json.loads(direcciones_json[0])  # Accedes al primer elemento de la lista y lo deserializas
+                print("Datos de direcciones:", direcciones)
+                
+                # Extraer los valores necesarios desde el JSON deserializado
+                tipo = [direccion.get('tipoDireccion') for direccion in direcciones]
+                nombreDireccion = [direccion.get('nombreDireccion') for direccion in direcciones]
+                ciudad = [direccion.get('ciudad') for direccion in direcciones]
+                pais = [direccion.get('pais') for direccion in direcciones]
+                region = [direccion.get('region') for direccion in direcciones]
+                comuna = [direccion.get('comuna') for direccion in direcciones]
+                direccion = [direccion.get('direccion') for direccion in direcciones]
+
+                # Imprimir los valores para debug
+                print(f"tipo de direcciones: {tipo}")
+                print(f"nombres de direcciones: {nombreDireccion}")
+                print(f"ciudades: {ciudad}")
+                print(f"paises: {pais}")
+                print(f"regiones: {region}")
+                print(f"comunas: {comuna}")
+                print(f"direcciones: {direccion}")
+            else:
+                return JsonResponse({'success': False, 'message': 'No se encontraron direcciones en el request.'}, status=400)
 
             # Verificar que todas las listas tienen la misma longitud
-            print(f"ID de dirección: {direccionID}")
-            if not all(len(lst) == len(namedire) for lst in [ciudad, direccion, tipo, pais, region, comuna, direccionID]):
+            if not all(len(lst) == len(nombreDireccion) for lst in [ciudad, direccion, tipo, pais, region, comuna]):
                 return JsonResponse({'success': False, 'message': 'Las listas deben tener la misma longitud.'}, status=400)
 
-            for i in range(len(namedire)):
-                print(f"Datos de dirección {i+1}:")
-                nombredire = namedire[i].strip()  # Eliminar espacios en blanco
+            # Procesar cada dirección
+            for i in range(len(nombreDireccion)):
+                print(f"Procesando dirección {i+1}:")
+                nombredire = nombreDireccion[i].strip()  # Eliminar espacios en blanco
+                
                 if nombredire:  # Comprobar que el nombre de dirección no esté vacío
                     fregion = get_object_or_404(RegionDB, numero=region[i])
                     fcomuna = get_object_or_404(ComunaDB, codigo=comuna[i])
 
-                    # Buscar la dirección existente por ID
+                    # Buscar la dirección existente por ID (si tienes un campo para esto)
                     direccion_obj = None
-                    if direccionID[i]:  # Asegurarse de que el ID no esté vacío
-                        print(f"ID de dirección: {direccionID[i]}")
-                        direccion_obj = DireccionDB.objects.filter(id=direccionID[i]).first()
+
+                    # Aquí asumo que hay un campo opcional 'id' en el JSON para identificar direcciones existentes
+                    direccion_id = direcciones[i].get('id')  # Extraer ID si existe
+                    if direccion_id:  # Si se proporcionó un ID
+                        direccion_obj = DireccionDB.objects.filter(id=direccion_id).first()
 
                     # Si la dirección existe, actualizarla; si no, crearla
                     if direccion_obj:
@@ -368,7 +414,7 @@ def actualizarAgregarDirecion(request, socio):
                         direccion_obj.tipoDireccion = tipo[i]
                         direccion_obj.pais = pais[i]
                         direccion_obj.save()  # Guardar cambios
-                        print(f"Dirección {i+1} actualizada con éxito")
+                        print(f"Dirección {i+1} actualizada con éxito.")
                     else:
                         # Crear una nueva dirección si no existe
                         DireccionDB.objects.create(
@@ -381,7 +427,7 @@ def actualizarAgregarDirecion(request, socio):
                             SocioNegocio=socio,
                             pais=pais[i]
                         )
-                        print(f"Dirección {i+1} creada con éxito")
+                        print(f"Dirección {i+1} creada con éxito.")
                 else:
                     print(f"No se ha creado ni actualizado la dirección {i+1} porque el nombre está vacío.")
             
@@ -389,6 +435,8 @@ def actualizarAgregarDirecion(request, socio):
 
         except KeyError as e:
             return JsonResponse({'success': False, 'message': f'Falta el campo: {str(e)}'}, status=400)
+        except json.JSONDecodeError as e:
+            return JsonResponse({'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, status=400)
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
 

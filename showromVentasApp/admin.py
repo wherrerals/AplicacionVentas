@@ -67,6 +67,12 @@ class TipoSNDBper(admin.ModelAdmin):
 class TipoClienteDBper(admin.ModelAdmin):
     list_display = ('codigo', 'nombre')
 
+class RegionDBper(admin.ModelAdmin):
+    list_display = ('numero', 'nombre')
+
+class ComunaDBper(admin.ModelAdmin):
+    list_display = ('codigo', 'nombre', 'region')
+
 # Register your models here.
 admin.site.register(TipoDocTributarioDB, TipoDocTributarioDBper)
 admin.site.register(SucursalDB, SucursalDBper)
@@ -86,5 +92,5 @@ admin.site.register(GrupoSNDB, GrupoSnDBper)
 admin.site.register(TipoSNDB, TipoSNDBper)
 admin.site.register(TipoClienteDB, TipoClienteDBper)
 #admin.site.register(DireccionDB, DireccionDBper)
-admin.site.register(ComunaDB)
-admin.site.register(RegionDB)
+admin.site.register(ComunaDB, ComunaDBper)
+admin.site.register(RegionDB, RegionDBper)

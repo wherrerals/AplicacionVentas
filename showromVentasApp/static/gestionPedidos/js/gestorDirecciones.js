@@ -6,14 +6,14 @@ class DireccionManager {
 
   initializeEvents() {
     // Evento para agregar dirección en la pestaña principal
-    document.getElementById('agregar_dir').addEventListener('click', () => this.agregarDireccion('dir'));
+    document.getElementById('agregar_dir').addEventListener('click', () => this.agregarDireccion('dir', 'Despacho'));
     // Evento para agregar dirección dentro del modal de facturación
-    document.getElementById('agregar_dir_facturacion').addEventListener('click', () => this.agregarDireccion('listaDireccionFacturacion'));
+    document.getElementById('agregar_dir_facturacion').addEventListener('click', () => this.agregarDireccion('listaDireccionFacturacion', 'Facturación'));
     // Evento para agregar dirección dentro del modal de despacho
-    document.getElementById('agregar_dir_despacho').addEventListener('click', () => this.agregarDireccion('listaDireccionDespacho'));
+    document.getElementById('agregar_dir_despacho').addEventListener('click', () => this.agregarDireccion('listaDireccionDespacho', 'Despacho'));
   }
 
-  agregarDireccion(containerId) {
+  agregarDireccion(containerId, tipoDireccion) {
     this.contdir++;  // Incrementa el contador cada vez que se agrega una nueva dirección
 
     // Crear una nueva fila para la dirección
@@ -51,8 +51,8 @@ class DireccionManager {
             <div class="col">
               <select class="form-select" name="tipodireccion[]" style="font-size: 12px;border-color: rgb(159,168,175);">
                 <optgroup label="Tipo">
-                  <option value="12" selected="">Despacho</option>
-                  <option value="13">Facturación</option>
+                  <option value="12" ${tipoDireccion === 'Despacho' ? 'selected' : ''}>Despacho</option>
+                  <option value="13" ${tipoDireccion === 'Facturación' ? 'selected' : ''}>Facturación</option>
                 </optgroup>
               </select>
             </div>
@@ -60,7 +60,7 @@ class DireccionManager {
 
           <div class="row">
             <div class="col-sm-4">
-              <label class="col-form-label" style="font-size: 13px;">Dirección</label> 
+              <label class="col-form-label" style="font-size: 13px;">ID</label> 
             </div>
             <div class="col">
               <input class="form-control" type="text" name="nombre_direccion[]" id="nombre_direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
@@ -348,16 +348,16 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                     });
                 } else {
                     console.log(`No hay direcciones de tipo ${tipoDireccion} para este cliente`);
-                    $(listaSelector).html(`<p>No hay direcciones disponibles de este tipo.</p>`);
+                    $(listaSelector).html(`<p id="dirmens1">No hay direcciones disponibles de este tipo.</p>`);
                 }
             } else {
                 console.log("No se encontraron clientes con el RUT proporcionado");
-                $(listaSelector).html('<p>Error al cargar direcciones.</p>');
+                $(listaSelector).html('<p id="dirmens1>Error al cargar direcciones.</p>');
             }
         },
         error: (xhr, status, error) => {
             console.error('Error al obtener las direcciones del cliente:', error);
-            $(listaSelector).html('<p>Error al cargar direcciones.</p>');
+            $(listaSelector).html('<p id="dirmens1>Error al cargar direcciones.</p>');
         }
     });
 }

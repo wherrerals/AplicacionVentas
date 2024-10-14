@@ -7,7 +7,7 @@ class ComunaDB(models.Model):
 
         verbose_name = 'Comuna'
         verbose_name_plural = 'Comuna'
-        
+
     codigo = models.CharField(max_length=50,null = False)
     nombre = models.CharField(max_length=50,null = False)
     region = models.ForeignKey(RegionDB, on_delete=models.CASCADE, default=1)
