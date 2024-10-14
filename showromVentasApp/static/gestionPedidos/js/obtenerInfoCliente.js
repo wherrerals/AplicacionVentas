@@ -13,6 +13,9 @@ $(document).ready(function(){
         // Asignar el rut como atributo data-rut del input
         $('#inputCliente').attr('data-rut', clienteId);
 
+        $('#inputCliente').attr('data-codigoSN', codigoSN);
+
+
         // Asignar el rut como atributo data-rut del input
         console.log("rut del cliente seleccionado: ",clienteId)
         

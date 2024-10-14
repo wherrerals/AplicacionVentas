@@ -36,16 +36,12 @@ class SocioNegocioRepository:
         return SocioNegocioDB.objects.create(**kwargs)
 
     @staticmethod
+
+    @staticmethod
     def buscarClientesPorRut(rut):
-        """
-        Obtiene los clientes que contengan el rut ingresado
-
-        params:
-            rut: str
-
-            - Rut del cliente a buscar
-        
-        return:
-            SocioNegocioDB
-        """
         return SocioNegocioDB.objects.filter(rut__icontains=rut)
+
+    @staticmethod
+    def buscarClientesPorNombre(nombre):
+        return SocioNegocioDB.objects.filter(nombre__icontains=nombre)
+

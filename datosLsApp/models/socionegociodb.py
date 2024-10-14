@@ -16,7 +16,7 @@ class SocioNegocioDB(models.Model):
     razonSocial = models.CharField(max_length=255)
     rut = models.CharField(max_length=255,null = False)
     email = models.EmailField()
-    telefono = models.CharField(max_length=11)
+    telefono = models.CharField(max_length=12)
     giro = models.CharField(max_length=50)
     condicionPago = models.IntegerField(default=-1)
     plazoReclamaciones = models.CharField(max_length=255, default="STANDAR")

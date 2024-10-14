@@ -1,5 +1,5 @@
 #Django modulos
-from django.shortcuts import render, redirect  
+from django.shortcuts import get_object_or_404, render, redirect  
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib.auth.hashers import make_password
@@ -11,6 +11,8 @@ from django.http import JsonResponse, HttpResponse
 from datosLsApp.models.usuariodb import User 
 from datosLsApp.models import (ProductoDB, SocioNegocioDB, UsuarioDB, RegionDB, GrupoSNDB, TipoSNDB, TipoClienteDB, DireccionDB, ComunaDB, ContactoDB)
 from adapters.sl_client import APIClient
+
+
 #librerias Python usadas
 import requests
 import json
@@ -69,6 +71,7 @@ def list_quotations(request):
     """
     
     return render(request, "lista_cotizaciones.html")
+
 
 @login_required
 def quotations(request):
@@ -322,8 +325,80 @@ def mis_datos(request):
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 
 
+def actualizarAgregarDirecion(request, socio):
+    print("estos son los datos",request.POST)
+    if request.method == "POST":
+        try:
+            # Obtener listas de datos
+            direccionID = request.POST.getlist('nombreDireccion')
+            namedire = request.POST.getlist('ciudad')
+            ciudad = request.POST.getlist('ciudad')
+            direccion = request.POST.getlist('direccion')
+            tipo = request.POST.getlist('tipodireccion')
+            pais = request.POST.getlist('pais')
+            region = request.POST.getlist('region')
+            comuna = request.POST.getlist('comuna')
+
+            # Verificar que todas las listas tienen la misma longitud
+            print(f"ID de dirección: {direccionID}")
+            if not all(len(lst) == len(namedire) for lst in [ciudad, direccion, tipo, pais, region, comuna, direccionID]):
+                return JsonResponse({'success': False, 'message': 'Las listas deben tener la misma longitud.'}, status=400)
+
+            for i in range(len(namedire)):
+                print(f"Datos de dirección {i+1}:")
+                nombredire = namedire[i].strip()  # Eliminar espacios en blanco
+                if nombredire:  # Comprobar que el nombre de dirección no esté vacío
+                    fregion = get_object_or_404(RegionDB, numero=region[i])
+                    fcomuna = get_object_or_404(ComunaDB, codigo=comuna[i])
+
+                    # Buscar la dirección existente por ID
+                    direccion_obj = None
+                    if direccionID[i]:  # Asegurarse de que el ID no esté vacío
+                        print(f"ID de dirección: {direccionID[i]}")
+                        direccion_obj = DireccionDB.objects.filter(id=direccionID[i]).first()
+
+                    # Si la dirección existe, actualizarla; si no, crearla
+                    if direccion_obj:
+                        # Actualizar la dirección existente
+                        direccion_obj.nombreDireccion = nombredire
+                        direccion_obj.ciudad = ciudad[i]
+                        direccion_obj.calleNumero = direccion[i]
+                        direccion_obj.comuna = fcomuna
+                        direccion_obj.region = fregion
+                        direccion_obj.tipoDireccion = tipo[i]
+                        direccion_obj.pais = pais[i]
+                        direccion_obj.save()  # Guardar cambios
+                        print(f"Dirección {i+1} actualizada con éxito")
+                    else:
+                        # Crear una nueva dirección si no existe
+                        DireccionDB.objects.create(
+                            nombreDireccion=nombredire,
+                            ciudad=ciudad[i],
+                            calleNumero=direccion[i],
+                            comuna=fcomuna,
+                            region=fregion,
+                            tipoDireccion=tipo[i],
+                            SocioNegocio=socio,
+                            pais=pais[i]
+                        )
+                        print(f"Dirección {i+1} creada con éxito")
+                else:
+                    print(f"No se ha creado ni actualizado la dirección {i+1} porque el nombre está vacío.")
+            
+            return JsonResponse({'success': True, 'message': 'Direcciones actualizadas o creadas con éxito.'})
+
+        except KeyError as e:
+            return JsonResponse({'success': False, 'message': f'Falta el campo: {str(e)}'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+    return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
+
+
 @login_required
 def agregarDireccion(request, socio):
+    print(f"RUT del socio: {socio}")
+    print("data recibida: ", request.POST)
     if request.method == "POST":
         nombredirecciones = request.POST.getlist('nombre_direccion[]')
         ciudades = request.POST.getlist('ciudad[]')
@@ -414,7 +489,56 @@ def agregarContacto(request, cliente):
                 print(f"No se ha creado el contacto {i+1} porque algunos campos están vacíos.")
     return render(request, "cotizacion.html", {'clienteNoIncluido': clienteNoIncluido})
 
+"""
+Este metodo sirve para poder guardar los contactos de un cliente en la base de datos a traves de una peticion AJAX
+        creada en los modales, cuando se desea agregar un contacto o editar un contacto de un cliente ya existente.
+        Con este estaba probando pero no lo logre. (no empece con el de direcciones)
+"""
 
+@login_required
+def guardarContactosAJAX(request):
+    
+    if request.method == "POST":
+        # Parsear los datos de contactos desde el request
+        contactos_json = request.POST.get('contactos')
+        contactos = json.loads(contactos_json)
+
+        cliente_id = request.POST.get('cliente')
+        cliente = SocioNegocioDB.objects.get(rut=cliente_id)
+
+        # Verificar que el cliente exista
+        if not cliente:
+            return JsonResponse({'success': False, 'message': 'Cliente no encontrado'})
+
+        # Iterar sobre los contactos recibidos
+        for contacto in contactos:
+            nombre = contacto['nombre']
+            apellido = contacto['apellido']
+            telefono = contacto.get('telefono')
+            celular = contacto.get('celular')
+            email = contacto.get('email')
+
+            # Verificar si los campos requeridos están completos
+            if nombre and apellido:
+                nombreCompleto = f"{nombre} {apellido}"
+
+                # Crear o actualizar el contacto
+                ContactoDB.objects.create(
+                    codigoInternoSap=1,  # Aquí deberías manejar la lógica del código interno si es variable
+                    nombreCompleto=nombreCompleto,
+                    nombre=nombre,
+                    apellido=apellido,
+                    telefono=telefono,
+                    celular=celular,
+                    email=email,
+                    SocioNegocio=cliente
+                )
+                print(f"Contacto {nombreCompleto} creado con éxito")
+            else:
+                print(f"No se ha creado el contacto porque algunos campos están vacíos.")
+
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'message': 'Método no permitido'})
 
 
 @login_required
@@ -473,7 +597,8 @@ def list_quotations_2(request):
         return JsonResponse({'error': 'Invalid parameters'}, status=400)
 
     data = client.get_quotations(top=top, skip=skip)
-    return JsonResponse(data, safe=False) """
+    return JsonResponse(data, safe=False) 
+"""
 
 
 def quotate_items(request, docEntry):
