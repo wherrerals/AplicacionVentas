@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentPage = 1; // Controlar la página actual
     const recordsPerPage = 20; // Cantidad de registros por página
     let totalPages = null; // No conocemos el total de páginas inicialmente
+    let activeFilters = {}; // Variable para almacenar los filtros aplicados
 
     const getSkip = (page) => (page - 1) * recordsPerPage;
 
@@ -31,13 +32,17 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     };
 
-    const applyFiltersAndFetchData = (filters) => {
+    const applyFiltersAndFetchData = (filters, page = 1) => {
         showLoader();
+        const skip = getSkip(page); // Calcular el número de registros a omitir
         const filterData = {
-            top: 20,
-            skip: 0,
+            top: recordsPerPage,
+            skip,
             ...filters
         };
+
+        // Guardar los filtros activos para que funcionen con la paginación
+        activeFilters = filters;
 
         fetch('/ventas/listado_Cotizaciones_filtrado/', {
             method: 'POST',
@@ -55,11 +60,12 @@ document.addEventListener("DOMContentLoaded", function () {
             if (data && data.data && Array.isArray(data.data.value)) {
                 displayQuotations(data.data.value);
 
-                
+                // Si el backend devuelve el número total de registros
                 if (data.totalRecords) {
                     totalPages = Math.ceil(data.totalRecords / recordsPerPage);
                 }
 
+                updatePagination(page); // Actualizar la paginación
                 hideLoader();
             } else {
                 console.error('Error: Expected data.data.value to be an array');
@@ -118,11 +124,9 @@ document.addEventListener("DOMContentLoaded", function () {
         };
     };
 
-    // Función para obtener los datos de la página actual
+    // Función para obtener los datos de la página actual con filtros
     const fetchAndDisplayData = (page = 1) => {
-        const skip = getSkip(page);
-        fetchAndDisplayInitialData({ top: recordsPerPage, skip });
-        updatePagination(page);
+        applyFiltersAndFetchData(activeFilters, page);
         window.scrollTo(0, 0); // Desplazar hacia la parte superior de la página
     };
 
@@ -142,7 +146,7 @@ document.addEventListener("DOMContentLoaded", function () {
             prevButton.querySelector('a').addEventListener('click', (event) => {
                 event.preventDefault();
                 currentPage -= 1;
-                fetchAndDisplayData(currentPage);
+                fetchAndDisplayData(currentPage); // Mantener filtros al paginar
             });
         } else {
             prevButton.classList.add('disabled');
@@ -160,6 +164,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 pageItem.classList.add('active');
             }
             pageItem.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
+            pageItem.querySelector('a').addEventListener('click', (event) => {
+                event.preventDefault();
+                currentPage = i;
+                fetchAndDisplayData(currentPage); // Mantener filtros al cambiar de página
+            });
             paginationContainer.appendChild(pageItem);
         }
 
@@ -175,7 +184,7 @@ document.addEventListener("DOMContentLoaded", function () {
             nextButton.querySelector('a').addEventListener('click', (event) => {
                 event.preventDefault();
                 currentPage += 1;
-                fetchAndDisplayData(currentPage);
+                fetchAndDisplayData(currentPage); // Mantener filtros al avanzar
             });
         } else {
             nextButton.classList.add('disabled');
@@ -183,10 +192,10 @@ document.addEventListener("DOMContentLoaded", function () {
         paginationContainer.appendChild(nextButton);
     };
 
-    // Llamar a la función para cargar la primera página al inicio
+    // Llamar a la función para cargar la primera página con filtros activos al inicio
     fetchAndDisplayData(currentPage);
 
-    // Escuchar el evento 'keydown' para capturar "Enter" en cualquier campo de filtro
+    // Escuchar el evento 'keydown' para capturar "Enter" en los campos de entrada
     const filterForm = document.querySelector('#filterForm');
     filterForm.addEventListener('keydown', function(event) {
         if (event.key === "Enter") {
@@ -195,5 +204,14 @@ document.addEventListener("DOMContentLoaded", function () {
             applyFiltersAndFetchData(filters); // Aplica los filtros cuando se presiona Enter
             window.scrollTo(0, 0); // Desplazar hacia la parte superior de la página
         }
+    });
+
+    // Escuchar el evento 'change' en los selectores para aplicar los filtros automáticamente
+    const selects = document.querySelectorAll('select');
+    selects.forEach(select => {
+        select.addEventListener('change', () => {
+            const filters = getFilterData();
+            applyFiltersAndFetchData(filters); // Aplicar los filtros cuando cambia el selector
+        });
     });
 });
