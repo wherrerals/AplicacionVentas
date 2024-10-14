@@ -37,6 +37,7 @@ urlpatterns = [
     path('guardar_contactos/', view.guardarContactosAJAX, name='guardar_contactos_ajx'), 
     path('guardar_direcciones/<str:socio>/', view.actualizarAgregarDirecion, name='guardar_direccion'),
     path('guardar_contactos/<str:socio>/', view.agregarContacto, name='guardar_contactos'),
+    path('obtener_comunas_por_region/', view.enlazarComunas, name='obtener_comunas_por_region'),
 ]
 
 """ Este es el path que estaba probando

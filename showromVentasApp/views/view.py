@@ -17,6 +17,8 @@ from adapters.sl_client import APIClient
 import requests
 import json
 
+from logicaVentasApp.services.comuna import Comuna
+
 #Inicio vistas Renderizadoras
 
 """
@@ -72,6 +74,28 @@ def list_quotations(request):
     
     return render(request, "lista_cotizaciones.html")
 
+def enlazarComunas(request):
+    """
+    Obtiene las comunas de una región y las devuelve en formato JSON.
+
+    Args:
+        request (HttpRequest): La petición HTTP recibida.
+
+    Returns:
+        JsonResponse: Si no se proporciona un ID de región, devuelve un error 400.
+        JsonResponse: Las comunas de la región solicitada en formato JSON.
+    """
+
+    print("Enlazando comunas")
+    if request.method == 'GET':
+        id_Region = request.GET.get('idRegion')
+        
+        if not id_Region:
+            return JsonResponse({'error': 'No se proporcionó un ID de región'}, status=400)
+        
+        comuna_service = Comuna()
+
+    return comuna_service.obtenerComunas(id_Region)
 
 @login_required
 def quotations(request):
