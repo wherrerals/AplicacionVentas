@@ -69,7 +69,7 @@ class Producto {
               </td>
               <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${this.precioSinDescuento}</td>
               <td style="font-size: 12px;background: transparent;border-style: none;">
-                  <input class="form-control" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="0">
+                  <input class="form-control" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="1">
               </td>
               <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
                   <span id="precio_Venta">${this.totalProducto}</span>
@@ -168,5 +168,5 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     });
   
     // Llamar a la función agregarInteractividad si es necesario
-    agregarInteractividad(newRow, productoCodigo);
+    agregarInteractividad(newRow, productoCodigo); 
 }

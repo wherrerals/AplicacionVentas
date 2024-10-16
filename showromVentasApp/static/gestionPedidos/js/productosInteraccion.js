@@ -53,22 +53,24 @@ function agregarInteractividad(newRow, codigoProducto) {
 
   // Función para calcular el precio total
   function calcularPrecioTotal() {
-      var cantidad = parseFloat(inputCantidad.value) || 0;
-      var precioUnitario = parseFloat(spanPrecioVenta.textContent) || 0;
-      var precioTotal = cantidad * precioUnitario;
-      var descuento = parseFloat(inputDescuento.value) || 0;
+    var cantidad = parseFloat(inputCantidad.value) || 0;
+    var precioUnitario = parseFloat(spanPrecioVenta.textContent) || 0;
+    var precioTotal = cantidad * precioUnitario;
+    var descuento = parseFloat(inputDescuento.value) || 0;
 
-      var precioFinal = precioTotal - (precioTotal * (descuento / 100));
-      var precioConDescuento = precioUnitario * (1 - (descuento / 100));
+    // Si el descuento es 0, el precio con descuento también será 0
+    var precioFinal = descuento === 0 ? precioTotal : precioTotal - (precioTotal * (descuento / 100));
+    var precioConDescuento = descuento === 0 ? 0 : precioUnitario * (1 - (descuento / 100));
 
-      // Actualizar el producto en la lista
-      producto.modificarPrecioFinal(precioFinal);
+    // Actualizar el producto en la lista
+    producto.modificarPrecioFinal(precioFinal);
 
-      tdPrecioVenta.textContent = precioFinal.toFixed(2);
-      tdPrecioDescuento.textContent = precioConDescuento.toFixed(2);
+    tdPrecioVenta.textContent = precioFinal.toFixed(2);
+    tdPrecioDescuento.textContent = precioConDescuento.toFixed(2);
 
-      actualizarValores();
-  }
+    actualizarValores();
+}
+
 
   // Función para aplicar el descuento
   function aplicarDescuento() {
