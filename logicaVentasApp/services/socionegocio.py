@@ -640,3 +640,52 @@ class SocioNegocio:
             print(f"Error general al crear socio de negocio en SAP: {str(e)}")
             return {'error': f"Error inesperado: {str(e)}"}
 
+    def verificarRutValido(self, rut):
+        """
+        Método para verificar si un RUT es válido.
+
+        Args:
+            rut (str): RUT a verificar. Debe tener el formato "XXXXXXXX-X".
+
+        Returns:
+            bool: True si el RUT es válido, False si no.
+        """
+        try:
+            # RUT sin puntos y guion
+            rut = rut.replace(".", "").replace("-", "")
+            
+            # Separar el dígito verificador del número base
+            numero, digito_verificador = rut[:-1], rut[-1].upper()
+
+            #numero base en entero
+            numero = int(numero)
+            
+            # Invertir los dígitos del número base para el cálculo
+            numero_invertido = str(numero)[::-1]
+
+            # Lista de multiplicadores cíclicos 2, 3, 4, 5, 6, 7
+            multiplicadores = [2, 3, 4, 5, 6, 7]
+
+            # Sumar los productos de los dígitos por los multiplicadores
+            suma = 0
+            for i, digito in enumerate(numero_invertido):
+                suma += int(digito) * multiplicadores[i % len(multiplicadores)]
+
+            # Calcular el residuo
+            residuo = suma % 11
+
+            # Calcular el dígito verificador según el módulo 11
+            digito_calculado = 11 - residuo
+            if digito_calculado == 11:
+                digito_calculado = '0'
+            elif digito_calculado == 10:
+                digito_calculado = 'K'
+            else:
+                digito_calculado = str(digito_calculado)
+
+            # Retornar si el dígito verificador coincide con el calculado
+            return digito_calculado == digito_verificador
+
+        except Exception as e:
+            print(f"Error al verificar RUT: {str(e)}")
+            return False

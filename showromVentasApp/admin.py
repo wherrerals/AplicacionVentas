@@ -2,7 +2,7 @@ from django.contrib import admin
 from datosLsApp.models import (
     CondicionPagoDB, DocumentoDB, TipoDocTributarioDB, SucursalDB, 
     TipoVentaDB, VendedorDB, ProductoDB, BodegaDB, InventarioDB, 
-    ItemDB, SocioNegocioDB, UsuarioDB, ContactoDB, DireccionDB, ComunaDB,
+    LineaDB, SocioNegocioDB, UsuarioDB, ContactoDB, DireccionDB, ComunaDB,
     GrupoSNDB, TipoSNDB, TipoClienteDB
 )
 from datosLsApp.models.regiondb import RegionDB
@@ -41,7 +41,7 @@ class Productosper(admin.ModelAdmin):
     list_display = ('codigo', 'nombre', 'stockTotal', 'precioLista', 'precioVenta')
     search_fields = ['codigo', 'nombre']
 
-class ItemDBper(admin.ModelAdmin):
+class LineaDBper(admin.ModelAdmin):
     list_display = ('producto', 'cantidad', 'descuento')
 
 class SocioNegocioDBper(admin.ModelAdmin):
@@ -83,7 +83,7 @@ admin.site.register(CondicionPagoDB, CondicionPagoper)
 admin.site.register(ProductoDB, Productosper)
 admin.site.register(BodegaDB, BodegaDBper)
 admin.site.register(InventarioDB, InventarioDBper)
-admin.site.register(ItemDB, ItemDBper)
+admin.site.register(LineaDB, LineaDBper)
 admin.site.register(SocioNegocioDB, SocioNegocioDBper)
 admin.site.register(UsuarioDB, UsuarioDBper)
 admin.site.register(ContactoDB, ContactoDBper)

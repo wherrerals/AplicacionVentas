@@ -4,7 +4,7 @@ from datosLsApp.models.documentodb import DocumentoDB
 from datosLsApp.models.tipoentregadb import TipoEntregaDB
 from datosLsApp.models.productodb import ProductoDB
 
-class ItemDB(models.Model):
+class LineaDB(models.Model):
     class Meta:
         db_table = 'item'
         verbose_name = 'Item'
