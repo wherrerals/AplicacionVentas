@@ -455,13 +455,11 @@ def agregarDireccion(request, socio):
         paises = request.POST.getlist('pais[]')
         regiones = request.POST.getlist('region[]')
         comunas = request.POST.getlist('comuna[]')
-        print(f"nombre direccion: " , nombredirecciones)
-        print(f"nombres de cuidades: " , ciudades)
-        print(f"tipo de direcciones: " , tipos)
-
-
 
         for i in range(len(nombredirecciones)):
+
+            print(f"Procesando dirección {i+1}:")
+            
             nombredireccion = nombredirecciones[i]
             ciudad = ciudades[i]
             callenumero = callesnumeros[i]
@@ -495,6 +493,9 @@ def agregarDireccion(request, socio):
 
 @login_required
 def agregarContacto(request, cliente):
+
+    print(f"RUT del cliente: {cliente}")
+    print("data recibida: ", request.POST)
     if request.method == "POST":
         nombres = request.POST.getlist('nombre[]')
         apellidos = request.POST.getlist('apellido[]')

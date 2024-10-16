@@ -70,6 +70,13 @@ class SocioNegocio:
             Si el cliente se creó exitosamente, retorna un JsonResponse con un mensaje de éxito.
             Si hubo un error, retorna un JsonResponse con un mensaje de error y un código de estado 400 o 500.
         """
+
+        rutVerificado = self.verificarRutValido(self.rut)
+        
+        print(f"Rut verificado: {rutVerificado}")
+        if not rutVerificado:
+            return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)
+
         try:
             print("Creando o actualizando cliente...")
             print(f"validando datos obligatorios")
