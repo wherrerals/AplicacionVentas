@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'AplicacionVentas.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 
-""" DATABASES = {
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
@@ -92,11 +92,10 @@ WSGI_APPLICATION = 'AplicacionVentas.wsgi.application'
         'PORT':'3306',
     }
 }
- """
 
 # settings.py
 
-DATABASES = {
+""" DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',         # Nombre de la base de datos
@@ -106,7 +105,7 @@ DATABASES = {
         'PORT': '3306',               # Puerto por defecto de MySQL
     }
 }
-
+ """
 
 # Base service Layer
 API_BASE_URL = 'https://182.160.29.24:50003/b1s/v1/'
