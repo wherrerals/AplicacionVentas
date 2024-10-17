@@ -445,8 +445,6 @@ def actualizarAgregarDirecion(request, socio):
 
 @login_required
 def agregarDireccion(request, socio):
-    print(f"RUT del socio: {socio}")
-    print("data recibida: ", request.POST)
     if request.method == "POST":
         nombredirecciones = request.POST.getlist('nombre_direccion[]')
         ciudades = request.POST.getlist('ciudad[]')
@@ -455,11 +453,13 @@ def agregarDireccion(request, socio):
         paises = request.POST.getlist('pais[]')
         regiones = request.POST.getlist('region[]')
         comunas = request.POST.getlist('comuna[]')
+        print(f"nombre direccion: " , nombredirecciones)
+        print(f"nombres de cuidades: " , ciudades)
+        print(f"tipo de direcciones: " , tipos)
+
+
 
         for i in range(len(nombredirecciones)):
-
-            print(f"Procesando dirección {i+1}:")
-            
             nombredireccion = nombredirecciones[i]
             ciudad = ciudades[i]
             callenumero = callesnumeros[i]
@@ -487,6 +487,7 @@ def agregarDireccion(request, socio):
             else:
                 print(f"No se ha creado la dirección {i+1} porque algunos campos están vacíos.")
     return redirect("/")
+
 
 
 
