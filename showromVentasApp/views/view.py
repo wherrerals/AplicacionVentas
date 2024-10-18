@@ -399,7 +399,7 @@ def actualizarAgregarDirecion(request, socio):
                     direccion_obj = None
 
                     # Aquí asumo que hay un campo opcional 'id' en el JSON para identificar direcciones existentes
-                    direccion_id = direcciones[i].get('id')  # Extraer ID si existe
+                    direccion_id = direcciones[i].get('direccionId') # Extraer ID si existe
                     if direccion_id:  # Si se proporcionó un ID
                         direccion_obj = DireccionDB.objects.filter(id=direccion_id).first()
 
@@ -418,15 +418,18 @@ def actualizarAgregarDirecion(request, socio):
                     else:
                         # Crear una nueva dirección si no existe
                         DireccionDB.objects.create(
+                            rownum=1,  # Ajustar según la lógica de generación de números de fila
                             nombreDireccion=nombredire,
                             ciudad=ciudad[i],
                             calleNumero=direccion[i],
+                            codigoImpuesto='iva',  # Ajustar según la lógica de códigos de impuestos
+                            tipoDireccion=tipo[i],
+                            pais=pais[i],
+                            SocioNegocio=socio,
                             comuna=fcomuna,
                             region=fregion,
-                            tipoDireccion=tipo[i],
-                            SocioNegocio=socio,
-                            pais=pais[i]
                         )
+                        
                         print(f"Dirección {i+1} creada con éxito.")
                 else:
                     print(f"No se ha creado ni actualizado la dirección {i+1} porque el nombre está vacío.")
