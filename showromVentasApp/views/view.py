@@ -400,6 +400,7 @@ def actualizarAgregarDirecion(request, socio):
 
                     # Aquí asumo que hay un campo opcional 'id' en el JSON para identificar direcciones existentes
                     direccion_id = direcciones[i].get('direccionId') # Extraer ID si existe
+                    print(f"ID de la dirección: {direccion_id}")
                     if direccion_id:  # Si se proporcionó un ID
                         direccion_obj = DireccionDB.objects.filter(id=direccion_id).first()
 
