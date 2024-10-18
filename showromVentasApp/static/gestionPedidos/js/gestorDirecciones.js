@@ -244,7 +244,7 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                   <div class="col-sm-12" style="height: 10px;background: transparent;"><span>&nbsp;</span></div>
                                 </div>
 
-                                <input type="hidden" name="contacto_id[]" value="${direccion.id}" id="contacto_id_${index}">
+                                <input type="hidden" name="direccionid[]" value="${direccion.id}" id="contacto_id_${index}">
 
                                 <div class="row">
                                     <div class="col-sm-4">
