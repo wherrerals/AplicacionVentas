@@ -401,8 +401,7 @@ def actualizarAgregarDirecion(request, socio):
                     direccion_obj = None
 
                     # Aquí asumo que hay un campo opcional 'id' en el JSON para identificar direcciones existentes
-                    direccion_id = direcciones[i].get('id')  # Extraer ID si existe
-                    print(f"ID de la dirección: {direccion_id}")
+                    direccion_id = direcciones[i].get('direccionId') # Extraer ID si existe
                     if direccion_id:  # Si se proporcionó un ID
                         direccion_obj = DireccionDB.objects.filter(id=direccion_id).first()
 
@@ -421,15 +420,18 @@ def actualizarAgregarDirecion(request, socio):
                     else:
                         # Crear una nueva dirección si no existe
                         DireccionDB.objects.create(
+                            rownum=1,  # Ajustar según la lógica de generación de números de fila
                             nombreDireccion=nombredire,
                             ciudad=ciudad[i],
                             calleNumero=direccion[i],
+                            codigoImpuesto='iva',  # Ajustar según la lógica de códigos de impuestos
+                            tipoDireccion=tipo[i],
+                            pais=pais[i],
+                            SocioNegocio=socio,
                             comuna=fcomuna,
                             region=fregion,
-                            tipoDireccion=tipo[i],
-                            SocioNegocio=socio,
-                            pais=pais[i]
                         )
+                        
                         print(f"Dirección {i+1} creada con éxito.")
                 else:
                     print(f"No se ha creado ni actualizado la dirección {i+1} porque el nombre está vacío.")
@@ -444,10 +446,6 @@ def actualizarAgregarDirecion(request, socio):
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
     return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
-
-# Para guardar solo los contactos
-# pendiente por refactorizar
-# usada en el modal de cotizaciones para actualizar los contactos
 
 def actualizarAgregarContacto(request, socio):
     print("Estos son los datos:", request.POST)
@@ -498,7 +496,7 @@ def actualizarAgregarContacto(request, socio):
                     contacto_obj = None
 
                     # Aquí asumo que hay un campo opcional 'id' en el JSON para identificar contactos existentes
-                    contacto_id = contactos[i].get('id')  # Extraer ID si existe
+                    contacto_id = contactos[i].get('contacto_id')  # Extraer ID si existe
                     print(f"ID del contacto: {contacto_id}")
                     if contacto_id:  # Si se proporcionó un ID
                         contacto_obj = ContactoDB.objects.filter(id=contacto_id).first()
@@ -538,6 +536,8 @@ def actualizarAgregarContacto(request, socio):
             return JsonResponse({'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, status=400)
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+
 
 @login_required
 def agregarDireccion(request, socio):

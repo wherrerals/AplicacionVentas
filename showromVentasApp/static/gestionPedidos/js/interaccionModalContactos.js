@@ -66,7 +66,7 @@ $(document).ready(function() {
                 if (response.success) {
                     alert('Contactos guardados correctamente');
                     $('#contactoModal').modal('hide');
-                    location.reload();
+                    //location.reload();
                 } else {
                     alert('Error al guardar contactos: ' + response.message);
                 }

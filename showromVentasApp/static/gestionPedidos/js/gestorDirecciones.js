@@ -60,7 +60,7 @@ class DireccionManager {
 
           <div class="row">
             <div class="col-sm-4">
-              <label class="col-form-label" style="font-size: 13px;">ID</label> 
+              <label class="col-form-label" style="font-size: 13px;">Nombre</label> 
             </div>
             <div class="col">
               <input class="form-control" type="text" name="nombre_direccion[]" id="nombre_direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
@@ -74,7 +74,7 @@ class DireccionManager {
             <div class="col">
               <select class="form-select" name="pais[]" style="font-size: 12px;border-color: rgb(159,168,175);">
                 <optgroup label="País">
-                  <option value="12" selected="">Chile</option>
+                  <option value="Chile" selected="">Chile</option>
                 </optgroup>
               </select>
             </div>
@@ -262,10 +262,10 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
 
                                 <div class="row">
                                     <div class="col-sm-4">
-                                      <label class="col-form-label" style="font-size: 13px;">ID</label>
+                                      <label class="col-form-label" style="font-size: 13px;">Nombre</label>
                                       </div>
                                     <div class="col">
-                                    <input class="form-control" name="direccion_static[]" id=direccion_${index} type="text" value="${direccion.id}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled>
+                                    <input class="form-control" name="direccion_static[]" id=direccion_${index} type="text" value="${direccion.nombreDireccion}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled>
                                     </div>
                                 </div>
 
@@ -276,7 +276,7 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                   <div class="col">
                                     <select class="form-select" id=pais_${index} name="pais_static[]" style="font-size: 12px; border-color: rgb(159,168,175);" disabled>
                                       <optgroup label="País">
-                                        <option value="${direccion.pais}" selected>chile</option>
+                                        <option value="${direccion.pais}" selected>Chile</option>
                                       </optgroup>
                                     </select>
                                   </div>
@@ -333,7 +333,7 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
 
                                 <div class="row">
                                     <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Dirección</label></div>
-                                    <div class="col"><input id=nombreDireccion_${index} name="nombreDireccion_static[]" class="form-control" type="text" value="${direccion.nombreDireccion}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                    <div class="col"><input id=nombreDireccion_${index} name="nombreDireccion_static[]" class="form-control" type="text" value="${direccion.calleNumero}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
                                 </div>
                             </div>
                         `;
@@ -426,7 +426,7 @@ function cargarComunas(regionId, comunaSelect, comunaSeleccionada = null) {
       // Rellenar el select con las comunas obtenidas
       data.forEach(function(comuna) {
         let selected = comunaSeleccionada && comunaSeleccionada === comuna.nombre ? "selected" : "";
-        $(comunaSelect).append(`<option value="${comuna.id}" ${selected}>${comuna.nombre}</option>`);
+        $(comunaSelect).append(`<option value="${comuna.codigo}" ${selected}>${comuna.nombre}</option>`);
       });
 
       console.log("Select de comunas actualizado.");
