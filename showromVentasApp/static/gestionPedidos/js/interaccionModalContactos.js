@@ -48,6 +48,7 @@ $(document).ready(function() {
 
 
         // Enviar los contactos al backend mediante AJAX
+        
 
         let urlguardarCont = `/ventas/guardar_contactos/${rutCliemte}/`;
         $.ajax({
