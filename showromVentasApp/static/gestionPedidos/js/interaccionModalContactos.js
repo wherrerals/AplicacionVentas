@@ -48,6 +48,7 @@ $(document).ready(function() {
 
 
         // Enviar los contactos al backend mediante AJAX
+        
 
         let urlguardarCont = `/ventas/guardar_contactos/${rutCliemte}/`;
         $.ajax({
@@ -65,7 +66,7 @@ $(document).ready(function() {
                 if (response.success) {
                     alert('Contactos guardados correctamente');
                     $('#contactoModal').modal('hide');
-                    location.reload();
+                    //location.reload();
                 } else {
                     alert('Error al guardar contactos: ' + response.message);
                 }
