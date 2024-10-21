@@ -12,8 +12,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-fexe1oq@sx@j&x3m#tw(#x(r!g32fylgea=whky=#ge^vn5f*h'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
+#DEBUG = False   
 
 #En este se debe colocar la ip de la maquina en la que se esta trabajando o la ip de la maquina en la que se va a desplegar la aplicacion
 ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '192.168.3.41', '192.168.3.42', '127.0.0.1']
@@ -88,7 +90,7 @@ DATABASES = {
         'USER':'root',
         'PASSWORD':'Ea7hava5*', #led_studio
         #'PASSWORD':'Ea7hava5}', #home
-        'PASSWORD':'qwerty', #nico
+        #'PASSWORD':'qwerty', #nico
         #'HOST':'localhost',
         'PORT':'3306',
     }
