@@ -176,6 +176,7 @@ class CotizacionView(View):
     @csrf_exempt
     def crearCotizacion(self, request):
         print("probando")
+        print("Request body:", request.body)
         if request.method == 'POST':
             try:
                 other = None

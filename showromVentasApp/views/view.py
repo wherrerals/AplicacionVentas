@@ -404,6 +404,8 @@ def actualizarAgregarDirecion(request, socio):
                     if direccion_id:  # Si se proporcionó un ID
                         direccion_obj = DireccionDB.objects.filter(id=direccion_id).first()
 
+                        #verificar la unificacion de los if para que no se repita el codigo
+
                     # Si la dirección existe, actualizarla; si no, crearla
                     if direccion_obj:
                         # Actualizar la dirección existente
@@ -416,10 +418,11 @@ def actualizarAgregarDirecion(request, socio):
                         direccion_obj.pais = pais[i]
                         direccion_obj.save()  # Guardar cambios
                         print(f"Dirección {i+1} actualizada con éxito.")
+                    
                     else:
                         # Crear una nueva dirección si no existe
                         DireccionDB.objects.create(
-                            rownum=1,  # Ajustar según la lógica de generación de números de fila
+                             # Ajustar según la lógica de generación de números de fila
                             nombreDireccion=nombredire,
                             ciudad=ciudad[i],
                             calleNumero=direccion[i],
