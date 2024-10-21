@@ -30,19 +30,20 @@ Decoradores usados:
 @login_required
 def home(request):
     """
-    Rendereriza la pagina principal y muestra el nombre del usuario que ha iniciado sesión
+    Rendereriza la pagina principal y muestra el nombre del usuario y sus grupos que ha iniciado sesión
 
     Args: 
         request (HttpRequest): La petición HTTP recibida.
 
     Returns:
-        HttpResponse: Si el ususario esta autenticado renderiza el template 'home.html' con el nombre de usuario.
-        HttpResponse: Si el usuario no esta autenticado redirige a el template del login.
+        HttpResponse: Si el usuario está autenticado, renderiza el template 'home.html' con el nombre de usuario y los grupos.
+        HttpResponse: Si el usuario no está autenticado, redirige al template del login.
     """
-
     if request.user.is_authenticated:
         username = request.user.username 
-        return render(request, 'home.html', {'username': username}) # Accede al nombre de usuario y permite su uso en el template
+        grupos_usuario = request.user.groups.values_list('name', flat=True)  # Obtiene todos los nombres de los grupos del usuario
+        return render(request, 'home.html', {'username': username, 'grupos_usuario': list(grupos_usuario)})
+
 
 
 @login_required
@@ -349,6 +350,8 @@ def mis_datos(request):
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 
 # Para guardar solo las direcciones
+# pendiente por refactorizar
+# usada en el modal de cotizaciones para actualizar las direcciones
 def actualizarAgregarDirecion(request, socio):
     print("Estos son los datos:", request.POST)
     

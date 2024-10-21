@@ -51,6 +51,7 @@ function traerInformacionCliente(clienteId) {
                 actualizarContactos(cliente.contactos);
                 actualizarDirecciones(cliente.direcciones, '#direcciones_despacho', "12");
                 actualizarDirecciones(cliente.direcciones, '#direcciones_facturacion', "13");
+                cargarInformacionClienteEnModal(cliente);
             } else {
                 console.log('No se encontraron clientes con el número proporcionado.');
             }

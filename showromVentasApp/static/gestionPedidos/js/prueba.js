@@ -58,12 +58,21 @@ function limpiarMensajes() {
 function mostrarMensaje(mensaje, tipo) {
     const contenedorMensajes = document.getElementById('contenedor-mensajes') || document.body;
     const div = document.createElement('div');
-    div.className = `mensaje ${tipo}`;
-    div.textContent = mensaje;
+
+    // Usar clases de Bootstrap para los mensajes
+    div.className = `mensaje alert alert-${tipo === 'error' ? 'danger' : 'success'} alert-dismissible fade show`;
+    div.setAttribute('role', 'alert');
+    div.innerHTML = `
+        ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
     contenedorMensajes.appendChild(div);
 
+    // Eliminar automáticamente el mensaje después de 5 segundos
     setTimeout(() => {
-        div.remove();
+        div.classList.remove('show');  // Desvanecer el mensaje
+        setTimeout(() => div.remove(), 150);  // Luego removerlo del DOM
     }, 5000);
 }
 
