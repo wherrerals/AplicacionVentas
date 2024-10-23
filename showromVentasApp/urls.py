@@ -12,6 +12,7 @@ urlpatterns = [
     path('listado_Cotizaciones/', CotizacionView.as_view(), name='listado_Cotizaciones'),
     path('listado_Cotizaciones_filtrado/', CotizacionView.as_view(), name='listado_Cotizaciones_filtrado'),
     path('agregar_editar_clientes/', SocioNegocioView.as_view(), name='agregar_editar_clientes'),
+    path('informacion_cliente/', SocioNegocioView.as_view(), name='informacion_cliente'),
     path('buscar_clientes/', SocioNegocioView.as_view(), name='busquedaClientes'),
     path('verificar_cliente/', SocioNegocioView.as_view(), name='verificar_cliente'),
     path('listado_productos/', Productos.as_view(), name='listado_productos'),

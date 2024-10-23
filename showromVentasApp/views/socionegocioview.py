@@ -5,8 +5,11 @@ from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
+import logging
 import json
 
+
+logger = logging.getLogger(__name__)
 
 class SocioNegocioView(FormView):
 
@@ -64,6 +67,7 @@ class SocioNegocioView(FormView):
         route_map = {
             '/ventas/buscar_clientes/': self.busquedaSocioNegocio,
             '/ventas/verificar_cliente/': self.verificarSapSocio,
+            '/ventas/informacion_cliente/': self.informacionCliente
         }
 
         # Buscar el método basado en la ruta
@@ -126,39 +130,6 @@ class SocioNegocioView(FormView):
                 # Error inesperado, se loguea y se informa al usuario de forma genérica
                 print(f"Error inesperado: {str(e)}")
                 return JsonResponse({'success': False, 'error': 'Error inesperado, contacte con soporte'}, status=500)
-
-
-
-
-
-    """     
-    @csrf_exempt  # No recomendado para producción. Preferir csrf_protect
-    def creacionCionSocioNeocio(self, request):
-        if request.method == 'POST':
-            try:
-                data = json.loads(request.body)
-            except json.JSONDecodeError:
-                return JsonResponse({'error': 'JSON inválido'}, status=400)
-
-            # Verificar si 'CardCode' está presente en el JSON
-            carcode = data.get('CardCode')
-            if not carcode:
-                return JsonResponse({'error': 'Falta el campo CardCode'}, status=400)
-
-            # Crear el socio_negocio y verificar si ya existe
-            socio_negocio = SocioNegocio(request)
-            verificacion = socio_negocio.verificarSocioNegocioSap(carcode)
-            if verificacion:
-                return JsonResponse({'error': 'Socio de negocio ya existe'}, status=409)  # 409 Conflict
-
-            # Crear el socio de negocio
-            creacion = socio_negocio.creacionSocioSAP(data)
-            return JsonResponse(creacion, status=201)
-
-        return JsonResponse({'error': 'Método no permitido'}, status=405)  # Manejo de métodos no permitidos 
-        """
-
-
             
     def busquedaSocioNegocio(self, request):
         """
@@ -195,9 +166,6 @@ class SocioNegocioView(FormView):
             return JsonResponse({'error': 'No se proporcionó un número o nombre válido'})
 
         return JsonResponse({'error': 'Método no permitido'}, status=405)
-
-
-    
         
     def verificarSapSocio(self, request):
         """
@@ -230,5 +198,52 @@ class SocioNegocioView(FormView):
         
         return JsonResponse({"error": "Método no permitido."}, status=405)
 
+    def informacionCliente(self, request):
+        """
+        Obtiene la información de un cliente por RUT.
 
+        Args:
+            request (HttpRequest): Request HTTP con el parámetro 'rut'
+
+        Returns:
+            JsonResponse: Respuesta JSON con la información del cliente
+        """
+        if request.method != 'GET':
+            return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+        rut = request.GET.get('rut')
+        logger.info(f"Consultando información de cliente con RUT: {rut}")
+
+        if not rut:
+            return JsonResponse({
+                'error': 'No se proporcionó un RUT de socio de negocio'
+            }, status=400)
+
+        try:
+            socio_negocio_service = SocioNegocio(request)
+            resultados = socio_negocio_service.infoCliente(rut)
+            
+            # Si hay un error específico del servicio
+            if isinstance(resultados, dict) and 'error' in resultados:
+                return JsonResponse(resultados, status=500)
+            
+            # Si no hay resultados (lista vacía)
+            if not resultados:
+                return JsonResponse({
+                    'success': True,
+                    'data': [],
+                    'message': f'No se encontraron resultados para el RUT: {rut}'
+                })
+
+            # Respuesta exitosa con datos
+            return JsonResponse({
+                'success': True,
+                'data': resultados
+            }, safe=False)
+
+        except Exception as e:
+            logger.error(f"Error al consultar información del cliente: {str(e)}")
+            return JsonResponse({
+                'error': 'Error al procesar la solicitud'
+            }, status=500)
 

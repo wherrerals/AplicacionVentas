@@ -44,4 +44,21 @@ class SocioNegocioRepository:
     @staticmethod
     def buscarClientesPorNombre(nombre):
         return SocioNegocioDB.objects.filter(nombre__icontains=nombre)
+    
+    def obtenerPorCodigoSN(self, codigoSN):
+        """
+        Obtiene un socio de negocio por su código
+        
+        params:
+            codigoSN: str
+
+            - Código del socio de negocio a buscar
+        
+        return:
+            SocioNegocioDB | None
+        """
+        try:
+            return SocioNegocioDB.objects.get(codigoSN__icontains=codigoSN)
+        except SocioNegocioDB.DoesNotExist:
+            return None
 

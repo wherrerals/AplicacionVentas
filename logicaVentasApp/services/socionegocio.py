@@ -1,5 +1,6 @@
 import json
 import logging
+from venv import logger
 from django.http import JsonResponse
 from django.db import transaction
 from django.core.exceptions import ValidationError
@@ -309,12 +310,14 @@ class SocioNegocio:
             Si se encontraron resultados, retorna un diccionario con los datos de los socios de negocio.
             Si no se encontraron resultados, retorna una lista vacía.
         """
+        print(f"identificador: {identificador}")
 
         try:
             if buscar_por_nombre:
                 # Si se busca por nombre, usa el repositorio que busca por nombre
                 resultados_clientes = SocioNegocioRepository.buscarClientesPorNombre(identificador)
             else:
+                print("Buscando por rut")
                 # Si no, se busca por rut (número)
                 resultados_clientes = SocioNegocioRepository.buscarClientesPorRut(identificador)
 
@@ -804,3 +807,83 @@ class SocioNegocio:
             return {'data': {'success': False, 'message': f'Falta el campo: {str(e)}'}, 'status': 400}
         except json.JSONDecodeError as e:
             return {'data': {'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, 'status': 400}
+
+
+    def infoCliente(self, identificador, buscar_por_nombre=False):
+        """
+        Método para buscar un socio de negocio por nombre o rut.
+
+        Args:
+            identificador (str): Nombre o rut del socio de negocio.
+            buscar_por_nombre (bool): Indica si se busca por nombre o por rut.
+
+        Returns:
+            list: Lista de diccionarios con los datos de los socios de negocio.
+            dict: Diccionario con error en caso de excepción.
+        """
+        logger.info(f"Buscando socio negocio - Identificador: {identificador}, "
+                f"Buscar por nombre: {buscar_por_nombre}")
+
+        try:
+            # Validar que el identificador no esté vacío
+            if not identificador or not identificador.strip():
+                return {'error': 'El identificador está vacío'}
+
+            # Realizar la búsqueda según el tipo
+            if buscar_por_nombre:
+                resultados_clientes = SocioNegocioRepository.buscarClientesPorNombre(identificador)
+            else:
+                resultados_clientes = SocioNegocioRepository.buscarClientesPorRut(identificador)
+
+            # Si no hay resultados, retornar lista vacía
+            if not resultados_clientes:
+                logger.info(f"No se encontraron resultados para el identificador: {identificador}")
+                return []
+
+            resultados_formateados = []
+
+            # Procesar cada socio encontrado
+            for socio in resultados_clientes:
+                try:
+                    # Prefetch de direcciones y contactos
+                    direcciones = DireccionDB.objects.filter(
+                        SocioNegocio=socio
+                    ).select_related('comuna', 'region')
+                    
+                    contactos = ContactoDB.objects.filter(
+                        SocioNegocio=socio
+                    )
+
+                    # Formatear datos
+                    direcciones_formateadas = self.formatear_direcciones(direcciones)
+                    contactos_formateados = self.formatear_contactos(contactos)
+
+                    # Crear diccionario con datos del socio
+                    socio_formateado = {
+                        'nombre': socio.nombre or '',
+                        'apellido': socio.apellido or '',
+                        'razonSocial': socio.razonSocial or '',
+                        'codigoSN': socio.codigoSN or '',
+                        'rut': socio.rut or '',
+                        'email': socio.email or '',
+                        'telefono': socio.telefono or '',
+                        'giro': socio.giro or '',
+                        'condicionPago': socio.condicionPago or '',
+                        'plazoReclamaciones': socio.plazoReclamaciones or '',
+                        'clienteExportacion': socio.clienteExportacion or False,
+                        'vendedor': socio.vendedor or '',
+                        'direcciones': direcciones_formateadas,
+                        'contactos': contactos_formateados
+                    }
+                    
+                    resultados_formateados.append(socio_formateado)
+                    
+                except Exception as e:
+                    logger.error(f"Error al formatear socio {socio.rut}: {str(e)}")
+                    continue
+
+            return resultados_formateados
+
+        except Exception as e:
+            logger.error(f"Error al buscar socio negocio: {str(e)}")
+            return {'error': f'Error al realizar la búsqueda: {str(e)}'}
