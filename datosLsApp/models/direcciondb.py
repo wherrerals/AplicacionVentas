@@ -10,7 +10,7 @@ class DireccionDB(models.Model):
         verbose_name = 'Direccion'
         verbose_name_plural = 'Direccion'
 
-    rowNum = models.IntegerField(default='0 ') #dato SAP por socio negocio
+    rowNum = models.IntegerField(default=0) #dato SAP por socio negocio
     nombreDireccion = models.CharField(max_length=50,null = False) #identificador natural 
     ciudad = models.CharField(max_length=50, default='prueba')
     calleNumero = models.CharField(max_length=50) #corresponde a direccio en direccion

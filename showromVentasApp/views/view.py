@@ -11,8 +11,7 @@ from django.http import JsonResponse, HttpResponse
 from datosLsApp.models.usuariodb import User 
 from datosLsApp.models import (ProductoDB, SocioNegocioDB, UsuarioDB, RegionDB, GrupoSNDB, TipoSNDB, TipoClienteDB, DireccionDB, ComunaDB, ContactoDB)
 from adapters.sl_client import APIClient
-
-
+from logicaVentasApp.services.socionegocio import SocioNegocio
 #librerias Python usadas
 import requests
 import json
@@ -301,6 +300,7 @@ def registrarCuenta(request):
     return render(request,"micuenta.html",{'email': email, "nombre": nombre, "telefono":telefono,"mensaje_error_contrasena": mensaje})
 
 #agregaado vista para modificar los datos
+
 @login_required
 def mis_datos(request):
 
@@ -349,198 +349,33 @@ def mis_datos(request):
 
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 
-# Para guardar solo las direcciones
-# pendiente por refactorizar
-# usada en el modal de cotizaciones para actualizar las direcciones
+
 def actualizarAgregarDirecion(request, socio):
-    print("Estos son los datos:", request.POST)
-    
     if request.method == "POST":
         try:
-            # Obtener el campo 'direcciones' que es una lista con un JSON como cadena
-            direcciones_json = request.POST.getlist('direcciones')
-            
-            # Verificar si el campo no es nulo y luego deserializar el JSON
-            if direcciones_json:
-                direcciones = json.loads(direcciones_json[0])  # Accedes al primer elemento de la lista y lo deserializas
-                print("Datos de direcciones:", direcciones)
-                
-                # Extraer los valores necesarios desde el JSON deserializado
-                tipo = [direccion.get('tipoDireccion') for direccion in direcciones]
-                nombreDireccion = [direccion.get('nombreDireccion') for direccion in direcciones]
-                ciudad = [direccion.get('ciudad') for direccion in direcciones]
-                pais = [direccion.get('pais') for direccion in direcciones]
-                region = [direccion.get('region') for direccion in direcciones]
-                comuna = [direccion.get('comuna') for direccion in direcciones]
-                direccion = [direccion.get('direccion') for direccion in direcciones]
+            print("Estos son los datos:", request.POST)
+            # Delegamos la lógica de procesamiento al servicio
+            result = SocioNegocio.procesarDirecciones(request.POST, socio)
+            return JsonResponse(result['data'], status=result['status'])
 
-                # Imprimir los valores para debug
-                print(f"tipo de direcciones: {tipo}")
-                print(f"nombres de direcciones: {nombreDireccion}")
-                print(f"ciudades: {ciudad}")
-                print(f"paises: {pais}")
-                print(f"regiones: {region}")
-                print(f"comunas: {comuna}")
-                print(f"direcciones: {direccion}")
-            else:
-                return JsonResponse({'success': False, 'message': 'No se encontraron direcciones en el request.'}, status=400)
-
-            # Verificar que todas las listas tienen la misma longitud
-            if not all(len(lst) == len(nombreDireccion) for lst in [ciudad, direccion, tipo, pais, region, comuna]):
-                return JsonResponse({'success': False, 'message': 'Las listas deben tener la misma longitud.'}, status=400)
-
-            # Procesar cada dirección
-            for i in range(len(nombreDireccion)):
-                print(f"Procesando dirección {i+1}:")
-                nombredire = nombreDireccion[i].strip()  # Eliminar espacios en blanco
-                
-                if nombredire:  # Comprobar que el nombre de dirección no esté vacío
-                    fregion = get_object_or_404(RegionDB, numero=region[i])
-                    fcomuna = get_object_or_404(ComunaDB, codigo=comuna[i])
-
-                    # Buscar la dirección existente por ID (si tienes un campo para esto)
-                    direccion_obj = None
-
-                    # Aquí asumo que hay un campo opcional 'id' en el JSON para identificar direcciones existentes
-                    direccion_id = direcciones[i].get('direccionId') # Extraer ID si existe
-                    print(f"ID de la dirección: {direccion_id}")
-                    if direccion_id:  # Si se proporcionó un ID
-                        direccion_obj = DireccionDB.objects.filter(id=direccion_id).first()
-
-                        #verificar la unificacion de los if para que no se repita el codigo
-
-                    # Si la dirección existe, actualizarla; si no, crearla
-                    if direccion_obj:
-                        # Actualizar la dirección existente
-                        direccion_obj.nombreDireccion = nombredire
-                        direccion_obj.ciudad = ciudad[i]
-                        direccion_obj.calleNumero = direccion[i]
-                        direccion_obj.comuna = fcomuna
-                        direccion_obj.region = fregion
-                        direccion_obj.tipoDireccion = tipo[i]
-                        direccion_obj.pais = pais[i]
-                        direccion_obj.save()  # Guardar cambios
-                        print(f"Dirección {i+1} actualizada con éxito.")
-                    
-                    else:
-                        # Crear una nueva dirección si no existe
-                        DireccionDB.objects.create(
-                             # Ajustar según la lógica de generación de números de fila
-                            nombreDireccion=nombredire,
-                            ciudad=ciudad[i],
-                            calleNumero=direccion[i],
-                            codigoImpuesto='iva',  # Ajustar según la lógica de códigos de impuestos
-                            tipoDireccion=tipo[i],
-                            pais=pais[i],
-                            SocioNegocio=socio,
-                            comuna=fcomuna,
-                            region=fregion,
-                        )
-                        
-                        print(f"Dirección {i+1} creada con éxito.")
-                else:
-                    print(f"No se ha creado ni actualizado la dirección {i+1} porque el nombre está vacío.")
-            
-            return JsonResponse({'success': True, 'message': 'Direcciones actualizadas o creadas con éxito.'})
-
-        except KeyError as e:
-            return JsonResponse({'success': False, 'message': f'Falta el campo: {str(e)}'}, status=400)
-        except json.JSONDecodeError as e:
-            return JsonResponse({'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, status=400)
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
     return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
 
+
 def actualizarAgregarContacto(request, socio):
-    print("Estos son los datos:", request.POST)
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
-            # Obtener el campo 'contactos' que es una lista con un JSON como cadena
-            contactos_json = request.POST.getlist('contactos')
-            
-            # Verificar si el campo no es nulo y luego deserializar el JSON
-            if contactos_json:
-                contactos = json.loads(contactos_json[0])  # Accedes al primer elemento de la lista y lo deserializas
-                print("Datos de contactos:", contactos)
-                
-                # Extraer los valores necesarios desde el JSON deserializado
-                nombres = [contacto.get('nombre') for contacto in contactos]
-                apellidos = [contacto.get('apellido') for contacto in contactos]
-                telefonos = [contacto.get('telefono') for contacto in contactos]
-                celulares = [contacto.get('celular') for contacto in contactos]
-                emails = [contacto.get('email') for contacto in contactos]
+            print("Estos son los datos:", request.POST)
+            # Delegamos la lógica de procesamiento al servicio
+            result = SocioNegocio.procesarContactos(request.POST, socio)
+            return JsonResponse(result['data'], status=result['status'])
 
-                # Imprimir los valores para debug
-                print(f"nombres: {nombres}")
-                print(f"apellidos: {apellidos}")
-                print(f"telefonos: {telefonos}")
-                print(f"celulares: {celulares}")
-                print(f"emails: {emails}")
-            else:
-                return JsonResponse({'success': False, 'message': 'No se encontraron contactos en el request.'}, status=400)
-
-            # Verificar que todas las listas tienen la misma longitud
-            if not all(len(lst) == len(nombres) for lst in [apellidos, telefonos, celulares, emails]):
-                return JsonResponse({'success': False, 'message': 'Las listas deben tener la misma longitud.'}, status=400)
-
-            # Procesar cada contacto
-            for i in range(len(nombres)):
-                print(f"Procesando contacto {i+1}:")
-                nombre = nombres[i].strip()  # Eliminar espacios en blanco
-                apellido = apellidos[i].strip()  # Eliminar espacios en blanco
-                
-                if nombre and apellido:  # Comprobar que el nombre y apellido no estén vacíos
-                    nombreCompleto = f"{nombre} {apellido}"
-                    telefono = telefonos[i]
-                    celular = celulares[i]
-                    email = emails[i]
-
-                    # Buscar el contacto existente por ID (si tienes un campo
-                    # opcional 'id' en el JSON para identificar contactos existentes)
-                    contacto_obj = None
-
-                    # Aquí asumo que hay un campo opcional 'id' en el JSON para identificar contactos existentes
-                    contacto_id = contactos[i].get('contacto_id')  # Extraer ID si existe
-                    print(f"ID del contacto: {contacto_id}")
-                    if contacto_id:  # Si se proporcionó un ID
-                        contacto_obj = ContactoDB.objects.filter(id=contacto_id).first()
-
-                    # Si el contacto existe, actualizarlo; si no, crearlo
-                    if contacto_obj:
-                        # Actualizar el contacto existente
-                        contacto_obj.nombreCompleto = nombreCompleto
-                        contacto_obj.nombre = nombre
-                        contacto_obj.apellido = apellido
-                        contacto_obj.telefono = telefono
-                        contacto_obj.celular = celular
-                        contacto_obj.email = email
-                        contacto_obj.save()
-                        print(f"Contacto {i+1} actualizado con éxito.")
-                    else:
-                        # Crear un nuevo contacto si no existe
-                        ContactoDB.objects.create(
-                            codigoInternoSap=1,  # Aquí deberías manejar la lógica del código interno si es variable
-                            nombreCompleto=nombreCompleto,
-                            nombre=nombre,
-                            apellido=apellido,
-                            telefono=telefono,
-                            celular=celular,
-                            email=email,
-                            SocioNegocio=socio
-                        )
-                        print(f"Contacto {i+1} creado con éxito.")
-                else:   
-                    print(f"No se ha creado ni actualizado el contacto {i+1} porque el nombre o apellido está vacío.")
-
-            return JsonResponse({'success': True, 'message': 'Contactos actualizados o creados con éxito.'})
-        
-        except KeyError as e:
-            return JsonResponse({'success': False, 'message': f'Falta el campo: {str(e)}'}, status=400)
-        except json.JSONDecodeError as e:
-            return JsonResponse({'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, status=400)
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+    return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
 
 
 
