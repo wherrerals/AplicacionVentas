@@ -13,7 +13,8 @@ function submitForm() {
     const rut = document.getElementById("inputCliente").getAttribute("data-codigoSN");
     const cardCode = rut;
     const pgc = -1;
-    const spc = 41; //document.getElementById("salesPersonCode").value;
+    const spcInt  = document.getElementById("vendedor_data").getAttribute("data-codeVen");
+    const spc  = parseInt(spcInt, 10); // Convertir a entero con base 10
     const trnasp = 1; //document.getElementById("transportationCode").value;
     const ultv = 1; //document.getElementById("uledtipoventa").value;
     const ultd = "RESE"; //document.getElementById("uledtipodoc").value;

@@ -39,10 +39,26 @@ def home(request):
         HttpResponse: Si el usuario no está autenticado, redirige al template del login.
     """
     if request.user.is_authenticated:
-        username = request.user.username 
-        grupos_usuario = request.user.groups.values_list('name', flat=True)  # Obtiene todos los nombres de los grupos del usuario
-        return render(request, 'home.html', {'username': username, 'grupos_usuario': list(grupos_usuario)})
+        username = request.user.username
 
+        try:
+            usuario = UsuarioDB.objects.get(usuarios=request.user)
+            nombreUser = usuario.nombre
+            grupos_usuario = request.user.groups.values_list('name', flat=True)  # Obtiene todos los nombres de los grupos del usuario
+
+
+        except UsuarioDB.DoesNotExist:
+            return JsonResponse({'error': 'No se encontró el usuario relacionado con el usuario autenticado'}, status=404)
+        
+
+        
+        context = {
+            'username': username,
+            'nombreuser': nombreUser,
+            'grupos_usuario': list(grupos_usuario)
+        }
+
+        return render(request, 'home.html', context)
 
 
 @login_required
@@ -123,6 +139,7 @@ def quotations(request):
             usuario = UsuarioDB.objects.get(usuarios=request.user)
             sucurs = usuario.sucursal  # Accede a la sucursal a través del modelo UsuarioDB
             nombreUser = usuario.nombre  # Accede al nombre del usuario a través del modelo UsuarioDB
+            codVen = usuario.vendedor.codigo  # Accede al código del vendedor a través del modelo UsuarioDB
 
         except UsuarioDB.DoesNotExist:
             # Maneja el caso en que no se encuentre el usuario relacionado
@@ -140,7 +157,8 @@ def quotations(request):
             'username': username,
             'regiones': regiones,
             'sucursal': sucurs,
-            'nombreuser': nombreUser
+            'nombreuser': nombreUser,
+            'codigoVendedor': codVen
         }
 
         # Renderiza el template con el contexto

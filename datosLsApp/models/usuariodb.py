@@ -14,6 +14,7 @@ class UsuarioDB(models.Model):
     telefono = models.CharField(max_length=15)
     usuarios = models.OneToOneField(User, on_delete=models.CASCADE)
     sucursal = models.ForeignKey('SucursalDB', on_delete=models.CASCADE, default=1)
+    vendedor = models.ForeignKey('VendedorDB', on_delete=models.CASCADE, default=1)
     
     def __str__(self):
         return f'{self.nombre}'

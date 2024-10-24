@@ -29,7 +29,7 @@ class CondicionPagoper(admin.ModelAdmin):
     list_display = ('codigo', 'nombre')
 
 class VendedorDBper(admin.ModelAdmin):
-    list_display = ('codigo', 'nombre', 'sucursal')
+    list_display = ('codigo', 'nombre')
 
 class DocumentoDBper(admin.ModelAdmin):
     list_display = ('docEntry', 'folio', 'totalAntesDelDescuento', 'totalDocumento', 'vendedor')
@@ -50,7 +50,7 @@ class SocioNegocioDBper(admin.ModelAdmin):
 
 
 class UsuarioDBper(admin.ModelAdmin):
-    list_display = ('nombre', 'email', 'telefono', 'sucursal', 'usuarios')
+    list_display = ('nombre', 'email', 'telefono', 'usuarios', 'sucursal', 'vendedor')
 
 class ContactoDBper(admin.ModelAdmin):
     list_display = ('nombreCompleto',)
