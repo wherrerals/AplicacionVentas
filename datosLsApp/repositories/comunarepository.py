@@ -1,6 +1,13 @@
 from datosLsApp.models import ComunaDB
 
 class ComunaRepository:
+    """
+    Repositorio de Comunas
+
+    Metodos disponibles:
+    - obtenerComunasPorRegion(region)
+    
+    """
 
     def obtenerComunasPorRegion(self, region):
         """

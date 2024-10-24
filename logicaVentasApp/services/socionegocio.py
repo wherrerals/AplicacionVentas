@@ -16,7 +16,38 @@ from adapters.sl_client import APIClient
 
 
 class SocioNegocio:
+    """
+    Clase para la lógica de negocio de los socios de negocio.
 
+    Metodos disponibles:
+
+    - validarDatosObligatorios()
+    - crearOActualizarCliente()
+    - obtenerGrupoSN()
+    - obtenerTipoCliente()
+    - procesarClienteExistente(codigosn)
+    - obtenerTipoSN()
+    - crearNuevoCliente(codigosn, tiposn, grupoSN, tipoCliente)
+    - manejarErrorValidacion(e)
+    - manejarErrorGeneral(e)
+    - crearClientePersona(self, codigosn, rut, tiposn, tipocliente, email, grupoSN)
+    - crearClienteEmpresa(self, codigosn, tiposn, grupoSN, tipoCliente)
+    - validardatosObligatorios(self)
+    - generarCodigoSN(rut)
+    - agregarDireccionYContacto(request, cliente)
+    - buscarSocioNegocio(identificador, buscar_por_nombre=False)
+    - formatear_direcciones(direcciones)
+    - formatear_contactos(contactos)
+    - validarGrupoSN(self)
+    - validarRut(self)
+    - validarEmail(self)
+    - verificarSocioNegocioSap(cardCode)
+    - prepararJsonCliente(jsonData)
+    - creacionSocioSAP(data)
+    - verificarRutValido(rut)
+    - procesarDirecciones(data, socio)
+    - procesarContactos(data, socio)
+    """
     def __init__(self, request):
         """
         Constructor de la clase SocioNegocio
@@ -74,46 +105,29 @@ class SocioNegocio:
 
         rutVerificado = self.verificarRutValido(self.rut)
         
-        print(f"Rut verificado: {rutVerificado}")
         if not rutVerificado:
             return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)
 
         try:
-            print("Creando o actualizando cliente...")
-            print(f"validando datos obligatorios")
-            self.validarDatosObligatorios()
-            print(f"Datos obligatorios validados")
-            codigosn = SocioNegocio.generarCodigoSN(self.rut)
-            print(f"Código de socio de negocio: {codigosn}")
-            grupoSN = self.obtenerGrupoSN()
-            print(f"Grupo de socio de negocio: {grupoSN}")
-            tipoCliente = self.obtenerTipoCliente()
-            print(f"Tipo de cliente: {tipoCliente}")
 
+            self.validarDatosObligatorios()
+            codigosn = SocioNegocio.generarCodigoSN(self.rut)
+            grupoSN = self.obtenerGrupoSN()
+            tipoCliente = self.obtenerTipoCliente()
             clienteExistente = SocioNegocioRepository.obtenerPorRut(self.rut)
 
-            print(f"Cliente existente: {clienteExistente}")
-
             if clienteExistente is not None:
-                print("Cliente existente encontrado")
                 return self.procesarClienteExistente(codigosn)
 
             tiposn = self.obtenerTipoSN()
 
             with transaction.atomic():
-                print("Creando nuevo cliente...")
                 cliente = self.crearNuevoCliente(codigosn, tiposn, grupoSN, tipoCliente)
 
-                
-                print
-
-                print(f"Cliente creado: {cliente}")
-
-                print("Creando cliente en SAP...")
                 json_data = self.prepararJsonCliente(self.request.POST)
+
                 self.creacionSocioSAP(json_data)
-                print("Cliente creado en SAP")
-            
+
                 return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
 
         except ValidationError as e:
@@ -122,12 +136,32 @@ class SocioNegocio:
             return self.manejarErrorGeneral(e)
 
     def obtenerGrupoSN(self):
+        """
+        Método para obtener el grupo de socio de negocio.
+
+        Raises:
+            ValidationError: Si el grupo de socio de negocio no se encuentra.
+
+        Returns:
+            GrupoSNDB: Grupo de socio de negocio.
+        """
+
         grupoSN = GrupoSNRepository.obtenerGrupoSNPorCodigo(self.gruposn)
         if not grupoSN:
             raise ValidationError(f"Grupo de socio de negocio no encontrado para el código: {self.gruposn}")
         return grupoSN
 
     def obtenerTipoCliente(self):
+        """
+        Método para obtener el tipo de cliente 'Natural'.
+
+        Raises:
+            ValidationError: Si el tipo de cliente no se encuentra.
+
+        Returns:
+            TipoClienteDB: Tipo de cliente 'Natural'.
+        """
+
         tipoCliente = TipoClienteRepository.obtenerTipoClientePorCodigo('N')
         if not tipoCliente:
             raise ValidationError("Tipo de cliente no encontrado")
@@ -135,28 +169,58 @@ class SocioNegocio:
 
     def procesarClienteExistente(self, codigosn):
 
-        print("Procesando cliente existente...")
+        """
+        Método para procesar un cliente existente.
+
+        Args:
+            codigosn (str): Código del socio de negocio.
+
+        Returns:
+            Si el cliente ya existe en SAP y en la base de datos, retorna un JsonResponse con un mensaje de éxito.
+            Si el cliente ya existe en la base de datos pero no en SAP, retorna un JsonResponse con un mensaje de éxito.
+        """
+
         verificacionSap = self.verificarSocioNegocioSap(codigosn)
-        print(f"Verificación en SAP: {verificacionSap}")
-        print(f"cogidoSN: {codigosn}")
 
         if verificacionSap:
-            print("Cliente ya existe en SAP y en la base de datos")
             return JsonResponse({'success': True, 'message': 'Cliente ya existe en SAP y en la base de datos'})
         
         else:
-            print("Cliente ya existe en la base de datos, pero no en SAP")
             json_data = self.prepararJsonCliente(self.request.POST)
             self.creacionSocioSAP(json_data)
             return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
 
     def obtenerTipoSN(self):
+        """
+        Método para obtener el tipo de socio de negocio 'Cliente' o 'Proveedor'.
+
+        Raises:
+            ValidationError: Si el tipo de socio de negocio no se encuentra.
+
+        Returns:
+            TipoSNDB: Tipo de socio de negocio.
+        """
+
         tiposn = TipoSNRepository.obtenerTipoSnPorCodigo('C' if self.gruposn == '100' else 'I')
         if not tiposn:
             raise ValidationError(f"Tipo de socio de negocio no encontrado para el código: {'C' if self.gruposn == '100' else 'I'}")
         return tiposn
 
     def crearNuevoCliente(self, codigosn, tiposn, grupoSN, tipoCliente):
+        """
+        Método para crear un nuevo cliente.
+
+        Args:
+            codigosn (str): Código del socio de negocio.
+            tiposn (TipoSNDB): Tipo de socio de negocio.
+            grupoSN (GrupoSNDB): Grupo de socio de negocio.
+            tipoCliente (TipoClienteDB): Tipo de cliente.
+
+        Returns:
+            Si el cliente se creó exitosamente, retorna un JsonResponse con un mensaje de éxito.
+            Si hubo un error, retorna un JsonResponse con un mensaje de error y un código de estado 400 o 500.
+        """
+
         with transaction.atomic():
             if self.gruposn == '100':
                 cliente = self.crearClientePersona(self, codigosn, self.rut, tiposn, tipoCliente, self.email, grupoSN)
@@ -171,9 +235,29 @@ class SocioNegocio:
         return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
 
     def manejarErrorValidacion(self, e):
+        """
+        Método para manejar errores de validación.
+
+        Args:
+            e (ValidationError): Error de validación.
+
+        Returns:
+            JsonResponse: JsonResponse con un mensaje de error y un código de estado 400.
+        """
+
         return JsonResponse({'success': False, 'message': str(e)}, status=400)
 
     def manejarErrorGeneral(self, e):
+        """
+        Método para manejar errores generales.
+
+        Args:
+            e (Exception): Error general.
+
+        Returns:
+            JsonResponse: JsonResponse con un mensaje de error y un código de estado 500.
+        """
+
         return JsonResponse({'success': False, 'message': 'Error al crear el cliente'}, status=500)
 
 
@@ -245,7 +329,6 @@ class SocioNegocio:
         email = self.request.POST.get('emailSN')
 
         if not all([gruposn, rut, email]):
-            print("Datos obligatorios faltantes")
             raise ValidationError("Faltan datos obligatorios")
         return gruposn, rut, email
 
@@ -282,19 +365,15 @@ class SocioNegocio:
             Si hubo un error, retorna un JsonResponse con un mensaje de error y un código de estado 400 o 500.
         """
 
-        print("Agregando dirección y contacto...")
-        print(f"dirección: {request.POST.get('nombre_direccion[]')}")
         from showromVentasApp.views.view import agregarDireccion, agregarContacto
 
         if 'nombre_direccion[]' not in request.POST:
-            print("Dirección faltante")
             raise ValidationError("Debe agregar al menos una dirección")
         agregarDireccion(request, cliente)
 
         if 'nombre' not in request.POST:
             agregarContacto(request, cliente)
         else:
-            print("Contacto faltante")
             raise ValidationError("Debe agregar al menos un contacto")
 
 
@@ -461,20 +540,14 @@ class SocioNegocio:
         client = APIClient()
 
         try:
-            print("Verificando socio de negocio en SAP...")
-            
             response = client.verificarCliente(endpoint="BusinessPartners", cardCode=cardCode)
-            print(f"Response: {response}")
 
             # Verifica si la respuesta contiene el 'CardCode'
             if 'CardCode' in response:
-                print(f"Socio de negocio encontrado: {response['CardCode']}")
                 return True
             else:
-                print("Socio de negocio no encontrado.")
                 return False
         except Exception as e:
-            print(f"Error al verificar socio de negocio en SAP: {str(e)}")
             return False
     
     def prepararJsonCliente(self, jsonData):
@@ -490,18 +563,14 @@ class SocioNegocio:
         """
         
         # Datos de la cabecera
-        print("Preparando JSON para el socio de negocio...")
-        print(f"Datos recibidos: {jsonData}")
-        cardCode = jsonData.get('rutSN')
-        print(f"CardCode: {cardCode}")
 
+        cardCode = jsonData.get('rutSN')
         nombre = jsonData.get('nombreSN')
         apellido = jsonData.get('apellidoSN')
 
         # Obtener cliente
         try:
-            cliente = SocioNegocioDB.objects.get(rut=cardCode)  # Asumiendo que 'rut' es el identificador único
-            print(f"Cliente: {cliente}")
+            cliente = SocioNegocioDB.objects.get(rut=cardCode)
         except SocioNegocioDB.DoesNotExist:
             raise ValueError(f"No se encontró el cliente con RUT: {cardCode}")
 
@@ -596,19 +665,13 @@ class SocioNegocio:
         client = APIClient()
         
         try:
-            print("Creando socio de negocio en SAP...")
-
-
             # Enviar solicitud a SAP
-            print(f"Datos a enviar: {data}")
             response = client.crearCliente(data)
-            print(f"Respuesta de la API: {response}")
             
             if isinstance(response, dict):
                 # Verificar si la respuesta contiene un 'CardCode'
                 if 'CardCode' in response:
                     card_code = response.get('CardCode')
-                    print(f"Socio de negocio creado exitosamente con CardCode: {card_code}")
                     
                     # Extraer BPAddresses si está presente
                     bp_addresses = response.get('BPAddresses', [])
@@ -630,24 +693,18 @@ class SocioNegocio:
                 # Manejar el mensaje de error si lo hay
                 elif 'error' in response:
                     error_message = response.get('error', 'Error desconocido')
-                    print(f"Error devuelto por la API: {error_message}")
                     return {'error': f"Error: {error_message}"}
                 else:
-                    print("Respuesta inesperada de la API.")
                     return {'error': 'Respuesta inesperada de la API.'}
             
             else:
-                print("La respuesta de la API no es válida o no es un diccionario.")
                 return {'error': 'La respuesta de la API no es válida.'}
 
         except json.JSONDecodeError as e:
-            print(f"Error al decodificar el JSON: {str(e)}")
             return {'error': 'Error al decodificar el JSON.'}
         except ConnectionError as e:
-            print(f"Error de conexión con SAP: {str(e)}")
             return {'error': 'Error de conexión con SAP.'}
         except Exception as e:
-            print(f"Error general al crear socio de negocio en SAP: {str(e)}")
             return {'error': f"Error inesperado: {str(e)}"}
 
     def verificarRutValido(self, rut):
@@ -697,11 +754,21 @@ class SocioNegocio:
             return digito_calculado == digito_verificador
 
         except Exception as e:
-            print(f"Error al verificar RUT: {str(e)}")
             return False
 
     def procesarDirecciones(data, socio):
+        """
+        Método para procesar las direcciones de un socio de negocio.
 
+        Args:
+
+            data (QueryDict): Datos de las direcciones.
+            socio (SocioNegocioDB): Socio de negocio al que se le agregarán las direcciones.
+
+        Returns:
+
+            JsonResponse: JsonResponse con un mensaje de éxito o error.
+        """
         try:
             # Obtener la lista de direcciones como JSON
             direcciones_json = data.getlist('direcciones')
@@ -711,7 +778,6 @@ class SocioNegocio:
             
             # Deserializar el JSON
             direcciones = json.loads(direcciones_json[0])
-            print(f"Direcciones deserializadas: {direcciones}")
             
             # Extraer campos relevantes
             tipo = [direccion.get('tipoDireccion') for direccion in direcciones]
@@ -756,11 +822,11 @@ class SocioNegocio:
             return {'data': {'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, 'status': 400}
         
     def procesarContactos(data, socio):
-
-        print("Procesando contactos...")
+        """
+        
+        """
         try:
             contactos_json = data.getlist('contactos')
-            print(f"Contactos JSON: {contactos_json}")
 
             if not contactos_json:
                 return JsonResponse({'success': False, 'message': 'No se encontraron contactos en el request.'}, status=400)
@@ -776,7 +842,6 @@ class SocioNegocio:
 
             # Verifica la longitud de todas las listas
             if not all(len(lst) == len(nombres) for lst in [apellidos, telefonos, celulares, emails]):
-                print("Las listas deben tener la misma longitud.")
                 return JsonResponse({'success': False, 'message': 'Las listas deben tener la misma longitud.'}, status=400)
 
             for i in range(len(nombres)):
@@ -789,13 +854,11 @@ class SocioNegocio:
                         contacto_obj = ContactoRepository.obtenerContacto(contacto_id)
 
                         if contacto_obj:
-                            print(f"Actualizando contacto {i+1}...")
                             ContactoRepository.actualizarContacto(contacto_obj, nombre, apellidos[i], telefonos[i], celulares[i], emails[i])
                     else:
                         try:
                             ContactoRepository.crearContacto(socio, nombre, apellidos[i], telefonos[i], emails[i], celulares[i])
                         except Exception as e:
-                            print(f"Error al crear el contacto: {str(e)}")
                             return JsonResponse({'success': False, 'message': f'Error al crear el contacto: {str(e)}'}, status=500)
 
                 else:

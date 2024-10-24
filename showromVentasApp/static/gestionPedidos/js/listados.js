@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><a href="${urlModel}">${quotation.DocNum}</a></td>
-                <td><a href="/cliente.html">${quotation.CardName || 'Cliente Desconocido'}</a></td>
+                <td><a href="/cliente.html" cadcode-data="${quotation.CardCode}">${quotation.CardName || 'Cliente Desconocido'}</a></td>
                 <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
                 <td>${quotation.DocDate}</td>
                 <td>${status}</td>
@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
             fecha_fin: document.querySelector('[name="fecha_fin"]').value,
             fecha_doc: document.querySelector('[name="fecha_documento"]').value,
             docNum: document.querySelector('[name="docNum"]').value,
-            cardNAme: document.querySelector('[name="cardNAme"]').value,
+            carData: document.querySelector('[name="cardNAme"]').value,
             salesEmployeeName: document.querySelector('[name="salesEmployeeName"]').value,
             DocumentStatus: document.querySelector('[name="DocumentStatus"]').value,
             docTotal: document.querySelector('[name="docTotal"]').value
@@ -134,6 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const paginationContainer = document.querySelector('.pagination');
         paginationContainer.innerHTML = ''; // Limpiar la paginación actual
 
+        // Si no conocemos el total de páginas, no mostramos la paginación
         // Botón "Anterior"
         const prevButton = document.createElement('li');
         prevButton.classList.add('page-item');

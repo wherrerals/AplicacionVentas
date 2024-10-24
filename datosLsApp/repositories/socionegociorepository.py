@@ -1,6 +1,19 @@
 from datosLsApp.models import SocioNegocioDB
 
 class SocioNegocioRepository:
+
+    """
+    Repositorio de Socios de Negocio
+
+    Metodos disponibles:
+
+    - obtenerPorRut(rut)
+    - crearCliente(**kwargs)
+    - buscarClientesPorRut(rut)
+    - buscarClientesPorNombre(nombre)
+    - obtenerPorCodigoSN(codigoSN)
+
+    """
     
     @staticmethod
     def obtenerPorRut(rut):
@@ -39,6 +52,15 @@ class SocioNegocioRepository:
 
     @staticmethod
     def buscarClientesPorRut(rut):
+        """
+        Busca clientes por rut
+        
+        params:
+            rut: str - Rut del cliente a buscar
+        
+        return:
+            QuerySet - Clientes encontrados
+            """
         return SocioNegocioDB.objects.filter(rut__icontains=rut)
 
     @staticmethod

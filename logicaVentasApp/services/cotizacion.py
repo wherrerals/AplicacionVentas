@@ -7,6 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Cotizacion(Documento):
+
     """
     Clase para manejar las cotizaciones en la aplicación.
 
@@ -29,13 +30,16 @@ class Cotizacion(Documento):
         eliminarDocumento: Elimina una cotización.
         actualizarEstadoDocumento: Actualiza el estado de una cotización.
     """
+    
     def __init__(self, request=None):
+        
         """
         Inicializa una nueva instancia de la clase Cotizacion.
 
         Args:
             request (dict): Datos de la cotización.
         """
+
         super().__init__(request)
         self.client = APIClient()
         self.cliente = None
@@ -124,19 +128,40 @@ class Cotizacion(Documento):
         if data.get('docNum'):
             docum = int(data.get('docNum'))
             filters['contains(Quotations/DocNum,'] = f"{docum})"
-        if data.get('carCode'):
-            filters['contains(Quotations/CardCode,'] = f"'{data.get('carCode')}'"
-        if data.get('cardNAme'):
-            filters['contains(Quotations/CardName,'] = f"'{data.get('cardNAme')}')"
+
+        if data.get('carData'):
+            car_data = data.get('carData')
+            
+            if car_data.isdigit():  # Si es un número
+                filters['contains(Quotations/CardCode,'] = f"'{car_data}')"
+            else:  # Si contiene letras (nombre)
+                filters['contains(Quotations/CardName,'] = f"'{car_data}')"
+
         if data.get('salesEmployeeName'):
-            filters['contains(SalesPersons/SalesEmployeeName,'] = f"'{data.get('salesEmployeeName')}'"
+            filters['contains(SalesPersons/SalesEmployeeName,'] = f"'{data.get('salesEmployeeName')}'" 
+        
+        #if data.get('DocumentStatus'):
+        #   filters['Quotations/DocumentStatus eq'] = f"'{data.get('DocumentStatus')}'"
+
+        #if data.get('cancelled'):
+        #    filters['Quotations/Cancelled eq'] = f"'{data.get('cancelled')}'"
+
         if data.get('DocumentStatus'):
-            filters['Quotations/DocumentStatus eq'] = f"'{data.get('DocumentStatus')}'"
+            document_status = data.get('DocumentStatus')
+
+            if document_status == 'O':
+                filters['Quotations/DocumentStatus eq'] = "'O'"
+            elif document_status == 'C':
+                filters['Quotations/DocumentStatus eq'] = "'C'"
+                filters['Quotations/Cancelled eq'] = "'N'"
+                
+            else:
+                filters['Quotations/Cancelled eq'] = "'Y'"
+
         if data.get('docTotal'):
             docTotal = float(data.get('docTotal'))
-            filters['contains(Quotations/DocTotal,'] = f"{docTotal})"
-        if data.get('cancelled'):
-            filters['Quotations/Cancelled eq'] = f"'{data.get('cancelled')}'"
+            filters['Quotations/DocTotal eq'] = f"{docTotal}"
+
 
         # Limpiar filtros vacíos o inválidos
         filters = {k: v for k, v in filters.items() if v and v != "''"}
