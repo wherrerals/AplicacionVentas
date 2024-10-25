@@ -251,6 +251,7 @@ class SocioNegocio:
             tipoCliente=tipocliente
         )
 
+
     @staticmethod
     def crearClienteEmpresa(self, codigosn, tiposn, grupoSN, tipoCliente):
         """
