@@ -83,4 +83,3 @@ class SocioNegocioRepository:
             return SocioNegocioDB.objects.get(codigoSN__icontains=codigoSN)
         except SocioNegocioDB.DoesNotExist:
             return None
-

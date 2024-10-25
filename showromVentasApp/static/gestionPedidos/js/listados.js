@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><a href="${urlModel}">${quotation.DocNum}</a></td>
-                <td><a href="/cliente.html" cadcode-data="${quotation.CardCode}">${quotation.CardName || 'Cliente Desconocido'}</a></td>
+                <td><a href="/cliente.html" cadcode-data="${quotation.CardCode}">${quotation.CardCode || 'Cliente Desconocido'} - ${quotation.CardName || 'Cliente Desconocido'}</a></td>
                 <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
                 <td>${quotation.DocDate}</td>
                 <td>${status}</td>

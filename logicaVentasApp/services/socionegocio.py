@@ -108,7 +108,6 @@ class SocioNegocio:
         print(f"Rut verificado: {rutVerificado}")
         if not rutVerificado:
             return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)
-
         try:
             print("Creando o actualizando cliente...")
             print(f"validando datos obligatorios")
@@ -134,9 +133,6 @@ class SocioNegocio:
             with transaction.atomic():
                 print("Creando nuevo cliente...")
                 cliente = self.crearNuevoCliente(codigosn, tiposn, grupoSN, tipoCliente)
-
-                
-                print
 
                 print(f"Cliente creado: {cliente}")
 
@@ -185,17 +181,12 @@ class SocioNegocio:
 
     def procesarClienteExistente(self, codigosn):
 
-        print("Procesando cliente existente...")
         verificacionSap = self.verificarSocioNegocioSap(codigosn)
-        print(f"Verificación en SAP: {verificacionSap}")
-        print(f"cogidoSN: {codigosn}")
 
         if verificacionSap:
-            print("Cliente ya existe en SAP y en la base de datos")
             return JsonResponse({'success': True, 'message': 'Cliente ya existe en SAP y en la base de datos'})
         
         else:
-            print("Cliente ya existe en la base de datos, pero no en SAP")
             json_data = self.prepararJsonCliente(self.request.POST)
             self.creacionSocioSAP(json_data)
             return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
@@ -207,6 +198,7 @@ class SocioNegocio:
         return tiposn
 
     def crearNuevoCliente(self, codigosn, tiposn, grupoSN, tipoCliente):
+        
         with transaction.atomic():
             if self.gruposn == '100':
                 cliente = self.crearClientePersona(self, codigosn, self.rut, tiposn, tipoCliente, self.email, grupoSN)
@@ -226,8 +218,6 @@ class SocioNegocio:
     def manejarErrorGeneral(self, e):
         return JsonResponse({'success': False, 'message': 'Error al crear el cliente'}, status=500)
 
-
-    @staticmethod
     def crearClientePersona(self, codigosn, rut, tiposn, tipocliente, email, grupoSN):
         """
         Método para crear un cliente persona.
@@ -329,24 +319,34 @@ class SocioNegocio:
             ValidationError: Si no se encuentra la dirección o el contacto.
 
         Returns:
-            si la dirección y el contacto se agregaron exitosamente, retorna un JsonResponse con un mensaje de éxito.
-            Si hubo un error, retorna un JsonResponse con un mensaje de error y un código de estado 400 o 500.
+            JsonResponse: Si la dirección y el contacto se agregaron exitosamente, retorna un mensaje de éxito.
+                        Si hubo un error, retorna un mensaje de error y un código de estado 400.
         """
 
         print("Agregando dirección y contacto...")
-        print(f"dirección: {request.POST.get('nombre_direccion[]')}")
         from showromVentasApp.views.view import agregarDireccion, agregarContacto
 
-        if 'nombre_direccion[]' not in request.POST:
+        direccion = request.POST.get('nombre_direccion[]')
+        contacto = request.POST.get('nombre[]')
+        
+        if not direccion and not contacto:
+            print("Faltan dirección y contacto")
+            raise ValidationError("Debe agregar al menos una dirección y un contacto")
+
+        if not direccion:
             print("Dirección faltante")
             raise ValidationError("Debe agregar al menos una dirección")
-        agregarDireccion(request, cliente)
 
-        if 'nombre' not in request.POST:
-            agregarContacto(request, cliente)
-        else:
+        if not contacto:
             print("Contacto faltante")
             raise ValidationError("Debe agregar al menos un contacto")
+        
+        # Agregar dirección y contacto si se encuentran
+        agregarDireccion(request, cliente)
+        agregarContacto(request, cliente)
+
+        return JsonResponse({"mensaje": "Dirección y contacto agregados exitosamente."})
+
 
 
     def buscarSocioNegocio(identificador, buscar_por_nombre=False):
