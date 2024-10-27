@@ -3,13 +3,19 @@ class ContactoManager {
     this.contcon = 0; // Inicializamos el contador
     this.initializeEvents();
   }
+    initializeEvents() {
+        // Verificar si el elemento 'agregar_cont' existe antes de agregar el evento
+        const agregarCont = document.getElementById('agregar_cont');
+        if (agregarCont) {
+            agregarCont.addEventListener('click', () => this.agregarContacto('cont'));
+        }
 
-  initializeEvents() {
-    // Evento para agregar contacto en la pestaña principal
-    document.getElementById('agregar_cont').addEventListener('click', () => this.agregarContacto('cont'));
-    // Evento para agregar contacto dentro del modal
-    document.getElementById('agregar_cont_modal').addEventListener('click', () => this.agregarContacto('listaContactos'));
-  }
+        // Verificar si el elemento 'agregar_cont_modal' existe antes de agregar el evento
+        const agregarContModal = document.getElementById('agregar_cont_modal');
+        if (agregarContModal) {
+            agregarContModal.addEventListener('click', () => this.agregarContacto('listaContactos'));
+        }
+    }
 
   agregarContacto(containerId) {
     this.contcon++;  // Incrementa el contador cada vez que se agrega un nuevo contacto

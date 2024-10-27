@@ -5,12 +5,21 @@ class DireccionManager {
   }
 
   initializeEvents() {
-    // Evento para agregar dirección en la pestaña principal
-    document.getElementById('agregar_dir').addEventListener('click', () => this.agregarDireccion('dir', 'Despacho'));
-    // Evento para agregar dirección dentro del modal de facturación
-    document.getElementById('agregar_dir_facturacion').addEventListener('click', () => this.agregarDireccion('listaDireccionFacturacion', 'Facturación'));
-    // Evento para agregar dirección dentro del modal de despacho
-    document.getElementById('agregar_dir_despacho').addEventListener('click', () => this.agregarDireccion('listaDireccionDespacho', 'Despacho'));
+    // Verificar existencia antes de agregar eventos
+    const agregarDirBtn = document.getElementById('agregar_dir');
+    if (agregarDirBtn) {
+      agregarDirBtn.addEventListener('click', () => this.agregarDireccion('dir', 'Despacho'));
+    }
+
+    const agregarDirFacturacionBtn = document.getElementById('agregar_dir_facturacion');
+    if (agregarDirFacturacionBtn) {
+      agregarDirFacturacionBtn.addEventListener('click', () => this.agregarDireccion('listaDireccionFacturacion', 'Facturación'));
+    }
+
+    const agregarDirDespachoBtn = document.getElementById('agregar_dir_despacho');
+    if (agregarDirDespachoBtn) {
+      agregarDirDespachoBtn.addEventListener('click', () => this.agregarDireccion('listaDireccionDespacho', 'Despacho'));
+    }
   }
 
   agregarDireccion(containerId, tipoDireccion) {

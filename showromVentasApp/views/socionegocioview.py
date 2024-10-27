@@ -5,6 +5,7 @@ from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ValidationError
+from django.shortcuts import redirect
 import logging
 import json
 
@@ -70,7 +71,7 @@ class SocioNegocioView(FormView):
             '/ventas/informacion_cliente/': self.informacionCliente
         }
 
-        # Buscar el método basado en la ruta
+        # Buscar el método basado en la ruta 
         handler = route_map.get(request.path)
         if handler:
             return handler(request)
@@ -200,50 +201,24 @@ class SocioNegocioView(FormView):
 
     def informacionCliente(self, request):
         """
-        Obtiene la información de un cliente por RUT.
-
-        Args:
-            request (HttpRequest): Request HTTP con el parámetro 'rut'
-
-        Returns:
-            JsonResponse: Respuesta JSON con la información del cliente
+        Redirige a la página de creación de clientes, manteniendo el RUT en la URL.
         """
         if request.method != 'GET':
             return JsonResponse({'error': 'Método no permitido'}, status=405)
 
         rut = request.GET.get('rut')
-        logger.info(f"Consultando información de cliente con RUT: {rut}")
-
         if not rut:
-            return JsonResponse({
-                'error': 'No se proporcionó un RUT de socio de negocio'
-            }, status=400)
+            return JsonResponse({'error': 'No se proporcionó un RUT de socio de negocio'}, status=400)
 
         try:
             socio_negocio_service = SocioNegocio(request)
             resultados = socio_negocio_service.infoCliente(rut)
             
-            # Si hay un error específico del servicio
-            if isinstance(resultados, dict) and 'error' in resultados:
-                return JsonResponse(resultados, status=500)
-            
-            # Si no hay resultados (lista vacía)
-            if not resultados:
-                return JsonResponse({
-                    'success': True,
-                    'data': [],
-                    'message': f'No se encontraron resultados para el RUT: {rut}'
-                })
-
-            # Respuesta exitosa con datos
-            return JsonResponse({
-                'success': True,
-                'data': resultados
-            }, safe=False)
+            # Verifica si hay resultados para el cliente y devuelve los datos con safe=False
+            if resultados:
+                return JsonResponse(resultados, status=200, safe=False)  # safe=False permite serializar objetos no 'dict'
+            else:
+                return JsonResponse({'error': 'No se encontraron resultados para el RUT especificado'}, status=404)
 
         except Exception as e:
-            logger.error(f"Error al consultar información del cliente: {str(e)}")
-            return JsonResponse({
-                'error': 'Error al procesar la solicitud'
-            }, status=500)
-
+            return JsonResponse({'error': str(e)}, status=500)
