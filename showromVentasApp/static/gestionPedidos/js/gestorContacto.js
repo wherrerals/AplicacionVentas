@@ -3,6 +3,8 @@ class ContactoManager {
     this.contcon = 0; // Inicializamos el contador
     this.initializeEvents();
   }
+
+
     initializeEvents() {
         // Verificar si el elemento 'agregar_cont' existe antes de agregar el evento
         const agregarCont = document.getElementById('agregar_cont');
