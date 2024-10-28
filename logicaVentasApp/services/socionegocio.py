@@ -2,9 +2,13 @@ import json
 import logging
 from venv import logger
 from django.http import JsonResponse
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.core.exceptions import ValidationError
+from datosLsApp.models.gruposndb import GrupoSNDB
 from datosLsApp.models.socionegociodb import SocioNegocioDB
+from datosLsApp.models.tipoclientedb import TipoClienteDB
+from datosLsApp.models.tiposndb import TipoSNDB
 from datosLsApp.repositories.socionegociorepository import SocioNegocioRepository
 from datosLsApp.repositories.gruposnrepository import GrupoSNRepository
 from datosLsApp.repositories.tipoclienterepository import TipoClienteRepository
@@ -496,6 +500,31 @@ class SocioNegocio:
         if not self.email:
             raise ValidationError("Email no encontrado")
         
+    def verificarSocioDB(self, rut):
+        """
+        Metodo que verifica si un socio de negocio existe en la base de datos.
+
+        Args:
+            rut (str): rut del socio de negocio.
+
+        Returns:
+            bool: True si el socio de negocio existe, False si no.
+        """
+        print ("Verificando socio de negocio en la base de datos...")
+        try:
+            repo = SocioNegocioRepository()
+            socio = repo.obtenerPorCodigoSN(rut)
+            print(f"Socio de negocio encontrado: {socio}")
+            if socio:
+                return True
+            
+            else:
+                return False
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': 'Error al verificar el socio de negocio'}, status=500)
+            
+
+
         
     def verificarSocioNegocioSap(self, cardCode):
         """
@@ -938,3 +967,137 @@ class SocioNegocio:
         except Exception as e:
             logger.error(f"Error al buscar socio negocio: {str(e)}")
             return {'error': f'Error al realizar la búsqueda: {str(e)}'}
+        
+
+    def convertirJsonObjeto(self, json_data):
+        """
+        Metodo para convertir un JSON a un objeto Python.
+
+        args:
+            json_data (str): Cadena JSON a convertir.
+
+        Returns:
+            dict: Objeto Python convertido.
+        """
+        print("Convirtiendo JSON a objeto Python...")
+
+        # Verificar si `json_data` es una cadena JSON y convertirla si es necesario
+        if isinstance(json_data, str):
+            return json.loads(json_data)
+        return json_data  # Si ya es un dict, lo retorna directamente
+
+
+    def procesarDatosSocionegocio(self, data):
+
+        print("Procesando datos del socio de negocio...")
+
+        # Datos principales del socio de negocio
+        socio_negocio = {
+            "codigoSN": data.get("CardCode", ""),
+            "nombre": data.get("CardName", ""),
+            "apellido": data.get("CardName", ""),  # Si solo hay un campo de nombre, apellido se mantiene igual
+            "email": data.get("EmailAddress", ""),
+            "telefono": data.get("Phone1", ""),
+            "celular": data.get("Phone1", ""),
+            "rut": data.get("FederalTaxID", ""),
+            "grupoSN": data.get("GroupCode", ""),
+            "tipoSN": "I",  # Valor fijo según lo especificado
+            "tipoCliente": "N"  # Valor fijo según lo especificado
+        }
+        
+        # Direcciones del socio de negocio
+        direcciones = []
+        for direccion in data.get("BPAddresses", []):
+            direcciones.append({
+                "rowNum": direccion.get("RowNum", ""),
+                "nombreDireccion": direccion.get("AddressName", ""),
+                "calleNumero": direccion.get("Street", ""),
+                "ciudad": direccion.get("City", ""),
+                "codigoImpuesto": direccion.get("TaxCode", ""),
+                "SocioNegocio": direccion.get("BPCode", ""),
+                "comuna": direccion.get("State", "")
+            })
+        
+        # Empleados de contacto del socio de negocio
+        empleados_contacto = []
+        for contacto in data.get("ContactEmployees", []):
+            empleados_contacto.append({
+                "codigoInternoSap": contacto.get("InternalCode", ""),
+                "nombreCompleto": contacto.get("Name", ""),
+                "nombre": contacto.get("Name", ""),  # Asumiendo que 'Name' contiene nombre completo
+                "apellido": contacto.get("Name", ""),  # Si es necesario dividir nombre y apellido, puede ajustarse
+                "telefono": contacto.get("Phone1", ""),
+                "celular": contacto.get("Phone1", ""),
+                "email": contacto.get("E_Mail", ""),
+                "SocioNegocio": contacto.get("CardCode", "")
+            })
+
+        # Estructura final de salida
+        resultado = {
+            "SocioNegocio": socio_negocio,
+            "Direcciones": direcciones,
+            "Contactos": empleados_contacto
+        }
+
+        return resultado
+    
+
+
+    def guardarClienteCompleto(self, data):
+        # Crear el cliente principal usando el método del repositorio
+        print("Guardando cliente completo...")
+        print(f"Datos recibidos: {data}")
+
+        # Acceder a los datos del cliente
+        socio_negocio = data["SocioNegocio"]
+
+        # Obtener la instancia de GrupoSNDB
+        try:
+            grupo = GrupoSNDB.objects.get(codigo=socio_negocio["grupoSN"]) # Cambiado de id a codigo
+            tipo = TipoSNDB.objects.get(codigo=socio_negocio["tipoSN"])
+            tipo_cliente = TipoClienteDB.objects.get(codigo=socio_negocio["tipoCliente"])
+
+        except ObjectDoesNotExist:
+            print(f"GrupoSN con codigo {socio_negocio['grupoSN']} no encontrado.")
+            # Maneja el error según sea necesario, como lanzar una excepción o crear un nuevo grupo
+
+        cliente = SocioNegocioRepository.crearCliente(
+            codigoSN=socio_negocio["codigoSN"],
+            nombre=socio_negocio["nombre"],
+            apellido=socio_negocio["apellido"],
+            email=socio_negocio["email"],
+            telefono=socio_negocio["telefono"],
+            rut=socio_negocio["rut"],
+            grupoSN=grupo, 
+            tipoSN=tipo,
+            tipoCliente=tipo_cliente
+        )
+
+        # Crear las direcciones asociadas al cliente usando el método del repositorio
+        for direccion in data.get("Direcciones", []):
+            DireccionRepository.crearDireccion(
+                socio=socio_negocio["codigoSN"],
+                nombre_direccion=direccion["nombreDireccion"],
+                ciudad=direccion["ciudad"],
+                calle_numero=direccion["calleNumero"],
+                comuna_id=direccion["comuna"],
+                region_id=13,  # Valor por defecto
+                tipo_direccion=12,
+                pais=direccion.get("pais", "Chile")  # Valor por defecto
+            )
+
+        # Crear los contactos asociados al cliente usando el método del repositorio
+        for contacto in data.get("Contactos", []):
+            ContactoRepository.crearContacto(
+                socio=socio_negocio["codigoSN"],
+                nombre_contacto=contacto["nombre"],
+                apellido_contacto=contacto["apellido"],
+                telefono_contacto=contacto["telefono"],
+                email_contacto=contacto["email"],
+                celular_contacto=contacto["celular"]
+            )
+
+        return cliente
+
+
+

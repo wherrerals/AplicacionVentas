@@ -654,3 +654,18 @@ def quotate_items(request, docEntry):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     
+def probandoSL(request):
+    cardcode = "10880683C"
+    client = APIClient()
+    sn = SocioNegocio(request)
+    data = client.getInfoSN(cardcode)
+    conversion = sn.convertirJsonObjeto(data)
+    dataCreacion = sn.procesarDatosSocionegocio(conversion)
+
+    try:
+        print("Guardando cliente completo")
+        creacion = sn.guardarClienteCompleto(dataCreacion)
+        return JsonResponse(creacion, safe=False)
+    
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.views.generic import View, FormView
+from adapters.sl_client import APIClient
 from logicaVentasApp.services.socionegocio import SocioNegocio
 from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
@@ -207,18 +208,52 @@ class SocioNegocioView(FormView):
             return JsonResponse({'error': 'Método no permitido'}, status=405)
 
         rut = request.GET.get('rut')
+
+        print("RUT: ", rut)
         if not rut:
             return JsonResponse({'error': 'No se proporcionó un RUT de socio de negocio'}, status=400)
 
         try:
-            socio_negocio_service = SocioNegocio(request)
-            resultados = socio_negocio_service.infoCliente(rut)
-            
-            # Verifica si hay resultados para el cliente y devuelve los datos con safe=False
-            if resultados:
-                return JsonResponse(resultados, status=200, safe=False)  # safe=False permite serializar objetos no 'dict'
-            else:
-                return JsonResponse({'error': 'No se encontraron resultados para el RUT especificado'}, status=404)
+            # Crear instancia del servicio y verificar si el cliente existe en el DB
+            print("ruta: ", rut )
+            print("Buscando información del cliente")
+            cardCode = rut + "C"
 
+            print("CardCode: ", cardCode)
+
+            socio_negocio_service = SocioNegocio(request)
+
+            sn_existe = socio_negocio_service.verificarSocioDB(cardCode)
+
+            print("SN Existe: ", sn_existe)
+
+            if sn_existe:
+
+                resultados = socio_negocio_service.infoCliente(rut)
+                # Verifica si hay resultados para el cliente y devuelve los datos con safe=False
+                if resultados:
+                    return JsonResponse(resultados, status=200, safe=False)  # safe=False permite serializar objetos no 'dict'
+                else:
+                    return JsonResponse({'error': 'No se encontraron resultados para el RUT especificado'}, status=404)
+                
+            else:
+                client = APIClient() # Instancia de la clase APIClient
+                sn = SocioNegocio(request) # Instancia de la clase SocioNegocio
+                data = client.getInfoSN(cardCode) # obtener información del socio de negocio
+                conversion = sn.convertirJsonObjeto(data) # Convertir el json a objeto
+                dataCreacion = sn.procesarDatosSocionegocio(conversion) # Procesar los datos del socio de negocio
+                creacion = sn.guardarClienteCompleto(dataCreacion) # Guardar el cliente en la base de datos
+                
+                try:
+                    if creacion:
+                        resultados = socio_negocio_service.infoCliente(rut)
+                        if resultados:
+                            return JsonResponse(resultados, status=200, safe=False)
+                        else:
+                            return JsonResponse({'error': 'No se encontraron resultados para el RUT especificado'}, status=404)
+                    else:
+                        return JsonResponse({'error': 'Error al crear el cliente'}, status=500)
+                except Exception as e:
+                    return JsonResponse({'error': str(e)}, status=500)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)

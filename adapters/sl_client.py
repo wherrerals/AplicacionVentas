@@ -304,3 +304,14 @@ class APIClient:
             print(f"Error en la solicitud a la API: {e}")
             raise
     
+    def getInfoSN(self, cardCode):
+        print("Probando la conexión con la API...")
+        print(f"CardCode: {cardCode}")
+        print("*" * 50)
+        details = f"BusinessPartners('{cardCode}')?$select=CardCode,CardName,CardType,Phone1,EmailAddress,Notes,GroupCode,FederalTaxID,BPAddresses,ContactEmployees"
+        url = f"{self.base_url}{details}"
+        response = self.session.get(url, verify=False) # Se realiza la solicitud GET
+        response.raise_for_status() # Esto generará una excepción para cualquier código de estado HTTP 4xx/5xx
+        
+        print(url)
+        return response.json()
