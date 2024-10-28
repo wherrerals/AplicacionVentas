@@ -230,19 +230,19 @@ class SocioNegocioView(FormView):
             if sn_existe:
 
                 resultados = socio_negocio_service.infoCliente(rut)
-                # Verifica si hay resultados para el cliente y devuelve los datos con safe=False
+
                 if resultados:
                     return JsonResponse(resultados, status=200, safe=False)  # safe=False permite serializar objetos no 'dict'
                 else:
                     return JsonResponse({'error': 'No se encontraron resultados para el RUT especificado'}, status=404)
                 
             else:
-                client = APIClient() # Instancia de la clase APIClient
-                sn = SocioNegocio(request) # Instancia de la clase SocioNegocio
-                data = client.getInfoSN(cardCode) # obtener información del socio de negocio
-                conversion = sn.convertirJsonObjeto(data) # Convertir el json a objeto
-                dataCreacion = sn.procesarDatosSocionegocio(conversion) # Procesar los datos del socio de negocio
-                creacion = sn.guardarClienteCompleto(dataCreacion) # Guardar el cliente en la base de datos
+                client = APIClient() 
+                sn = SocioNegocio(request)
+                data = client.getInfoSN(cardCode)
+                conversion = sn.convertirJsonObjeto(data)
+                dataCreacion = sn.procesarDatosSocionegocio(conversion) 
+                creacion = sn.guardarClienteCompleto(dataCreacion)
                 
                 try:
                     if creacion:
@@ -255,5 +255,6 @@ class SocioNegocioView(FormView):
                         return JsonResponse({'error': 'Error al crear el cliente'}, status=500)
                 except Exception as e:
                     return JsonResponse({'error': str(e)}, status=500)
+                
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
