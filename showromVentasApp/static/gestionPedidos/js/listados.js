@@ -82,12 +82,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const displayQuotations = (quotations) => {
         const tbody = document.querySelector('#listadoCotizaciones');
         tbody.innerHTML = '';
-
+    
         quotations.forEach(entry => {
             const quotation = entry.Quotations || {};
             const salesPerson = entry.SalesPersons || {};
             const vatSumFormatted = Number(quotation.DocTotalNeto).toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
             const docTotalFormatted = Number(quotation.DocTotal).toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+            
             const getStatus = (quotation) => {
                 if (quotation.Cancelled === 'Y') return 'Cancelado';
                 else if (quotation.DocumentStatus === 'O') return 'Abierto';
@@ -96,11 +97,11 @@ document.addEventListener("DOMContentLoaded", function () {
             };
             const status = getStatus(quotation);
             let urlModel = `/ventas/obtener_detalles_cotizacion/${quotation.DocEntry}/`;
-
+    
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><a href="${urlModel}">${quotation.DocNum}</a></td>
-                <td><a href="/cliente.html" cadcode-data="${quotation.CardCode}">${quotation.CardCode || 'Cliente Desconocido'} - ${quotation.CardName || 'Cliente Desconocido'}</a></td>
+                <td><a href="#" class="cliente-link" data-cadcode="${quotation.CardCode}">${quotation.CardName || 'Cliente Desconocido'}</a></td>
                 <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
                 <td>${quotation.DocDate}</td>
                 <td>${status}</td>
@@ -109,20 +110,42 @@ document.addEventListener("DOMContentLoaded", function () {
             `;
             tbody.appendChild(tr);
         });
+    
+        // Agrega el evento click a todos los enlaces de clientes después de añadir las filas
+        document.querySelectorAll('.cliente-link').forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                let cadCode = event.target.getAttribute('data-cadcode');
+        
+                // Eliminar la "C" final si está presente
+                if (cadCode && cadCode.endsWith("C")) {
+                    cadCode = cadCode.slice(0, -1);
+                }
+        
+                if (cadCode) {
+                    // Realiza la solicitud AJAX al backend para obtener la información del cliente
+                    fetch(`/ventas/informacion_cliente/?rut=${cadCode}`)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Error al obtener la información del cliente');
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Información del cliente:', data);
+        
+                            // Redirige a la página de creación de cliente después de obtener los datos
+                            window.location.href = `/ventas/creacion_clientes/?rut=${cadCode}`;
+                        })
+                        .catch(error => {
+                            console.error('Error en la solicitud AJAX:', error);
+                        });
+                } else {
+                    alert("No se pudo obtener el RUT del cliente.");
+                }
+            });
+        });
+        ;
     };
-
-    const getFilterData = () => {
-        return {
-            fecha_inicio: document.querySelector('[name="fecha_inicio"]').value,
-            fecha_fin: document.querySelector('[name="fecha_fin"]').value,
-            fecha_doc: document.querySelector('[name="fecha_documento"]').value,
-            docNum: document.querySelector('[name="docNum"]').value,
-            carData: document.querySelector('[name="cardNAme"]').value,
-            salesEmployeeName: document.querySelector('[name="salesEmployeeName"]').value,
-            DocumentStatus: document.querySelector('[name="DocumentStatus"]').value,
-            docTotal: document.querySelector('[name="docTotal"]').value
-        };
-    };
+    
 
     // Función para obtener los datos de la página actual con filtros
     const fetchAndDisplayData = (page = 1) => {
