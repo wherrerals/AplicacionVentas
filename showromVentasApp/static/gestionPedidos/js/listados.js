@@ -146,6 +146,19 @@ document.addEventListener("DOMContentLoaded", function () {
         ;
     };
     
+    const getFilterData = () => {
+        return {
+            fecha_inicio: document.querySelector('[name="fecha_inicio"]').value,
+            fecha_fin: document.querySelector('[name="fecha_fin"]').value,
+            fecha_doc: document.querySelector('[name="fecha_documento"]').value,
+            docNum: document.querySelector('[name="docNum"]').value,
+            carData: document.querySelector('[name="cardNAme"]').value,
+            salesEmployeeName: document.querySelector('[name="salesEmployeeName"]').value,
+            DocumentStatus: document.querySelector('[name="DocumentStatus"]').value,
+            docTotal: document.querySelector('[name="docTotal"]').value
+        };
+    };
+
 
     // Función para obtener los datos de la página actual con filtros
     const fetchAndDisplayData = (page = 1) => {
