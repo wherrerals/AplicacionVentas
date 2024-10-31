@@ -44,7 +44,6 @@ def home(request):
         try:
             usuario = UsuarioDB.objects.get(usuarios=request.user)
             nombreUser = usuario.nombre
-            grupos_usuario = request.user.groups.values_list('name', flat=True)  # Obtiene todos los nombres de los grupos del usuario
 
 
         except UsuarioDB.DoesNotExist:
@@ -55,7 +54,6 @@ def home(request):
         context = {
             'username': username,
             'nombreuser': nombreUser,
-            'grupos_usuario': list(grupos_usuario)
         }
 
         return render(request, 'home.html', context)
