@@ -79,41 +79,39 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     };
 
-    // Evento para aplicar el filtro cuando se presiona Enter en #buscar
-    document.querySelector('#buscarlistacootizacion').addEventListener('keydown', function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault(); 
-            const searchText = event.target.value.trim();
+// Evento para capturar texto y colocarlo en el filtro correspondiente
+document.querySelector('#buscarlistacootizacion').addEventListener('keydown', function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); 
+        const searchText = event.target.value.trim();
 
-            
-            let filters = { ...activeFilters };
-
-            if (!isNaN(searchText)) {
-                // Si el texto es numérico, asume que es un número de documento (SAP)
-                filters.docNum = searchText;
-            } else if (/^\d{4}-\d{2}-\d{2}$/.test(searchText)) {
-                // Si el texto tiene formato de fecha YYYY-MM-DD, asume que es la fecha del documento
-                filters.fecha_documento = searchText;
-            }else if (searchText === "abierto" || searchText === "cerrado" || searchText === "cancelado" 
-                    || searchText === "Abierto" || searchText === "Cerrado" || searchText === "Cancelado") {
-                // Si el texto es "abierto", "cerrado" o "cancelado", aplica el filtro de estado
-                const estadoMap = {
-                    "abierto": "O",
-                    "cerrado": "C",
-                    "cancelado": "Y",
-                    "Abierto": "O",
-                    "Cerrado": "C",
-                    "Cancelado": "Y"
-                };
-                filters.DocumentStatus = estadoMap[searchText];
-            } else {
-                // En otros casos, asume que el texto es el nombre del cliente
-                filters.carData = searchText;
-            }
-            // Llama a la función para aplicar los filtros y obtener los datos
-            applyFiltersAndFetchData(filters);
+        // Coloca el valor en el campo de filtro correspondiente
+        if (!isNaN(searchText)) {
+            // Número de documento (SAP)
+            document.querySelector('[name="docNum"]').value = searchText;
+        } else if (/^\d{1,4}[-\/]\d{1,2}[-\/]\d{1,4}$/.test(searchText)) {
+            // Fecha en formato YYYY-MM-DD
+            document.querySelector('[name="fecha_documento"]').value = searchText;
+        } else if (["abierto", "cerrado", "cancelado", "Abierto", "Cerrado", "Cancelado"].includes(searchText)) {
+            // Estado del documento
+            const estadoMap = {
+                "abierto": "O",
+                "cerrado": "C",
+                "cancelado": "Y",
+                "Abierto": "O",
+                "Cerrado": "C",
+                "Cancelado": "Y"
+            };
+            document.querySelector('[name="DocumentStatus"]').value = estadoMap[searchText];
+        } else {
+            // Nombre del cliente
+            document.querySelector('[name="cardName"]').value = searchText;
         }
-    });
+
+        // Limpiar el input de búsqueda después de colocar el valor
+        event.target.value = '';
+    }
+});
 
 
     const displayQuotations = (quotations) => {
