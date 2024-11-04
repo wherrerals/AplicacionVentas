@@ -6,7 +6,10 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.core.exceptions import ObjectDoesNotExist
 from adapters.sl_client import APIClient
+from datosLsApp.models.regiondb import RegionDB
+from datosLsApp.models.usuariodb import UsuarioDB
 from logicaVentasApp.services.cotizacion import Cotizacion
 import json
 import requests
@@ -58,6 +61,7 @@ class CotizacionView(View):
         return {
             '/ventas/listado_Cotizaciones': self.listarCotizaciones,
             '/ventas/obtener_detalles_cotizacion': self.obtenerDetallesCotizacion,
+            '/ventas/detalles_cotizacion': self.detallesCotizacion,
         }
 
     def post_route_map(self):
@@ -205,4 +209,48 @@ class CotizacionView(View):
                 return JsonResponse(cambio, status=200)
             except json.JSONDecodeError as e:
                 return JsonResponse({'error': 'JSON inválido'}, status=400)
+    
+    def detallesCotizacion(self, request):
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+        username = request.user.username
+        
+        docentry = request.GET.get('docentry')
+        
+        regiones = RegionDB.objects.all()
+
+        client = APIClient()
+        document_client = client.detalleCotizacionCliente(docentry)
+        document_line = client.detalleCotizacionLineas(docentry)
+
+        try:
+            usuario = UsuarioDB.objects.get(usuarios=request.user)
+            sucurs = usuario.sucursal
+            nombre_user = usuario.nombre
+            cod_ven = usuario.vendedor.codigo
+        except ObjectDoesNotExist:
+
+            return render(request, 'error.html', {'error': 'Usuario no encontrado en la base de datos.'})
+
+        data = {
+            "Client": document_client,
+            "DocumentLine": document_line
+        }
+
+        context = {
+            'username': username,
+            'regiones': regiones,
+            'sucursal': sucurs,
+            'nombreuser': nombre_user,
+            'codigoVendedor': cod_ven
+        }
+
+        cotiza = Cotizacion()
+        lines_data = cotiza.formatearDatos(data)
+
+        context.update({'data': lines_data})
+        return render(request, 'cotizacion.html', context)
+
+
     

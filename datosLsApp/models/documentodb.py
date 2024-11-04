@@ -4,6 +4,7 @@ from datosLsApp.models.condicionpagodb import CondicionPagoDB
 from datosLsApp.models.tipodoctributariodb import TipoDocTributarioDB
 from datosLsApp.models.tipoentregadb import TipoEntregaDB
 from datosLsApp.models.tipoobjetosapdb import TipoObjetoSapDB
+from datosLsApp.models.tipoventadb import TipoVentaDB
 
 class DocumentoDB(models.Model):
     class Meta:
@@ -29,6 +30,7 @@ class DocumentoDB(models.Model):
     condi_pago = models.ForeignKey(CondicionPagoDB, on_delete=models.CASCADE, default=1)
     tipoentrega = models.ForeignKey(TipoEntregaDB, on_delete=models.CASCADE, default=1)
     tipoobjetoSap = models.ForeignKey(TipoObjetoSapDB, on_delete=models.CASCADE, default=1)    
+    tipoVenta = models.ForeignKey(TipoVentaDB, on_delete=models.CASCADE, default=1)
     # Otros campos que puedas tener
     
     def __str__(self):

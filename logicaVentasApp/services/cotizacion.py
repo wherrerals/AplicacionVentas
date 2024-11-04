@@ -180,12 +180,8 @@ class Cotizacion(Documento):
             tuple: Líneas de documento de la cotización, mensaje de error.
         """
         try:
-            print("-" * 10)
-            print(f"Fetching quotation items for DocEntry: {doc_entry}")
-            client = APIClient()
+            client = APIClient() 
             data = client.obtenerCotizacionesDE('Quotations', doc_entry)
-            print(f"Data received: {data}")
-            print("-" * 10)
 
             if 'value' not in data:
                 return None, 'No se encontraron datos de cotización'
@@ -194,6 +190,7 @@ class Cotizacion(Documento):
 
             try:
                 doc_entry_int = int(doc_entry)
+
             except ValueError:
                 return None, f'El valor de DocEntry proporcionado ({doc_entry}) no es un número válido'
             
@@ -259,6 +256,7 @@ class Cotizacion(Documento):
             }
             for line in documentLines
         ]
+    
 
     def prepararJsonCotizacion(self, jsonData):
         """
@@ -392,3 +390,88 @@ class Cotizacion(Documento):
         except Exception as e:
             logger.error(f"Error al actualizar el estado de la cotización: {str(e)}")
             return {'error': str(e)}
+        
+    def formatearDatos(self, json_data):
+        # Extraer y limpiar la información del cliente
+        client_info = json_data["Client"]["value"][0]
+        quotations = client_info.get("Quotations", {})
+        salesperson = client_info.get("SalesPersons", {})
+        contact_employee = client_info.get("BusinessPartners/ContactEmployees", {})
+
+        # Formatear los datos de cliente
+        cliente = {
+            "Quotations": {
+                "DocEntry": quotations.get("DocEntry"),
+                "DocNum": quotations.get("DocNum"),
+                "CardCode": quotations.get("CardCode"),
+                "CardName": quotations.get("CardName"),
+                "TransportationCode": quotations.get("TransportationCode"),
+                "Address": quotations.get("Address"),
+                "Address2": quotations.get("Address2"),
+                "DocDate": quotations.get("DocDate"),
+                "DocumentStatus": quotations.get("DocumentStatus"),
+                "Cancelled": quotations.get("Cancelled"),
+                "U_LED_TIPVTA": quotations.get("U_LED_TIPVTA"),
+                "U_LED_TIPDOC": quotations.get("U_LED_TIPDOC"),
+                "U_LED_NROPSH": quotations.get("U_LED_NROPSH"),
+                "NumAtCard": quotations.get("NumAtCard"),
+                "VatSum": quotations.get("VatSum"),
+                "DocTotal": quotations.get("DocTotal"),
+                "DocTotalNeto": quotations.get("DocTotalNeto"),
+            },
+            "SalesPersons": {
+                "SalesEmployeeCode": salesperson.get("SalesEmployeeCode"),
+                "SalesEmployeeName": salesperson.get("SalesEmployeeName"),
+                "U_LED_SUCURS": salesperson.get("U_LED_SUCURS"),
+            },
+            "ContactEmployee": {
+                "InternalCode": contact_employee.get("InternalCode"),
+                "FirstName": contact_employee.get("FirstName"),
+            }
+        }
+
+        # Extraer y limpiar la información de líneas de documento
+        document_lines = []
+        for line_info in json_data["DocumentLine"]["value"]:
+            line = line_info.get("Quotations/DocumentLines", {})
+            warehouse_info = line_info.get("Items/ItemWarehouseInfoCollection", {})
+            
+            document_line = {
+                "DocEntry": line.get("DocEntry"),
+                "LineNum": line.get("LineNum"),
+                "ItemCode": line.get("ItemCode"),
+                "ItemDescription": line.get("ItemDescription"),
+                "WarehouseCode": line.get("WarehouseCode"),
+                "Quantity": line.get("Quantity"),
+                "UnitPrice": line.get("UnitPrice"),
+                "GrossPrice": line.get("GrossPrice"),
+                "DiscountPercent": line.get("DiscountPercent"),
+                "Price": line.get("Price"),
+                "PriceAfterVAT": line.get("PriceAfterVAT"),
+                "LineTotal": line.get("LineTotal"),
+                "GrossTotal": line.get("GrossTotal"),
+                "ShipDate": line.get("ShipDate"),
+                "Address": line.get("Address"),
+                "ShippingMethod": line.get("ShippingMethod"),
+                "FreeText": line.get("FreeText"),
+                "BaseType": line.get("BaseType"),
+                "GrossBuyPrice": line.get("GrossBuyPrice"),
+                "BaseEntry": line.get("BaseEntry"),
+                "BaseLine": line.get("BaseLine"),
+                "LineStatus": line.get("LineStatus"),
+                "WarehouseInfo": {
+                    "WarehouseCode": warehouse_info.get("WarehouseCode"),
+                    "InStock": warehouse_info.get("InStock"),
+                    "Committed": warehouse_info.get("Committed"),
+                    "SalesStock": warehouse_info.get("SalesStock"),
+                }
+            }
+            document_lines.append(document_line)
+
+        # Formar el diccionario final
+        resultado = {
+            "Cliente": cliente,
+            "DocumentLines": document_lines
+        }
+
+        return resultado

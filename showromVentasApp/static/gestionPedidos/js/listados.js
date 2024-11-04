@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 else return 'Activo';
             };
             const status = getStatus(quotation);
-            let urlModel = `/ventas/obtener_detalles_cotizacion/${quotation.DocEntry}/`;
+            let urlModel = `/ventas/detalles_cotizacion/?docentry=${quotation.DocEntry}`;
     
             const tr = document.createElement('tr');
             tr.innerHTML = `

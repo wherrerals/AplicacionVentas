@@ -11,6 +11,7 @@ from django.http import JsonResponse, HttpResponse
 from datosLsApp.models.usuariodb import User 
 from datosLsApp.models import (ProductoDB, SocioNegocioDB, UsuarioDB, RegionDB, GrupoSNDB, TipoSNDB, TipoClienteDB, DireccionDB, ComunaDB, ContactoDB)
 from adapters.sl_client import APIClient
+from logicaVentasApp.services.cotizacion import Cotizacion
 from logicaVentasApp.services.socionegocio import SocioNegocio
 #librerias Python usadas
 import requests
@@ -655,17 +656,21 @@ def quotate_items(request, docEntry):
         return JsonResponse({'error': str(e)}, status=500)
     
 def probandoSL(request):
-    cardcode = "10880683C"
     client = APIClient()
-    sn = SocioNegocio(request)
-    data = client.getInfoSN(cardcode)
-    conversion = sn.convertirJsonObjeto(data)
-    dataCreacion = sn.procesarDatosSocionegocio(conversion)
+    docentry = 143563
 
-    try:
-        print("Guardando cliente completo")
-        creacion = sn.guardarClienteCompleto(dataCreacion)
-        return JsonResponse(creacion, safe=False)
-    
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+    documentClient = client.detalleCotizacionCliente(docentry)
+    documentLine = client.detalleCotizacionLineas(docentry)
+
+
+    data = {
+        "Client": documentClient,
+        "DocumentLine": documentLine
+    }
+
+    cotiza = Cotizacion()
+
+    lines_data = cotiza.formatearDatos(data)
+
+
+    return JsonResponse(lines_data, safe=False)
