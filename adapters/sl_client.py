@@ -315,3 +315,45 @@ class APIClient:
         
         print(url)
         return response.json()
+    
+    def detalleCotizacionCliente(self, docEntry):
+        """
+        permite obtener el detalle de una cotizacion de un cliente en la base de datos de SAP
+
+        Parámetros:
+            docEntry : int, opcional
+                El numero de documento de la cotizacion.
+        """
+
+        crossjoin = "Quotations,SalesPersons,BusinessPartners/ContactEmployees"
+        expand = "Quotations($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address,Address2,DocDate,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
+        filter = f"Quotations/DocEntry eq {docEntry} and Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Quotations/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode"    
+        url = f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
+
+        print(url)
+
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        return response.json()
+    
+
+    def detalleCotizacionLineas(self, docEntry):
+        """
+        Permite obtener el detalle de las lineas de una cotizacion en la base de datos de SAP
+
+        Parámetros:
+            docEntry : int, opcional
+                El numero de documento de la cotizacion.
+
+        """
+
+        crossJoin = "Quotations,Quotations/DocumentLines,Items/ItemWarehouseInfoCollection"
+        expand = "Quotations/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
+        filter = f"Quotations/DocEntry eq {docEntry} and Quotations/DocumentLines/DocEntry eq Quotations/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq Quotations/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq Quotations/DocumentLines/WarehouseCode"
+
+        url = f"{self.base_url}$crossjoin({crossJoin})?$expand={expand}&$filter={filter}"
+
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        return response.json()
+    

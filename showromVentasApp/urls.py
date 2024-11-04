@@ -39,6 +39,7 @@ urlpatterns = [
     path('guardar_direcciones/<str:socio>/', view.actualizarAgregarDirecion, name='guardar_direccion'),
     path('guardar_contactos/<str:socio>/', view.actualizarAgregarContacto, name='guardar_contactos'),
     path('obtener_comunas_por_region/', view.enlazarComunas, name='obtener_comunas_por_region'),
+    path('detalles_cotizacion/', cotizacionView.detallesCotizacion, name='detalles_cotizacion'),
     path('probando/', view.probandoSL, name='probando'),
 ]
 
