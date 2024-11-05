@@ -91,7 +91,7 @@ DATABASES = {
         'USER':'root',
         'PASSWORD':'Ea7hava5*', #led_studio
         #'PASSWORD':'Ea7hava5}', #home
-        'PASSWORD':'qwerty', #nico
+        #'PASSWORD':'qwerty', #nico
         #'HOST':'localhost',
         'PORT':'3306',
     }
