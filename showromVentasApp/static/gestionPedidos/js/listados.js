@@ -79,6 +79,41 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     };
 
+// Evento para capturar texto y colocarlo en el filtro correspondiente
+document.querySelector('#buscarlistacootizacion').addEventListener('keydown', function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); 
+        const searchText = event.target.value.trim();
+
+        // Coloca el valor en el campo de filtro correspondiente
+        if (!isNaN(searchText)) {
+            // Número de documento (SAP)
+            document.querySelector('[name="docNum"]').value = searchText;
+        } else if (/^\d{1,4}[-\/]\d{1,2}[-\/]\d{1,4}$/.test(searchText)) {
+            // Fecha en formato YYYY-MM-DD
+            document.querySelector('[name="fecha_documento"]').value = searchText;
+        } else if (["abierto", "cerrado", "cancelado", "Abierto", "Cerrado", "Cancelado"].includes(searchText)) {
+            // Estado del documento
+            const estadoMap = {
+                "abierto": "O",
+                "cerrado": "C",
+                "cancelado": "Y",
+                "Abierto": "O",
+                "Cerrado": "C",
+                "Cancelado": "Y"
+            };
+            document.querySelector('[name="DocumentStatus"]').value = estadoMap[searchText];
+        } else {
+            // Nombre del cliente
+            document.querySelector('[name="cardName"]').value = searchText;
+        }
+
+        // Limpiar el input de búsqueda después de colocar el valor
+        event.target.value = '';
+    }
+});
+
+
     const displayQuotations = (quotations) => {
         const tbody = document.querySelector('#listadoCotizaciones');
         tbody.innerHTML = '';
@@ -152,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function () {
             fecha_fin: document.querySelector('[name="fecha_fin"]').value,
             fecha_doc: document.querySelector('[name="fecha_documento"]').value,
             docNum: document.querySelector('[name="docNum"]').value,
-            carData: document.querySelector('[name="cardNAme"]').value,
+            carData: document.querySelector('[name="cardName"]').value,
             salesEmployeeName: document.querySelector('[name="salesEmployeeName"]').value,
             DocumentStatus: document.querySelector('[name="DocumentStatus"]').value,
             docTotal: document.querySelector('[name="docTotal"]').value
@@ -168,10 +203,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const updatePagination = (page) => {
         const paginationContainer = document.querySelector('.pagination');
-        paginationContainer.innerHTML = ''; // Limpiar la paginación actual
+        paginationContainer.innerHTML = '';
 
-        // Si no conocemos el total de páginas, no mostramos la paginación
-        // Botón "Anterior"
         const prevButton = document.createElement('li');
         prevButton.classList.add('page-item');
         prevButton.innerHTML = `

@@ -22,18 +22,22 @@
   <!-- End: Navbar Right Links -->
   <div id="contenedor" class="container">
     <div class="row" style="color: var(--bs-secondary-color);">
-      <div class="col-sm-4" style="text-align: right;padding-right: 0px;"><input type="search" placeholder="Buscar"
-          style="width: 100%;"></div>
-      <div class="col-sm-4" style="text-align: left;width: 160px;"><a class="btn btn-primary" role="button"
-          style="font-size: 12px;" href="{% url 'generar_cotizacion' %}">+ Nueva Cotización</a></div>
+      <div class="col-sm-4" style="text-align: right;padding-right: 0px;">
+        <input type="search" placeholder="Buscar" style="width: 100%;"></div>
+      <div class="col-sm-4" style="text-align: left;width: 160px;">
+        <a class="btn btn-primary" role="button" style="font-size: 12px;" href="{% url 'generar_cotizacion' %}">+ Nueva Cotización</a>
+      </div>
       <div class="col" style="text-align: right;padding-right: 0px;">
-        <div class="dropdown"><button class="btn btn-primary dropdown-toggle" aria-expanded="false"
-            data-bs-toggle="dropdown" type="button" style="font-size: 12px;">Acciones&nbsp;</button>
-          <div class="dropdown-menu"><a class="dropdown-item" href="#">Guardar</a><a class="dropdown-item"
-              href="#">Duplicar</a><a class="dropdown-item" href="#">Copiar a Orden de Venta</a><a class="dropdown-item"
-              href="solic_devolucion.html">Copiar a Solicitud de Devolución</a><a class="dropdown-item"
-              href="#">Imprimir / Descargar PDF</a><a class="dropdown-item" href="#">Cerrar</a><a class="dropdown-item"
-              href="#">Cancelar</a></div>
+        <div class="dropdown">
+          <button class="btn btn-primary dropdown-toggle" aria-expanded="false" data-bs-toggle="dropdown" type="button" style="font-size: 12px;">Acciones&nbsp;</button>
+          <div class="dropdown-menu"><a class="dropdown-item" href="#">Guardar</a>
+            <a class="dropdown-item" href="#">Duplicar</a>
+            <a class="dropdown-item" href="#">Copiar a Orden de Venta</a>
+            <a class="dropdown-item" href="solic_devolucion.html">Copiar a Solicitud de Devolución</a>
+            <a class="dropdown-item" href="#">Imprimir / Descargar PDF</a>
+            <a class="dropdown-item" href="#">Cerrar</a>
+            <a class="dropdown-item" href="#">Cancelar</a>
+          </div>
         </div>
       </div>
     </div>
@@ -257,7 +261,8 @@
             </div>
             <div class="col-sm-6" style="width: 58%;padding-right: 0px;">
               <select class="form-select" style="font-size: 12px;border-color: rgb(159,168,175);">
-                <optgroup label="Contacto" id="clientes">
+                <optgroup label="Contacto" id="clientes" value="Seleccione una dirección de despacho">
+                  <option value="">Seleccione un contacto</option>
                 </optgroup>
               </select>
             </div>

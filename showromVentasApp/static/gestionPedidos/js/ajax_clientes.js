@@ -4,21 +4,19 @@ $(document).ready(function(){
 
         // Solo realizar la búsqueda si el valor tiene al menos 3 caracteres
         if(inputValue.length >= 3){
-            let numero = inputValue; // Puedes usar el mismo valor tanto para número como para nombre
-            let nombre = inputValue; // Si ingresan nombre en lugar de número, igual capturamos el input
+            let numero = inputValue;
+            let nombre = inputValue;
 
-            // Define la URL directamente en el archivo JavaScript
             let buscarClientesUrl = '/ventas/buscar_clientes/';
 
             $.ajax({
                 url: buscarClientesUrl,
                 data: {
-                    'numero': numero || '', // Enviar número si está disponible, de lo contrario enviar vacío
-                    'nombre': nombre || ''  // Enviar nombre si está disponible, de lo contrario enviar vacío
+                    'numero': numero || '', 
+                    'nombre': nombre || ''  
                 },
                 dataType: 'json',
                 success: function(data){
-                    console.log("estos son los datos del cliente", data);
                     $('#resultadosClientes').empty();
                     if(data.resultadosClientes && data.resultadosClientes.length > 0){
                         data.resultadosClientes.forEach(function(resultadosClientes) {
@@ -29,21 +27,59 @@ $(document).ready(function(){
                             clientesElemento.attr('data-codigoSN', resultadosClientes.codigoSN);
                             clientesElemento.attr('data-rut', resultadosClientes.rut);
                             clientesElemento.text(resultadosClientes.codigoSN + ' - ' + resultadosClientes.nombre + ' ' + resultadosClientes.apellido);
-                            console.log(clientesElemento);
-
                             $('#resultadosClientes').append(clientesElemento);
-                            console.log("Se agregó un elemento <option> al select #resultadosClientes: " + resultadosClientes.nombre + ' ' + resultadosClientes.apellido + ' ' + numero);
                         });
                     } else {
-                        $('#resultadosClientes').html('No se encontraron resultados'); // Utilizar html() en lugar de text()
+                        $('#resultadosClientes').html('No se encontraron resultados');
                     }
                 },
-                error: function(xhr, status, error) { // Maneja errores de la solicitud AJAX
+                error: function(xhr, status, error) {
                     console.error('Error en la solicitud AJAX:', error);
                 }
             });
         } else {
-            $('#resultadosClientes').empty(); // Limpiar el contenedor si el input tiene menos de 3 caracteres
+            $('#resultadosClientes').empty();
         }
     });
+
+    // Evento para capturar "Enter" en el input y limpiar si está vacío
+    $('#inputCliente').on('keydown', function(event){
+        if (event.key === "Enter" && $(this).val().trim() === '') {
+            event.preventDefault();
+            limpiarInformacionCliente();
+        }
+    });
+
+    // Delegamos el evento click al contenedor para elementos creados dinámicamente
+    $('#resultadosClientes').on('click', '.suggestion-item', function(){
+        let nombre = $(this).attr('data-nombre');
+        let apellido = $(this).attr('data-apellido');
+        let clienteId = $(this).attr('data-rut');
+        let codigoSN = $(this).attr('data-codigoSN');
+
+        $('#inputCliente').val(codigoSN + " - " + nombre + ' ' + apellido);
+        $('#inputCliente').attr('data-rut', clienteId);
+        $('#inputCliente').attr('data-codigoSN', codigoSN);
+
+        $('#resultadosClientes').empty();
+
+        traerInformacionCliente(clienteId);
+    });
 });
+
+function limpiarInformacionCliente() {
+    $('#inputCliente').val(''); // Limpia el campo de entrada
+    $('#inputCliente').removeAttr('data-rut').removeAttr('data-codigoSN'); // Elimina los atributos
+    $('#resultadosClientes').empty(); // Vacía el contenedor de resultados
+
+    // Restablece el select de contactos con la opción predeterminada
+    $('#clientes').html(`
+        <option value="">Seleccione un contacto</option>
+    `);
+
+    // Restablece los selects de direcciones con opciones predeterminadas
+    $('#direcciones_despacho').html('<option value="">Seleccione una dirección de despacho</option>');
+    $('#direcciones_facturacion').html('<option value="">Seleccione una dirección de facturación</option>');
+
+    console.log("Información del cliente limpia.");
+}
