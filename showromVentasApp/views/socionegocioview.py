@@ -217,11 +217,14 @@ class SocioNegocioView(FormView):
             # Crear instancia del servicio y verificar si el cliente existe en el DB
             print("ruta: ", rut )
             print("Buscando información del cliente")
+
+            socio_negocio_service = SocioNegocio(request)
+
+
             cardCode = rut + "C"
 
             print("CardCode: ", cardCode)
 
-            socio_negocio_service = SocioNegocio(request)
 
             sn_existe = socio_negocio_service.verificarSocioDB(cardCode)
 
