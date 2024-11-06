@@ -137,8 +137,24 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
         quotations.forEach(entry => {
             const quotation = entry.Quotations || {};
             const salesPerson = entry.SalesPersons || {};
-            const vatSumFormatted = Number(quotation.DocTotalNeto).toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-            const docTotalFormatted = Number(quotation.DocTotal).toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+            function formatCurrency(value) {
+                // Convertimos el valor a número entero
+                const integerValue = Math.floor(value);
+                let formattedValue = integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+            
+                // Si el valor tiene 4 dígitos y no incluye un punto, lo añadimos manualmente
+                if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
+                    formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
+                }
+            
+                // Agregamos el símbolo de peso al principio
+                return `$ ${formattedValue}`;
+            }
+            
+            // Aplicamos la función a los valores necesarios
+            const vatSumFormatted = formatCurrency(quotation.DocTotalNeto);
+            const docTotalFormatted = formatCurrency(quotation.DocTotal);
+            
             
             const getStatus = (quotation) => {
                 if (quotation.Cancelled === 'Y') return 'Cancelado';
@@ -162,8 +178,8 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
                 <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
                 <td>${fechaFormateada}</td>
                 <td>${status}</td>
-                <td style="text-align: right;">$ ${vatSumFormatted}</td>
-                <td style="text-align: right;">$ ${docTotalFormatted}</td>
+                <td style="text-align: right;"> ${vatSumFormatted}</td>
+                <td style="text-align: right;"> ${docTotalFormatted}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -332,7 +348,7 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
     const netoValue = brutoValue * 0.84;
 1
     // Muestra el valor calculado en el campo neto
-    inputNeto.value = netoValue.toFixed(2); // Limita a 2 decimales
+    inputNeto.value = netoValue; // Limita a 2 decimales
     });
 
 });
