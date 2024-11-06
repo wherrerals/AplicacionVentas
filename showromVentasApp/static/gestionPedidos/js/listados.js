@@ -135,7 +135,7 @@ document.querySelector('#buscarlistacootizacion').addEventListener('keydown', fu
     
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><a href="${urlModel}">${quotation.DocNum}</a></td>
+                <td><a href="#" class="docentry-link" data-docentry="${quotation.DocEntry}">${quotation.DocNum}</a></td>
                 <td><a href="#" class="cliente-link" data-cadcode="${quotation.CardCode}">${quotation.CardName || 'Cliente Desconocido'}</a></td>
                 <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
                 <td>${quotation.DocDate}</td>
@@ -145,6 +145,20 @@ document.querySelector('#buscarlistacootizacion').addEventListener('keydown', fu
             `;
             tbody.appendChild(tr);
         });
+        
+        document.querySelectorAll('.docentry-link').forEach(link => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const docEntry = event.target.getAttribute('data-docentry');
+            
+            if (docEntry) {
+                // Redirige a la página de generación de cotización con docentry en la URL
+                window.location.href = `/ventas/generar_cotizacion/?docentry=${docEntry}`;
+            } else {
+                alert("No se pudo obtener el DocEntry de la cotización.");
+            }
+        });
+    });
     
         // Agrega el evento click a todos los enlaces de clientes después de añadir las filas
         document.querySelectorAll('.cliente-link').forEach(link => {
