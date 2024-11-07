@@ -174,7 +174,7 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><a href="#" class="docentry-link" data-docentry="${quotation.DocEntry}">${quotation.DocNum}</a></td>
-                <td><a href="#" class="cliente-link" data-cadcode="${quotation.CardCode}">${quotation.CardName || 'Cliente Desconocido'}</a></td>
+                <td><a href="#" class="cliente-link" data-cadcode="${quotation.CardCode}">${quotation.CardCode} - ${quotation.CardName || 'Cliente Desconocido'}</a></td>
                 <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
                 <td>${fechaFormateada}</td>
                 <td>${status}</td>
