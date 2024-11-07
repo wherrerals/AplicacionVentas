@@ -79,39 +79,55 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     };
 
-// Evento para capturar texto y colocarlo en el filtro correspondiente
+// Función para aplicar el filtro basado en el contenido del campo de búsqueda
+const aplicarFiltroDesdeBusqueda = () => {
+    const searchText = document.querySelector('#buscarlistacootizacion').value.trim();
+
+    // Coloca el valor en el campo de filtro correspondiente
+    if (!isNaN(searchText)) {
+        // Número de documento (SAP)
+        document.querySelector('[name="docNum"]').value = searchText;
+    } else if (/^\d{1,4}[-\/]\d{1,2}[-\/]\d{1,4}$/.test(searchText)) {
+        // Fecha en formato YYYY-MM-DD
+        document.querySelector('[name="fecha_documento"]').value = searchText;
+    } else if (["abierto", "cerrado", "cancelado", "Abierto", "Cerrado", "Cancelado"].includes(searchText)) {
+        // Estado del documento
+        const estadoMap = {
+            "abierto": "O",
+            "cerrado": "C",
+            "cancelado": "Y",
+            "Abierto": "O",
+            "Cerrado": "C",
+            "Cancelado": "Y"
+        };
+        document.querySelector('[name="DocumentStatus"]').value = estadoMap[searchText];
+    } else {
+        // Nombre del cliente
+        document.querySelector('[name="cardName"]').value = searchText;
+    }
+
+    // Limpiar el input de búsqueda después de colocar el valor
+    document.querySelector('#buscarlistacootizacion').value = '';
+
+    // Aplica los filtros y realiza la búsqueda
+    const filters = getFilterData();
+    applyFiltersAndFetchData(filters); // Aplica los filtros
+    window.scrollTo(0, 0); // Desplazar hacia la parte superior de la página
+};
+
+// Evento para capturar texto en el campo de búsqueda y aplicar el filtro al presionar "Enter"
 document.querySelector('#buscarlistacootizacion').addEventListener('keydown', function(event) {
     if (event.key === "Enter") {
         event.preventDefault(); 
-        const searchText = event.target.value.trim();
-
-        // Coloca el valor en el campo de filtro correspondiente
-        if (!isNaN(searchText)) {
-            // Número de documento (SAP)
-            document.querySelector('[name="docNum"]').value = searchText;
-        } else if (/^\d{1,4}[-\/]\d{1,2}[-\/]\d{1,4}$/.test(searchText)) {
-            // Fecha en formato YYYY-MM-DD
-            document.querySelector('[name="fecha_documento"]').value = searchText;
-        } else if (["abierto", "cerrado", "cancelado", "Abierto", "Cerrado", "Cancelado"].includes(searchText)) {
-            // Estado del documento
-            const estadoMap = {
-                "abierto": "O",
-                "cerrado": "C",
-                "cancelado": "Y",
-                "Abierto": "O",
-                "Cerrado": "C",
-                "Cancelado": "Y"
-            };
-            document.querySelector('[name="DocumentStatus"]').value = estadoMap[searchText];
-        } else {
-            // Nombre del cliente
-            document.querySelector('[name="cardName"]').value = searchText;
-        }
-
-        // Limpiar el input de búsqueda después de colocar el valor
-        event.target.value = '';
+        aplicarFiltroDesdeBusqueda();
     }
 });
+
+// Evento para aplicar el filtro al hacer clic en la lupa
+document.querySelector('#lupa-busqueda').addEventListener('click', function() {
+    aplicarFiltroDesdeBusqueda();
+});
+
 
 
     const displayQuotations = (quotations) => {
@@ -121,8 +137,24 @@ document.querySelector('#buscarlistacootizacion').addEventListener('keydown', fu
         quotations.forEach(entry => {
             const quotation = entry.Quotations || {};
             const salesPerson = entry.SalesPersons || {};
-            const vatSumFormatted = Number(quotation.DocTotalNeto).toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-            const docTotalFormatted = Number(quotation.DocTotal).toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+            function formatCurrency(value) {
+                // Convertimos el valor a número entero
+                const integerValue = Math.floor(value);
+                let formattedValue = integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+            
+                // Si el valor tiene 4 dígitos y no incluye un punto, lo añadimos manualmente
+                if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
+                    formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
+                }
+            
+                // Agregamos el símbolo de peso al principio
+                return `$ ${formattedValue}`;
+            }
+            
+            // Aplicamos la función a los valores necesarios
+            const vatSumFormatted = formatCurrency(quotation.DocTotalNeto);
+            const docTotalFormatted = formatCurrency(quotation.DocTotal);
+            
             
             const getStatus = (quotation) => {
                 if (quotation.Cancelled === 'Y') return 'Cancelado';
@@ -132,20 +164,40 @@ document.querySelector('#buscarlistacootizacion').addEventListener('keydown', fu
             };
             const status = getStatus(quotation);
             let urlModel = `/ventas/detalles_cotizacion/?docentry=${quotation.DocEntry}`;
+
+            date = quotation.DocDate
+            let partesFecha = date.split("-");
+
+            // Cambia el orden de las partes para obtener "dd/mm/aaaa"
+            let fechaFormateada = `${partesFecha[2]}/${partesFecha[1]}/${partesFecha[0]}`;
     
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><a href="${urlModel}">${quotation.DocNum}</a></td>
+                <td><a href="#" class="docentry-link" data-docentry="${quotation.DocEntry}">${quotation.DocNum}</a></td>
                 <td><a href="#" class="cliente-link" data-cadcode="${quotation.CardCode}">${quotation.CardName || 'Cliente Desconocido'}</a></td>
                 <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
-                <td>${quotation.DocDate}</td>
+                <td>${fechaFormateada}</td>
                 <td>${status}</td>
-                <td style="text-align: right;">$ ${vatSumFormatted}</td>
-                <td style="text-align: right;">$ ${docTotalFormatted}</td>
+                <td style="text-align: right;"> ${vatSumFormatted}</td>
+                <td style="text-align: right;"> ${docTotalFormatted}</td>
             `;
             tbody.appendChild(tr);
         });
-    
+        
+        document.querySelectorAll('.docentry-link').forEach(link => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const docEntry = event.target.getAttribute('data-docentry');
+            
+            if (docEntry) {
+                // Redirige a la página de generación de cotización con docentry en la URL
+                window.location.href = `/ventas/generar_cotizacion/?docentry=${docEntry}`;
+            } else {
+                alert("No se pudo obtener el DocEntry de la cotización.");
+            }
+        });
+    });
+
         // Agrega el evento click a todos los enlaces de clientes después de añadir las filas
         document.querySelectorAll('.cliente-link').forEach(link => {
             link.addEventListener('click', (event) => {
@@ -284,4 +336,19 @@ document.querySelector('#buscarlistacootizacion').addEventListener('keydown', fu
             applyFiltersAndFetchData(filters); // Aplicar los filtros cuando cambia el selector
         });
     });
+
+    // Selecciona los campos de bruto y neto
+    const inputBruto = document.getElementById('buscar_bruto');
+    const inputNeto = document.getElementById('buscar_neto');
+
+    // Escucha los cambios en el campo de bruto
+    inputBruto.addEventListener('input', function() {
+    // Convierte el valor del bruto a número y calcula el neto
+    const brutoValue = parseFloat(inputBruto.value) || 0;
+    const netoValue = brutoValue * 0.84;
+1
+    // Muestra el valor calculado en el campo neto
+    inputNeto.value = netoValue; // Limita a 2 decimales
+    });
+
 });

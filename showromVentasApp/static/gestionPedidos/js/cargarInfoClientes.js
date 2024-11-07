@@ -1,8 +1,7 @@
 // Función para rellenar los campos del modal con la información del cliente seleccionado
 function cargarInformacionClienteEnModal(cliente) {
     // Agregar logs para verificar si los datos están llegando correctamente
-    console.log("Cargando información del cliente en el modal:");
-    console.log(cliente);
+    console.log("Cargando información del cliente en el modal:", cliente);
 
     // Nombre y Apellido
     $('#nombreSN').val(cliente.nombre);
