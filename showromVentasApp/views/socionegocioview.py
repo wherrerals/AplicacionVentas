@@ -180,8 +180,6 @@ class SocioNegocioView(FormView):
             JsonResponse con la respuesta de la API
         """
 
-        print("Verificando Socio de Negocio")
-
         if request.method == "GET":
             cardCode = request.GET.get('data-rut')  # Usar en producción
             #cardCode = "10880683C"     
@@ -202,62 +200,29 @@ class SocioNegocioView(FormView):
 
     def informacionCliente(self, request):
         """
-        Redirige a la página de creación de clientes, manteniendo el RUT en la URL.
+        Método para obtener la información de un cliente
+        
+        args:
+            request: HttpRequest
+        
+        return:
+            JsonResponse con la información del cliente, o un mensaje de error
         """
         if request.method != 'GET':
             return JsonResponse({'error': 'Método no permitido'}, status=405)
 
         rut = request.GET.get('rut')
 
-        print("RUT: ", rut)
         if not rut:
             return JsonResponse({'error': 'No se proporcionó un RUT de socio de negocio'}, status=400)
 
         try:
-            # Crear instancia del servicio y verificar si el cliente existe en el DB
-            print("ruta: ", rut )
-            print("Buscando información del cliente")
-
             socio_negocio_service = SocioNegocio(request)
+            cardCode = socio_negocio_service.generarCardCode(rut)
 
-
-            cardCode = rut + "C"
-
-            print("CardCode: ", cardCode)
-
-
-            sn_existe = socio_negocio_service.verificarSocioDB(cardCode)
-
-            print("SN Existe: ", sn_existe)
-
-            if sn_existe:
-
-                resultados = socio_negocio_service.infoCliente(rut)
-
-                if resultados:
-                    return JsonResponse(resultados, status=200, safe=False)  # safe=False permite serializar objetos no 'dict'
-                else:
-                    return JsonResponse({'error': 'No se encontraron resultados para el RUT especificado'}, status=404)
-                
+            if socio_negocio_service.verificarSocioDB(cardCode):
+                return socio_negocio_service.responderInfoCliente(rut)
             else:
-                client = APIClient() 
-                sn = SocioNegocio(request)
-                data = client.getInfoSN(cardCode)
-                conversion = sn.convertirJsonObjeto(data)
-                dataCreacion = sn.procesarDatosSocionegocio(conversion) 
-                creacion = sn.guardarClienteCompleto(dataCreacion)
-                
-                try:
-                    if creacion:
-                        resultados = socio_negocio_service.infoCliente(rut)
-                        if resultados:
-                            return JsonResponse(resultados, status=200, safe=False)
-                        else:
-                            return JsonResponse({'error': 'No se encontraron resultados para el RUT especificado'}, status=404)
-                    else:
-                        return JsonResponse({'error': 'Error al crear el cliente'}, status=500)
-                except Exception as e:
-                    return JsonResponse({'error': str(e)}, status=500)
-                
+                return socio_negocio_service.crearYresponderCliente(cardCode, rut)
         except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)  
+            return JsonResponse({'error': str(e)}, status=500)
