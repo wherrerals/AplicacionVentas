@@ -49,8 +49,6 @@ class SocioNegocioRepository:
         return SocioNegocioDB.objects.create(**kwargs)
 
     @staticmethod
-
-    @staticmethod
     def buscarClientesPorRut(rut):
         """
         Busca clientes por rut

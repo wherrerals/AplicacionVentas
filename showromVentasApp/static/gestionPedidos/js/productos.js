@@ -110,7 +110,6 @@ class Producto {
     // Obtener el valor del descuento máximo
     let descuentoMaxElem = row.querySelector('#descuento');
     let descuentoMax = parseFloat(descuentoMaxElem.textContent.replace('Max: ', ''));
-    console.log('Descuento máximo:', descuentoMax);
 
     // Configurar el input para limitar el valor máximo
     let inputDescuento = row.querySelector('#agg_descuento');
@@ -141,13 +140,10 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     // Contador de productos
     let contprod = document.querySelectorAll('#productos tbody').length + 1;
     
-    // Crear una instancia de Producto
     let producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento);
     
-    // Crear una fila para el producto
     let newRow = producto.crearFila(contprod);
     
-    // Agregar la fila a la tabla
     document.getElementById('productos').appendChild(newRow);
   
     // Agregar eventos
