@@ -248,7 +248,7 @@ class CotizacionView(View):
 
         cotiza = Cotizacion()
         lines_data = cotiza.formatearDatos(data)
-
+        print("Lines data:", data)
         context.update({'data': lines_data})
         return render(request, 'cotizacion.html', context)
 

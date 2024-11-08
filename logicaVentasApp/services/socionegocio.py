@@ -9,7 +9,10 @@ from datosLsApp.models.gruposndb import GrupoSNDB
 from datosLsApp.models.socionegociodb import SocioNegocioDB
 from datosLsApp.models.tipoclientedb import TipoClienteDB
 from datosLsApp.models.tiposndb import TipoSNDB
-from datosLsApp.repositories import (GrupoSNRepository, SocioNegocioRepository, TipoClienteRepository, TipoSNRepository)
+from datosLsApp.repositories.socionegociorepository import SocioNegocioRepository
+from datosLsApp.repositories.gruposnrepository import GrupoSNRepository
+from datosLsApp.repositories.tipoclienterepository import TipoClienteRepository
+from datosLsApp.repositories.tiposnrepository import TipoSNRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.models import DireccionDB, ContactoDB
