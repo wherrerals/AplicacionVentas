@@ -174,7 +174,7 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><a href="#" class="docentry-link" data-docentry="${quotation.DocEntry}">${quotation.DocNum}</a></td>
-                <td><a href="#" class="cliente-link" data-cadcode="${quotation.CardCode}">${quotation.CardCode} - ${quotation.CardName || 'Cliente Desconocido'}</a></td>
+                <td><a href="#" class="cliente-link" data-cadcode="${quotation.CardCode}">${quotation.CardName || 'Cliente Desconocido'}</a></td>
                 <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
                 <td>${fechaFormateada}</td>
                 <td>${status}</td>
@@ -247,72 +247,74 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
     };
 
 
-    // Función para obtener los datos de la página actual con filtros
+    const updatePagination = (page) => {
+        const paginationContainers = document.querySelectorAll('.pagination');
+    
+        paginationContainers.forEach(paginationContainer => {
+            paginationContainer.innerHTML = ''; // Limpiar la paginación actual
+    
+            // Botón "Anterior"
+            const prevButton = document.createElement('li');
+            prevButton.classList.add('page-item');
+            prevButton.innerHTML = `
+                <a class="page-link" aria-label="Previous" href="#">
+                    <span aria-hidden="true">«</span>
+                </a>`;
+            if (page > 1) {
+                prevButton.querySelector('a').addEventListener('click', (event) => {
+                    event.preventDefault();
+                    currentPage -= 1;
+                    fetchAndDisplayData(currentPage);
+                });
+            } else {
+                prevButton.classList.add('disabled');
+            }
+            paginationContainer.appendChild(prevButton);
+    
+            // Números de página
+            let startPage = Math.max(1, page - 1);
+            let endPage = Math.min(totalPages || page + 1, page + 1);
+    
+            for (let i = startPage; i <= endPage; i++) {
+                const pageItem = document.createElement('li');
+                pageItem.classList.add('page-item');
+                if (i === page) {
+                    pageItem.classList.add('active');
+                }
+                pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                pageItem.querySelector('a').addEventListener('click', (event) => {
+                    event.preventDefault();
+                    currentPage = i;
+                    fetchAndDisplayData(currentPage);
+                });
+                paginationContainer.appendChild(pageItem);
+            }
+    
+            // Botón "Siguiente"
+            const nextButton = document.createElement('li');
+            nextButton.classList.add('page-item');
+            nextButton.innerHTML = `
+                <a class="page-link" aria-label="Next" href="#">
+                    <span aria-hidden="true">»</span>
+                </a>`;
+            if (totalPages === null || page < totalPages) {
+                nextButton.querySelector('a').addEventListener('click', (event) => {
+                    event.preventDefault();
+                    currentPage += 1;
+                    fetchAndDisplayData(currentPage);
+                });
+            } else {
+                nextButton.classList.add('disabled');
+            }
+            paginationContainer.appendChild(nextButton);
+        });
+    };
+    
     const fetchAndDisplayData = (page = 1) => {
         applyFiltersAndFetchData(activeFilters, page);
         window.scrollTo(0, 0); // Desplazar hacia la parte superior de la página
     };
-
-    const updatePagination = (page) => {
-        const paginationContainer = document.querySelector('.pagination');
-        paginationContainer.innerHTML = '';
-
-        const prevButton = document.createElement('li');
-        prevButton.classList.add('page-item');
-        prevButton.innerHTML = `
-            <a class="page-link" aria-label="Previous" href="#" id="prevButton">
-                <span aria-hidden="true">«</span>
-            </a>
-        `;
-        if (page > 1) {
-            prevButton.querySelector('a').addEventListener('click', (event) => {
-                event.preventDefault();
-                currentPage -= 1;
-                fetchAndDisplayData(currentPage); // Mantener filtros al paginar
-            });
-        } else {
-            prevButton.classList.add('disabled');
-        }
-        paginationContainer.appendChild(prevButton);
-
-        // Mostrar al menos 3 números de página alrededor de la página actual
-        let startPage = Math.max(1, page - 1);
-        let endPage = Math.min(totalPages || page + 1, page + 1); // Mostrar máximo 3 números
-
-        for (let i = startPage; i <= endPage; i++) {
-            const pageItem = document.createElement('li');
-            pageItem.classList.add('page-item');
-            if (i === page) {
-                pageItem.classList.add('active');
-            }
-            pageItem.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i}</a>`;
-            pageItem.querySelector('a').addEventListener('click', (event) => {
-                event.preventDefault();
-                currentPage = i;
-                fetchAndDisplayData(currentPage); // Mantener filtros al cambiar de página
-            });
-            paginationContainer.appendChild(pageItem);
-        }
-
-        // Botón "Siguiente"
-        const nextButton = document.createElement('li');
-        nextButton.classList.add('page-item');
-        nextButton.innerHTML = `
-            <a class="page-link" aria-label="Next" href="#" id="nextButton">
-                <span aria-hidden="true">»</span>
-            </a>
-        `;
-        if (totalPages === null || page < totalPages) { // Si no sabemos el total de páginas o no es la última
-            nextButton.querySelector('a').addEventListener('click', (event) => {
-                event.preventDefault();
-                currentPage += 1;
-                fetchAndDisplayData(currentPage); // Mantener filtros al avanzar
-            });
-        } else {
-            nextButton.classList.add('disabled');
-        }
-        paginationContainer.appendChild(nextButton);
-    };
+    
 
     // Llamar a la función para cargar la primera página con filtros activos al inicio
     fetchAndDisplayData(currentPage);
@@ -336,6 +338,22 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
             applyFiltersAndFetchData(filters); // Aplicar los filtros cuando cambia el selector
         });
     });
+
+    const attachClearEventListeners = () => {
+        const filterInputs = document.querySelectorAll('#filterForm input');
+        
+        filterInputs.forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.value === '') {
+                    const filters = getFilterData();
+                    applyFiltersAndFetchData(filters); // Actualiza los datos cuando se borra un campo
+                }
+            });
+        });
+    };
+
+    // Llamar a la función para agregar los eventos de limpiar filtros
+    attachClearEventListeners();
 
     // Selecciona los campos de bruto y neto
     const inputBruto = document.getElementById('buscar_bruto');
