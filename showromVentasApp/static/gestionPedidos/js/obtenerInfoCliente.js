@@ -29,13 +29,12 @@ $(document).ready(function(){
 // Función para traer información completa del cliente (modularizada)
 function traerInformacionCliente(clienteId) {
 
-    let buscarClientesUrl = '/ventas/buscar_clientes/'; // URL para buscar clientes
+    let buscarClientesUrl = `/ventas/buscar_clientes/?numero=${clienteId}`;
+
     $.ajax({
 
         url: buscarClientesUrl, // URL de la solicitud
-        data: {
-            'numero': clienteId  // numero es el rut del cliente
-        },
+        type: 'GET', // Método de la solicitud
         dataType: 'json',
         
         success: function(data) {
@@ -52,7 +51,7 @@ function traerInformacionCliente(clienteId) {
                 actualizarDirecciones(cliente.direcciones, '#direcciones_despacho', "12");
                 actualizarDirecciones(cliente.direcciones, '#direcciones_facturacion', "13");
                 cargarInformacionClienteEnModal(cliente);
-            } else {
+            } else { 
                 console.log('No se encontraron clientes con el número proporcionado.');
             }
         },

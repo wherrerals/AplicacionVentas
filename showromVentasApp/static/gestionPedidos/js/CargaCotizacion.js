@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", function () {
     if (docEntry) {
         const vendedorDataElement = document.getElementById("vendedor_data");
 
-        // Mostrar "Cargando..." antes de la solicitud
         if (vendedorDataElement) {
             vendedorDataElement.innerText = "Cargando...";
         }
@@ -22,74 +21,87 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 if (data.Cliente && data.Cliente.SalesPersons) {
                     console.log("Datos de la cotización:", data);
+
+                    // Extracción de datos principales
                     const salesEmployeeName = data.Cliente.SalesPersons.SalesEmployeeName;
                     const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
                     const numCotizacion = data.Cliente.Quotations.DocNum;
                     const docDate = data.Cliente.Quotations.DocDate;
                     const canceled = data.Cliente.Quotations.Canceled;
-                    const cardCode = data.Cliente.Quotations.CardCode;
+                    let cardCode = data.Cliente.Quotations.CardCode;
 
-                    console.log("Valor original de SalesEmployeeName:", salesEmployeeName);
-                    console.log("Valor original de U_LED_SUCURS (Sucursal):", sucursal);
-                    console.log("Número de cotización:", numCotizacion);
-                    console.log("Fecha de la cotización:", docDate);
-
-                    // Extraer el nombre limpio del vendedor
-                    // Extraer el nombre limpio del vendedor eliminando todo después del primer guion "-"
-                    const vendedorMatch = salesEmployeeName.match(/^[^-]+-\s*(.*?)\s*$/);
-                    const vendedorLimpio = vendedorMatch ? vendedorMatch[1] : "Vendedor desconocido";
-
-                    console.log("Nombre del vendedor limpio:", vendedorLimpio);
-
-
-                    // Mostrar el nombre del vendedor después de cargar
-                    if (vendedorDataElement) {
-                        vendedorDataElement.innerText = "Cargando...";
-                        setTimeout(() => {
-                            vendedorDataElement.innerText = vendedorLimpio;
-                        }, 0);
+                    if (cardCode.endsWith("C")) {
+                        cardCode = cardCode.slice(0, -1);
+                        console.log("Código de cliente corregido:", cardCode);
                     }
 
-                    // Supongamos que 'sucursal' tiene el valor que deseas mostrar
-                    const showroomElement =  document.getElementById("sucursal")
+                    const vendedorMatch = salesEmployeeName.match(/^[^-]+-\s*([^\s/]+.*?)\s*(\/|$)/);
+                    const vendedorLimpio = vendedorMatch ? vendedorMatch[1].trim() : "Vendedor desconocido";
+                    if (vendedorDataElement) {
+                        vendedorDataElement.innerText = vendedorLimpio;
+                    }
 
+                    const showroomElement = document.getElementById("sucursal");
                     if (showroomElement) {
-                        console.log("Contenido previo de showroom:", showroomElement.innerText);
-                        showroomElement.innerText = sucursal;  // Actualiza el texto con el valor de sucursal
-                        console.log("Contenido actualizado de showroom:", showroomElement.innerText);
+                        showroomElement.innerText = sucursal;
                     } else {
                         console.warn("No se encontró el elemento showroom en el DOM.");
                     }
 
-
-
-                    if (numCotizacion) {
-                        const numeroCotizacionElement = document.getElementById("numero_cotizacion");
-                        if (numeroCotizacionElement) {
-                            numeroCotizacionElement.textContent = `${numCotizacion}`;
-                        }
+                    const numeroCotizacionElement = document.getElementById("numero_cotizacion");
+                    if (numeroCotizacionElement) {
+                        numeroCotizacionElement.textContent = `${numCotizacion}`;
                     }
-
-                    if (docDate) {
-                        const dueDateElement = document.getElementById("docDueDate");
-                        if (dueDateElement) {
-                            dueDateElement.textContent = `${docDate}`;
-                        }
+                    const dueDateElement = document.getElementById("docDueDate");
+                    if (dueDateElement) {
+                        dueDateElement.textContent = `${docDate}`;
                     }
 
                     const estadoElement = document.querySelector('p strong[data-estado="bost_Open"]');
                     if (estadoElement) {
-
                         estadoElement.textContent = (canceled === "N") ? "Abierta" : "Cancelada";
                     }
 
+                    traerInformacionCliente(cardCode);
 
+                    // Iteración sobre `DocumentLines` para añadir cada producto
+                    const documentLines = data.DocumentLines;
+                    documentLines.forEach((line) => {
+                        const productoCodigo = line.ItemCode;
+                        const nombre = line.ItemDescription;
+                        const imagen = 'ruta_a_la_imagen.jpg';
+                        const precioVenta = line.PriceAfterVAT;
+                        const stockTotal = 0;
+                        const precioLista = line.GrossPrice;
+                        const precioDescuento = line.DiscountPercent;
+
+                        // Debugging: Verificar datos del producto antes de agregarlo
+                        console.log("Agregando producto con datos:", {
+                            productoCodigo,
+                            nombre,
+                            imagen,
+                            precioVenta,
+                            stockTotal,
+                            precioLista,
+                            precioDescuento
+                        });
+
+                        agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento);
+
+                        // Selección de la última fila añadida
+                        const productoRows = document.querySelectorAll('.product-row');
+                        const newRow = productoRows[productoRows.length - 1];
+                        if (!newRow) {
+                            console.error("Error: No se encontró la nueva fila del producto en el DOM.");
+                            return;
+                        }
+
+
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error en la solicitud AJAX:', error);
-
-                // Si hay un error, mostrar un mensaje alternativo
                 if (vendedorDataElement) {
                     vendedorDataElement.innerText = "Error al cargar datos";
                 }
