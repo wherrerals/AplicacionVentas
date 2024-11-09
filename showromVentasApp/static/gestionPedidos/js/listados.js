@@ -183,6 +183,17 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
             `;
             tbody.appendChild(tr);
         });
+
+                // Función para mostrar el overlay de carga
+        const showLoadingOverlay = () => {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        };
+
+        // Ocultar el overlay de carga (si necesitas ocultarlo en algún momento)
+        const hideLoadingOverlay = () => {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        };
+
         
         document.querySelectorAll('.docentry-link').forEach(link => {
         link.addEventListener('click', (event) => {
@@ -190,9 +201,11 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
             const docEntry = event.target.getAttribute('data-docentry');
             
             if (docEntry) {
+                showLoadingOverlay();
                 // Redirige a la página de generación de cotización con docentry en la URL
                 window.location.href = `/ventas/generar_cotizacion/?docentry=${docEntry}`;
             } else {
+                hideLoadingOverlay();
                 alert("No se pudo obtener el DocEntry de la cotización.");
             }
         });
@@ -210,6 +223,7 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
                 }
         
                 if (cadCode) {
+                    showLoadingOverlay();
                     // Realiza la solicitud AJAX al backend para obtener la información del cliente
                     fetch(`/ventas/informacion_cliente/?rut=${cadCode}`)
                         .then(response => {
@@ -223,9 +237,11 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
                             window.location.href = `/ventas/creacion_clientes/?rut=${cadCode}`;
                         })
                         .catch(error => {
+                            hideLoadingOverlay();
                             console.error('Error en la solicitud AJAX:', error);
                         });
                 } else {
+                    hideLoadingOverlay();
                     alert("No se pudo obtener el RUT del cliente.");
                 }
             });
