@@ -46,6 +46,7 @@ class SocioNegocioView(FormView):
         # Definir un diccionario de rutas a métodos POST
         route_map = {
             '/ventas/agregar_editar_clientes/': self.agregarSocioNegocio,
+            '/ventas/filtrar_socios_negocio/': self.filtrarSociosNegocio
             #'/ventas/crear_cliente/': self.creacionCionSocioNeocio,
         }
 
@@ -68,8 +69,9 @@ class SocioNegocioView(FormView):
         # Definir un diccionario de rutas a métodos GET
         route_map = {
             '/ventas/buscar_clientes/': self.busquedaSocioNegocio,
+            '/ventas/listado_socios_negocio/': self.listarSociosNegocio,
             '/ventas/verificar_cliente/': self.verificarSapSocio,
-            '/ventas/informacion_cliente/': self.informacionCliente
+            '/ventas/informacion_cliente/': self.informacionCliente,
         }
 
         # Buscar el método basado en la ruta 
@@ -226,3 +228,61 @@ class SocioNegocioView(FormView):
                 return socio_negocio_service.crearYresponderCliente(cardCode, rut)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
+    
+
+    def listarSociosNegocio(self, request):
+        try:
+            client = APIClient()
+            top = int(request.GET.get('top', 20))
+            skip = int(request.GET.get('skip', 0))
+            data = client.getDataSN(top=top, skip=skip)
+            return JsonResponse(data, safe=False)
+        except ValueError as e:
+            logger.error(f"Invalid parameters: {str(e)}")
+            return JsonResponse({'error': 'Parámetros inválidos'}, status=400)
+        except Exception as e:
+            logger.error(f"Error listing quotations: {str(e)}")
+            return self.handle_error(e)
+
+    def filtrarSociosNegocio(self, request):
+        """
+        Método para filtrar los socios de negocio
+        
+        args:
+            request: HttpRequest
+            
+            return:
+                JsonResponse con los datos de los socios de negocio, o un mensaje de error
+        """
+        print("Request body:", request.body)  # Verifica el cuerpo de la solicitud JSON recibida
+        
+        client = APIClient()
+
+        try:
+            data = json.loads(request.body)
+            print("Received data:", data)  # Verifica los datos JSON recibidos
+        except json.JSONDecodeError as e:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+        # Construir filtros usando la lógica de negocio
+        filters = SocioNegocio.construirFiltrosSociosNegocio(data)
+
+        # Validar los parámetros de paginación
+        try:
+            top = int(data.get('top', 20))
+            skip = int(data.get('skip', 0))
+        except ValueError:
+            return JsonResponse({'error': 'Invalid parameters'}, status=400)
+
+        print("Applying filters:", filters)  # Verifica los filtros aplicados
+        print("-" * 10)  
+        print(filters)
+
+        # Manejar la solicitud de datos
+        try:
+            data = client.getDataSN(top=top, skip=skip, filters=filters)
+            return JsonResponse({'data': data}, safe=False)
+        except Exception as e:
+            print("Error:", e)  # Verifica el error específico que está ocurriendo
+            return JsonResponse({'error': str(e)}, status=500)
+

@@ -1151,3 +1151,37 @@ class SocioNegocio:
                 return JsonResponse({'success': False, 'message': 'Error al guardar el cliente'}, status=500)
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'Error al crear el cliente: {str(e)}'}, status=500)
+
+
+    def construirFiltrosSociosNegocio(data):
+
+        """
+        Construye los filtros para la consulta de cotizaciones basados en los datos proporcionados.
+
+        Args:
+            data (dict): Datos de la consulta.
+
+        Returns:
+            dict: Filtros para la consulta de cotizaciones.
+        """
+
+        filters = {}
+
+        if data.get('cardType'):
+            filters['CardType eq'] = str(f"'{data.get('cardType')}'")
+        if data.get('CardCode'):
+            filters['contains(CardCode,'] = str(f"'{data.get('CardCode')}')")
+        if data.get('cardName'):
+            filters['contains(CardName,'] = str(f"'{data.get('cardName')}')")
+        if data.get('groupCode'):
+            groupCode = int(data.get('groupCode'))
+            filters['GroupCode eq'] = f"{groupCode})"
+        if data.get('phone'):
+            filters['contains(Phone1,'] = f"'{data.get('phone')}')"
+            filters['contains(SalesPersons/SalesEmployeeName,'] = f"'{data.get('salesEmployeeName')}'" 
+        if data.get('email'):
+            filters['contains(EmailAddress,'] = f"'{data.get('email')}')"
+        # Limpiar filtros vacíos o inválidos
+        filters = {k: v for k, v in filters.items() if v and v != "''"}
+
+        return filters
