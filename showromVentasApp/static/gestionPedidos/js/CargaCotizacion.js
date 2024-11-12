@@ -27,12 +27,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
                     const numCotizacion = data.Cliente.Quotations.DocNum;
                     const docDate = data.Cliente.Quotations.DocDate;
-                    const canceled = data.Cliente.Quotations.Canceled;
+                    const canceled = data.Cliente.Quotations.Cancelled;
                     let cardCode = data.Cliente.Quotations.CardCode;
+                    const DocumentStatus = data.Cliente.Quotations.DocumentStatus;
 
                     if (cardCode.endsWith("C")) {
                         cardCode = cardCode.slice(0, -1);
-                        console.log("Código de cliente corregido:", cardCode);
+                        //console.log("Código de cliente corregido:", cardCode);
                     }
 
                     const vendedorMatch = salesEmployeeName.match(/^[^-]+-\s*([^\s/]+.*?)\s*(\/|$)/);
@@ -59,8 +60,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     const estadoElement = document.querySelector('p strong[data-estado="bost_Open"]');
                     if (estadoElement) {
-                        estadoElement.textContent = (canceled === "N") ? "Abierta" : "Cancelada";
+                        if (canceled === "N" && DocumentStatus === "O") {
+                            estadoElement.textContent = "Abierta";
+                        } else if (canceled === "N" && DocumentStatus === "C") {
+                            estadoElement.textContent = "Cerrado";
+                        } else if (canceled === "Y" && DocumentStatus === "C") {
+                            estadoElement.textContent = "Cancelado";
+                        } else {
+                            estadoElement.textContent = "Estado desconocido"; // Para casos no previstos
+                        }
                     }
+                    
 
                     traerInformacionCliente(cardCode);
 

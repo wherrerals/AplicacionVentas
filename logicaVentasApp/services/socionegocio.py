@@ -51,6 +51,8 @@ class SocioNegocio:
     - verificarRutValido(rut)
     - procesarDirecciones(data, socio)
     - procesarContactos(data, socio)
+    - infoCliente(identificador, buscar_por_nombre=False)
+    - verificarSocioDB(rut)
     """
     def __init__(self, request):
         """
@@ -988,7 +990,16 @@ class SocioNegocio:
 
 
     def procesarDatosSocionegocio(self, data):
-        
+        """
+        Procesa los datos de un socio de negocio para ser guardados en la base de datos.
+
+        Args:
+            data (dict): Datos del socio de negocio.
+
+        Returns:
+            dict: Datos del socio de negocio procesados.
+
+        """
         name, lastname  = data.get('CardName').split(' ', 1)
 
         # Datos principales del socio de negocio
@@ -1063,7 +1074,8 @@ class SocioNegocio:
         except ObjectDoesNotExist:
             raise ValueError("No se encontró el grupo, tipo de socio de negocio o tipo de cliente")
             # Maneja el error según sea necesario, como lanzar una excepción o crear un nuevo grupo
-
+        
+        
         cliente = SocioNegocioRepository.crearCliente(
             codigoSN=socio_negocio["codigoSN"],
             nombre=socio_negocio["nombre"],
