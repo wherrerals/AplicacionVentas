@@ -1187,4 +1187,9 @@ class SocioNegocio:
         return filters
     
     def plp(cls):
+        """
+        clear
+        """
+
+        ab = 1 + 2
         pass
