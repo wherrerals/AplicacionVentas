@@ -996,7 +996,7 @@ class SocioNegocio:
             "codigoSN": data.get("CardCode", ""),
             "nombreCompleto": data.get("CardName", ""),
             "nombre": name or "Null",  # Asumiendo que 'CardName' contiene nombre completo
-            "apellido": lastname or "Null",  # Si solo hay un campo de nombre, apellido se mantiene igual
+            "apellido": lastname or "None",  # Si solo hay un campo de nombre, apellido se mantiene igual
             "email": data.get("EmailAddress", "") or "Null",
             "telefono": data.get("Phone1", "") or "Null",
             "celular": data.get("Phone1", "") or "Null",
@@ -1037,10 +1037,6 @@ class SocioNegocio:
                 "SocioNegocio": contacto.get("CardCode", "")
             })
 
-        print("Datos procesados del socio de negocio:")
-        print(f"Socio de negocio: {socio_negocio}")
-        print(f"Direcciones: {direcciones}")
-        print(f"Empleados de contacto: {empleados_contacto}")
         # Estructura final de salida
         resultado = {
             "SocioNegocio": socio_negocio,
