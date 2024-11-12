@@ -1185,3 +1185,6 @@ class SocioNegocio:
         filters = {k: v for k, v in filters.items() if v and v != "''"}
 
         return filters
+    
+    def plp(cls):
+        pass
