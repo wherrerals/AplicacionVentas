@@ -1,40 +1,41 @@
-document.addEventListener("DOMContentLoaded", function () {
-    function getQueryParam(param) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
-    }
+function cargarDatosCliente(rut) {
+  fetch(`/ventas/informacion_cliente/?rut=${rut}`)
+      .then(response => {
+          if (!response.ok) throw new Error('Error al obtener la información del cliente');
+          return response.json();
+      })
+      .then(data => {
+          document.getElementById("nombreSN").value = data[0].nombre || '';
+          document.getElementById("apellidoSN").value = data[0].apellido || '';
+          document.getElementById("rutSN").value = data[0].rut || '';
+          document.getElementById("giroSN").value = data[0].giro || '';
+          document.getElementById("telefonoSN").value = data[0].telefono || '';
+          document.getElementById("emailSN").value = data[0].email || '';
 
-    const rut = getQueryParam('rut');
+          // Asigna el atributo data-rut y luego llama a cargarContactos() y cargarDirecciones()
+          document.getElementById("rutSN").setAttribute("data-rut", data[0].rut || '');
+          document.getElementById("rutSN").readOnly = true;
 
-    if (rut) {
-        fetch(`/ventas/informacion_cliente/?rut=${rut}`)
-            .then(response => {
-                if (!response.ok) throw new Error('Error al obtener la información del cliente');
-                return response.json();
-            })
-            .then(data => {
-                document.getElementById("nombreSN").value = data[0].nombre || '';
-                document.getElementById("apellidoSN").value = data[0].apellido || '';
-                document.getElementById("rutSN").value = data[0].rut || '';
-                document.getElementById("giroSN").value = data[0].giro || '';
-                document.getElementById("telefonoSN").value = data[0].telefono || '';
-                document.getElementById("emailSN").value = data[0].email || '';
+          cargarContactos();
+          cargarDirecciones();
+      })
+      .catch(error => {
+          console.error('Error en la solicitud AJAX:', error);
+      });
+}
 
-                // Asigna el atributo data-rut y luego llama a cargarContactos()
-                document.getElementById("rutSN").setAttribute("data-rut", data[0].rut || '');
-                document.getElementById("rutSN").readOnly = true;
+// Función para cargar contactos
+function cargarContactos() {
+  const clienteRut = $('#rutSN').attr('data-rut');
+  // Resto del código para cargar contactos permanece igual
+}
 
-                // Llama a cargarContactos después de asignar data-rut
-                cargarContactos();
-                cargarDirecciones();
-            })
-            .catch(error => {
-                console.error('Error en la solicitud AJAX:', error);
-            });
-    } else {
-        console.error("No se proporcionó un RUT en la URL");
-    }
-});
+// Función para cargar direcciones
+function cargarDirecciones() {
+  const clienteRut = $('#rutSN').attr('data-rut');
+  // Resto del código para cargar direcciones permanece igual
+}
+
 
 // Función para cargar contactos, ahora debería funcionar
 function cargarContactos() {
@@ -322,6 +323,7 @@ function cargarDirecciones() {
                             if (confirm('¿Estás seguro que deseas eliminar esta direccion?')) {
                                 $(this).closest('.col-sm-5').remove();
                             }
+
                         });
                         
                       });
