@@ -356,4 +356,33 @@ class APIClient:
         response = self.session.get(url, verify=False)
         response.raise_for_status()
         return response.json()
+
+    def getDataSN(self, top=20, skip=0, filters=None):
+        """
+        """
+
+        self.__login()
+        selcect = f"CardCode,CardName,CardType,Phone1,EmailAddress,GroupCode"
+        order_by = f"CardName asc "
+        filter_condition = f"CardType eq 'cCustomer'"
+
+        if filters:
+            for key, value in filters.items():
+                filter_condition += f" and {key} {value}"
+
+        headers = {
+            "Prefer": f"odata.maxpagesize={top}"
+        }
+
+        query_url = f"BusinessPartners?$select={selcect}&$orderby={order_by}&$filter={filter_condition}&$top={top}&$skip={skip}"
+        url = f"{self.base_url}{query_url}"
+
+        response = self.session.get(url, headers=headers, verify=False)
+        response.raise_for_status()
+        print(url)
+        return response.json()
     
+"""    
+https://182.160.29.24:50003/b1s/v1/BusinessPartners?$select=CardCode,CardName,CardType,Phone1,EmailAddress,GroupCode&$orderby=CardName asc&$filter=CardType eq 'cCustomer' and contains(CardCode, '10') and 
+contains(CardName, 'Leonardo') and GroupCode eq 105 and contains(Phone1, '+569') and contains(EmailAddress, '@gmail') 
+"""

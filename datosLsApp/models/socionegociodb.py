@@ -11,13 +11,13 @@ class SocioNegocioDB(models.Model):
         verbose_name_plural = 'Socios Negocio'
 
     codigoSN = models.CharField(primary_key=True, max_length=255) #Es un identiicador unico que lo diferencia de todas las otras entradas
-    nombre = models.CharField(max_length=50,)
-    apellido = models.CharField(max_length=50)
+    nombre = models.CharField(max_length=150,)
+    apellido = models.CharField(max_length=150)
     razonSocial = models.CharField(max_length=255)
     rut = models.CharField(max_length=255,null = False)
     email = models.EmailField()
-    telefono = models.CharField(max_length=12)
-    giro = models.CharField(max_length=50)
+    telefono = models.CharField(max_length=18)
+    giro = models.CharField(max_length=100)
     condicionPago = models.IntegerField(default=-1)
     plazoReclamaciones = models.CharField(max_length=255, default="STANDAR")
     clienteExportacion = models.CharField(max_length=255, default="N")

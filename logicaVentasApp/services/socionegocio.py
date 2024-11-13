@@ -51,6 +51,8 @@ class SocioNegocio:
     - verificarRutValido(rut)
     - procesarDirecciones(data, socio)
     - procesarContactos(data, socio)
+    - infoCliente(identificador, buscar_por_nombre=False)
+    - verificarSocioDB(rut)
     """
     def __init__(self, request):
         """
@@ -988,7 +990,16 @@ class SocioNegocio:
 
 
     def procesarDatosSocionegocio(self, data):
-        
+        """
+        Procesa los datos de un socio de negocio para ser guardados en la base de datos.
+
+        Args:
+            data (dict): Datos del socio de negocio.
+
+        Returns:
+            dict: Datos del socio de negocio procesados.
+
+        """
         name, lastname  = data.get('CardName').split(' ', 1)
 
         # Datos principales del socio de negocio
@@ -996,7 +1007,7 @@ class SocioNegocio:
             "codigoSN": data.get("CardCode", ""),
             "nombreCompleto": data.get("CardName", ""),
             "nombre": name or "Null",  # Asumiendo que 'CardName' contiene nombre completo
-            "apellido": lastname or "Null",  # Si solo hay un campo de nombre, apellido se mantiene igual
+            "apellido": lastname or "None",  # Si solo hay un campo de nombre, apellido se mantiene igual
             "email": data.get("EmailAddress", "") or "Null",
             "telefono": data.get("Phone1", "") or "Null",
             "celular": data.get("Phone1", "") or "Null",
@@ -1037,10 +1048,6 @@ class SocioNegocio:
                 "SocioNegocio": contacto.get("CardCode", "")
             })
 
-        print("Datos procesados del socio de negocio:")
-        print(f"Socio de negocio: {socio_negocio}")
-        print(f"Direcciones: {direcciones}")
-        print(f"Empleados de contacto: {empleados_contacto}")
         # Estructura final de salida
         resultado = {
             "SocioNegocio": socio_negocio,
@@ -1067,7 +1074,8 @@ class SocioNegocio:
         except ObjectDoesNotExist:
             raise ValueError("No se encontró el grupo, tipo de socio de negocio o tipo de cliente")
             # Maneja el error según sea necesario, como lanzar una excepción o crear un nuevo grupo
-
+        
+        
         cliente = SocioNegocioRepository.crearCliente(
             codigoSN=socio_negocio["codigoSN"],
             nombre=socio_negocio["nombre"],
@@ -1155,3 +1163,45 @@ class SocioNegocio:
                 return JsonResponse({'success': False, 'message': 'Error al guardar el cliente'}, status=500)
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'Error al crear el cliente: {str(e)}'}, status=500)
+
+
+    def construirFiltrosSociosNegocio(data):
+
+        """
+        Construye los filtros para la consulta de cotizaciones basados en los datos proporcionados.
+
+        Args:
+            data (dict): Datos de la consulta.
+
+        Returns:
+            dict: Filtros para la consulta de cotizaciones.
+        """
+
+        filters = {}
+
+        if data.get('cardType'):
+            filters['CardType eq'] = str(f"'{data.get('cardType')}'")
+        if data.get('CardCode'):
+            filters['contains(CardCode,'] = str(f"'{data.get('CardCode')}')")
+        if data.get('cardName'):
+            filters['contains(CardName,'] = str(f"'{data.get('cardName')}')")
+        if data.get('groupCode'):
+            groupCode = int(data.get('groupCode'))
+            filters['GroupCode eq'] = f"{groupCode})"
+        if data.get('phone'):
+            filters['contains(Phone1,'] = f"'{data.get('phone')}')"
+            filters['contains(SalesPersons/SalesEmployeeName,'] = f"'{data.get('salesEmployeeName')}'" 
+        if data.get('email'):
+            filters['contains(EmailAddress,'] = f"'{data.get('email')}')"
+        # Limpiar filtros vacíos o inválidos
+        filters = {k: v for k, v in filters.items() if v and v != "''"}
+
+        return filters
+    
+    def plp(cls):
+        """
+        clear
+        """
+
+        ab = 1 + 2
+        pass
