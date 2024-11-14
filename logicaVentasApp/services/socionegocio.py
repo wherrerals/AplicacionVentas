@@ -207,10 +207,10 @@ class SocioNegocio:
         
         with transaction.atomic():
             if self.gruposn == '100':
-                cliente = self.crearClientePersona(self, codigosn, self.rut, tiposn, tipoCliente, self.email, grupoSN)
+                cliente = self.crearClientePersona(codigosn, self.rut, tiposn, tipoCliente, self.email, grupoSN)
                 
             elif self.gruposn == '105':
-                cliente = self.crearClienteEmpresa(self, codigosn, tiposn, grupoSN, tipoCliente)
+                cliente = self.crearClienteEmpresa(codigosn, tiposn, grupoSN, tipoCliente)
             else:
                 raise ValidationError(f"Grupo de cliente no válido: {self.gruposn}")
 
@@ -572,6 +572,7 @@ class SocioNegocio:
         # Datos de la cabecera
         print("Preparando JSON para el socio de negocio...")
         print(f"Datos recibidos: {jsonData}")
+        
         cardCode = jsonData.get('rutSN')
         print(f"CardCode: {cardCode}")
 
