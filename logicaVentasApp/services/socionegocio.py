@@ -109,27 +109,18 @@ class SocioNegocio:
             Si hubo un error, retorna un JsonResponse con un mensaje de error y un código de estado 400 o 500.
         """
 
-        rutVerificado = self.verificarRutValido(self.rut)
-        
-        print(f"Rut verificado: {rutVerificado}")
-        if not rutVerificado:
-            return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)
+   
         try:
-            print("Creando o actualizando cliente...")
-            print(f"validando datos obligatorios")
             self.validarDatosObligatorios()
-            print(f"Datos obligatorios validados")
+
+            #Obteniendo datos necesarios para la creación del cliente
             codigosn = SocioNegocio.generarCodigoSN(self.rut)
-            print(f"Código de socio de negocio: {codigosn}")
             grupoSN = self.obtenerGrupoSN()
-            print(f"Grupo de socio de negocio: {grupoSN}")
             tipoCliente = self.obtenerTipoCliente()
-            print(f"Tipo de cliente: {tipoCliente}")
 
+            #Verificar si el cliente ya existe en la base de datos
             clienteExistente = SocioNegocioRepository.obtenerPorRut(self.rut)
-
-            print(f"Cliente existente: {clienteExistente}")
-
+            
             if clienteExistente is not None:
                 print("Cliente existente encontrado")
                 return self.procesarClienteExistente(codigosn)
