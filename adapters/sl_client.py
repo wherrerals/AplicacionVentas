@@ -382,7 +382,15 @@ class APIClient:
         print(url)
         return response.json()
     
+    def actualizarSocioSAP(self, json_data):
+        response = requests.put(f"{self.sap_base_url}/endpoint_cliente", json=json_data, headers=self.headers)
+        if response.status_code != 200:
+            raise Exception(f"Error al actualizar cliente en SAP: {response.json()}")
+        return response.json()
+    
 """    
 https://182.160.29.24:50003/b1s/v1/BusinessPartners?$select=CardCode,CardName,CardType,Phone1,EmailAddress,GroupCode&$orderby=CardName asc&$filter=CardType eq 'cCustomer' and contains(CardCode, '10') and 
 contains(CardName, 'Leonardo') and GroupCode eq 105 and contains(Phone1, '+569') and contains(EmailAddress, '@gmail') 
 """
+
+

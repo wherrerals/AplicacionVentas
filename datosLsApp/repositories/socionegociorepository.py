@@ -81,3 +81,13 @@ class SocioNegocioRepository:
             return SocioNegocioDB.objects.get(codigoSN__icontains=codigoSN)
         except SocioNegocioDB.DoesNotExist:
             return None
+
+    def actualizarCliente(codigoSN, datosActualizados):
+        print("Actualizando cliente")
+
+        cliente = SocioNegocioDB.objects.get(codigoSN=codigoSN)
+
+        for campo, valor in datosActualizados.items():
+            setattr(cliente, campo, valor)
+        cliente.save()
+        return cliente
