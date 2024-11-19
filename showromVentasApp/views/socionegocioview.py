@@ -83,19 +83,14 @@ class SocioNegocioView(FormView):
     def agregarSocioNegocio(self, request):
         if request.method == 'POST':
 
-            print("Agregando Socio de Negocio")
-            print(f"Request: {request.POST}")
-
             try:
-                request.POST = request.POST.copy()
+                request.POST = request.POST.copy() # Copiar el QueryDict para poder modificarlo
 
                 # Crear instancia del socio de negocio y llamar al servicio
                 socioNegoService = SocioNegocio(request)
 
                 # Llamar al servicio para crear o actualizar el cliente
                 response = socioNegoService.crearOActualizarCliente()
-
-                print(f"Respuesta de crear o actualizar Cliente: {response.content}")
 
                 # Si la respuesta es un JsonResponse, obtenemos su contenido
                 response_data = json.loads(response.content)
