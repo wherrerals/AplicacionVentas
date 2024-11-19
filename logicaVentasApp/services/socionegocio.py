@@ -22,6 +22,7 @@ from adapters.sl_client import APIClient
 class SocioNegocio:
     
     def __init__(self, request):
+        
         self.logger = logging.getLogger(__name__)
         self.request = request
         self.gruposn = request.POST.get('grupoSN')
@@ -35,7 +36,6 @@ class SocioNegocio:
         
         
     def validarDatosObligatorios(self):
-        print("Validando datos obligatorios...")
         """
         Metodo para validar los datos obligatorios
 
@@ -46,6 +46,10 @@ class SocioNegocio:
         self.validarGrupoSN()
         self.validarRut()
         self.validarEmail()
+        self.validarNombre()
+        self.validarApellido()
+        self.validarTelefono()
+        self.tamañotelefono()
 
         
     def crearOActualizarCliente(self):
@@ -64,7 +68,7 @@ class SocioNegocio:
             logger.info(f"Cliente existente: {clienteExistente}")
                         
             if clienteExistente is not None:
-                return self.procesarClienteExistente(codigoSN, clienteExistente)
+                return self.procesarClienteExistente(codigoSN, clienteExistente, datosNuevos=self.request.POST)
             
             self.procesarNuevoCliente()
             return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
@@ -111,29 +115,65 @@ class SocioNegocio:
             # Agrega logs aquí, si es necesario
             raise e
 
-    def procesarClienteExistente(self, codigosn, datosCliente):
+    def procesarClienteExistente(self, codigosn, datosCliente, datosNuevos):
+
+        print("Actualizando")
+        print(f"datos cliente: {datosCliente}")
+        print(f"datos nuevos: {datosNuevos}")
+        
+        logger.info(f"Procesando cliente existente con código SN: {codigosn}")
 
         try:
-            logger.info(f"Procesando cliente con código SN: {codigosn}")
-            
-            # Verificación en SAP
             verificacionSap = self.verificarSocioNegocioSap(codigosn)
             logger.info(f"Resultado de verificación en SAP: {verificacionSap}")
 
             if verificacionSap:
-                return JsonResponse({'success': True, 'message': 'Cliente ya existe en SAP y en la base de datos'})
-            
-            logger.info("Cliente no encontrado en SAP. Creando en SAP...")
-            
-            # Preparar y enviar los datos para crear el cliente
+                # Actualizar cliente en la base de datos
+                if not self.actualizarSocioNegocio(codigosn, datosNuevos):
+                    raise ValueError("Error al actualizar el cliente en la base de datos")
+                
+                return JsonResponse({'success': True, 'message': 'Cliente actualizado exitosamente'})
+
             json_data = self.prepararJsonCliente(datosCliente)
             self.creacionSocioSAP(json_data)
-            
             return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
+            
+        except ConnectionError as e:
+            return JsonResponse({'success': False, 'message': 'Error de conexión con SAP'}, status=500)
+        except ValueError as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': 'Ocurrio un erro inesperado'}, status=500)
+
+    def actualizarSocioNegocio(self, cardcode, datos):
+        logger.info(f"Actualizando socio de negocio con código: {cardcode}")
+        print(f"Datos recibidos: {datos}")
+
+        repo = SocioNegocioRepository()
+
+        try:
+            # Verificar grupo de cliente
+            grupo_sn = datos.get('grupoSN')
+
+            if not grupo_sn:
+                raise ValueError("El atributo 'gruposn' no está definido o es inválido.")
+
+            # Determinar tipo de cliente
+            if grupo_sn == '100':
+                logger.info("Actualizando cliente persona...")
+                return repo.actualizarCliente(cardcode, datos)
+            else:
+                logger.info("Actualizando cliente empresa...")
+                return repo.actualizarClienteEmpresa(cardcode, datos)
+
+        except ValueError as ve:
+            logger.error(f"Error de validación: {str(ve)}")
+            return {'success': False, 'message': f"Error de validación: {str(ve)}"}
 
         except Exception as e:
-            logger.error(f"Error al procesar el cliente: {str(e)}")
-            return JsonResponse({'success': False, 'message': 'Ocurrió un error al procesar el cliente'}, status=500)
+            logger.error(f"Error inesperado al actualizar socio de negocio: {str(e)}")
+            return {'success': False, 'message': f"Error inesperado: {str(e)}"}
+
 
 
     def obtenerGrupoSN(self):
@@ -449,6 +489,47 @@ class SocioNegocio:
 
         if not self.gruposn:
             raise ValidationError("Grupo de socio de negocio no encontrado")
+        
+    def validarNombre(self):
+        """
+        Método para validar el nombre del cliente.
+
+        Raises:
+            ValidationError: Si el nombre no se encuentra.
+        """
+
+        if not self.nombre:
+            raise ValidationError("Nombre no encontrado")
+        
+    def validarApellido(self):
+        """
+        Método para validar el apellido del cliente.
+
+        Raises:
+            ValidationError: Si el apellido no se encuentra.
+        """
+
+        if not self.apellido:
+            raise ValidationError("Apellido no encontrado")
+    
+    def validarTelefono(self):
+        """
+        Método para validar el teléfono del cliente.
+
+        Raises:
+            ValidationError: Si el teléfono no se encuentra.
+        """
+
+        if not self.telefono:
+            raise ValidationError("Teléfono no encontrado")
+    
+    def tamañotelefono(self):
+        """
+        Método para validar el tamaño del teléfono del cliente.
+        """
+
+        if len(self.telefono) < 12:
+            raise ValidationError("El teléfono debe tener al menos 12 dígitos")
     
     def validarRut(self):
         """
