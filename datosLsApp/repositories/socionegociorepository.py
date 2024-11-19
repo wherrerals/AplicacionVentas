@@ -91,7 +91,7 @@ class SocioNegocioRepository:
             cliente.nombre = datosActualizados.get('nombreSN', cliente.nombre)
             cliente.apellido = datosActualizados.get('apellidoSN', cliente.apellido)
             cliente.rut = datosActualizados.get('rutSN', cliente.rut)
-            #cliente.telefono = datosActualizados.get('telefono', cliente.telefono)
+            cliente.telefono = datosActualizados.get('telefono', cliente.telefono)
             cliente.giro = datosActualizados.get('giroSN', cliente.giro)
             cliente.email = datosActualizados.get('emailSN', cliente.email)
 

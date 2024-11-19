@@ -1,3 +1,4 @@
+from shlex import quote
 import requests
 import json
 from django.conf import settings
@@ -382,11 +383,47 @@ class APIClient:
         print(url)
         return response.json()
     
-    def actualizarSocioSAP(self, json_data):
-        response = requests.put(f"{self.sap_base_url}/endpoint_cliente", json=json_data, headers=self.headers)
-        if response.status_code != 200:
-            raise Exception(f"Error al actualizar cliente en SAP: {response.json()}")
-        return response.json()
+
+    def actualizarSocioNegocioSL(self, cardCode, data):
+        """
+        Actualiza un socio de negocio en SAP Business One.
+        """
+        self.__login()
+        
+        url = f"{self.base_url}BusinessPartners('{cardCode}')"
+
+        try:
+            print(f"URL: {url}")
+            print(f"Data being sent: {data}")
+
+            # Enviar la solicitud PATCH a la API
+            response = self.session.patch(url, data, verify=False)
+            print(f"Respuesta completa: {response.status_code} - {response.text}")
+
+            # Manejar la respuesta según el código de estado
+            if response.status_code == 204:
+                # Si la respuesta es 204, no hay contenido en la respuesta, pero la operación fue exitosa
+                print("Socio de negocio actualizado correctamente (sin contenido en la respuesta).")
+                return {'success': True, 'message': 'Socio de negocio actualizado correctamente.'}
+            else:
+                # Si la respuesta tiene contenido (por ejemplo, 200 OK o 201 Created), procesar la respuesta
+                response.raise_for_status()  # Lanzar un error si la respuesta no es exitosa
+                print("Respuesta de la API:", response.json())  # Mostrar respuesta si tiene cuerpo
+                return response.json()
+            
+        except requests.exceptions.HTTPError as e:
+            # Si ocurre un error en la solicitud, imprimir y lanzar la excepción
+            print(f"Error en la solicitud a la API: {e}")
+            if 'response' in locals() and response is not None:
+                print(f"Cuerpo de la respuesta del servidor: {response.text}")
+            raise
+        except Exception as e:
+            # Capturar otros posibles errores y registrarlos
+            print(f"Error inesperado: {e}")
+            raise
+
+
+
     
 """    
 https://182.160.29.24:50003/b1s/v1/BusinessPartners?$select=CardCode,CardName,CardType,Phone1,EmailAddress,GroupCode&$orderby=CardName asc&$filter=CardType eq 'cCustomer' and contains(CardCode, '10') and 

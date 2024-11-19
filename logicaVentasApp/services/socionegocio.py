@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.core.exceptions import ValidationError
+from adapters.serializador import Serializador
 from datosLsApp.models.gruposndb import GrupoSNDB
 from datosLsApp.models.socionegociodb import SocioNegocioDB
 from datosLsApp.models.tipoclientedb import TipoClienteDB
@@ -109,17 +110,10 @@ class SocioNegocio:
             print("Cliente procesado con éxito.")
             return cliente  # Retorna el cliente creado, si aplica
 
-        except Exception as e:
-            # Manejo centralizado de errores
-            print(f"Error al procesar el cliente: {e}")
-            # Agrega logs aquí, si es necesario
-            raise e
+        except Exception as e: 
+            return JsonResponse({'success': False, 'message': 'Error al procesar el cliente'}, status=500)
 
     def procesarClienteExistente(self, codigosn, datosCliente, datosNuevos):
-
-        print("Actualizando")
-        print(f"datos cliente: {datosCliente}")
-        print(f"datos nuevos: {datosNuevos}")
         
         logger.info(f"Procesando cliente existente con código SN: {codigosn}")
 
@@ -146,6 +140,9 @@ class SocioNegocio:
             return JsonResponse({'success': False, 'message': 'Ocurrio un erro inesperado'}, status=500)
 
     def actualizarSocioNegocio(self, cardcode, datos):
+
+        print(f"Actualizando socio de negocio con código: {cardcode}")
+
         logger.info(f"Actualizando socio de negocio con código: {cardcode}")
         print(f"Datos recibidos: {datos}")
 
@@ -160,7 +157,21 @@ class SocioNegocio:
 
             # Determinar tipo de cliente
             if grupo_sn == '100':
+
                 logger.info("Actualizando cliente persona...")
+                
+                conexionSL = APIClient()
+
+                serializer = Serializador(formato='json')
+
+                datosSerializados = serializer.serializar(datos, cardcode)
+
+                print(f"Datos serializados para la API: {datosSerializados}")
+
+                logger.info(f"Datos serializados para la API: {datosSerializados}")
+                
+                response = conexionSL.actualizarSocioNegocioSL(cardcode, datosSerializados)
+
                 return repo.actualizarCliente(cardcode, datos)
             else:
                 logger.info("Actualizando cliente empresa...")
