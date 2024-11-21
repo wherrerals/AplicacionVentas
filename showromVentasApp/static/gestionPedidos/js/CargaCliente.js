@@ -4,37 +4,76 @@ document.addEventListener("DOMContentLoaded", function () {
       return urlParams.get(param);
   }
 
+  const rutInputSearch = document.querySelector('input[type="search"]');
+  const rutInputField = document.getElementById('rutSN');
   const rut = getQueryParam('rut');
 
+  const fetchClienteData = (rut) => {
+      if (rut) {
+          // Quitar los puntos y todo después del guion (incluido el guion)
+          const cleanedRut = rut.replace(/\./g, '').split('-')[0];
+          fetch(`/ventas/informacion_cliente/?rut=${cleanedRut}`)
+              .then(response => {
+                  if (!response.ok) throw new Error('Error al obtener la información del cliente');
+                  return response.json();
+              })
+              .then(data => {
+                  document.getElementById("nombreSN").value = data[0].nombre || '';
+                  document.getElementById("apellidoSN").value = data[0].apellido || '';
+                  document.getElementById("rutSN").value = data[0].rut || '';
+                  document.getElementById("giroSN").value = data[0].giro || '';
+                  document.getElementById("telefonoSN").value = data[0].telefono || '';
+                  document.getElementById("emailSN").value = data[0].email || '';
+
+                  // Asigna el atributo data-rut y luego llama a cargarContactos()
+                  document.getElementById("rutSN").setAttribute("data-rut", data[0].rut || '');
+                  document.getElementById("rutSN").readOnly = true;
+
+                  // Llama a cargarContactos después de asignar data-rut
+                  cargarContactos();
+                  cargarDirecciones();
+              })
+              .catch(error => {
+                  console.error('Error en la solicitud AJAX:', error);
+              });
+      } else {
+          console.error("No se proporcionó un RUT en la URL");
+      }
+  };
+
+  // Si hay un `rut` en la URL, cargar datos
   if (rut) {
-      fetch(`/ventas/informacion_cliente/?rut=${rut}`)
-          .then(response => {
-              if (!response.ok) throw new Error('Error al obtener la información del cliente');
-              return response.json();
-          })
-          .then(data => {
-              document.getElementById("nombreSN").value = data[0].nombre || '';
-              document.getElementById("apellidoSN").value = data[0].apellido || '';
-              document.getElementById("rutSN").value = data[0].rut || '';
-              document.getElementById("giroSN").value = data[0].giro || '';
-              document.getElementById("telefonoSN").value = data[0].telefono || '';
-              document.getElementById("emailSN").value = data[0].email || '';
+      fetchClienteData(rut);
+  }
 
-              // Asigna el atributo data-rut y luego llama a cargarContactos()
-              document.getElementById("rutSN").setAttribute("data-rut", data[0].rut || '');
-              document.getElementById("rutSN").readOnly = true;
+  const handleRutInput = (inputElement) => {
+      inputElement.addEventListener("keydown", function (event) {
+          if (event.key === "Enter") {
+              event.preventDefault(); // Evita el comportamiento predeterminado
+              let inputRut = inputElement.value.trim();
+              if (inputRut) {
+                  // Quitar puntos y todo después del guion antes de buscar
+                  inputRut = inputRut.replace(/\./g, '').split('-')[0];
+                  fetchClienteData(inputRut);
 
-              // Llama a cargarContactos después de asignar data-rut
-              cargarContactos();
-              cargarDirecciones();
-          })
-          .catch(error => {
-              console.error('Error en la solicitud AJAX:', error);
-          });
-  } else {
-      console.error("No se proporcionó un RUT en la URL");
+                  // Limpiar el campo de entrada
+                  inputElement.value = '';
+              } else {
+                  alert("Por favor, ingrese un RUT válido para buscar.");
+              }
+          }
+      });
+  };
+
+  // Aplicar el manejo de entrada a ambos campos
+  if (rutInputSearch) {
+      handleRutInput(rutInputSearch);
+  }
+  if (rutInputField) {
+      handleRutInput(rutInputField);
   }
 });
+
 
 // Función para cargar contactos, ahora debería funcionar
 function cargarContactos() {
