@@ -369,7 +369,7 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
     // Convierte el valor del bruto a número y calcula el neto
     const brutoValue = parseFloat(inputBruto.value) || 0;
     const netoValue = brutoValue * 0.84;
-1
+
     // Muestra el valor calculado en el campo neto
     inputNeto.value = netoValue; // Limita a 2 decimales
     });
