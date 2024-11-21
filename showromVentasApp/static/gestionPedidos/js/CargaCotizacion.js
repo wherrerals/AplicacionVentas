@@ -9,9 +9,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const docEntry = getQueryParam('docentry');
     if (docEntry) {
       const vendedorDataElement = document.getElementById("vendedor_data");
+      const showroomElement = document.getElementById("sucursal");
+      const estadoElement = document.getElementById('estado');
   
       if (vendedorDataElement) {
         vendedorDataElement.innerText = "Cargando...";
+        showroomElement.innerText = "Cargando...";
+        estadoElement.innerText = "Cargando...";
       }
   
       fetch(`/ventas/detalles_cotizacion/?docentry=${docEntry}`)
@@ -120,14 +124,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     if (rutCliente) {
-      console.log("RUT recibido en la página de destino:", rutCliente);
-      console.log("Nombre recibido en la página de destino:", nombreCliente);
-      console.log("Apellido recibido en la página de destino:", apellidoCliente);
-      console.log("Grupo recibido en la página de destino:", grupoSN);
-      console.log("Giro recibido en la página de destino:", giroCliente);
-      console.log("Teléfono recibido en la página de destino:", telefonoCliente);
-      console.log("Email recibido en la página de destino:", emailCliente);
-
+      //console.log("RUT recibido en la página de destino:", rutCliente);
+      //console.log("Nombre recibido en la página de destino:", nombreCliente);
+      //console.log("Apellido recibido en la página de destino:", apellidoCliente);
+      //console.log("Grupo recibido en la página de destino:", grupoSN);
+      //console.log("Giro recibido en la página de destino:", giroCliente);
+      //console.log("Teléfono recibido en la página de destino:", telefonoCliente);
+      //console.log("Email recibido en la página de destino:", emailCliente);
       traerInformacionCliente(rutCliente); // Llama a la función con el RUT
 
       if (grupoSN) {

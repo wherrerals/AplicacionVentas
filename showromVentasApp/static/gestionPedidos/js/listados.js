@@ -183,17 +183,6 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
             `;
             tbody.appendChild(tr);
         });
-
-                // Función para mostrar el overlay de carga
-        const showLoadingOverlay = () => {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-        };
-
-        // Ocultar el overlay de carga (si necesitas ocultarlo en algún momento)
-        const hideLoadingOverlay = () => {
-            document.getElementById('loadingOverlay').style.display = 'none';
-        };
-
         
         document.querySelectorAll('.docentry-link').forEach(link => {
         link.addEventListener('click', (event) => {

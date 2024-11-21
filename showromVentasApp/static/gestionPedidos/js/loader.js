@@ -1,4 +1,4 @@
-// loader.js
+// loader con "cargando cotizaciones"
 const showLoader = () => {
     const loader = document.getElementById('loader');
     if (loader) {
@@ -11,4 +11,14 @@ const hideLoader = () => {
     if (loader) {
         loader.style.display = 'none';
     }
+};
+
+//Loaer pagina gris con cargador al medio
+const showLoadingOverlay = () => {
+    document.getElementById('loadingOverlay').style.display = 'flex';
+};
+
+// Ocultar el overlay de carga (si necesitas ocultarlo en algún momento)
+const hideLoadingOverlay = () => {
+    document.getElementById('loadingOverlay').style.display = 'none';
 };
