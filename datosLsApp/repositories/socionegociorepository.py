@@ -82,12 +82,45 @@ class SocioNegocioRepository:
         except SocioNegocioDB.DoesNotExist:
             return None
 
+    @staticmethod
     def actualizarCliente(codigoSN, datosActualizados):
-        print("Actualizando cliente")
+        try:
+            cliente = SocioNegocioDB.objects.get(codigoSN=codigoSN)
+            
+            # Actualizar atributos comunes
+            cliente.nombre = datosActualizados.get('nombreSN', cliente.nombre)
+            cliente.apellido = datosActualizados.get('apellidoSN', cliente.apellido)
+            cliente.rut = datosActualizados.get('rutSN', cliente.rut)
+            cliente.telefono = datosActualizados.get('telefono', cliente.telefono)
+            cliente.giro = datosActualizados.get('giroSN', cliente.giro)
+            cliente.email = datosActualizados.get('emailSN', cliente.email)
 
-        cliente = SocioNegocioDB.objects.get(codigoSN=codigoSN)
+            cliente.save()
 
-        for campo, valor in datosActualizados.items():
-            setattr(cliente, campo, valor)
-        cliente.save()
-        return cliente
+            return {'success': True, 'message': 'Cliente persona actualizado correctamente', 'cliente': cliente}
+        
+        except SocioNegocioDB.DoesNotExist:
+            return {'success': False, 'message': f'Cliente con código {codigoSN} no encontrado'}
+        except Exception as e:
+            return {'success': False, 'message': f'Error al actualizar cliente: {str(e)}'}
+
+    @staticmethod
+    def actualizarClienteEmpresa(codigoSN, datosActualizados):
+        try:
+            cliente = SocioNegocioDB.objects.get(codigoSN=codigoSN)
+            
+            # Actualizar atributos específicos de empresa
+            cliente.razonSocial = datosActualizados.get('razonSocial', cliente.razonSocial)
+            cliente.rut = datosActualizados.get('rut', cliente.rut)
+            cliente.telefono = datosActualizados.get('telefono', cliente.telefono)
+            cliente.giro = datosActualizados.get('giro', cliente.giro)
+            cliente.email = datosActualizados.get('email', cliente.email)
+
+            cliente.save()
+
+            return {'success': True, 'message': 'Cliente empresa actualizado correctamente', 'cliente': cliente}
+        
+        except SocioNegocioDB.DoesNotExist:
+            return {'success': False, 'message': f'Cliente con código {codigoSN} no encontrado'}
+        except Exception as e:
+            return {'success': False, 'message': f'Error al actualizar cliente: {str(e)}'}
