@@ -59,7 +59,7 @@ class CotizacionView(View):
     
     def get_route_map(self):
         return {
-            '/ventas/listado_Cotizaciones': self.listarCotizaciones,
+            '/ventas/listado_Cotizaciones': self.listarCotizaciones, # Listado de cotizaciones, no es necesaria se deja para ver si es usada en otra parte del codigo. 
             '/ventas/obtener_detalles_cotizacion': self.obtenerDetallesCotizacion,
             '/ventas/detalles_cotizacion': self.detallesCotizacion,
         }
