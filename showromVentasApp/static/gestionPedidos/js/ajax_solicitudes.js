@@ -41,7 +41,7 @@ $(document).ready(function(){
                                 let precioLista = parseFloat(this.getAttribute('data-precioAnterior'));
                                 let precioDescuento = parseFloat(this.getAttribute('data-maxDescuento'));
                                 
-                                agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento); //Ejecuta la funcion agregar producto
+                                agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal); //Ejecuta la funcion agregar producto
 
                             });
 
