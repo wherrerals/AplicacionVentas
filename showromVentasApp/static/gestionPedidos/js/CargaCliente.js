@@ -9,15 +9,21 @@ document.addEventListener("DOMContentLoaded", function () {
   const rut = getQueryParam('rut');
 
   const fetchClienteData = (rut) => {
-      if (rut) {
-          // Quitar los puntos y todo después del guion (incluido el guion)
-          const cleanedRut = rut.replace(/\./g, '').split('-')[0];
-          fetch(`/ventas/informacion_cliente/?rut=${cleanedRut}`)
+            if (rut) {
+              const cleanedRut = rut.replace(/\./g, '').split('-')[0];
+              const clienteElement = document.querySelector("#nombreApellidoSN p");
+              const codigoElement = document.querySelector("#rut-display p");
+
+            if (clienteElement && codigoElement) {
+              clienteElement.textContent = "Cargando...";
+              codigoElement.textContent = "Cargando...";
+            } fetch(`/ventas/informacion_cliente/?rut=${cleanedRut}`)
               .then(response => {
                   if (!response.ok) throw new Error('Error al obtener la información del cliente');
                   return response.json();
               })
               .then(data => {
+                  //console.log("Datos del cliente:", data);
                   document.getElementById("nombreSN").value = data[0].nombre || '';
                   document.getElementById("apellidoSN").value = data[0].apellido || '';
                   document.getElementById("rutSN").value = data[0].rut || '';
@@ -25,7 +31,9 @@ document.addEventListener("DOMContentLoaded", function () {
                   document.getElementById("telefonoSN").value = data[0].telefono || '';
                   document.getElementById("emailSN").value = data[0].email || '';
 
-                  // Asigna el atributo data-rut y luego llama a cargarContactos()
+                  document.querySelector("#nombreApellidoSN p").textContent = `${data[0].apellido || ''}`;
+                  document.querySelector("#rut-display p").textContent = `${data[0].codigoSN || ''}`;                  
+
                   document.getElementById("rutSN").setAttribute("data-rut", data[0].rut || '');
                   document.getElementById("rutSN").readOnly = true;
 
@@ -65,6 +73,17 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   };
 
+
+  //Actualiza el texto de codigo cliente en cliente.html
+  document.getElementById('rutSN').addEventListener('input', function (event) {
+    const inputText = event.target.value;
+    const rutDisplayParagraph = document.querySelector('#rut-display p');
+
+    const modifiedText = inputText.length > 0 ? inputText.slice(0, -1) + 'C' : '';
+  
+    rutDisplayParagraph.textContent = modifiedText;
+  });
+  
   // Aplicar el manejo de entrada a ambos campos
   if (rutInputSearch) {
       handleRutInput(rutInputSearch);
