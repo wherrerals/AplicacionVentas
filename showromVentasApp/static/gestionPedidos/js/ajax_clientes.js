@@ -69,6 +69,13 @@ function limpiarInformacionCliente() {
     $('#inputCliente').val(''); // Limpia el campo de entrada
     $('#inputCliente').removeAttr('data-rut').removeAttr('data-codigoSN'); // Elimina los atributos
     $('#resultadosClientes').empty(); // Vacía el contenedor de resultados
+    $('#nombreSN').val('');
+    $('#apellidoSN').val(''); 
+    $('#rutSN').val('');
+    $('#codigoSN').val('');
+    $('#telefonoSN').val('');
+    $('#emailSN').val('');
+    $('#giroSN').val('');
 
     // Restablece el select de contactos con la opción predeterminada
     $('#clientes').html(`
