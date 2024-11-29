@@ -70,7 +70,7 @@ class ContactoRepository:
             print("Error en actualizarContacto", e)
 
 
-    def crearContacto(socio, nombre_contacto, apellido_contacto, telefono_contacto, email_contacto, celular_contacto):
+    def crearContacto(socio, codigo_interno_sap, nombre_contacto, apellido_contacto, telefono_contacto, email_contacto, celular_contacto):
         """
         Crea un nuevo contacto
 
@@ -89,6 +89,7 @@ class ContactoRepository:
 
             nuevo_contacto = ContactoDB.objects.create(
                 SocioNegocio=socio_obj,
+                codigoInternoSap = codigo_interno_sap,
                 nombreCompleto = nombre_contacto + " " + apellido_contacto,
                 nombre=nombre_contacto,
                 apellido=apellido_contacto,

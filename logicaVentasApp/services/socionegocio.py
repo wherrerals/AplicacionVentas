@@ -236,6 +236,8 @@ class SocioNegocio:
                 raise ValidationError(f"Grupo de cliente no válido: {self.gruposn}")
 
             SocioNegocio.agregarDireccionYContacto(self.request, cliente)
+            print("Cliente creado exitosamente.")
+            print(f"Cliente creado: {cliente}")
 
         return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
 
@@ -333,6 +335,7 @@ class SocioNegocio:
         rut_sn = rut.split("-")[0] if "-" in rut else rut
         return rut_sn.replace(".", "") + 'C'
 
+
     @staticmethod
     def agregarDireccionYContacto(request, cliente):
         """
@@ -349,30 +352,40 @@ class SocioNegocio:
             JsonResponse: Si la dirección y el contacto se agregaron exitosamente, retorna un mensaje de éxito.
                         Si hubo un error, retorna un mensaje de error y un código de estado 400.
         """
-
         print("Agregando dirección y contacto...")
         from showromVentasApp.views.view import agregarDireccion, agregarContacto
 
+        # Capturar datos de dirección y contacto desde el request
         direccion = request.POST.get('nombre_direccion[]')
-        contacto = request.POST.get('nombre[]')
-        
-        if not direccion and not contacto:
-            print("Faltan dirección y contacto")
-            raise ValidationError("Debe agregar al menos una dirección y un contacto")
+        nombre_contacto = request.POST.get('nombre[]') or cliente.nombre
+        apellido_contacto = request.POST.get('apellido[]') or cliente.apellido
+        telefono_contacto = request.POST.get('telefono[]') or cliente.telefono
+        email_contacto = request.POST.get('email[]') or cliente.email
 
+        # Validar que al menos un contacto esté completo
         if not direccion:
             print("Dirección faltante")
             raise ValidationError("Debe agregar al menos una dirección")
 
-        if not contacto:
-            print("Contacto faltante")
-            raise ValidationError("Debe agregar al menos un contacto")
-        
-        # Agregar dirección y contacto si se encuentran
+        if not (nombre_contacto and apellido_contacto and telefono_contacto and email_contacto):
+            raise ValidationError("Debe proporcionar datos suficientes para un contacto válido.")
+
+        # Preparar datos mínimos para contacto y dirección
+        contacto_data = {
+            'nombre': nombre_contacto,
+            'apellido': apellido_contacto,
+            'telefono': telefono_contacto,
+            'celular': telefono_contacto,
+            'email': email_contacto,
+        }
+        print(f"Datos de contacto generados: {contacto_data}")
+
+        # Agregar dirección y contacto
         agregarDireccion(request, cliente)
-        agregarContacto(request, cliente)
+        agregarContacto(request, cliente, **contacto_data)  # Asegúrate de que `agregarContacto` acepte estos datos.
 
         return JsonResponse({"mensaje": "Dirección y contacto agregados exitosamente."})
+
 
 
 
@@ -847,6 +860,8 @@ class SocioNegocio:
             print(f"Direcciones deserializadas: {direcciones}")
             
             # Extraer campos relevantes
+            #autoincementar row num por cada direccion agg
+            rownum = 1
             tipo = [direccion.get('tipoDireccion') for direccion in direcciones]
             nombre_direccion = [direccion.get('nombreDireccion') for direccion in direcciones]
             ciudad = [direccion.get('ciudad') for direccion in direcciones]
@@ -876,7 +891,7 @@ class SocioNegocio:
                     else:
                         # Crear la dirección
                         try:
-                            DireccionRepository.crearDireccion(socio, nombredire, ciudad[i], direccion[i], comuna[i], region[i], tipo[i], pais[i])
+                            DireccionRepository.crearDireccion(socio,rownum, nombredire, ciudad[i], direccion[i], comuna[i], region[i], tipo[i], pais[i])
                         except Exception as e:
                             print(f"Ocurrió un error al crear la dirección: {str(e)}")
                 else:
@@ -1074,7 +1089,7 @@ class SocioNegocio:
         direcciones = []
         for direccion in data.get("BPAddresses", []):
             direcciones.append({
-                #"rowNum": direccion.get("RowNum", ""),
+                "rowNum": direccion.get("RowNum", ""),
                 "nombreDireccion": direccion.get("AddressName", ""),
                 "calleNumero": direccion.get("Street", ""),
                 "ciudad": direccion.get("City", ""),
@@ -1144,8 +1159,8 @@ class SocioNegocio:
         # Crear las direcciones asociadas al cliente usando el método del repositorio
         for direccion in data.get("Direcciones", []):
             DireccionRepository.crearDireccion(
-                #rownum=direccion["rowNum"],
                 socio=socio_negocio["codigoSN"],
+                rownum=direccion["rowNum"],
                 nombre_direccion=direccion["nombreDireccion"],
                 ciudad=direccion["ciudad"],
                 calle_numero=direccion["calleNumero"],
@@ -1159,6 +1174,7 @@ class SocioNegocio:
         for contacto in data.get("Contactos", []):
             ContactoRepository.crearContacto(
                 socio=socio_negocio["codigoSN"],
+                codigo_interno_sap=contacto["codigoInternoSap"],
                 nombre_contacto=contacto["nombre"],
                 apellido_contacto=contacto["apellido"],
                 telefono_contacto=contacto["telefono"],

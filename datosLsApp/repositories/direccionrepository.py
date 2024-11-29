@@ -65,7 +65,7 @@ class DireccionRepository:
         direccion_obj.pais = pais
         direccion_obj.save()
 
-    def crearDireccion(socio, nombre_direccion, ciudad, calle_numero, comuna_id, region_id, tipo_direccion, pais):
+    def crearDireccion(socio, rownum, nombre_direccion, ciudad, calle_numero, comuna_id, region_id, tipo_direccion, pais):
         """
         Crea una dirección
 
@@ -90,6 +90,7 @@ class DireccionRepository:
 
             # Crea la dirección
             nueva_direccion = DireccionDB.objects.create(
+                rowNum = rownum,
                 nombreDireccion=nombre_direccion,
                 ciudad=ciudad,
                 calleNumero=calle_numero,
