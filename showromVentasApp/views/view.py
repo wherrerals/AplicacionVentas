@@ -406,11 +406,10 @@ def agregarDireccion(request, socio):
         paises = request.POST.getlist('pais[]')
         regiones = request.POST.getlist('region[]')
         comunas = request.POST.getlist('comuna[]')
-        print(f"nombre direccion: " , nombredirecciones)
-        print(f"nombres de cuidades: " , ciudades)
-        print(f"tipo de direcciones: " , tipos)
 
-
+        print(f"nombre direccion: ", nombredirecciones)
+        print(f"nombres de ciudades: ", ciudades)
+        print(f"tipo de direcciones: ", tipos)
 
         for i in range(len(nombredirecciones)):
             nombredireccion = nombredirecciones[i]
@@ -421,11 +420,11 @@ def agregarDireccion(request, socio):
             region = regiones[i]
             comuna = comunas[i]
 
-            # Verificar si existe un campo requerido
-            if nombredireccion:
+            if nombredireccion:  # Verificar si el nombre de la dirección está presente
                 fregion = RegionDB.objects.get(numero=region)
                 fcomuna = ComunaDB.objects.get(codigo=comuna)
 
+                # Crear la dirección principal
                 DireccionDB.objects.create(
                     nombreDireccion=nombredireccion,
                     ciudad=ciudad,
@@ -437,48 +436,86 @@ def agregarDireccion(request, socio):
                     pais=pais
                 )
                 print(f"Dirección {i+1} creada con éxito")
+
+                # Verificar y duplicar si es necesario
+                tipo_faltante = '12' if tipo == '13' else '13'
+                DireccionDB.objects.create(
+                    nombreDireccion=nombredireccion,
+                    ciudad=ciudad,
+                    calleNumero=callenumero,
+                    comuna=fcomuna,
+                    region=fregion,
+                    tipoDireccion=tipo_faltante,
+                    SocioNegocio=socio,
+                    pais=pais
+                )
+                print(f"Dirección duplicada con tipo {tipo_faltante} creada con éxito")
             else:
                 print(f"No se ha creado la dirección {i+1} porque algunos campos están vacíos.")
-    return redirect("/")
+        
+        return redirect("/")
 
 
 
 
 
 @login_required
-def agregarContacto(request, cliente):
-
+def agregarContacto(request, cliente, **kwargs):
     print(f"RUT del cliente: {cliente}")
-    print("data recibida: ", request.POST)
+    print("Data recibida: ", request.POST)
+
+    clienteNoIncluido = None
+    if cliente is None:
+        clienteNoIncluido = "No se ha incluido el cliente en la solicitud."
+
     if request.method == "POST":
-        nombres = request.POST.getlist('nombre[]')
-        apellidos = request.POST.getlist('apellido[]')
-        telefonos = request.POST.getlist('telefono[]')
-        celulares = request.POST.getlist('celular[]')
-        emails = request.POST.getlist('email[]')
+        # Determinar si estamos trabajando con un contacto único o múltiples
+        if 'nombre' in kwargs:
+            # Caso: contacto único enviado desde kwargs
+            nombres = [kwargs.get('nombre')]
+            apellidos = [kwargs.get('apellido')]
+            telefonos = [kwargs.get('telefono')]
+            celulares = [kwargs.get('celular')]
+            emails = [kwargs.get('email')]
+        elif 'nombre' in request.POST:
+            # Caso: contacto único enviado desde POST
+            nombres = [request.POST.get('nombre')]
+            apellidos = [request.POST.get('apellido')]
+            telefonos = [request.POST.get('telefono')]
+            celulares = [request.POST.get('celular')]
+            emails = [request.POST.get('email')]
+        elif 'nombre[]' in request.POST:
+            # Caso: múltiples contactos enviados desde POST
+            nombres = request.POST.getlist('nombre[]')
+            apellidos = request.POST.getlist('apellido[]')
+            telefonos = request.POST.getlist('telefono[]')
+            celulares = request.POST.getlist('celular[]')
+            emails = request.POST.getlist('email[]')
+        else:
+            nombres = []
+            apellidos = []
+            telefonos = []
+            celulares = []
+            emails = []
 
-        clienteNoIncluido = None
+        print(f"Contactos recibidos: {nombres}")
+        print(f"Apellidos recibidos: {apellidos}")
 
-        if cliente is None:
-            clienteNoIncluido = "No se ha incluido el cliente en la solicitud."
-
-
-        print(f"contactos recibidos: " ,nombres)
-        print(f"contactos recibidos: " ,apellidos)
-
+        # Iterar sobre los contactos recibidos
         for i in range(len(nombres)):
             nombre = nombres[i]
-            apellido = apellidos[i]
-            telefono = telefonos[i]
-            celular = celulares[i]
-            email = emails[i]
+            apellido = apellidos[i] if i < len(apellidos) else None
+            telefono = telefonos[i] if i < len(telefonos) else None
+            celular = celulares[i] if i < len(celulares) else None
+            email = emails[i] if i < len(emails) else None
 
             # Verificar si los campos requeridos están completos
             if nombre and apellido:
                 nombreCompleto = f"{nombre} {apellido}"
 
+                # Crear el contacto en la base de datos
                 ContactoDB.objects.create(
-                    codigoInternoSap=1,  # Aquí deberías manejar la lógica del código interno si es variable
+                    codigoInternoSap=1,  # Aquí puedes manejar la lógica del código interno si es variable
                     nombreCompleto=nombreCompleto,
                     nombre=nombre,
                     apellido=apellido,
@@ -487,10 +524,12 @@ def agregarContacto(request, cliente):
                     email=email,
                     SocioNegocio=cliente
                 )
-                print(f"Contacto {i+1} creado con éxito")
+                print(f"Contacto {i+1} creado con éxito: {nombreCompleto}")
             else:
                 print(f"No se ha creado el contacto {i+1} porque algunos campos están vacíos.")
+
     return render(request, "cotizacion.html", {'clienteNoIncluido': clienteNoIncluido})
+
 
 """
 Este metodo sirve para poder guardar los contactos de un cliente en la base de datos a traves de una peticion AJAX
