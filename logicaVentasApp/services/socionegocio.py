@@ -1074,7 +1074,7 @@ class SocioNegocio:
         direcciones = []
         for direccion in data.get("BPAddresses", []):
             direcciones.append({
-                #"rowNum": direccion.get("RowNum", ""),
+                "rowNum": direccion.get("RowNum", ""),
                 "nombreDireccion": direccion.get("AddressName", ""),
                 "calleNumero": direccion.get("Street", ""),
                 "ciudad": direccion.get("City", ""),
@@ -1144,8 +1144,8 @@ class SocioNegocio:
         # Crear las direcciones asociadas al cliente usando el método del repositorio
         for direccion in data.get("Direcciones", []):
             DireccionRepository.crearDireccion(
-                #rownum=direccion["rowNum"],
                 socio=socio_negocio["codigoSN"],
+                rownum=direccion["rowNum"],
                 nombre_direccion=direccion["nombreDireccion"],
                 ciudad=direccion["ciudad"],
                 calle_numero=direccion["calleNumero"],
@@ -1159,6 +1159,7 @@ class SocioNegocio:
         for contacto in data.get("Contactos", []):
             ContactoRepository.crearContacto(
                 socio=socio_negocio["codigoSN"],
+                codigo_interno_sap=contacto["codigoInternoSap"],
                 nombre_contacto=contacto["nombre"],
                 apellido_contacto=contacto["apellido"],
                 telefono_contacto=contacto["telefono"],
