@@ -373,5 +373,23 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
     // Muestra el valor calculado en el campo neto
     inputNeto.value = netoValue; // Limita a 2 decimales
     });
+    
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const rutSN = urlParams.get("rutSN") || "";
+    const nombreSN = urlParams.get("nombreSN") || "";
+  
+    // Si hay parámetros en la URL, aplicarlos automáticamente
+    if (rutSN || nombreSN) {
+      console.log("Aplicando filtros desde la URL:", { rutSN, nombreSN });
+  
+      // Colocar los valores en los campos correspondientes
+      if (rutSN) document.querySelector('[name="cardName"]').value = rutSN;
+      if (nombreSN) document.querySelector('[name="cardName"]').value = nombreSN;
+  
+      // Aplicar los filtros automáticamente
+      const filters = getFilterData();
+      applyFiltersAndFetchData(filters);
+    }
 
 });

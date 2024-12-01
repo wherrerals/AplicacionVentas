@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   const cotizacionLink = document.getElementById("cotizacionLink");
+  const filtroCotizacionLink = document.getElementById("FiltroCotizacionLink");
   const rutInput = document.getElementById("rutSN");
 
   if (cotizacionLink && rutInput) {
@@ -20,9 +21,22 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("Redirigiendo a URL:", url);
       window.location.href = url;
     });
-  } else {
-    // Redirigir sin parámetros si los elementos necesarios no existen
-    console.warn("No se encontraron los elementos necesarios para la redirección.");
-    window.location.href = "/ventas/generar_cotizacion/";
+  }
+
+  if (filtroCotizacionLink && rutInput) {
+    filtroCotizacionLink.addEventListener("click", function (event) {
+      event.preventDefault(); // Evita la redirección predeterminada
+
+      // Capturar valores de los inputs
+      let rutSN = rutInput.value.trim() || ""; // Si está vacío, se asigna una cadena vacía
+      const nombreSN = document.getElementById("nombreSN")?.value.trim() || "";
+      const apellidoSN = document.getElementById("apellidoSN")?.value.trim() || "";
+      const nombreBuscar = nombreSN + " " + apellidoSN;
+
+      // Redirigir con los datos como parámetros en la URL
+      const url = `/ventas/lista_cotizaciones/?rutSN=${encodeURIComponent(rutSN)}&nombreSN=${encodeURIComponent(nombreBuscar)}`;
+      console.log("Redirigiendo a URL:", url);
+      window.location.href = url;
+    });
   }
 });
