@@ -18,6 +18,7 @@ $(document).ready(function () {
                             resultado.precioAnterior = resultado.precioAnterior;
                             resultado.maxDescuento = parseFloat(resultado.maxDescuento);
                             resultado.stockTotal = parseInt(resultado.stockTotal);
+                            const sucursal = $('#sucursal').text().trim();
 
                             // Agregar elementos al resultado
                             var productoElemento = document.createElement('p');
@@ -41,7 +42,7 @@ $(document).ready(function () {
                                 let precioLista = parseFloat(this.getAttribute('data-precioAnterior'));
                                 let precioDescuento = parseFloat(this.getAttribute('data-maxDescuento'));
 
-                                agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento); // Ejecuta la función agregar producto
+                                agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad=1, sucursal); // Ejecuta la función agregar producto
 
                                 // Limpia el input #inputNumero al seleccionar un producto
                                 $('#inputNumero').val('');

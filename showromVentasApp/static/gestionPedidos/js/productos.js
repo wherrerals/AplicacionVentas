@@ -138,7 +138,7 @@ class Producto {
   }
   
   // Función global para manejar la adición de productos
-  function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal) {
+  function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal) {
       // Contador de productos
       console.log("cantidad: ", cantidad);
       console.log("sucursal: ", sucursal);
