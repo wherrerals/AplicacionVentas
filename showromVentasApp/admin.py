@@ -5,7 +5,10 @@ from datosLsApp.models import (
     LineaDB, SocioNegocioDB, UsuarioDB, ContactoDB, DireccionDB, ComunaDB,
     GrupoSNDB, TipoSNDB, TipoClienteDB
 )
+
 from datosLsApp.models.regiondb import RegionDB
+from datosLsApp.models.stockbodegasdb import StockBodegasDB
+
 
 # Modificaciones en administrador
 admin.site.site_header = 'Led Studio'
@@ -94,3 +97,4 @@ admin.site.register(TipoClienteDB, TipoClienteDBper)
 #admin.site.register(DireccionDB, DireccionDBper)
 admin.site.register(ComunaDB, ComunaDBper)
 admin.site.register(RegionDB, RegionDBper)
+admin.site.register(StockBodegasDB)

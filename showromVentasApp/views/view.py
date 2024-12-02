@@ -11,6 +11,7 @@ from django.http import JsonResponse, HttpResponse
 from datosLsApp.models.usuariodb import User 
 from datosLsApp.models import (ProductoDB, SocioNegocioDB, UsuarioDB, RegionDB, GrupoSNDB, TipoSNDB, TipoClienteDB, DireccionDB, ComunaDB, ContactoDB)
 from adapters.sl_client import APIClient
+from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
 from logicaVentasApp.services.cotizacion import Cotizacion
 from logicaVentasApp.services.socionegocio import SocioNegocio
 #librerias Python usadas
@@ -18,6 +19,7 @@ import requests
 import json
 
 from logicaVentasApp.services.comuna import Comuna
+from datosLsApp.models.stockbodegasdb import StockBodegasDB
 
 #Inicio vistas Renderizadoras
 
@@ -711,3 +713,19 @@ def probandoSL(request):
 
 
     return JsonResponse(lines_data, safe=False)
+
+
+def obtenerStockBodegas(request):
+    bodega_id = request.GET.get('idBodega')  # Obtener el ID de la bodega
+    producto_id = request.GET.get('idProducto')  # Obtener el ID del producto
+
+    if not bodega_id or not producto_id:
+        return JsonResponse({'error': 'Faltan parámetros: idBodega y idProducto son obligatorios'}, status=400)
+
+    try:
+        repo = StockBodegasRepository()
+        stock_bodega = repo.consultarStockPorBodega(producto_id, bodega_id)
+        
+        return JsonResponse({'stock': stock_bodega.stock}, status=200)
+    except StockBodegasDB.DoesNotExist:
+        return JsonResponse({'error': 'No se encontró stock para este producto y bodega'}, status=404)
