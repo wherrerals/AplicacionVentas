@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const getSkip = (page) => (page - 1) * recordsPerPage;
 
+    //ESta funcon no se esta utilizando, no borrar!
     const fetchAndDisplayInitialData = (params) => {
         showLoader();
         const url = `${window.location.origin}${baseURL}?top=${params.top}&skip=${params.skip}`;
