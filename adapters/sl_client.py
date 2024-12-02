@@ -364,7 +364,7 @@ class APIClient:
 
         self.__login()
         selcect = f"CardCode,CardName,CardType,Phone1,EmailAddress,GroupCode"
-        order_by = f"CardName asc "
+        order_by = f"CardName desc"
         filter_condition = f"CardType eq 'cCustomer'"
 
         if filters:
