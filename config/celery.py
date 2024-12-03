@@ -1,18 +1,40 @@
-from __future__ import absolute_import, unicode_literals
+# config/celery.py
 import os
 from celery import Celery
+from celery.schedules import crontab
 
 # Configuración del entorno de Django para Celery
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')  # Ajusta 'config.settings' al nombre correcto de tu proyecto
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')  # Asegúrate de que el nombre del proyecto sea correcto
 
-app = Celery('AplicacionVentas')
+# Crear la aplicación Celery
+app = Celery('taskApp')
 
-# Carga la configuración desde el archivo settings.py de Django
+# Cargar la configuración desde el archivo settings.py de Django
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-# Auto-descubre tareas definidas en aplicaciones instaladas
+# Auto-descubrir tareas en aplicaciones instaladas
 app.autodiscover_tasks()
 
 @app.task(bind=True)
 def debug_task(self):
     print(f'Request: {self.request!r}')
+
+
+app.conf.update(
+    task_create_missing_queues=True,
+    worker_pool='solo',  # Intenta usar 'solo' para evitar problemas de concurrencia
+)
+
+
+# Configuración de beat_schedule para ejecutar múltiples tareas
+app.conf.beat_schedule = {
+    "sync-products-every-hour": {
+        "task": "taskApp.tasks.sync_products",  # Ruta correcta a la tarea
+        "schedule": crontab(minute="*/1"),  # Ejecutar cada hora
+    },
+    
+    "sync-clients-daily": {
+        "task": "taskApp.tasks.sync_clients",  # Ruta correcta a la tarea
+        "schedule": crontab(minute="*/10"),  # Ejecutar todos los días a medianoche
+    },
+}

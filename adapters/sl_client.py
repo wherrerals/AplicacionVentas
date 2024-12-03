@@ -422,7 +422,23 @@ class APIClient:
             print(f"Error inesperado: {e}")
             raise
 
+    def fetchProducts(self):
+        endpoint = f"{self.base_url}/products"
+        response = requests.get(endpoint, headers=self.headers)
+        response.raise_for_status()
+        return response.json()
 
+    def fetchStock(self):
+        endpoint = f"{self.base_url}/stock"
+        response = requests.get(endpoint, headers=self.headers)
+        response.raise_for_status()
+        return response.json()
+
+    def fetchPrices(self):
+        endpoint = f"{self.base_url}/prices"
+        response = requests.get(endpoint, headers=self.headers)
+        response.raise_for_status()
+        return response.json()
 
     
 """    

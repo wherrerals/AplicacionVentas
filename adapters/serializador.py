@@ -27,6 +27,7 @@ class Serializador:
         """
         Mapea los datos recibidos al formato esperado por la API externa.
         """
+
         # Extraer datos y formatear campos necesarios
         nombre_completo = f"{datos['nombreSN']} {datos['apellidoSN']}"
 
@@ -38,3 +39,28 @@ class Serializador:
             'Cellular': datos['telefonoSN'],
             'EmailAddress': datos['emailSN'],
         }
+
+    def serializeProducts(self, data):
+
+        
+        return [
+            {
+                "sku": item["SKU"],
+                "name": item["Name"],
+                "description": item["Description"],
+                "price": item.get("Price"), 
+            }
+            for item in data
+        ]
+
+    def serializeStock(self, data):
+
+
+        return [
+            {
+                "sku": item["SKU"],
+                "warehouse": item["Warehouse"],
+                "stock": item["Stock"],
+            }
+            for item in data
+        ]

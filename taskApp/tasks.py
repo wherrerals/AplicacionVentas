@@ -1,0 +1,19 @@
+# logicaVentasApp/tasks.py
+from celery import shared_task
+
+
+
+# Tarea Celery para sincronizar productos
+""" @shared_task
+def sync_products():
+    service = Producto()
+    service.sync()  # Llama al método de sincronización de productos
+ """
+@shared_task
+def sync_products():
+    print("Sincronizando productos...")
+
+@shared_task
+def sync_clients():
+    print("Sincronizando clientes...")
+    

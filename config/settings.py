@@ -34,7 +34,9 @@ INSTALLED_APPS = [
     'config',
     'datosLsApp',
     'logicaVentasApp',
-    'showromVentasApp'    
+    'showromVentasApp',
+    'taskApp',
+
 ]
 
 MIDDLEWARE = [
@@ -97,11 +99,11 @@ DATABASES = {
     }
 }
 
-# Configuración de Celery
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # Cambia la URL según tu configuración
+# Configuración de Celery con RabbitMQ como broker
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost//'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-
+CELERY_RESULT_BACKEND = 'rpc://'
 
 #Configuracion para docker
 """ DATABASES = {
