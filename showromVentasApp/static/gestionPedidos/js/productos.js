@@ -12,7 +12,64 @@ class Producto {
         this.cantidad = cantidad;
         this.sucursal = sucursal;
     }
-  
+
+    async obtenerStock(codigoProducto) {
+        try {
+            const response = await fetch(`/ventas/obtener_stock_bodegas/?idProducto=${codigoProducto}`);
+            if (!response.ok) {
+                throw new Error("Error al obtener el stock");
+            }
+            const data = await response.json();
+            //console.log("info bodegas:", data)
+            return data; // Lista de objetos con bodega y stock
+        } catch (error) {
+            console.error("Error al obtener el stock:", error);
+            return null;
+        }
+    }
+
+    async actualizarStock(row) {
+        const stockData = await this.obtenerStock(this.productoCodigo);
+        if (stockData) {
+            // Mapear las bodegas para obtener una relación de value -> código
+            const bodegaMap = {
+                "12": "GR",
+                "13": "LC",
+                "14": "PH",
+                "15": "ME"
+            };
+    
+            // Calcular el stock total sumando los valores
+            const stockTotal = stockData.reduce((total, bodega) => total + bodega.stock, 0);
+    
+            // Mostrar el stock total
+            const stockTotalElem = row.querySelector('[name="stock_total"]');
+            stockTotalElem.textContent = `Total: ${stockTotal}`;
+            // Obtener el value de la bodega seleccionada
+            const selectBodega = row.querySelector('.form-select');
+            const valueSeleccionado = selectBodega.value;
+    
+            // Usar el mapa para obtener el código correspondiente a partir del value
+            const bodegaSeleccionada = bodegaMap[valueSeleccionado];
+    
+            // Encontrar el stock de la bodega seleccionada
+            const stockBodega = stockData.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock || 0;
+    
+            // Mostrar el stock de la bodega seleccionada
+            const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
+            stockBodegaElem.textContent = `Stock: ${stockBodega}`;
+
+                    // Limitar el selector de cantidad según el stock de la bodega seleccionada
+            const cantidadInput = row.querySelector('#calcular_cantidad');
+            cantidadInput.max = stockBodega;
+
+            // Ajustar el valor actual si excede el nuevo stock máximo
+            if (parseInt(cantidadInput.value, 10) > stockBodega) {
+                cantidadInput.value = stockBodega;
+            }
+        }
+    }
+    
     // Método para crear una fila en la tabla de productos
     crearFila(contprod) {
         let newRow = document.createElement('tbody');
@@ -42,7 +99,8 @@ class Producto {
                           </select>
                         </div>
                         <div class="col" style="text-align: center;">
-                            <small style="font-size: 12px;" name="stock_total">Stock: ${this.stockTotal}</small>
+                            <small style="font-size: 12px;" name="stock_bodega">Stock:  </small>
+                            <small style="font-size: 12px;" id="stock_total" name="stock_total">Total: </small>
                         </div>
                     </div>
                 </td>
@@ -94,6 +152,19 @@ class Producto {
             </tr>
             </tr>
         `;
+
+        // Agregar evento mouseover para mostrar stock en otras tiendas
+        const precioVentaElem = newRow.querySelector('#stock_total');
+        precioVentaElem.addEventListener('mouseover', async () => {
+            const stockData = await this.obtenerStock(this.productoCodigo);
+            if (stockData) {
+                // Crear el contenido del tooltip
+                const tooltipContent = stockData
+                    .map(bodega => `${bodega.bodega}: ${bodega.stock}`)
+                    .join('\n');
+                precioVentaElem.title = `Stock en otras tiendas:\n${tooltipContent}`;
+            }
+        });
         this.limitarMaxDescuento(newRow);
         return newRow;
     }
@@ -165,6 +236,13 @@ class Producto {
           });
           console.log('Evento emitido:', event);
           document.dispatchEvent(event);
+      });
+
+      producto.actualizarStock(newRow);
+
+      // Evento para actualizar el stock al cambiar de bodega
+      newRow.querySelector('.form-select').addEventListener('change', function () {
+          producto.actualizarStock(newRow);
       });
     
       // Llamar a la función agregarInteractividad si es necesario
