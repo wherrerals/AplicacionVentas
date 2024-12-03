@@ -23,10 +23,19 @@
   <div id="contenedor" class="container">
     <div class="row" style="color: var(--bs-secondary-color);">
       <div class="col-sm-4" style="text-align: right;padding-right: 0px;">
-        <input type="search" placeholder="Buscar" style="width: 100%;"></div>
+        <input type="search" placeholder="Buscar" style="width: 100%;">
+      </div>
+      
+      <div class="col-auto">
+        <svg id="lupa-busqueda" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="gray" class="bi bi-search" viewBox="0 0 16 16" style="cursor: pointer; margin-top: 6px;">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001a1.007 1.007 0 0 0-.058.058l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.059-.058zm-5.442-9.29a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11z"/>
+        </svg>
+    </div>
       <div class="col-sm-4" style="text-align: left;width: 160px;">
         <a class="btn btn-primary" role="button" style="font-size: 12px;" href="{% url 'generar_cotizacion' %}">+ Nueva Cotización</a>
       </div>
+
+      
       <div class="col" style="text-align: right;padding-right: 0px;">
         <div class="dropdown">
           <button class="btn btn-primary dropdown-toggle" aria-expanded="false" data-bs-toggle="dropdown" type="button" style="font-size: 12px;">Acciones&nbsp;</button>
