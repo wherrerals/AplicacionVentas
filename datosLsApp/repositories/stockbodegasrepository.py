@@ -1,23 +1,11 @@
-
 from datosLsApp.models import StockBodegasDB
 
 class StockBodegasRepository:
-        
-    def consultarStockPorBodega(self, producto_id, bodega_id):
+    def consultarStockPorProducto(self, producto_id):
         """
-        Obtiene el stock de una bodega
+        Obtiene el stock para todas las bodegas de un producto específico.
 
-        params:
-            bodega: BodegaDB
-
-            - Bodega de la que se quiere obtener el stock
-
-        return:
-            QuerySet
+        :param producto_id: ID del producto.
+        :return: QuerySet con los registros de stock por bodega.
         """
-        stock_bodega = StockBodegasDB.objects.get(
-            idProducto_id=producto_id,
-            idBodega_id=bodega_id
-        )
-
-        return stock_bodega.stock
+        return StockBodegasDB.objects.filter(idProducto_id=producto_id)

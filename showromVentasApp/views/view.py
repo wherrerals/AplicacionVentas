@@ -716,16 +716,27 @@ def probandoSL(request):
 
 
 def obtenerStockBodegas(request):
-    bodega_id = request.GET.get('idBodega')  # Obtener el ID de la bodega
     producto_id = request.GET.get('idProducto')  # Obtener el ID del producto
 
-    if not bodega_id or not producto_id:
-        return JsonResponse({'error': 'Faltan parámetros: idBodega y idProducto son obligatorios'}, status=400)
+    if not producto_id:
+        return JsonResponse({'error': 'Falta el parámetro: idProducto es obligatorio'}, status=400)
 
     try:
         repo = StockBodegasRepository()
-        stock_bodega = repo.consultarStockPorBodega(producto_id, bodega_id)
-        
-        return JsonResponse({'stock': stock_bodega.stock}, status=200)
+        stock_por_bodegas = repo.consultarStockPorProducto(producto_id)
+
+        # Crear la respuesta con la información de todas las bodegas asociadas
+        data = [
+            {
+                'bodega': item.idBodega.codigo,
+                'stock': item.stock
+            }
+            for item in stock_por_bodegas
+        ]
+
+        return JsonResponse(data, safe=False, status=200)
+
     except StockBodegasDB.DoesNotExist:
-        return JsonResponse({'error': 'No se encontró stock para este producto y bodega'}, status=404)
+        return JsonResponse({'error': 'No se encontró stock para este producto'}, status=404)
+
+
