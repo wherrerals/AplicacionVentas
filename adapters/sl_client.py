@@ -422,25 +422,26 @@ class APIClient:
             print(f"Error inesperado: {e}")
             raise
 
-    def fetchProducts(self):
-        endpoint = f"{self.base_url}/products"
-        response = requests.get(endpoint, headers=self.headers)
+    def obtenerProductosSL(self):
+
+        self.__login()
+        select = "ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection"
+        filter = "SalesItem eq 'tYES'"
+        order_by = "ItemCode"
+
+        url = f"{self.base_url}Items?$select={select}&$filter={filter}&$orderby={order_by}"
+
+        response = self.session.get(url, verify=False)
         response.raise_for_status()
+        print(url)
         return response.json()
 
-    def fetchStock(self):
-        endpoint = f"{self.base_url}/stock"
-        response = requests.get(endpoint, headers=self.headers)
-        response.raise_for_status()
-        return response.json()
 
-    def fetchPrices(self):
-        endpoint = f"{self.base_url}/prices"
-        response = requests.get(endpoint, headers=self.headers)
-        response.raise_for_status()
-        return response.json()
 
-    
+
+"""
+https://182.160.29.24:50003/b1s/v1/Items?$select=ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection&$filter=SalesItem eq 'tYES'&$orderby=ItemCode
+"""
 """    
 https://182.160.29.24:50003/b1s/v1/BusinessPartners?$select=CardCode,CardName,CardType,Phone1,EmailAddress,GroupCode&$orderby=CardName asc&$filter=CardType eq 'cCustomer' and contains(CardCode, '10') and 
 contains(CardName, 'Leonardo') and GroupCode eq 105 and contains(Phone1, '+569') and contains(EmailAddress, '@gmail') 
