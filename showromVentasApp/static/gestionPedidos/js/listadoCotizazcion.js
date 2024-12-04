@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const getSkip = (page) => (page - 1) * recordsPerPage;
 
+    //ESta funcon no se esta utilizando, no borrar!
     const fetchAndDisplayInitialData = (params) => {
         showLoader();
         const url = `${window.location.origin}${baseURL}?top=${params.top}&skip=${params.skip}`;
@@ -373,5 +374,23 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
     // Muestra el valor calculado en el campo neto
     inputNeto.value = netoValue; // Limita a 2 decimales
     });
+    
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const rutSN = urlParams.get("rutSN") || "";
+    const nombreSN = urlParams.get("nombreSN") || "";
+  
+    // Si hay parámetros en la URL, aplicarlos automáticamente
+    if (rutSN || nombreSN) {
+      console.log("Aplicando filtros desde la URL:", { rutSN, nombreSN });
+  
+      // Colocar los valores en los campos correspondientes
+      if (rutSN) document.querySelector('[name="cardName"]').value = rutSN;
+      if (nombreSN) document.querySelector('[name="cardName"]').value = nombreSN;
+  
+      // Aplicar los filtros automáticamente
+      const filters = getFilterData();
+      applyFiltersAndFetchData(filters);
+    }
 
 });

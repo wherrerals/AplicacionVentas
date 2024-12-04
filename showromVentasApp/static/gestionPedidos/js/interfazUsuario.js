@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
       let mes = formatNumber(tresDiasDespues.getMonth() + 1);
       let año = tresDiasDespues.getFullYear();
   
-      let fechaFormateada = año + '-' + dia + '-' + mes;
+      let fechaFormateada = año + '-' + mes + '-' + dia;
   
       let diasVencidosLabel = document.getElementById('docDueDate');
       if (diasVencidosLabel) {

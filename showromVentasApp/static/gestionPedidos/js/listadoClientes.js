@@ -6,6 +6,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const getSkip = (page) => (page - 1) * recordsPerPage;
 
+
+    const getFilterData = () => {
+        return {
+            codigo: document.querySelector('[name="codigo"]').value.trim(),
+            nombre: document.querySelector('[name="nombre"]').value.trim(),
+            tipo: document.querySelector('[name="tipo"]').value.trim(),
+            telefono: document.querySelector('[name="telefono"]').value.trim(),
+            email: document.querySelector('[name="email"]').value.trim()
+        };
+    };
+
     const fetchAndDisplayData = (page = 1) => {
         if (!hasMoreData && page > currentPage) return;
     
@@ -50,6 +61,59 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     
 
+    const applySearchFromBuscador = () => {
+        const searchText = document.querySelector('#buscador').value.trim();
+
+        if (!searchText) {
+            console.log("El buscador está vacío, limpiando filtros...");
+            // Limpia todos los filtros
+            document.querySelectorAll('.form-control, .form-select').forEach(filter => filter.value = '');
+            fetchAndDisplayData(1);
+            return;
+        }
+        console.log("Texto ingresado en el buscador:", searchText);
+        // Determinar a qué filtro pertenece el texto ingresado
+        if (/^\d+$/.test(searchText)) {
+            // Es un código (solo números)
+            document.querySelector('[name="codigo"]').value = searchText;
+            console.log("entro en codigo ")
+
+        } else if (searchText.toLowerCase() === 'persona' || searchText.toLowerCase() === 'empresa') {
+            // Es el tipo (Persona o Empresa)
+            const tipoMap = { persona: '12', empresa: '13' };
+            document.querySelector('[name="tipo"]').value = tipoMap[searchText.toLowerCase()];
+            console.log("entro en tipo ")
+        } else if (/^\+/.test(searchText)) {
+            // Es un teléfono (empieza con "+")
+            document.querySelector('[name="telefono"]').value = searchText;
+            console.log("entro en telefono ")
+        } else if (/@/.test(searchText)) {
+            // Es un email (contiene "@")
+            document.querySelector('[name="email"]').value = searchText;
+            console.log("entro en email ")
+        } else {
+            // Se asume que es un nombre si no encaja en las otras categorías
+            document.querySelector('[name="nombre"]').value = searchText;
+            console.log("entro en nombre ")
+        }
+
+        console.log("Aplicando búsqueda con filtro identificado:", getFilterData());
+        fetchAndDisplayData(1);
+    };
+
+        // Agregar evento al hacer clic en la lupa
+        document.querySelector('#lupa-busqueda').addEventListener('click', () => {
+            applySearchFromBuscador();
+        });
+
+        // Evento para buscar al presionar "Enter" en el buscador
+        document.querySelector('#buscador').addEventListener('keydown', (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Evitar que el formulario se envíe
+                applySearchFromBuscador(); // Ejecutar búsqueda
+            }
+        });
+        
     const displayClients = (clients) => {
         const tbody = document.querySelector('#listadoClientes');
         tbody.innerHTML = ''; // Limpiar datos anteriores
@@ -138,7 +202,41 @@ document.addEventListener("DOMContentLoaded", function () {
             paginationContainer.appendChild(nextButton);
         });
     };
+
+
+        // Agregar evento keydown para aplicar filtros al presionar "Enter"
+        document.querySelectorAll('.form-control, .form-select').forEach(filter => {
+            filter.addEventListener('keydown', (event) => {
+                if (event.key === "Enter") { // Detectar la tecla Enter
+                    event.preventDefault(); // Evitar el envío del formulario
     
+                    const filters = getFilterData(); // Capturar los datos de los filtros
+                    console.log("Filtros aplicados al presionar Enter:", filters);
+    
+                    fetchAndDisplayData(1); // Realizar la búsqueda desde la primera página
+                }
+            });
+        });
+    
+
+        // Agregar eventos a los inputs para buscar al borrar contenido o al presionar la "x"
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.value.trim() === '') {
+                    console.log("Filtro vacío, aplicando búsqueda...");
+                    fetchAndDisplayData(1);
+                }
+            });
+        });
+    
+        // Agregar eventos a los selects para buscar al cambiar la selección
+        document.querySelectorAll('.form-select').forEach(select => {
+            select.addEventListener('change', () => {
+                console.log("Filtro modificado en selector, aplicando búsqueda...");
+                fetchAndDisplayData(1);
+            });
+        });
+
     // Llama a la función para cargar los datos de la primera página al inicio
     fetchAndDisplayData(currentPage);
 

@@ -364,7 +364,7 @@ class APIClient:
 
         self.__login()
         selcect = f"CardCode,CardName,CardType,Phone1,EmailAddress,GroupCode"
-        order_by = f"CardName asc "
+        order_by = f"CardName desc"
         filter_condition = f"CardType eq 'cCustomer'"
 
         if filters:
@@ -422,9 +422,26 @@ class APIClient:
             print(f"Error inesperado: {e}")
             raise
 
+    def obtenerProductosSL(self, skip=0):
+
+        self.__login()
+        select = "ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection"
+        filter = "SalesItem eq 'tYES'"
+        order_by = "ItemCode desc"
+
+        url = f"{self.base_url}Items?$select={select}&$filter={filter}&$orderby={order_by}&$skip={skip}"
+
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print(url)
+        return response.json()
 
 
-    
+
+
+"""
+https://182.160.29.24:50003/b1s/v1/Items?$select=ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection&$filter=SalesItem eq 'tYES'&$orderby=ItemCode
+"""
 """    
 https://182.160.29.24:50003/b1s/v1/BusinessPartners?$select=CardCode,CardName,CardType,Phone1,EmailAddress,GroupCode&$orderby=CardName asc&$filter=CardType eq 'cCustomer' and contains(CardCode, '10') and 
 contains(CardName, 'Leonardo') and GroupCode eq 105 and contains(Phone1, '+569') and contains(EmailAddress, '@gmail') 

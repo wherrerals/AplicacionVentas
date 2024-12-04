@@ -12,14 +12,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-fexe1oq@sx@j&x3m#tw(#x(r!g32fylgea=whky=#ge^vn5f*h'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-
 DEBUG = True
 
-#DEBUG = False   
-
-#En este se debe colocar la ip de la maquina en la que se esta trabajando o la ip de la maquina en la que se va a desplegar la aplicacion
-ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '192.168.3.41', '192.168.3.42', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '192.168.3.41', '192.168.3.42']
 #ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.3.41']
 #python manage.py runserver 192.168.3.41:8000
 
 
@@ -31,12 +28,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'config',
+    'AplicacionVentas',
     'datosLsApp',
     'logicaVentasApp',
-    'showromVentasApp',
-    'taskApp',
-
+    'showromVentasApp'    
 ]
 
 MIDDLEWARE = [
@@ -50,7 +45,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = 'AplicacionVentas.urls'
 
 #/Users/Cuervo/Documents/AplicacionVentas/showromVentasApp/templates/showromVentasApp
 #/Users/nicor/Universidad/Practica/AplicacionVentas/showromVentasApp/templates/showromVentasApp
@@ -73,13 +68,12 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'showromVentasApp.context_processors.grupos_usuario'
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = 'AplicacionVentas.wsgi.application'
 
 
 # Database
@@ -91,21 +85,16 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
         'USER':'root',
-        'PASSWORD':'Ea7hava5*', #led_studio
         #'PASSWORD':'Ea7hava5}', #home
+        'PASSWORD':'Ea7hava5*', #led_studio
         #'PASSWORD':'qwerty', #nico
-        #'HOST':'localhost',
+        'HOST':'localhost',
         'PORT':'3306',
     }
 }
 
-# Configuración de Celery con RabbitMQ como broker
-CELERY_BROKER_URL = 'amqp://guest:guest@localhost//'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_BACKEND = 'rpc://'
+# settings.py
 
-#Configuracion para docker
 """ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -174,6 +163,7 @@ LOGIN_REDIRECT_URL = '/ventas'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+
 
 
 # Static files (CSS, JavaScript, Images)

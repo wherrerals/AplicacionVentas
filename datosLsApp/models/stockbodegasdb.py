@@ -15,6 +15,7 @@ class StockBodegasDB(models.Model):
     idProducto = models.ForeignKey(ProductoDB, on_delete=models.CASCADE)
     idBodega = models.ForeignKey(BodegaDB, on_delete=models.CASCADE)
     stock = models.IntegerField(default=-1)
+    stockDisponibleReal = models.IntegerField(default=-1)
 
     def __str__(self):
-        return f"{self.codigoProducto}"
+        return f"{self.idProducto}"

@@ -1079,6 +1079,7 @@ class SocioNegocio:
             "email": data.get("EmailAddress", "") or "Null",
             "telefono": data.get("Phone1", "") or "Null",
             "celular": data.get("Phone1", "") or "Null",
+            "giro": data.get("Notes", "") or "Null",
             "rut": data.get("FederalTaxID", "") or "Null",
             "grupoSN": data.get("GroupCode", "") or "Null",
             "tipoSN": "I",  # Valor fijo según lo especificado
@@ -1150,6 +1151,7 @@ class SocioNegocio:
             apellido=socio_negocio["apellido"],
             email=socio_negocio["email"],
             telefono=socio_negocio["telefono"],
+            giro = socio_negocio["giro"],
             rut=socio_negocio["rut"],
             grupoSN=grupo, 
             tipoSN=tipo,

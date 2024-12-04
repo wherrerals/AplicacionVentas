@@ -80,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Iteración sobre `DocumentLines` para añadir cada producto
             const documentLines = data.DocumentLines;
             documentLines.forEach((line) => {
+              console.log("Producto: ", line)
               const productoCodigo = line.ItemCode;
               const nombre = line.ItemDescription;
               const imagen = 'ruta_a_la_imagen.jpg';
@@ -98,7 +99,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 precioDescuento
               });
   
-              agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento);
+              agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal);
             });
           }
         })
