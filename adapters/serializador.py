@@ -46,6 +46,10 @@ class Serializador:
 
         # Recorrer todos los productos en "value"
         for product_data in json_data.get("value", []):
+            # Verificar si 'ItemName' es nulo, si es así, omitir el producto
+            if not product_data.get("ItemName"):
+                continue
+
             # Formatear información de un producto
             producto = {
                 "Producto": {
@@ -85,5 +89,6 @@ class Serializador:
             })
 
         return productos
+
 
 

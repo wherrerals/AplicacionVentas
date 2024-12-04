@@ -1,4 +1,5 @@
 # config/celery.py
+from datetime import timedelta
 import os
 from celery import Celery
 from celery.schedules import crontab
@@ -30,11 +31,13 @@ app.conf.update(
 app.conf.beat_schedule = {
     "sync-products-every-minute": {
         "task": "taskApp.tasks.sync_products1",  # Ruta correcta a la tarea
-        "schedule": crontab(minute="*/1"),  # Ejecutar cada hora
+        #"schedule": crontab(minute="*/1"),  # Ejecutar cada minuto
+        "schedule": timedelta(seconds=5),  # Ejecutar cada 10 segundos
     },
     
     "data-product": {
         "task": "taskApp.tasks.sync_products",  # Ruta correcta a la tarea
-        "schedule": crontab(minute="*/1"),  # Ejecutar todos los días a medianoche
+        #"schedule": crontab(minute="*/1"),  # Ejecutar cada minuto
+        "schedule": timedelta(seconds=5),  # Ejecutar cada 10 segundos
     },
 }

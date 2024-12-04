@@ -1,9 +1,6 @@
 from django.contrib import admin
-
-# Register your models here.
-# tasks_app/admin.py
-from django.contrib import admin
 from .models import CeleryTask
+from .models import SyncState
 
 @admin.register(CeleryTask)
 class CeleryTaskAdmin(admin.ModelAdmin):
@@ -15,3 +12,9 @@ class CeleryTaskAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         """Filtra las tareas para mostrar solo las relevantes."""
         return super().get_queryset(request).order_by('-timestamp')
+
+@admin.register(SyncState)
+class SyncStateAdmin(admin.ModelAdmin):
+    list_display = ('key', 'value')
+    search_fields = ('key',)
+    readonly_fields = ('key', 'value')

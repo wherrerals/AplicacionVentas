@@ -19,3 +19,10 @@ class CeleryTask(models.Model):
             self.status = result.status
             self.result = result.result if result.successful() else result.traceback
             self.save()
+            
+class SyncState(models.Model):
+    key = models.CharField(max_length=50, unique=True)
+    value = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return f"SyncState {self.key} = {self.value}"

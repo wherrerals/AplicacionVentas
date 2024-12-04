@@ -422,14 +422,14 @@ class APIClient:
             print(f"Error inesperado: {e}")
             raise
 
-    def obtenerProductosSL(self):
+    def obtenerProductosSL(self, skip=0):
 
         self.__login()
         select = "ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection"
         filter = "SalesItem eq 'tYES'"
         order_by = "ItemCode desc"
 
-        url = f"{self.base_url}Items?$select={select}&$filter={filter}&$orderby={order_by}"
+        url = f"{self.base_url}Items?$select={select}&$filter={filter}&$orderby={order_by}&$skip={skip}"
 
         response = self.session.get(url, verify=False)
         response.raise_for_status()
