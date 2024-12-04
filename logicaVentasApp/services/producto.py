@@ -1,23 +1,25 @@
-from adapters import sl_client
 from adapters.serializador import Serializador
-from datosLsApp.repositories import ProductoRepository
+from adapters.sl_client import APIClient
+from datosLsApp.repositories.productorepository import ProductoRepository
 
 class Producto:
-    def __init__(self):
-        self.adapter = sl_client()
-        self.serializer = Serializador()
-        self.repository = ProductoRepository()
+
 
     def sync(self):
         # Obtener datos desde SAP
-        products_data = self.adapter.fetch_products()
-        stock_data = self.adapter.fetch_stock()
-        prices_data = self.adapter.fetch_prices()
+        apiConect = APIClient()
+        jsonProductos = apiConect.obtenerProductosSL()
 
         # Serializar datos
-        products = self.serializer.serialize_products(products_data)
-        stock = self.serializer.serialize_stock(stock_data)
+        serialcer = Serializador('json')
+        jsonserializado = serialcer.formatearDatos(jsonProductos)
 
-        # Crear o actualizar productos y stock
-        self.repository.sync_products(products)
-        self.repository.sync_stock(stock)
+        # Guardar productos en la base de datos
+        repo = ProductoRepository()
+        creacion = repo.sync_products_and_stock(jsonserializado)
+
+
+        if creacion:
+            return "Productos Sincronizados"
+
+        print(f"Productos obtenidos: {jsonserializado}")

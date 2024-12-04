@@ -28,13 +28,13 @@ app.conf.update(
 
 # Configuración de beat_schedule para ejecutar múltiples tareas
 app.conf.beat_schedule = {
-    "sync-products-every-hour": {
-        "task": "taskApp.tasks.sync_products",  # Ruta correcta a la tarea
+    "sync-products-every-minute": {
+        "task": "taskApp.tasks.sync_products1",  # Ruta correcta a la tarea
         "schedule": crontab(minute="*/1"),  # Ejecutar cada hora
     },
     
-    "sync-clients-daily": {
-        "task": "taskApp.tasks.sync_clients",  # Ruta correcta a la tarea
-        "schedule": crontab(minute="*/10"),  # Ejecutar todos los días a medianoche
+    "data-product": {
+        "task": "taskApp.tasks.sync_products",  # Ruta correcta a la tarea
+        "schedule": crontab(minute="*/1"),  # Ejecutar todos los días a medianoche
     },
 }

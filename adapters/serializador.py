@@ -40,27 +40,50 @@ class Serializador:
             'EmailAddress': datos['emailSN'],
         }
 
-    def serializeProducts(self, data):
+    def formatearDatos(self, json_data):
+        # Lista para almacenar todos los productos procesados
+        productos = []
 
-        
-        return [
-            {
-                "sku": item["SKU"],
-                "name": item["Name"],
-                "description": item["Description"],
-                "price": item.get("Price"), 
+        # Recorrer todos los productos en "value"
+        for product_data in json_data.get("value", []):
+            # Formatear información de un producto
+            producto = {
+                "Producto": {
+                    "nombre": product_data.get("ItemName"),
+                    "codigo": product_data.get("ItemCode"),
+                    "imagen": "imagen.jpg",  # Este dato debería ser dinámico si existe en el JSON
+                }
             }
-            for item in data
-        ]
 
-    def serializeStock(self, data):
+            # Filtrar y formatear la información de precios (PriceList = 1 o 2)
+            item_prices = []
+            for item_price in product_data.get("ItemPrices", []):
+                price_list = item_price.get("PriceList")
+                if price_list in [1, 2]:  # Filtrar por PriceList
+                    item_prices.append({
+                        "priceList": price_list,
+                        "precio": item_price.get("Price"),
+                        "moneda": item_price.get("Currency"),
+                    })
+
+            # Filtrar y formatear la información de bodegas (WarehouseCode = "PH", "LC", "ME")
+            bodegas = []
+            for warehouse_info in product_data.get("ItemWarehouseInfoCollection", []):
+                warehouse_code = warehouse_info.get("WarehouseCode")
+                if warehouse_code in ["PH", "LC", "ME"]:  # Filtrar por WarehouseCode
+                    bodegas.append({
+                        "nombre": warehouse_code,
+                        "stock_disponible": warehouse_info.get("InStock"),
+                        "stock_comprometido": warehouse_info.get("Committed"),
+                    })
+
+            # Agregar el producto procesado a la lista
+            productos.append({
+                "Producto": producto,
+                "Precios": item_prices,
+                "Bodegas": bodegas,
+            })
+
+        return productos
 
 
-        return [
-            {
-                "sku": item["SKU"],
-                "warehouse": item["Warehouse"],
-                "stock": item["Stock"],
-            }
-            for item in data
-        ]
