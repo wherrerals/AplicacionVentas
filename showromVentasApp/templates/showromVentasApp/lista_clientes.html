@@ -31,19 +31,27 @@
       </p>
     </div>
   </div>
+
   <div class="row">
     <div class="col">
       <p></p>
     </div>
   </div>
   <form>
+
     <div class="container" style="padding: 0px; padding-left: 10px">
       <div class="row" style="color: var(--bs-secondary-color); font-size: 12px">
+        
         <div class="col-sm-4" style="text-align: right">
-          <input class="form-control" type="search" placeholder="Buscar"
-            style="width: 100%; height: 32px; font-size: 12px" />
+          <input class="form-control" id="buscador" type="search" placeholder="Buscar" style="width: 100%; height: 32px; font-size: 12px" />
         </div>
 
+        <div class="col-auto">
+          <svg id="lupa-busqueda" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="gray" class="bi bi-search" viewBox="0 0 16 16" style="cursor: pointer; margin-top: 6px;">
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001a1.007 1.007 0 0 0-.058.058l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.059-.058zm-5.442-9.29a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11z"/>
+          </svg>
+      </div>
+      
         <div class="col-sm-4" style="text-align: left">
           <a class="btn btn-primary" role="button" id="btn_nva_cotizacion" style="text-align: left;font-size: 12px;" href="{% url 'creacion_clientes' %}">+ Nueva Cliente</a>
         </div>
@@ -75,22 +83,30 @@
             <table class="table">
               <thead>
                 <tr style="background: var(--bs-primary-text-emphasis)">
+
                   <th style="background: transparent; color: var(--bs-table-bg)">
-                    <div><span>Código</span></div>
                     <div>
-                      <input class="form-control" type="search" style="width: 100%; font-size: 12px" />
+                      <span>Código</span></div>
+                    <div>
+                      <input name="codigo" class="form-control" type="search" style="width: 100%; font-size: 12px" />
                     </div>
                   </th>
+
                   <th style="background: transparent; color: var(--bs-table-bg)">
-                    <div><span>Nombre</span></div>
                     <div>
-                      <input class="form-control" type="search" style="width: 100%; font-size: 12px" />
+                      <span>Nombre</span>
+                    </div>
+                    <div>
+                      <input name="nombre" class="form-control" type="search" style="width: 100%; font-size: 12px" />
                     </div>
                   </th>
+
                   <th style="background: transparent; color: var(--bs-table-bg)">
-                    <div><span>Tipo</span></div>
                     <div>
-                      <select class="form-select" style="font-size: 12px; width: 100%">
+                      <span>Tipo</span>
+                    </div>
+                    <div>
+                      <select name="tipo" class="form-select" style="font-size: 12px; width: 100%">
                         <optgroup label="Tipo de Cliente">
                           <option value="12" selected="">Persona</option>
                           <option value="13">Empresa</option>
@@ -98,16 +114,22 @@
                       </select>
                     </div>
                   </th>
+
                   <th style="background: transparent; color: var(--bs-table-bg)">
-                    <div><span>Teléfono</span></div>
+                    <div
+                    span>Teléfono</span>
+                  </div>
                     <div>
-                      <input class="form-control" type="search" style="width: 100%; font-size: 12px" />
+                      <input name="telefono" class="form-control" type="search" style="width: 100%; font-size: 12px" />
                     </div>
                   </th>
+
                   <th style="background: transparent; color: var(--bs-table-bg)">
-                    <div><span>Email</span></div>
                     <div>
-                      <input class="form-control" type="search" style="width: 100%; font-size: 12px" />
+                      <span>Email</span>
+                    </div>
+                    <div>
+                      <input name="email"class="form-control" type="search" style="width: 100%; font-size: 12px" />
                     </div>
                   </th>
                 </tr>
