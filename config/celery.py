@@ -32,6 +32,6 @@ app.conf.beat_schedule = {
     "data-product": {
         "task": "taskApp.tasks.sync_products",  # Ruta correcta a la tarea
         #"schedule": crontab(minute="*/1"),  # Ejecutar cada minuto
-        "schedule": timedelta(seconds=5),  # Ejecutar cada 10 segundos
+        "schedule": timedelta(seconds=1),  # Ejecutar cada 10 segundos
     },
 }
