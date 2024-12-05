@@ -9,33 +9,34 @@ import pika
 class Producto:
 
     def sync(self):
-        # Obtener el valor de `skip` de la base de datos, si no existe, lo crea en 0
         state, created = SyncState.objects.get_or_create(key='product_sync_skip', defaults={'value': 0})
+        skip = state.value
+        total_synced = 0
 
-        with transaction.atomic():
-            skip = state.value
+        while True:
+            # Obtener productos de la API de Sales Layer
+            re = APIClient()
+            productos = re.obtenerProductosSL(skip=skip)
+            if not productos:  # Si no hay más productos, se detiene la sincronización
+                break
 
-            # Obtener datos desde SAP
-            apiConect = APIClient()
-            jsonProductos = apiConect.obtenerProductosSL(skip=skip)
-
-            # Serializar los productos
+            # Serializar y guardar productos
             serialcer = Serializador('json')
-            jsonserializado = serialcer.formatearDatos(jsonProductos)
-
-            # Guardar productos en la base de datos
+            jsonserializado = serialcer.formatearDatos(productos)
             repo = ProductoRepository()
             creacion = repo.sync_products_and_stock(jsonserializado)
-            
+
             if creacion:
-                mensaje = f"{len(jsonserializado)} productos sincronizados exitosamente"
-                state.value += 1
+                synced_count = len(jsonserializado)
+                total_synced += synced_count
+                # Actualizar el estado de `skip` para la siguiente llamada
+                state.value += synced_count
                 state.save()
-            else:
-                mensaje = "No se sincronizaron productos nuevos"
 
-            return mensaje
+            # Incrementar `skip` en función de la cantidad de productos procesados
+            skip += len(productos)
 
+        return f"{total_synced} productos sincronizados exitosamente"
         
 """
 
