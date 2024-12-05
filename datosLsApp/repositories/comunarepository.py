@@ -22,3 +22,18 @@ class ComunaRepository:
             QuerySet
         """
         return ComunaDB.objects.filter(region=region)
+    
+
+    def obtenerComunaPorId(self, codigo_comuna):
+        """
+        Obtiene una comuna por su id
+
+        params:
+            id_comuna: int
+
+            - Id de la comuna
+
+        return:
+            ComunaDB
+        """
+        return ComunaDB.objects.get(codigo=codigo_comuna)

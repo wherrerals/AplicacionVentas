@@ -27,4 +27,3 @@ class Comuna:
         return JsonResponse(comunas_list, safe=False)
     
 
-

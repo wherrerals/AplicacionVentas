@@ -11,6 +11,8 @@ from django.http import JsonResponse, HttpResponse
 from datosLsApp.models.usuariodb import User 
 from datosLsApp.models import (ProductoDB, SocioNegocioDB, UsuarioDB, RegionDB, GrupoSNDB, TipoSNDB, TipoClienteDB, DireccionDB, ComunaDB, ContactoDB)
 from adapters.sl_client import APIClient
+from datosLsApp.repositories.comunarepository import ComunaRepository
+from datosLsApp.repositories.regionrepository import RegionRepository
 from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
 from logicaVentasApp.services.cotizacion import Cotizacion
 from logicaVentasApp.services.socionegocio import SocioNegocio
@@ -739,4 +741,47 @@ def obtenerStockBodegas(request):
     except StockBodegasDB.DoesNotExist:
         return JsonResponse({'error': 'No se encontró stock para este producto'}, status=404)
 
+def obtenerRegionesId(request):
+    numeroRegion = request.GET.get('numero')  # Obtener el ID de la región
 
+    if not numeroRegion:
+        return JsonResponse({'error': 'Falta el parámetro: idRegion es obligatorio'}, status=400)
+
+    try:
+        region = RegionRepository()
+
+        region = region.obtenerRegionPorId(numeroRegion)
+
+        print(f"Región encontrada: {region}")
+
+        data = {
+            'numero': region.numero,
+            'nombre': region.nombre        
+            }
+
+        return JsonResponse(data, status=200)
+
+    except RegionDB.DoesNotExist:
+        return JsonResponse({'error': 'No se encontró la región solicitada'}, status=404)
+
+def  obtenerComunasId(request):
+    codigo_comuna = request.GET.get('codigo')  # Obtener el ID de la comuna
+
+    if not codigo_comuna:
+        return JsonResponse({'error': 'Falta el parámetro: idComuna es obligatorio'}, status=400)
+
+    try:
+        comuna = ComunaRepository()
+
+        comuna = comuna.obtenerComunaPorId(codigo_comuna)
+
+        data = {
+            'codigo': comuna.codigo,
+            'nombre': comuna.nombre,
+            'region': comuna.region.nombre
+        }
+
+        return JsonResponse(data, status=200)
+
+    except ComunaDB.DoesNotExist:
+        return JsonResponse({'error': 'No se encontró la comuna solicitada'}, status=404)
