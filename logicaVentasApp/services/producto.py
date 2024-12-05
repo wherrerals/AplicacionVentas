@@ -3,6 +3,8 @@ from adapters.sl_client import APIClient
 from datosLsApp.repositories.productorepository import ProductoRepository
 from taskApp.models import SyncState
 from django.db import transaction
+import pika
+
 
 class Producto:
 
@@ -24,6 +26,18 @@ class Producto:
             # Guardar productos en la base de datos
             repo = ProductoRepository()
             creacion = repo.sync_products_and_stock(jsonserializado)
+            
+            if creacion:
+                mensaje = f"{len(jsonserializado)} productos sincronizados exitosamente"
+                state.value += 1
+                state.save()
+            else:
+                mensaje = "No se sincronizaron productos nuevos"
+
+            return mensaje
+
+        
+"""
 
             #if creacion is not None:
                 # Si la sincronización fue exitosa, incrementar el valor de `skip`
@@ -35,4 +49,4 @@ class Producto:
             print(f"Productos obtenidos: {jsonserializado}")
 
             return "Productos Sincronizados"
-
+"""
