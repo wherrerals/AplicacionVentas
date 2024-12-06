@@ -138,7 +138,7 @@ class Cotizacion(Documento):
                 filters['contains(Quotations/CardName,'] = f"'{car_data}')"
 
         if data.get('salesEmployeeName'):
-            filters['contains(SalesPersons/SalesEmployeeName,'] = f"'{data.get('salesEmployeeName')}'" 
+            filters['contains(SalesPersons/SalesEmployeeName,'] = f"'{data.get('salesEmployeeName')}')" 
         
         #if data.get('DocumentStatus'):
         #   filters['Quotations/DocumentStatus eq'] = f"'{data.get('DocumentStatus')}'"
