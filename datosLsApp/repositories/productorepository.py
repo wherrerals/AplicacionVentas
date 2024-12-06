@@ -39,6 +39,8 @@ class ProductoRepository:
             if "Bodegas" in product_data:
                 self.sync_stock(producto, product_data["Bodegas"])
 
+        return True
+
     def sync_stock(self, producto, bodegas):
         """
         Sincroniza la información de stock para un producto en las bodegas.

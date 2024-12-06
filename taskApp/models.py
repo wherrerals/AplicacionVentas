@@ -1,8 +1,4 @@
 from django.db import models
-
-# Create your models here.
-# tasks_app/models.py
-from django.db import models
 from celery.result import AsyncResult
 
 class CeleryTask(models.Model):
