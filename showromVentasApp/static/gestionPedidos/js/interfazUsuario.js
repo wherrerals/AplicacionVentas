@@ -24,3 +24,23 @@ document.addEventListener('DOMContentLoaded', function() {
     sumarTresDias();
   });
   
+
+  //Oculta el boton de acciones si no hay numero de cotizacion
+  document.addEventListener('DOMContentLoaded', function () {
+    const numeroCotizacion = document.getElementById('numero_cotizacion');
+    const botonAcciones = document.querySelector('.btn.btn-primary.dropdown-toggle');
+
+
+    function checkNumeroCotizacion() {
+        if (!numeroCotizacion.textContent.trim()) {
+            botonAcciones.style.display = 'none'; 
+        } else {
+            botonAcciones.style.display = 'inline-block';
+        }
+    }
+
+    checkNumeroCotizacion();
+
+    const observer = new MutationObserver(checkNumeroCotizacion);
+    observer.observe(numeroCotizacion, { childList: true, subtree: true });
+});
