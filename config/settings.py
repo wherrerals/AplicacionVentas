@@ -91,9 +91,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
         'USER':'root',
-        #'PASSWORD':'Ea7hava5*', #led_studio
+        'PASSWORD':'Ea7hava5*', #led_studio
         #'PASSWORD':'Ea7hava5}', #home
-        'PASSWORD':'qwerty', #nico
+        #'PASSWORD':'qwerty', #nico
         #'HOST':'localhost',
         'PORT':'3306',
     }
@@ -104,6 +104,12 @@ CELERY_BROKER_URL = 'amqp://guest:guest@localhost//'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'rpc://'
+# Configuración de rutas de tareas a colas específicas
+CELERY_TASK_ROUTES = {
+    'taskApp.tasks.sync_products': {'queue': 'sync_queue'},  # Asigna la tarea a una cola específica
+}
+# Otras configuraciones
+CELERY_TASK_CREATE_MISSING_QUEUES = True
 
 #Configuracion para docker
 """ DATABASES = {
