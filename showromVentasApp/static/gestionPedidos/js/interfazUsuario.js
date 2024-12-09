@@ -24,3 +24,24 @@ document.addEventListener('DOMContentLoaded', function() {
     sumarTresDias();
   });
   
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const numeroCotizacion = document.getElementById('numero_cotizacion');
+    const botonAcciones = document.querySelector('.btn.btn-primary.dropdown-toggle');
+
+    // Función para verificar si el elemento está vacío
+    function checkNumeroCotizacion() {
+        if (!numeroCotizacion.textContent.trim()) {
+            botonAcciones.style.display = 'none'; // Oculta el botón
+        } else {
+            botonAcciones.style.display = 'inline-block'; // Muestra el botón
+        }
+    }
+
+    // Llama a la función inicialmente
+    checkNumeroCotizacion();
+
+    // Observa cambios en el elemento
+    const observer = new MutationObserver(checkNumeroCotizacion);
+    observer.observe(numeroCotizacion, { childList: true, subtree: true });
+});
