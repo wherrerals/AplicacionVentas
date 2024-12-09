@@ -1096,7 +1096,8 @@ class SocioNegocio:
                 "ciudad": direccion.get("City", ""),
                 "codigoImpuesto": direccion.get("TaxCode", ""),
                 "SocioNegocio": direccion.get("BPCode", ""),
-                "comuna": direccion.get("State", "")
+                #"region": direccion.get("State", ""),
+                #"comuna": 16214,
             })
 
         # Empleados de contacto del socio de negocio
@@ -1166,11 +1167,12 @@ class SocioNegocio:
                 nombre_direccion=direccion["nombreDireccion"],
                 ciudad=direccion["ciudad"],
                 calle_numero=direccion["calleNumero"],
-                comuna_id=1101,
-                region_id=1,  # Valor por defecto
+                comuna_id=666,
+                region_id=13,  # Valor por defecto
                 tipo_direccion=12,
                 pais=direccion.get("pais", "Chile")  # Valor por defecto
             )
+            print (f"Data Direccion: {direccion}")
 
         # Crear los contactos asociados al cliente usando el método del repositorio
         for contacto in data.get("Contactos", []):

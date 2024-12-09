@@ -427,7 +427,7 @@ class APIClient:
         self.__login()
         select = "ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection"
         filter = "SalesItem eq 'tYES'"
-        order_by = "ItemCode desc"
+        order_by = "ItemCode asc"
 
         url = f"{self.base_url}Items?$select={select}&$filter={filter}&$orderby={order_by}&$skip={skip}"
 

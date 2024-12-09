@@ -29,15 +29,9 @@ app.conf.update(
 
 # Configuración de beat_schedule para ejecutar múltiples tareas
 app.conf.beat_schedule = {
-    "sync-products-every-minute": {
-        "task": "taskApp.tasks.sync_products1",  # Ruta correcta a la tarea
-        #"schedule": crontab(minute="*/1"),  # Ejecutar cada minuto
-        "schedule": timedelta(seconds=5),  # Ejecutar cada 10 segundos
-    },
-    
     "data-product": {
         "task": "taskApp.tasks.sync_products",  # Ruta correcta a la tarea
         #"schedule": crontab(minute="*/1"),  # Ejecutar cada minuto
-        "schedule": timedelta(seconds=5),  # Ejecutar cada 10 segundos
+        "schedule": timedelta(seconds=1),  # Ejecutar cada 10 segundos
     },
 }

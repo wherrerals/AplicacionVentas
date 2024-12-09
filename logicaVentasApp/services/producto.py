@@ -3,27 +3,43 @@ from adapters.sl_client import APIClient
 from datosLsApp.repositories.productorepository import ProductoRepository
 from taskApp.models import SyncState
 from django.db import transaction
+import pika
+
 
 class Producto:
 
     def sync(self):
-        # Obtener el valor de `skip` de la base de datos, si no existe, lo crea en 0
+
         state, created = SyncState.objects.get_or_create(key='product_sync_skip', defaults={'value': 0})
+        skip = state.value
+        total_synced = 0
 
-        with transaction.atomic():
-            skip = state.value
+        cliente = APIClient()
+        productos = cliente.obtenerProductosSL(skip=skip)
 
-            # Obtener datos desde SAP
-            apiConect = APIClient()
-            jsonProductos = apiConect.obtenerProductosSL(skip=skip)
 
-            # Serializar los productos
-            serialcer = Serializador('json')
-            jsonserializado = serialcer.formatearDatos(jsonProductos)
+        # Serializar y guardar productos
+        serialcer = Serializador('json')
+        jsonserializado = serialcer.formatearDatos(productos)
+        repo = ProductoRepository()
+        creacion = repo.sync_products_and_stock(jsonserializado)
 
-            # Guardar productos en la base de datos
-            repo = ProductoRepository()
-            creacion = repo.sync_products_and_stock(jsonserializado)
+        if creacion:
+            synced_count = len(jsonserializado)
+            total_synced += synced_count
+            # Actualizar el estado de `skip` para la siguiente llamada
+            state.value += synced_count  # Incrementamos `skip` en 20 (o la cantidad de productos que hemos obtenido)
+            state.save()
+
+        # Incrementar `skip` en función de la cantidad de productos procesados
+        skip += len(productos)
+
+        return f"{total_synced} productos sincronizados exitosamente"
+
+
+
+        
+"""
 
             #if creacion is not None:
                 # Si la sincronización fue exitosa, incrementar el valor de `skip`
@@ -35,4 +51,4 @@ class Producto:
             print(f"Productos obtenidos: {jsonserializado}")
 
             return "Productos Sincronizados"
-
+"""

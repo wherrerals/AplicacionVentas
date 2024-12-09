@@ -9,6 +9,7 @@ class VendedorDB(models.Model):
 
     codigo = models.IntegerField()
     nombre = models.CharField(max_length=100,null = False)
+    tipoVendedor = models.CharField(max_length=6, default='NA')
     #sucursal = models.ForeignKey(SucursalDB, on_delete=models.CASCADE, default=1)
     
     def __str__(self):
