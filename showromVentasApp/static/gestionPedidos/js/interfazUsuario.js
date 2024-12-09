@@ -25,23 +25,22 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
 
+  //Oculta el boton de acciones si no hay numero de cotizacion
   document.addEventListener('DOMContentLoaded', function () {
     const numeroCotizacion = document.getElementById('numero_cotizacion');
     const botonAcciones = document.querySelector('.btn.btn-primary.dropdown-toggle');
 
-    // Función para verificar si el elemento está vacío
+
     function checkNumeroCotizacion() {
         if (!numeroCotizacion.textContent.trim()) {
-            botonAcciones.style.display = 'none'; // Oculta el botón
+            botonAcciones.style.display = 'none'; 
         } else {
-            botonAcciones.style.display = 'inline-block'; // Muestra el botón
+            botonAcciones.style.display = 'inline-block';
         }
     }
 
-    // Llama a la función inicialmente
     checkNumeroCotizacion();
 
-    // Observa cambios en el elemento
     const observer = new MutationObserver(checkNumeroCotizacion);
     observer.observe(numeroCotizacion, { childList: true, subtree: true });
 });

@@ -59,4 +59,63 @@ function cambiarLabel(razonSocialRadioName, nombreLabelId, apellidoInputId, apel
 }
 
 
+document.addEventListener('DOMContentLoaded', function () {
+    const duplicarOpcion = document.getElementById('duplicar');
 
+    if (duplicarOpcion) {
+        duplicarOpcion.addEventListener('click', function (event) {
+            event.preventDefault(); // Evitar acción predeterminada del enlace
+
+            console.log('Evento click detectado en "Duplicar".');
+
+            // Crear una nueva pestaña
+            const nuevaVentana = window.open('', '_blank');
+            if (nuevaVentana) {
+                const docOriginal = document.documentElement.cloneNode(true);
+
+                // Crear una estructura HTML completa en la nueva pestaña
+                nuevaVentana.document.open();
+                nuevaVentana.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                        <head>
+                            ${document.head.innerHTML} <!-- Clonar el contenido del <head> -->
+                        </head>
+                        <body>
+                            ${document.body.innerHTML} <!-- Clonar el contenido del <body> -->
+                        </body>
+                    </html>
+                `);
+                nuevaVentana.document.close();
+                console.log('Nueva pestaña creada con el contenido duplicado.');
+
+                // Ejecutar la función global definida en ajax__clientes.js
+                nuevaVentana.onload = function () {
+                    if (typeof nuevaVentana.limpiarInformacionCliente === 'function') {
+                        nuevaVentana.limpiarInformacionCliente();
+                        console.log('Función limpiarInformacionCliente ejecutada en la nueva pestaña.');
+                    } else {
+                        console.error('La función limpiarInformacionCliente no está definida en la nueva pestaña.');
+                    }
+                };
+            } else {
+                alert('No se pudo abrir una nueva pestaña. Verifica bloqueadores de pop-ups.');
+                return;
+            }
+
+            // Cerrar el menú desplegable
+            const dropdownMenu = duplicarOpcion.closest('.dropdown-menu');
+            if (dropdownMenu) {
+                dropdownMenu.classList.remove('show');
+            }
+
+            // Asegúrate de cerrar también el botón de toggle
+            const dropdownToggle = duplicarOpcion.closest('.dropdown').querySelector('.dropdown-toggle');
+            if (dropdownToggle) {
+                dropdownToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    } else {
+        console.error('No se encontró el enlace "Duplicar". Verifica el id.');
+    }
+});
