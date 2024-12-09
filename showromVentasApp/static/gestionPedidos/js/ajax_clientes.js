@@ -62,6 +62,7 @@ $(document).ready(function () {
 
         // Actualizar valores en el DOM
         $('#inputCliente').val(`${codigoSN} - ${nombre} ${apellido}`);
+        $('#inputCliente').attr('data-rut', clienteId)
         $('#rutSN').val(clienteId);
         $('#rutSN').attr('data-rut', clienteId); // Actualiza el atributo data-rut
         $('#inputCliente').attr('data-codigoSN', codigoSN);
@@ -69,6 +70,7 @@ $(document).ready(function () {
         // Limpiar los resultados
         $('#resultadosClientes').empty();
 
+        traerInformacionCliente(clienteId);
         const rutDisplayParagraph = document.querySelector('#rut-display p');
         const rutSinPuntos = clienteId.replace(/\./g, '')
         const modifiedText = rutSinPuntos.length > 0 ? rutSinPuntos.slice(0, -1) + 'C' : '';
