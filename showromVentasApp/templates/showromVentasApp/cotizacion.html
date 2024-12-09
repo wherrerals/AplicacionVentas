@@ -43,7 +43,7 @@
             <a class="dropdown-item" href="#" id="duplicar"   >Duplicar</a>
             <a class="dropdown-item" href="#">Copiar a Orden de Venta</a>
             <a class="dropdown-item" href="solic_devolucion.html">Copiar a Solicitud de Devolución</a>
-            <a class="dropdown-item" href="#">Imprimir / Descargar PDF</a>
+            <a class="dropdown-item" href="#" id="generarPDF"   >Imprimir / Descargar PDF</a>
             <a class="dropdown-item" href="#">Cerrar</a>
             <a class="dropdown-item" href="#">Cancelar</a>
           </div>
@@ -493,7 +493,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col" style="width: 70%;"><textarea class="form-control" placeholder="Observaciones"></textarea>
+        <div class="col"id="Observaciones" style="width: 70%;"><textarea class="form-control" placeholder="Observaciones"></textarea>
         </div>
         <div class="col">
           <div class="row">
@@ -547,6 +547,10 @@
     </form>
   </div>
   
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="{% static 'gestionPedidos/js/loader.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/bloqueCampos.js' %}"></script>  
   <script src="{% static 'gestionPedidos/js/gestorDirecciones.js' %}"></script>
