@@ -15,8 +15,7 @@ function submitForm() {
     const pgc = -1;
     const spcInt  = document.getElementById("vendedor_data").getAttribute("data-codeVen");
     const spc  = parseInt(spcInt, 10); // Convertir a entero con base 10
-    const trnasp = 1; //document.getElementById("transportationCode").value;
-    const ultv = 1; //document.getElementById("uledtipoventa").value;
+    const trnasp = document.getElementById("tipoEntrega-1").value;
     const ultd = "RESE"; //document.getElementById("uledtipodoc").value;
     const ulfen = 1; //document.getElementById("uledforenv").value;
 
@@ -47,12 +46,12 @@ function submitForm() {
             "ItemCode": itemCode,
             "Quantity": parseFloat(quantity),
             "ShipDate": docDueDate, //shipDate,
-            "DiscountPercent": parseFloat(discount),
-            "WarehouseCode": warehouseCode,
-            "CostingCode": costingCode,
-            "ShippingMethod": shippingMethod,
-            "COGSCostingCode": cogsCostingCode,
-            "CostingCode2": costingCode2,
+            "DiscountPercent": parseFloat(discount),//pendiente porcentaje de descuento
+            "WarehouseCode": warehouseCode, //pendiente bodega
+            "CostingCode": costingCode, // Pendiente código de sucursal, lc, Ph, gr, rs
+            "ShippingMethod": shippingMethod, // entrega en tienda, retiro en tienda, despacho a domicilio
+            "COGSCostingCode": cogsCostingCode, //pendiente 
+            "CostingCode2": costingCode2, // Pendiente código de sucursal, lc, Ph, gr, rs
             "COGSCostingCode2": cogsCostingCode2,
         };
         lines.push(line);
@@ -67,7 +66,6 @@ function submitForm() {
         "PaymentGroupCode": pgc,  
         "SalesPersonCode": spc,
         "TransportationCode": trnasp,
-        "U_LED_TIPVTA": ultv,
         "U_LED_TIPDOC": ultd,
         "U_LED_FORENV": ulfen,
         "DocumentLines": lines
