@@ -436,6 +436,29 @@ class APIClient:
         print(url)
         return response.json()
     
+    def elementosReceta(self, itemCode):
+
+        self.__login()
+        select = "ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection"
+        filter = f"ItemCode eq '{itemCode}' and SalesItem eq 'tYES'"
+        order_by = "ItemCode asc"
+
+        url = f"{self.base_url}Items?$select={select}&$filter={filter}&$orderby={order_by}"
+
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print(url)
+        return response.json()
+    
+    def productTree(self, itemCode):
+
+        url = f"{self.base_url}ProductTrees('{itemCode}')"
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print(url)
+        return response.json()
+    
+    
     def getODV(self, top=20, skip=0, filters=None):
 
         self.__login()
