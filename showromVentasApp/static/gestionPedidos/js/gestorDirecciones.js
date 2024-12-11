@@ -295,52 +295,52 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                 </div>
 
 
-                                <div class="row">
-                                <div class="col-sm-4">
-                                  <label class="col-form-label" style="font-size: 13px;">Región</label>
-                                </div>
-                                <div class="col">
-                                  <select class="form-select" id="region_${index}" name="region_static[]" style="font-size: 12px; border-color: rgb(159,168,175);" disabled>
-                                    <optgroup label="Región">
-                                      <option value="15" ${direccion.region === "Arica y Parinacota" ? "selected" : ""}>Arica y Parinacota</option>
-                                      <option value="1" ${direccion.region === "Tarapacá" ? "selected" : ""}>Tarapacá</option>
-                                      <option value="2" ${direccion.region === "Antofagasta" ? "selected" : ""}>Antofagasta</option>
-                                      <option value="3" ${direccion.region === "Atacama" ? "selected" : ""}>Atacama</option>
-                                      <option value="4" ${direccion.region === "Coquimbo" ? "selected" : ""}>Coquimbo</option>
-                                      <option value="5" ${direccion.region === "Valparaíso" ? "selected" : ""}>Valparaíso</option>
-                                      <option value="13" ${direccion.region === "Metropolitana de Santiago" ? "selected" : ""}>Metropolitana de Santiago</option>
-                                      <option value="6" ${direccion.region === "Libertador General Bernardo O'Higgins" ? "selected" : ""}>Libertador General Bernardo O'Higgins</option>
-                                      <option value="7" ${direccion.region === "Maule" ? "selected" : ""}>Maule</option>
-                                      <option value="16" ${direccion.region === "Ñuble" ? "selected" : ""}>Ñuble</option>
-                                      <option value="8" ${direccion.region === "Biobío" ? "selected" : ""}>Biobío</option>
-                                      <option value="9" ${direccion.region === "La Araucanía" ? "selected" : ""}>La Araucanía</option>
-                                      <option value="14" ${direccion.region === "Los Ríos" ? "selected" : ""}>Los Ríos</option>
-                                      <option value="10" ${direccion.region === "Los Lagos" ? "selected" : ""}>Los Lagos</option>
-                                      <option value="11" ${direccion.region === "Aysén del General Carlos Ibáñez del Campo" ? "selected" : ""}>Aysén del General Carlos Ibáñez del Campo</option>
-                                      <option value="12" ${direccion.region === "Magallanes y de la Antártica Chilena" ? "selected" : ""}>Magallanes y de la Antártica Chilena</option>
-                                    </optgroup>
-                                  </select>
-                                </div>
-                              </div>
-
-
-                                <div class="row">
+                                  <div class="row">
                                   <div class="col-sm-4">
-                                    <label class="col-form-label" style="font-size: 13px;">Comuna</label>
+                                    <label class="col-form-label" style="font-size: 13px;">Región</label>
                                   </div>
-                                    <div class="col">
-                                        <select class="form-select" id="comuna_${index}" name="comuna_static[]" style="font-size: 12px; border-color: rgb(159,168,175);" disabled>
-                                            <optgroup label="Comuna">
-                                                <!-- Las opciones de comunas se cargarán dinámicamente -->
-                                            </optgroup>
-                                        </select>
-                                    </div>
+                                  <div class="col">
+                                    <select class="form-select" id="region_${index}" name="region_static[]" style="font-size: 12px; border-color: rgb(159,168,175);" disabled>
+                                      <optgroup label="Región">
+                                        <option value="15" ${direccion.region_numero === 15 ? "selected" : ""}>Arica y Parinacota</option>
+                                        <option value="1" ${direccion.region_numero === 1 ? "selected" : ""}>Tarapacá</option>
+                                        <option value="2" ${direccion.region_numero === 2 ? "selected" : ""}>Antofagasta</option>
+                                        <option value="3" ${direccion.region_numero === 3 ? "selected" : ""}>Atacama</option>
+                                        <option value="4" ${direccion.region_numero === 4 ? "selected" : ""}>Coquimbo</option>
+                                        <option value="5" ${direccion.region_numero === 5 ? "selected" : ""}>Valparaíso</option>
+                                        <option value="13" ${direccion.region_numero === 13 ? "selected" : ""}>Metropolitana de Santiago</option>
+                                        <option value="6" ${direccion.region_numero === 6 ? "selected" : ""}>Libertador General Bernardo O'Higgins</option>
+                                        <option value="7" ${direccion.region_numero === 7 ? "selected" : ""}>Maule</option>
+                                        <option value="16" ${direccion.region_numero === 16 ? "selected" : ""}>Ñuble</option>
+                                        <option value="8" ${direccion.region_numero === 8 ? "selected" : ""}>Biobío</option>
+                                        <option value="9" ${direccion.region_numero === 9 ? "selected" : ""}>La Araucanía</option>
+                                        <option value="14" ${direccion.region_numero === 14 ? "selected" : ""}>Los Ríos</option>
+                                        <option value="10" ${direccion.region_numero === 10 ? "selected" : ""}>Los Lagos</option>
+                                        <option value="11" ${direccion.region_numero === 11 ? "selected" : ""}>Aysén del General Carlos Ibáñez del Campo</option>
+                                        <option value="12" ${direccion.region_numero === 12 ? "selected" : ""}>Magallanes y de la Antártica Chilena</option>
+                                      </optgroup>
+                                    </select>
+                                  </div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Ciudad</label></div>
-                                    <div class="col"><input id=ciudad_${index} name="cuidad_static[]" class="form-control" type="text" value="${direccion.ciudad}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
-                                </div>
+
+                                  <div class="row">
+                                    <div class="col-sm-4">
+                                      <label class="col-form-label" style="font-size: 13px;">Comuna</label>
+                                    </div>
+                                      <div class="col">
+                                          <select class="form-select" id="comuna_${index}" name="comuna_static[]" style="font-size: 12px; border-color: rgb(159,168,175);" disabled>
+                                              <optgroup label="Comuna">
+                                                  <!-- Las opciones de comunas se cargarán dinámicamente -->
+                                              </optgroup>
+                                          </select>
+                                      </div>
+                                  </div>
+
+                                  <div class="row">
+                                      <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Ciudad</label></div>
+                                      <div class="col"><input id=ciudad_${index} name="cuidad_static[]" class="form-control" type="text" value="${direccion.ciudad}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                  </div>
 
 
                                 <div class="row">
@@ -349,7 +349,15 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                 </div>
                             </div>
                         `;
+                        //console.log("region: ", direccion.region);
+                        //console.log("comuna: ", direccion.comuna);
+                        //console.log("region numero: ", direccion.region_numero);
+                        //console.log("Comuna numero: ", direccion.comuna_codigo);
                         $(listaSelector).append(direccionElemento); // Agregar la dirección al modal correspondiente
+
+                        const regionSelect = $(`#region_${index}`);
+                        const comunaSelect = $(`#comuna_${index}`);
+                        cargarComunas(direccion.region_numero, comunaSelect, direccion.comuna_codigo);
 
                         $(document).on('click', `#editar_dir_${index}`, function() {
                           console.log("Habilitando edición para la dirección con index:", index);
@@ -406,65 +414,58 @@ $(document).ready(() => {
 });
 
 
-$(document).on('change', '[id^="region_"]', function() {
-  const regionId = $(this).val();  // Obtener el valor de la región seleccionada
-  const index = $(this).attr('id').split('_')[1];  // Extraer el índice dinámico del ID
-  const comunaSelect = $(`#comuna_${index}`);  // Seleccionar el select de comuna correspondiente
+// Función para inicializar región y comunas al cargar la página
+function inicializarRegionYComuna(direccion, index) {
+  const regionSelect = $(`#region_${index}`); // Selector del campo de región
+  const comunaSelect = $(`#comuna_${index}`); // Selector del campo de comuna
+
+  // Seleccionar la región
+  regionSelect.val(direccion.region_numero).trigger('change'); // Dispara el evento change para cargar comunas
+
+  // Cargar las comunas y seleccionar la correspondiente
+  cargarComunas(direccion.region_numero, comunaSelect, direccion.comuna_codigo);
+}
+
+// Evento para cuando cambia la región (ya implementado)
+$(document).on('change', '[id^="region_"]', function () {
+  const regionId = $(this).val(); // Obtener el valor de la región seleccionada
+  const index = $(this).attr('id').split('_')[1]; // Extraer el índice dinámico del ID
+  const comunaSelect = $(`#comuna_${index}`); // Seleccionar el select de comuna correspondiente
 
   console.log("Región seleccionada:", regionId);
   console.log("Index detectado:", index);
   console.log("Select de comunas encontrado:", comunaSelect);
 
   if (regionId) {
-    cargarComunas(regionId, comunaSelect);  // Llamar a la función para cargar comunas
+    cargarComunas(regionId, comunaSelect); // Llamar a la función para cargar comunas
   } else {
-    $(comunaSelect).empty().append('<option value="">Seleccione una comuna</option>');  // Si no hay región seleccionada
+    $(comunaSelect).empty().append('<option value="">Seleccione una comuna</option>'); // Limpiar si no hay región seleccionada
   }
 });
 
-
+// Función para cargar comunas y seleccionar la correspondiente
 function cargarComunas(regionId, comunaSelect, comunaSeleccionada = null) {
   console.log("Cargando comunas para la región con ID:", regionId);
 
-
   $.ajax({
-    url: `/ventas/obtener_comunas_por_region/?idRegion=${regionId}`,  // Asegúrate de que esta ruta sea la correcta
+    url: `/ventas/obtener_comunas_por_region/?idRegion=${regionId}`, // Asegúrate de que esta ruta sea la correcta
     method: 'GET',
-    success: function(data) {
+    success: function (data) {
       console.log("Datos recibidos del servidor:", data);
       $(comunaSelect).empty();
       $(comunaSelect).append('<option value="">Seleccione una comuna</option>');
 
       // Rellenar el select con las comunas obtenidas
-      data.forEach(function(comuna) {
-        let selected = comunaSeleccionada && comunaSeleccionada === comuna.nombre ? "selected" : "";
+      data.forEach(function (comuna) {
+        let selected = comunaSeleccionada && comunaSeleccionada === comuna.codigo ? "selected" : "";
         $(comunaSelect).append(`<option value="${comuna.codigo}" ${selected}>${comuna.nombre}</option>`);
       });
 
       console.log("Select de comunas actualizado.");
     },
-    error: function(xhr, status, error) {
+    error: function (xhr, status, error) {
       console.error("Error al cargar comunas:", error);
       $(comunaSelect).empty().append('<option value="">Error al cargar comunas</option>');
     }
   });
 }
-
-
-$(document).on('change', 'select[name="region[]"]', function() {
-  const regionId = $(this).val();  // Obtener el valor de la región seleccionada
-
-  // Subir al contenedor padre y luego buscar el siguiente select de comuna
-  const comunaSelect = $(this).closest('.row').next().find('select[name="comuna[]"]');
-
-  console.log("Región seleccionada:", regionId);  // Verificar qué región se seleccionó
-  console.log("Select de comunas encontrado:", comunaSelect);
-
-  if (regionId) {
-    cargarComunas(regionId, comunaSelect);  // Llamar a la función para cargar comunas
-  } else {
-    $(comunaSelect).empty().append('<option value="">Seleccione una comuna</option>');  // Si no hay región seleccionada
-  }
-});
-
-

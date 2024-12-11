@@ -475,7 +475,9 @@ class SocioNegocio:
             'tipoDireccion': direccion.tipoDireccion,
             'pais': direccion.pais,
             'comuna': direccion.comuna.nombre,
-            'region': direccion.region.nombre
+            'region': direccion.region.nombre,
+            'comuna_codigo': direccion.comuna.codigo,
+            'region_numero': direccion.region.numero,
         } for direccion in direcciones]
 
     @staticmethod

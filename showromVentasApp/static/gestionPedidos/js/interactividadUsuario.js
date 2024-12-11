@@ -120,6 +120,50 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+document.getElementById("cerrar").addEventListener("click", function(event) {
+    event.preventDefault();
+    handleAction("cerrar");
+});
+
+document.getElementById("cancelar").addEventListener("click", function(event) {
+    event.preventDefault();
+    handleAction("cancelar");
+});
+
+function handleAction(action) {
+    const numeroCotizacion = document.getElementById("numero_cotizacion").innerText;
+    const estado = action === "cerrar" ? "Close" : "Cancel";
+
+    // Crear objeto de datos a enviar
+    const payload = {
+        DocEntry: numeroCotizacion,
+        Estado: estado
+    };
+
+    // Realizar POST con los datos
+    fetch('/ventas/cambiar_estado_cotizacion/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log("Acción realizada con éxito:", payload);
+        } else {
+            console.error("Error en la respuesta del servidor.");
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Respuesta del servidor:", data);
+    })
+    .catch(error => {
+        console.error("Error al realizar el POST:", error);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const generarPDF = document.getElementById('generarPDF');
 
@@ -133,21 +177,21 @@ document.addEventListener('DOMContentLoaded', function () {
             // Captura los datos del cliente
             const rutSN = document.getElementById('rutSN')?.value || 'No disponible';
             const nombreSN = document.getElementById('nombreSN')?.value || '';
-            const apellidoSN = document.getElementById('apellidorow')?.value || '';
+            const apellidoSN = document.getElementById('apellidoSN')?.value || '';
             const grupoSN = document.querySelector('input[name="grupoSN"]:checked')?.nextElementSibling?.textContent.trim() || 'No especificado';
-            const direccion = document.getElementById('direccion')?.value || 'No disponible';
-            const contactoNombre = document.querySelector('input[name="nombre[]"]')?.value || '';
-            const contactoApellido = document.querySelector('input[name="apellido[]"]')?.value || '';
+            const direccion = document.getElementById('nombreDireccion_0')?.value || 'No disponible';
+            const contactoNombre = document.getElementById('nombre_0')?.value || '';
+            const contactoApellido = document.getElementById('apellido_0')?.value || '';
             const telefonoSN = document.getElementById('telefonoSN')?.value || 'No disponible';
             const emailSN = document.getElementById('emailSN')?.value || 'No disponible';
 
             // Captura los datos de la cotización
             const fechaActual = new Date().toISOString().replace('T', ' ').split('.')[0];
-            const docDueDate = document.getElementById('docDueDate')?.value || 'No disponible';
+            const docDueDate = document.getElementById('docDueDate')?.textContent || 'No disponible';
             const vendedorData = document.getElementById('vendedor_data')?.textContent || 'No disponible';
             const emailVendedor = 'email@vendedor'; // Texto plano
             const telefonoVendedor = '(+56) 2 2385 3700'; // Texto plano
-            const showroomCode = document.getElementById('sucursal')?.value || 'No especificado';
+            const showroomCode = document.getElementById('sucursal')?.textContent || 'No especificado';
             const numeroCotizacion = document.getElementById('numero_cotizacion')?.textContent || 'No disponible';
 
             // Lógica para las direcciones de showroom
@@ -225,11 +269,11 @@ document.addEventListener('DOMContentLoaded', function () {
             pdf.setFontSize(10);
 
             // Datos del Cliente
-            pdf.text(`RUT: ${rutSN}`, 10, yPosition);
-            pdf.text(`Nombre: ${nombreSN} ${apellidoSN}`, 10, yPosition + 6);
-            pdf.text(`Tipo: ${grupoSN}`, 10, yPosition + 12);
-            pdf.text(`Dirección: ${direccion}`, 10, yPosition + 18);
-            pdf.text(`Contacto: ${contactoNombre} ${contactoApellido}`, 10, yPosition + 24);
+            pdf.text(`${rutSN}`, 10, yPosition);
+            pdf.text(`${nombreSN} ${apellidoSN}`, 10, yPosition + 6);
+            pdf.text(`${grupoSN}`, 10, yPosition + 12);
+            pdf.text(`${direccion}`, 10, yPosition + 18);
+            pdf.text(`Contacto: ${contactoNombre} ${contactoApellido}`, 10, yPosition + 24);    
             pdf.text(`Teléfono: ${telefonoSN}`, 10, yPosition + 30);
             pdf.text(`Email: ${emailSN}`, 10, yPosition + 36);
 
@@ -237,10 +281,9 @@ document.addEventListener('DOMContentLoaded', function () {
             pdf.text(`Fecha: ${fechaActual}`, midX + 10, yPosition);
             pdf.text(`Válido Hasta: ${docDueDate}`, midX + 10, yPosition + 6);
             pdf.text(`Vendedor: ${vendedorData}`, midX + 10, yPosition + 12);
-            pdf.text(`Email: ${emailVendedor}`, midX + 10, yPosition + 18);
-            pdf.text(`Teléfono: ${telefonoVendedor}`, midX + 10, yPosition + 24);
-            pdf.text(`Showroom: ${showroomDireccion}`, midX + 10, yPosition + 30);
-            pdf.text(`Observaciones: ${observaciones}`, midX + 10, yPosition + 36);
+            pdf.text(`Email: ${emailVendedor} / Teléfono: ${telefonoVendedor}`, midX + 10, yPosition + 18);
+            pdf.text(`Showroom: ${showroomDireccion}`, midX + 10, yPosition + 24);
+            pdf.text(`Observaciones: ${observaciones}`, midX + 10, yPosition + 30);
 
 
             const agregarPieDePagina = (pdf, pageNumber, totalPages) => {
@@ -281,6 +324,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Cuarta columna (numeración de páginas)
                 pdf.text(`Página | ${pageNumber} de ${totalPages}`, columnWidth * 3 + 5, pageHeight - 8);
             };
+
+                    // Añadir tabla de totales
+                    const agregarTablaTotales = () => {
+                        const totalNeto = document.getElementById('total_neto')?.textContent || '$0';
+                        const iva = document.getElementById('iva')?.textContent || '$0';
+                        const totalBruto = document.getElementById('total_bruto')?.textContent || '$0';
+        
+                        const startY = yPosition + 50; // Espacio adicional debajo de los detalles
+        
+                        pdf.setFontSize(10);
+                        pdf.text('Subtotal Neto:', 10, startY);
+                        pdf.text(totalNeto, 80, startY);
+        
+                        pdf.text('IVA 19%:', 10, startY + 10);
+                        pdf.text(iva, 80, startY + 10);
+        
+                        pdf.text('Total a Pagar:', 10, startY + 20);
+                        pdf.text(totalBruto, 80, startY + 20);
+                    };
+                    agregarTablaTotales();
 
             // Configurar contenido del PDF
             const totalPages = 2; // Cambiar dinámicamente según el contenido
