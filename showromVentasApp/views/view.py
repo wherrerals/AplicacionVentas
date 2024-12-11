@@ -394,6 +394,8 @@ def actualizarAgregarContacto(request, socio):
             print("Estos son los datos:", request.POST)
             # Delegamos la lógica de procesamiento al servicio
             result = SocioNegocio.procesarContactos(request.POST, socio)
+            
+
             return JsonResponse(result['data'], status=result['status'])
 
         except Exception as e:

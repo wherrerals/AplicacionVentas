@@ -414,7 +414,7 @@ class Cotizacion(Documento):
 
         # Verificar que el cardcode esté presente
         if not data.get('CardCode'):
-            errores.append("El campo 'cardcode' es obligatorio.")
+            errores.append("No se a ingresado cliente para la Cotizacion.")
 
         if not data.get('DocumentLines'):
             errores.append("La cotización debe tener al menos una línea de documento.")

@@ -76,6 +76,9 @@ class RegionDBper(admin.ModelAdmin):
 class ComunaDBper(admin.ModelAdmin):
     list_display = ('codigo', 'nombre', 'region')
 
+class stockBodegasDBper(admin.ModelAdmin):
+    list_display = ('idProducto', 'idBodega', 'stock', 'stockDisponibleReal')
+
 # Register your models here.
 admin.site.register(TipoDocTributarioDB, TipoDocTributarioDBper)
 admin.site.register(SucursalDB, SucursalDBper)
@@ -97,4 +100,4 @@ admin.site.register(TipoClienteDB, TipoClienteDBper)
 #admin.site.register(DireccionDB, DireccionDBper)
 admin.site.register(ComunaDB, ComunaDBper)
 admin.site.register(RegionDB, RegionDBper)
-admin.site.register(StockBodegasDB)
+admin.site.register(StockBodegasDB, stockBodegasDBper)

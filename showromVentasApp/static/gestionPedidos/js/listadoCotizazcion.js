@@ -1,37 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const baseURL = '/ventas/listado_Cotizaciones/';
     let currentPage = 1; // Controlar la página actual
     const recordsPerPage = 20; // Cantidad de registros por página
     let totalPages = null; // No conocemos el total de páginas inicialmente
     let activeFilters = {}; // Variable para almacenar los filtros aplicados
 
     const getSkip = (page) => (page - 1) * recordsPerPage;
-
-    //ESta funcon no se esta utilizando, no borrar!
-    const fetchAndDisplayInitialData = (params) => {
-        showLoader();
-        const url = `${window.location.origin}${baseURL}?top=${params.top}&skip=${params.skip}`;
-        fetch(url)
-            .then(response => {
-                if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
-            .then(data => {
-                console.log(data);
-                displayQuotations(data.value || []);
-
-                // Si el backend devuelve el número total de registros
-                if (data.totalRecords) {
-                    totalPages = Math.ceil(data.totalRecords / recordsPerPage);
-                }
-
-                hideLoader();
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                hideLoader();
-            });
-    };
 
     const applyFiltersAndFetchData = (filters, page = 1) => {
         showLoader();

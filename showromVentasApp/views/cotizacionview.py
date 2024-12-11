@@ -65,6 +65,7 @@ class CotizacionView(View):
         }
 
     def post_route_map(self):
+        
         return {
             '/ventas/listado_Cotizaciones_filtrado': self.filtrarCotizaciones,
             '/ventas/crear_cotizacion': self.crearCotizacion,
@@ -194,13 +195,15 @@ class CotizacionView(View):
     
     
     def actualizarEstadosCotizacion(self, request):
+        
+
         if request.method == 'POST':
             try:
                 print("Actualizando estado de cotización")
                 print("Request body:", request.body)
                 print("-" * 10)
                 data = json.loads(request.body)
-                docNum = data.get('DocEntry')
+                docNum = data.get('DocNum')
                 estado = data.get('Estado')
                 if docNum is None or estado is None:
                     return JsonResponse({'error': 'Faltan parámetros'}, status=400)
