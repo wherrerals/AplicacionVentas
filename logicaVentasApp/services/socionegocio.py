@@ -1259,7 +1259,7 @@ class SocioNegocio:
             filters['contains(CardName'] = f"'{filter_data['nombre']}')"
         if filter_data.get('tipo'):
             groupCode = int(filter_data['tipo'])
-            filters['GroupCode eq'] = f"{groupCode}"
+            filters['GroupCode eq '] = f"{groupCode} "
         if filter_data.get('telefono'):
             filters['contains(Phone1'] = f"'{filter_data['telefono']}')"
         if filter_data.get('email'):
