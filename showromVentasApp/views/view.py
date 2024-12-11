@@ -65,6 +65,19 @@ def home(request):
         }
 
         return render(request, 'home.html', context)
+    
+def odv(request):
+    """
+    Renderiza la pagina de lista de cotizaciones 
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'lista_cotizaciones.html' 
+    """
+    
+    return render(request, "ordenventa.html")
 
 
 @login_required
@@ -798,9 +811,16 @@ def trigger_sync(request):
     except TimeoutError:
         return JsonResponse({'status': 'Error: RabbitMQ no está disponible'}, status=500)
     
-def pryebas(request):
+def pruebas(request):
     
     pro = Producto()
     obtenerReceta = pro.obtenerReceta("B25400084K2")
 
     return JsonResponse(obtenerReceta, safe=False)
+
+def pryebas(request):
+    sl = APIClient()
+
+    odv = sl.getODV()
+
+    return JsonResponse(odv, safe=False)

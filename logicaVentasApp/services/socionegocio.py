@@ -1241,37 +1241,41 @@ class SocioNegocio:
 
 
     def construirFiltrosSociosNegocio(data):
-
         """
-        Construye los filtros para la consulta de cotizaciones basados en los datos proporcionados.
+        Construye los filtros para la consulta de socios de negocio basados en los datos proporcionados.
 
         Args:
             data (dict): Datos de la consulta.
 
         Returns:
-            dict: Filtros para la consulta de cotizaciones.
+            dict: Filtros para la consulta de socios de negocio.
         """
-
         filters = {}
+        filter_data = data.get('filters', {})
 
-        if data.get('cardType'):
-            filters['CardType eq'] = str(f"'{data.get('cardType')}'")
-        if data.get('CardCode'):
-            filters['contains(CardCode,'] = str(f"'{data.get('CardCode')}')")
-        if data.get('cardName'):
-            filters['contains(CardName,'] = str(f"'{data.get('cardName')}')")
-        if data.get('groupCode'):
-            groupCode = int(data.get('groupCode'))
-            filters['GroupCode eq'] = f"{groupCode})"
-        if data.get('phone'):
-            filters['contains(Phone1,'] = f"'{data.get('phone')}')"
-            filters['contains(SalesPersons/SalesEmployeeName,'] = f"'{data.get('salesEmployeeName')}'" 
-        if data.get('email'):
-            filters['contains(EmailAddress,'] = f"'{data.get('email')}')"
+        if filter_data.get('codigo'):
+            filters['contains(CardCode'] = f"'{filter_data['codigo']}')"
+        if filter_data.get('nombre'):
+            filters['contains(CardName'] = f"'{filter_data['nombre']}')"
+        if filter_data.get('tipo'):
+            groupCode = int(filter_data['tipo'])
+            filters['GroupCode eq'] = f"{groupCode}"
+        if filter_data.get('telefono'):
+            filters['contains(Phone1'] = f"'{filter_data['telefono']}')"
+        if filter_data.get('email'):
+            filters['contains(EmailAddress'] = f"'{filter_data['email']}')"
+
         # Limpiar filtros vacíos o inválidos
         filters = {k: v for k, v in filters.items() if v and v != "''"}
 
         return filters
+
+
+    
+    """
+    filter=CardType eq 'cCustomer' and contains(CardCode, '10') 
+    and contains(CardName, 'Leonardo') and GroupCode eq 105 and contains(Phone1, '+569') and contains(EmailAddress, '@gmail')
+    """
     
     def plp(cls):
         """

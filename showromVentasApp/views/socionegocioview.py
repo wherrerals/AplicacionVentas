@@ -278,7 +278,7 @@ class SocioNegocioView(FormView):
         # Manejar la solicitud de datos
         try:
             data = client.getDataSN(top=top, skip=skip, filters=filters)
-            return JsonResponse({'data': data}, safe=False)
+            return JsonResponse(data, safe=False)
         except Exception as e:
             print("Error:", e)  # Verifica el error específico que está ocurriendo
             return JsonResponse({'error': str(e)}, status=500)

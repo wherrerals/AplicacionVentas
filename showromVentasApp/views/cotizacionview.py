@@ -203,7 +203,7 @@ class CotizacionView(View):
                 print("Request body:", request.body)
                 print("-" * 10)
                 data = json.loads(request.body)
-                docNum = data.get('DocNum')
+                docNum = data.get('DocEntry')
                 estado = data.get('Estado')
                 if docNum is None or estado is None:
                     return JsonResponse({'error': 'Faltan parámetros'}, status=400)

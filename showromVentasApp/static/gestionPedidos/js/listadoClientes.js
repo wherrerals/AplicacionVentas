@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const baseURL = '/ventas/listado_socios_negocio/';
+    const baseURL = '/ventas/filtrar_socios_negocio/';
     let currentPage = 1; // Página actual
     const recordsPerPage = 20; // Cantidad de registros por página
     let hasMoreData = true; // Determina si hay más datos para cargar
@@ -19,21 +19,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const fetchAndDisplayData = (page = 1) => {
         if (!hasMoreData && page > currentPage) return;
-    
+
         // Desplazar hacia la parte superior antes de comenzar la carga
         window.scrollTo({
             top: 0,
             behavior: 'smooth',
         });
-    
+
         // Mostrar el loader después de iniciar el desplazamiento
         setTimeout(() => {
             showLoader();
-    
+
             const skip = getSkip(page);
-            const url = `${baseURL}?top=${recordsPerPage}&skip=${skip}`;
-    
-            fetch(url)
+            const filters = getFilterData(); // Captura los filtros
+            const payload = {
+                top: recordsPerPage,
+                skip: skip,
+                filters: filters,
+            };
+
+            fetch(baseURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload), // Convertimos el objeto en JSON
+            })
                 .then(response => {
                     if (!response.ok) throw new Error('Error al obtener los datos del servidor');
                     return response.json();
@@ -41,11 +52,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then(data => {
                     if (data.value && Array.isArray(data.value)) {
                         displayClients(data.value);
-    
+                        console.log(data); // Aquí puedes ver la estructura de los datos
+
+
                         // Determinar si hay más datos basándonos en el tamaño de los datos devueltos
                         hasMoreData = data.value.length === recordsPerPage;
                         currentPage = page;
-    
+
                         updatePagination(page);
                     } else {
                         console.error('Error: Formato inesperado de los datos');
@@ -59,7 +72,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
         }, 300); // Tiempo para garantizar que el desplazamiento se vea antes del loader
     };
-    
 
     const applySearchFromBuscador = () => {
         const searchText = document.querySelector('#buscador').value.trim();
@@ -101,19 +113,19 @@ document.addEventListener("DOMContentLoaded", function () {
         fetchAndDisplayData(1);
     };
 
-        // Agregar evento al hacer clic en la lupa
-        document.querySelector('#lupa-busqueda').addEventListener('click', () => {
-            applySearchFromBuscador();
-        });
+    // Agregar evento al hacer clic en la lupa
+    document.querySelector('#lupa-busqueda').addEventListener('click', () => {
+        applySearchFromBuscador();
+    });
 
-        // Evento para buscar al presionar "Enter" en el buscador
-        document.querySelector('#buscador').addEventListener('keydown', (event) => {
-            if (event.key === "Enter") {
-                event.preventDefault(); // Evitar que el formulario se envíe
-                applySearchFromBuscador(); // Ejecutar búsqueda
-            }
-        });
-        
+    // Evento para buscar al presionar "Enter" en el buscador
+    document.querySelector('#buscador').addEventListener('keydown', (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Evitar que el formulario se envíe
+            applySearchFromBuscador(); // Ejecutar búsqueda
+        }
+    });
+
     const displayClients = (clients) => {
         const tbody = document.querySelector('#listadoClientes');
         tbody.innerHTML = ''; // Limpiar datos anteriores
@@ -139,10 +151,10 @@ document.addEventListener("DOMContentLoaded", function () {
             document.querySelector('#paginationTop'),
             document.querySelector('#paginationBottom'),
         ];
-    
+
         paginationContainers.forEach((paginationContainer) => {
             paginationContainer.innerHTML = ''; // Limpiar la paginación actual
-    
+
             const createPageItem = (pageNum, isActive = false) => {
                 const pageItem = document.createElement('li');
                 pageItem.classList.add('page-item');
@@ -158,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
                 return pageItem;
             };
-    
+
             // Botón "Anterior"
             const prevButton = document.createElement('li');
             prevButton.classList.add('page-item');
@@ -175,15 +187,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 prevButton.classList.add('disabled');
             }
             paginationContainer.appendChild(prevButton);
-    
+
             // Números de página (mostrar 3 números centrados en la página actual)
             const startPage = Math.max(1, page - 1);
             const endPage = page + 1;
-    
+
             for (let i = startPage; i <= endPage; i++) {
                 paginationContainer.appendChild(createPageItem(i, i === page));
             }
-    
+
             // Botón "Siguiente"
             const nextButton = document.createElement('li');
             nextButton.classList.add('page-item');
@@ -204,38 +216,38 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
 
-        // Agregar evento keydown para aplicar filtros al presionar "Enter"
-        document.querySelectorAll('.form-control, .form-select').forEach(filter => {
-            filter.addEventListener('keydown', (event) => {
-                if (event.key === "Enter") { // Detectar la tecla Enter
-                    event.preventDefault(); // Evitar el envío del formulario
-    
-                    const filters = getFilterData(); // Capturar los datos de los filtros
-                    console.log("Filtros aplicados al presionar Enter:", filters);
-    
-                    fetchAndDisplayData(1); // Realizar la búsqueda desde la primera página
-                }
-            });
-        });
-    
+    // Agregar evento keydown para aplicar filtros al presionar "Enter"
+    document.querySelectorAll('.form-control, .form-select').forEach(filter => {
+        filter.addEventListener('keydown', (event) => {
+            if (event.key === "Enter") { // Detectar la tecla Enter
+                event.preventDefault(); // Evitar el envío del formulario
 
-        // Agregar eventos a los inputs para buscar al borrar contenido o al presionar la "x"
-        document.querySelectorAll('.form-control').forEach(input => {
-            input.addEventListener('input', () => {
-                if (input.value.trim() === '') {
-                    console.log("Filtro vacío, aplicando búsqueda...");
-                    fetchAndDisplayData(1);
-                }
-            });
+                const filters = getFilterData(); // Capturar los datos de los filtros
+                console.log("Filtros aplicados al presionar Enter:", filters);
+
+                fetchAndDisplayData(1); // Realizar la búsqueda desde la primera página
+            }
         });
-    
-        // Agregar eventos a los selects para buscar al cambiar la selección
-        document.querySelectorAll('.form-select').forEach(select => {
-            select.addEventListener('change', () => {
-                console.log("Filtro modificado en selector, aplicando búsqueda...");
+    });
+
+
+    // Agregar eventos a los inputs para buscar al borrar contenido o al presionar la "x"
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('input', () => {
+            if (input.value.trim() === '') {
+                console.log("Filtro vacío, aplicando búsqueda...");
                 fetchAndDisplayData(1);
-            });
+            }
         });
+    });
+
+    // Agregar eventos a los selects para buscar al cambiar la selección
+    document.querySelectorAll('.form-select').forEach(select => {
+        select.addEventListener('change', () => {
+            console.log("Filtro modificado en selector, aplicando búsqueda...");
+            fetchAndDisplayData(1);
+        });
+    });
 
     // Llama a la función para cargar los datos de la primera página al inicio
     fetchAndDisplayData(currentPage);
