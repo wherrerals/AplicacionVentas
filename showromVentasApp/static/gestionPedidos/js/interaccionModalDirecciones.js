@@ -8,7 +8,6 @@ $(document).ready(function() {
 
         // Recorrer cada div que contiene las direcciones de despacho
         $('#listaDireccionDespacho .col-sm-5').each(function() {
-            let tipoDireccion = $(this).find('select[name="tipodireccion[]"]').val();
             let nombreDireccion = $(this).find('input[name="nombre_direccion[]"]').val();
             let pais = $(this).find('select[name="pais[]"]').val();
             let region = $(this).find('select[name="region[]"]').val();
@@ -17,7 +16,18 @@ $(document).ready(function() {
             let direccion = $(this).find('input[name="direccion[]"]').val();
             let direccionId = $(this).find('input[name="direccionid[]"]').val();
 
-            console.log('diccionario: ', tipoDireccion, nombreDireccion, pais, region, ciudad, comuna, direccion, direccionId);
+            let tipoDireccion = $(this).find('input[name="tipodireccion[]"]').val();
+            // Asignar valores basados en el texto recibido
+            if (tipoDireccion === 'Despacho') {
+                tipoDireccion = 12;
+            } else if (tipoDireccion === 'Facturación') {
+                tipoDireccion = 13;
+            } else {
+                tipoDireccion = null;
+            }
+
+
+            console.log('diccionario modificado: ', tipoDireccion, nombreDireccion, pais, region, ciudad, comuna, direccion, direccionId);
 
 
             // Validar que todos los campos obligatorios tengan valores
@@ -32,6 +42,29 @@ $(document).ready(function() {
                     'direccion': direccion,
                     'direccionId': direccionId
                 });
+                
+                let comunaNombre = $(this).find('select[name="comuna[]"] option:selected').text();
+                console.log('Nombre de la comuna seleccionada:', comunaNombre);
+                
+
+                let nuevoTexto = `${nombreDireccion} - ${ciudad} ${comunaNombre}`;
+                console.log('nuevoTexto: ', nuevoTexto);
+
+                
+                // Buscar si la opción ya existe en el selector
+                let opcionExistente = $(`#direcciones_despacho option[value="${nuevoTexto}"]`);
+
+                if (opcionExistente.length > 0) {
+                    // Si la opción existe, seleccionarla
+                    $(`#direcciones_despacho`).val(nuevoTexto);
+                    console.log(`Opción seleccionada: ${nuevoTexto}`);
+                } else {
+                    // Si no existe, agregarla y seleccionarla
+                    $(`#direcciones_despacho`).append(
+                        `<option value="${nuevoTexto}">${nuevoTexto}</option>`
+                    ).val(nuevoTexto);
+                    console.log(`Nueva opción agregada y seleccionada: ${nuevoTexto}`);
+                }
             } else {
                 console.log('Dirección ignorada porque no tiene todos los campos completos.');
             }
@@ -82,7 +115,7 @@ $(document).ready(function() {
                     'direccionId': direccionId
                 });
             } else {
-                console.log('Dirección ignorada porque no tiene todos los campos completos.');
+                console.log('Dirección ignorada porque no tiene todos los campos completos. BBBBBBBBBBBBBBBBBBBBB');
             }
         });
 

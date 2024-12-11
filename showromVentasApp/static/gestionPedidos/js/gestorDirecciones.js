@@ -377,9 +377,13 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                           $(`#pais_${index}`).attr('name', 'pais[]');
                           $(`#region_${index}`).attr('name', 'region[]');
                           $(`#ciudad_${index}`).attr('name', 'ciudad[]');
-                          $(`#comuna_${index}`).attr('name', 'comuna[]');
+                          $(`#comuna_${index}`).attr('name', 'comuna[]').attr('data-comuna', direccion.comuna);
                           $(`#nombreDireccion_${index}`).attr('name', 'direccion[]');
                           $(`#contacto_id_${index}`).attr('name', 'direccionid[]');
+
+                          let tipoDireccion = $(`input[name="tipodireccion[]"]`).val();
+                          console.log('Valor capturado de tipoDireccion:', tipoDireccion);
+
                       
                           console.log("Edición habilitada para la dirección con index:", index);
                       });
