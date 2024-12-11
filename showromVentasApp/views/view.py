@@ -15,6 +15,7 @@ from datosLsApp.repositories.comunarepository import ComunaRepository
 from datosLsApp.repositories.regionrepository import RegionRepository
 from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
 from logicaVentasApp.services.cotizacion import Cotizacion
+from logicaVentasApp.services.producto import Producto
 from logicaVentasApp.services.socionegocio import SocioNegocio
 #librerias Python usadas
 import requests
@@ -393,6 +394,8 @@ def actualizarAgregarContacto(request, socio):
             print("Estos son los datos:", request.POST)
             # Delegamos la lógica de procesamiento al servicio
             result = SocioNegocio.procesarContactos(request.POST, socio)
+            
+
             return JsonResponse(result['data'], status=result['status'])
 
         except Exception as e:
@@ -794,3 +797,10 @@ def trigger_sync(request):
         return JsonResponse({'status': 'Sincronización en cola'})
     except TimeoutError:
         return JsonResponse({'status': 'Error: RabbitMQ no está disponible'}, status=500)
+    
+def pryebas(request):
+    
+    pro = Producto()
+    obtenerReceta = pro.obtenerReceta("B25400084K2")
+
+    return JsonResponse(obtenerReceta, safe=False)

@@ -18,4 +18,10 @@ class VTEXClient:
         response.raise_for_status()
         return response.json()
     
+    def obtenerImagenPorSKU(self, sku):
+        url = f"{self.base_url}catalog/pvt/sku/{sku}/image"
+        response = requests.get(url, headers=self.headers)
+        response.raise_for_status()
+        return response.json()
+    
     

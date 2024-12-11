@@ -435,16 +435,58 @@ class APIClient:
         response.raise_for_status()
         print(url)
         return response.json()
+    
+    def elementosReceta(self, itemCode):
 
+        self.__login()
+        select = "ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection"
+        filter = f"ItemCode eq '{itemCode}' and SalesItem eq 'tYES'"
+        order_by = "ItemCode asc"
+
+        url = f"{self.base_url}Items?$select={select}&$filter={filter}&$orderby={order_by}"
+
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print(url)
+        return response.json()
+    
+    def productTree(self, itemCode):
+
+        url = f"{self.base_url}ProductTrees('{itemCode}')"
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print(url)
+        return response.json()
+    
+    
+    def getODV(self, top=20, skip=0, filters=None):
+
+        self.__login()
+        crossjoin = f"Orders,SalesPersons"
+        expand = f"Orders($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
+        order_by = f"DocNum desc"
+        filter_condition = f"Orders/SalesPersonCode eq SalesPersons/SalesEmployeeCode" 
+
+        if filters:
+            for key, value in filters.items():
+                filter_condition += f" and {key} {value}"
+
+        headers = {
+            "Prefer": f"odata.maxpagesize={top}"
+        }
+
+        query_url = f"$crossjoin({crossjoin})?$expand={expand}&$orderby={order_by}&$filter={filter_condition}&$top={top}&$skip={skip}"
+        url = f"{self.base_url}{query_url}"
+
+        response = self.session.get(url, headers=headers, verify=False)
+        response.raise_for_status()
+        print(url)
+        return response.json()
 
 
 
 """
-https://182.160.29.24:50003/b1s/v1/Items?$select=ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection&$filter=SalesItem eq 'tYES'&$orderby=ItemCode
+https://182.160.29.24:50003/b1s/v1/$crossjoin(Orders,SalesPersons)?$expand=Orders($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)&$orderby=DocNum desc&$
+filter=Orders/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Orders/DocDate ge '2023-05-23' and Orders/DocDate le '2023-05-25' and contains(Orders/DocNum, 12) and contains(Orders/CardCode, '2') and contains(Orders/CardName, 'CA') and contains(SalesPersons/SalesEmployeeName, 'e') 
+and Orders/DocumentStatus eq 'C' and contains(Orders/DocTotal, 0) and Orders/Cancelled eq 'Y'
 """
-"""    
-https://182.160.29.24:50003/b1s/v1/BusinessPartners?$select=CardCode,CardName,CardType,Phone1,EmailAddress,GroupCode&$orderby=CardName asc&$filter=CardType eq 'cCustomer' and contains(CardCode, '10') and 
-contains(CardName, 'Leonardo') and GroupCode eq 105 and contains(Phone1, '+569') and contains(EmailAddress, '@gmail') 
-"""
-
-

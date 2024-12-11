@@ -46,7 +46,9 @@ class SocioNegocioView(FormView):
         # Definir un diccionario de rutas a métodos POST
         route_map = {
             '/ventas/agregar_editar_clientes/': self.agregarSocioNegocio,
-            '/ventas/filtrar_socios_negocio/': self.filtrarSociosNegocio
+            '/ventas/filtrar_socios_negocio/': self.filtrarSociosNegocio,
+            '/ventas/listado_socios_negocio/': self.listarSociosNegocio,
+
             #'/ventas/crear_cliente/': self.creacionCionSocioNeocio,
         }
 

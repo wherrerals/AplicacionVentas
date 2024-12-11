@@ -7,18 +7,23 @@ function submitForm() {
     // Capturar los datos del documento
     const fechaSolo = new Date().toISOString().split('T')[0]; // Salida en formato YYYY-MM-DD
 
-    const docDate = fechaSolo;
-    const docDueDate = document.getElementById("docDueDate").textContent;
-    const taxDate = fechaSolo;
-    const rut = document.getElementById("inputCliente").getAttribute("data-codigoSN");
-    const cardCode = rut;
-    const pgc = -1;
-    const spcInt  = document.getElementById("vendedor_data").getAttribute("data-codeVen");
-    const spc  = parseInt(spcInt, 10); // Convertir a entero con base 10
-    const trnasp = 1; //document.getElementById("transportationCode").value;
-    const ultv = 1; //document.getElementById("uledtipoventa").value;
-    const ultd = "RESE"; //document.getElementById("uledtipodoc").value;
+    const docDate = fechaSolo; //listo 
+    const docDueDate = document.getElementById("docDueDate").textContent; //listo
+    const taxDate = fechaSolo; // listo
+    const rut = document.getElementById("inputCliente").getAttribute("data-codigoSN"); //listo
+    const cardCode = rut;//listo
+    const pgc = -1; //listo
+    const spcInt  = document.getElementById("vendedor_data").getAttribute("data-codeVen"); //listo
+    const spc  = parseInt(spcInt, 10); //listo Convertir a entero con base 10
+    const trnasp = document.getElementById("tipoEntrega-1").value; //listo
     const ulfen = 1; //document.getElementById("uledforenv").value;
+
+    const tipoDocElement = document.querySelector("[name='tipoDocTributario']:checked");
+    if (!tipoDocElement) {
+        console.error("No se seleccionó un tipo de documento tributario.");
+        return;
+    }
+    const ultd = tipoDocElement.value; //listo
 
     console.log('Fecha del documento:', docDate);
     console.log('Fecha de vencimiento del documento:', docDueDate);
@@ -33,13 +38,16 @@ function submitForm() {
         const itemCode = row.querySelector("[name='sku_producto']").innerText;
         const quantity = row.querySelector("[name='cantidad']").value;
         //const shipDate = row.querySelector("[name='fecha_envio']").value;
-        const discount = row.querySelector("[name='precio_lista']").value;
-        const warehouseCode = "GR"; //row.querySelector("[name='Bodega']").value;
+        const discount = row.querySelector("#agg_descuento").value;
+        const bodegaElement = "LC";//row.querySelector("[name='bodegas']");
         const costingCode = "LC"; //row.querySelector("[name='costingCode']").value;
-        const shippingMethod = 2; //row.querySelector("[name='shippingMethod']").value;
+        //const shippingMethod = 2; //row.querySelector("[name='shippingMethod']").value;
         const cogsCostingCode = "LC";//row.querySelector("[name='cogsCostingCode']").value;
         const costingCode2 = "AV";//row.querySelector("[name='costingCode2']").value;
         const cogsCostingCode2 = "AV"; //row.querySelector("[name='cogsCostingCode2']").value;
+
+        const warehouseCode = bodegaElement //? bodegaElement.value : null;
+        
 
         // Crea un objeto con los datos de la línea
         const line = {
@@ -47,12 +55,12 @@ function submitForm() {
             "ItemCode": itemCode,
             "Quantity": parseFloat(quantity),
             "ShipDate": docDueDate, //shipDate,
-            "DiscountPercent": parseFloat(discount),
-            "WarehouseCode": warehouseCode,
-            "CostingCode": costingCode,
-            "ShippingMethod": shippingMethod,
-            "COGSCostingCode": cogsCostingCode,
-            "CostingCode2": costingCode2,
+            "DiscountPercent": parseFloat(discount),//pendiente porcentaje de descuento
+            "WarehouseCode": warehouseCode, //pendiente bodega
+            "CostingCode": costingCode, // Pendiente código de sucursal, lc, Ph, gr, rs
+            "ShippingMethod": trnasp, // entrega en tienda, retiro en tienda, despacho a domicilio
+            "COGSCostingCode": cogsCostingCode, //pendiente 
+            "CostingCode2": costingCode2, // Pendiente código de sucursal, lc, Ph, gr, rs
             "COGSCostingCode2": cogsCostingCode2,
         };
         lines.push(line);
@@ -67,7 +75,6 @@ function submitForm() {
         "PaymentGroupCode": pgc,  
         "SalesPersonCode": spc,
         "TransportationCode": trnasp,
-        "U_LED_TIPVTA": ultv,
         "U_LED_TIPDOC": ultd,
         "U_LED_FORENV": ulfen,
         "DocumentLines": lines
@@ -118,7 +125,7 @@ function submitForm() {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: `Error al crear la cotización: ${data.message}`,
+                    text: `Error al crear la cotización: ${data.error}`,
                     confirmButtonText: 'Aceptar'
                 });
             }
