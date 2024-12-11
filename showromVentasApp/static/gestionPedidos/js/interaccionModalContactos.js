@@ -78,3 +78,40 @@ $(document).ready(function() {
         });
     });
 });
+
+$(document).ready(function () {
+    // Escuchar cambios en los inputs de nombre y apellido
+    $(document).on('input', 'input[name="nombre[]"], input[name="apellido[]"]', function () {
+        // Recorrer cada fila de contacto
+        $('#listaContactos .col-sm-5').each(function () {
+            let nombre = $(this).find('input[name="nombre[]"]').val();
+            let apellido = $(this).find('input[name="apellido[]"]').val();
+            let contactoid = $(this).find('input[name="contacto_id[]"]').val();
+
+            // Crear texto para mostrar en el selector
+            let nuevoTexto = `${nombre} ${apellido}`;
+
+            // Verificar si el selector existe
+            if ($('#contactos_cliete').length > 0) {
+                console.log('Selector contactos_cliete encontrado.');
+
+                // Buscar si la opción ya existe en el selector
+                let opcionExistente = $(`#contactos_cliete option[value="${contactoid}"]`);
+
+                if (opcionExistente.length > 0) {
+                    // Si la opción existe, actualiza el texto
+                    opcionExistente.text(nuevoTexto);
+                    console.log(`Opción actualizada: ${nuevoTexto}`);
+                } else if (contactoid) {
+                    // Si no existe, agregarla y seleccionarla
+                    $(`#contactos_cliete`).append(
+                        `<option value="${contactoid}">${nuevoTexto}</option>`
+                    );
+                    console.log(`Nueva opción agregada: ${nuevoTexto}`);
+                }
+            } else {
+                console.log('El selector contactos_cliete no existe.');
+            }
+        });
+    });
+});
