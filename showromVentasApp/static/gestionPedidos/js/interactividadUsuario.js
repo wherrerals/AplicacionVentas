@@ -120,6 +120,50 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+document.getElementById("cerrar").addEventListener("click", function(event) {
+    event.preventDefault();
+    handleAction("cerrar");
+});
+
+document.getElementById("cancelar").addEventListener("click", function(event) {
+    event.preventDefault();
+    handleAction("cancelar");
+});
+
+function handleAction(action) {
+    const numeroCotizacion = document.getElementById("numero_cotizacion").innerText;
+    const estado = action === "cerrar" ? "Close" : "Cancel";
+
+    // Crear objeto de datos a enviar
+    const payload = {
+        DocEntry: numeroCotizacion,
+        Estado: estado
+    };
+
+    // Realizar POST con los datos
+    fetch('/ventas/cambiar_estado_cotizacion/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log("Acción realizada con éxito:", payload);
+        } else {
+            console.error("Error en la respuesta del servidor.");
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Respuesta del servidor:", data);
+    })
+    .catch(error => {
+        console.error("Error al realizar el POST:", error);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const generarPDF = document.getElementById('generarPDF');
 
@@ -229,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function () {
             pdf.text(`${nombreSN} ${apellidoSN}`, 10, yPosition + 6);
             pdf.text(`${grupoSN}`, 10, yPosition + 12);
             pdf.text(`${direccion}`, 10, yPosition + 18);
-            pdf.text(`Contacto: ${contactoNombre} ${contactoApellido}`, 10, yPosition + 24);
+            pdf.text(`Contacto: ${contactoNombre} ${contactoApellido}`, 10, yPosition + 24);    
             pdf.text(`Teléfono: ${telefonoSN}`, 10, yPosition + 30);
             pdf.text(`Email: ${emailSN}`, 10, yPosition + 36);
 
