@@ -45,7 +45,9 @@ urlpatterns = [
     path('obtener_comuna_id/', view.obtenerComunasId, name='obtener_comuna_id'),
     path('obtener_stock_bodegas/', view.obtenerStockBodegas, name='obtener_stock'),
     path('detalles_cotizacion/', cotizacionView.detallesCotizacion, name='detalles_cotizacion'),
-    path('probando/', view.probandoSL, name='probando'),
+    path('ordenesVentas/', view.odv, name='ordenesVentas'),
+    path('pruebas/', view.pryebas, name='pruebas'),
+    #path('obtener_receta/', view.pryebas, name='obtener_receta'),
 ]
 
 """ Este es el path que estaba probando

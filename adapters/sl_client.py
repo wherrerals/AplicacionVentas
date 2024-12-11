@@ -231,17 +231,16 @@ class APIClient:
     
     def actualizarEstadoDocumentoSL(self, endpoint, docNum, estado):
         """
-        permite cambiar el estado de un documento en la base de datos de SAP
+        Permite cambiar el estado de un documento en la base de datos de SAP.
 
         Parámetros:
-            endpoint : str, opcional
-                El endpoint donde se creara la cotizacion (por defecto es '').
-            docNum : int, opcional
-                El numero de documento a cambiar de estado.
-            estado : str, opcional
-                El estado al que se cambiara el documento.
+            endpoint : str
+                El endpoint donde se creará la cotización.
+            docNum : int
+                El número de documento a cambiar de estado.
+            estado : str
+                El estado al que se cambiará el documento.
         """
-
         print(f"Endpoint: {endpoint}")
         print(f"DocNum: {docNum}")
         print(f"Estado: {estado}")
@@ -249,12 +248,32 @@ class APIClient:
 
         url = f"{self.base_url}{endpoint}({docNum})/{estado}"
         response = self.session.post(url, verify=False)
-        response.raise_for_status()
+
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            # Intentar capturar el mensaje de error de la respuesta
+            try:
+                error_message = response.json().get("error", "Error desconocido")
+            except ValueError:  # Si la respuesta no es JSON
+                error_message = response.text or "Error desconocido"
+            
+            print(f"Error al actualizar estado: {error_message}")
+            return {'error': f'Error al actualizar el estado del documento: {error_message}'}
 
         print(response)
         print(url)
+
         if response.status_code == 204:
             return {'message': 'Estado actualizado correctamente'}
+        elif response.status_code == 400:
+            try:
+                error_message = response.json().get("error", "Detalles no proporcionados")
+            except ValueError:
+                error_message = response.text or "Detalles no proporcionados"
+            
+            return {'error': f'Error al actualizar el estado: {error_message}'}
+
         
     
     def verificarCliente(self, endpoint, cardCode):
@@ -360,28 +379,29 @@ class APIClient:
 
     def getDataSN(self, top=20, skip=0, filters=None):
         """
+        Recupera datos de socios de negocio desde la API con filtros opcionales.
         """
-
         self.__login()
-        selcect = f"CardCode,CardName,CardType,Phone1,EmailAddress,GroupCode"
+        select = f"CardCode,CardName,CardType,Phone1,EmailAddress,GroupCode"
         order_by = f"CardName desc"
         filter_condition = f"CardType eq 'cCustomer'"
 
         if filters:
             for key, value in filters.items():
-                filter_condition += f" and {key} {value}"
+                filter_condition += f" and {key}, {value}"
 
         headers = {
             "Prefer": f"odata.maxpagesize={top}"
         }
 
-        query_url = f"BusinessPartners?$select={selcect}&$orderby={order_by}&$filter={filter_condition}&$top={top}&$skip={skip}"
+        query_url = f"BusinessPartners?$select={select}&$orderby={order_by}&$filter={filter_condition}&$top={top}&$skip={skip}"
         url = f"{self.base_url}{query_url}"
 
         response = self.session.get(url, headers=headers, verify=False)
         response.raise_for_status()
-        print(url)
+        print(url)  # Depuración
         return response.json()
+
     
 
     def actualizarSocioNegocioSL(self, cardCode, data):
@@ -435,16 +455,58 @@ class APIClient:
         response.raise_for_status()
         print(url)
         return response.json()
+    
+    def elementosReceta(self, itemCode):
 
+        self.__login()
+        select = "ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection"
+        filter = f"ItemCode eq '{itemCode}' and SalesItem eq 'tYES'"
+        order_by = "ItemCode asc"
 
+        url = f"{self.base_url}Items?$select={select}&$filter={filter}&$orderby={order_by}"
 
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print(url)
+        return response.json()
+    
+    def productTree(self, itemCode):
+
+        url = f"{self.base_url}ProductTrees('{itemCode}')"
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print(url)
+        return response.json()
+    
+    
+    def getODV(self, top=20, skip=0, filters=None):
+
+        self.__login()
+        crossjoin = f"Orders,SalesPersons"
+        expand = f"Orders($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
+        order_by = f"DocNum desc"
+        filter_condition = f"Orders/SalesPersonCode eq SalesPersons/SalesEmployeeCode" 
+
+        if filters:
+            for key, value in filters.items():
+                filter_condition += f" and {key} {value}"
+
+        headers = {
+            "Prefer": f"odata.maxpagesize={top}"
+        }
+
+        query_url = f"$crossjoin({crossjoin})?$expand={expand}&$orderby={order_by}&$filter={filter_condition}&$top={top}&$skip={skip}"
+        url = f"{self.base_url}{query_url}"
+
+        response = self.session.get(url, headers=headers, verify=False)
+        response.raise_for_status()
+        print(url)
+        return response.json()
+
+    
 
 """
-https://182.160.29.24:50003/b1s/v1/Items?$select=ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection&$filter=SalesItem eq 'tYES'&$orderby=ItemCode
+https://182.160.29.24:50003/b1s/v1/$crossjoin(Orders,SalesPersons)?$expand=Orders($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)&$orderby=DocNum desc&$
+filter=Orders/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Orders/DocDate ge '2023-05-23' and Orders/DocDate le '2023-05-25' and contains(Orders/DocNum, 12) and contains(Orders/CardCode, '2') and contains(Orders/CardName, 'CA') and contains(SalesPersons/SalesEmployeeName, 'e') 
+and Orders/DocumentStatus eq 'C' and contains(Orders/DocTotal, 0) and Orders/Cancelled eq 'Y'
 """
-"""    
-https://182.160.29.24:50003/b1s/v1/BusinessPartners?$select=CardCode,CardName,CardType,Phone1,EmailAddress,GroupCode&$orderby=CardName asc&$filter=CardType eq 'cCustomer' and contains(CardCode, '10') and 
-contains(CardName, 'Leonardo') and GroupCode eq 105 and contains(Phone1, '+569') and contains(EmailAddress, '@gmail') 
-"""
-
-

@@ -65,6 +65,7 @@ class CotizacionView(View):
         }
 
     def post_route_map(self):
+        
         return {
             '/ventas/listado_Cotizaciones_filtrado': self.filtrarCotizaciones,
             '/ventas/crear_cotizacion': self.crearCotizacion,
@@ -194,6 +195,8 @@ class CotizacionView(View):
     
     
     def actualizarEstadosCotizacion(self, request):
+        
+
         if request.method == 'POST':
             try:
                 print("Actualizando estado de cotización")

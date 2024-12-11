@@ -46,7 +46,9 @@ class SocioNegocioView(FormView):
         # Definir un diccionario de rutas a métodos POST
         route_map = {
             '/ventas/agregar_editar_clientes/': self.agregarSocioNegocio,
-            '/ventas/filtrar_socios_negocio/': self.filtrarSociosNegocio
+            '/ventas/filtrar_socios_negocio/': self.filtrarSociosNegocio,
+            '/ventas/listado_socios_negocio/': self.listarSociosNegocio,
+
             #'/ventas/crear_cliente/': self.creacionCionSocioNeocio,
         }
 
@@ -276,7 +278,7 @@ class SocioNegocioView(FormView):
         # Manejar la solicitud de datos
         try:
             data = client.getDataSN(top=top, skip=skip, filters=filters)
-            return JsonResponse({'data': data}, safe=False)
+            return JsonResponse(data, safe=False)
         except Exception as e:
             print("Error:", e)  # Verifica el error específico que está ocurriendo
             return JsonResponse({'error': str(e)}, status=500)
