@@ -418,7 +418,7 @@ $(document).ready(() => {
 });
 
 
-// Función para inicializar región y comunas al cargar la página
+// Función para inicializar región y comunas al cargar la página o datos existentes
 function inicializarRegionYComuna(direccion, index) {
   const regionSelect = $(`#region_${index}`); // Selector del campo de región
   const comunaSelect = $(`#comuna_${index}`); // Selector del campo de comuna
@@ -430,15 +430,13 @@ function inicializarRegionYComuna(direccion, index) {
   cargarComunas(direccion.region_numero, comunaSelect, direccion.comuna_codigo);
 }
 
-// Evento para cuando cambia la región (ya implementado)
-$(document).on('change', '[id^="region_"]', function () {
+// Evento para cuando cambia la región al crear una nueva dirección
+$(document).on('change', '[id^="region_"], select[name="region[]"]', function () {
   const regionId = $(this).val(); // Obtener el valor de la región seleccionada
-  const index = $(this).attr('id').split('_')[1]; // Extraer el índice dinámico del ID
-  const comunaSelect = $(`#comuna_${index}`); // Seleccionar el select de comuna correspondiente
-
-  console.log("Región seleccionada:", regionId);
-  console.log("Index detectado:", index);
-  console.log("Select de comunas encontrado:", comunaSelect);
+  const index = $(this).attr('id') ? $(this).attr('id').split('_')[1] : null; // Extraer índice si existe
+  const comunaSelect = index
+    ? $(`#comuna_${index}`) // Para elementos con ID dinámico
+    : $(this).closest('.row').next('.row').find('select[name="comuna[]"]'); // Para elementos con estructura estática
 
   if (regionId) {
     cargarComunas(regionId, comunaSelect); // Llamar a la función para cargar comunas
@@ -447,15 +445,12 @@ $(document).on('change', '[id^="region_"]', function () {
   }
 });
 
-// Función para cargar comunas y seleccionar la correspondiente
+// Función para cargar comunas dinámicamente y seleccionar la correspondiente si existe
 function cargarComunas(regionId, comunaSelect, comunaSeleccionada = null) {
-  console.log("Cargando comunas para la región con ID:", regionId);
-
   $.ajax({
     url: `/ventas/obtener_comunas_por_region/?idRegion=${regionId}`, // Asegúrate de que esta ruta sea la correcta
     method: 'GET',
     success: function (data) {
-      console.log("Datos recibidos del servidor:", data);
       $(comunaSelect).empty();
       $(comunaSelect).append('<option value="">Seleccione una comuna</option>');
 
@@ -464,8 +459,6 @@ function cargarComunas(regionId, comunaSelect, comunaSeleccionada = null) {
         let selected = comunaSeleccionada && comunaSeleccionada === comuna.codigo ? "selected" : "";
         $(comunaSelect).append(`<option value="${comuna.codigo}" ${selected}>${comuna.nombre}</option>`);
       });
-
-      console.log("Select de comunas actualizado.");
     },
     error: function (xhr, status, error) {
       console.error("Error al cargar comunas:", error);
@@ -473,3 +466,18 @@ function cargarComunas(regionId, comunaSelect, comunaSeleccionada = null) {
     }
   });
 }
+
+// Función para inicializar las regiones y comunas al cargar la página
+function inicializarFormularioDirecciones(direcciones) {
+  direcciones.forEach((direccion, index) => {
+    inicializarRegionYComuna(direccion, index); // Inicializar cada dirección
+  });
+}
+
+// Llamada inicial al cargar la página con datos existentes
+$(document).ready(function () {
+  // Si hay datos existentes
+  if (typeof direcciones !== "undefined") {
+    inicializarFormularioDirecciones(direcciones);
+  }
+});
