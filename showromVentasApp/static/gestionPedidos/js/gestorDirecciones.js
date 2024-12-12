@@ -259,17 +259,14 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                     <div class="col-sm-4">
                                       <label class="col-form-label" style="font-size: 13px;">Tipo</label>
                                     </div>
-                                    <div class="col">
-                                      <input
-                                          class="form-control"
-                                          type="text"
-                                          name="tipoDireccion_static[]"
-                                          id="tipoDireccion_${index}"
-                                          value="${direccion.tipoDireccion === '12' ? 'Despacho' : direccion.tipoDireccion === '13' ? 'Facturación' : ''}"
-                                          style="font-size: 12px; border-color: rgb(159,168,175);"
-                                          disabled
-                                      />
-                                    </div>
+                                  <div class="col">
+                                    <select
+                                        class="form-select" name="tipoDireccion_static[]" id="tipoDireccion_${index}" style="font-size: 12px; border-color: rgb(159,168,175);" disabled>
+                                        <option value="" ${!direccion.tipoDireccion ? 'selected' : ''}>Seleccionar</option>
+                                        <option value="12" ${direccion.tipoDireccion === '12' ? 'selected' : ''}>Despacho</option>
+                                        <option value="13" ${direccion.tipoDireccion === '13' ? 'selected' : ''}>Facturación</option>
+                                    </select>
+                                  </div>
                                 </div>
 
                                 <div class="row">
@@ -363,7 +360,7 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                           console.log("Habilitando edición para la dirección con index:", index);
                           
                           // Hacer los campos editables
-                          $(`#tipoDireccion_${index}`).prop('disabled', false).prop('readonly', true);
+                          $(`#tipoDireccion_${index}`).prop('disabled', false)
                           $(`#direccion_${index}`).prop('disabled', false);
                           $(`#pais_${index}`).prop('disabled', false);
                           $(`#region_${index}`).prop('disabled', false);
