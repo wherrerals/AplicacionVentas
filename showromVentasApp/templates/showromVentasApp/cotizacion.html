@@ -77,6 +77,7 @@
         <p></p>
       </div>
     </div>
+    
     <div class="row" style="background: #f0f2f5;">
       <div class="col-sm-5">
         <p>Vendedor:&nbsp;
@@ -306,11 +307,11 @@
         </div>
       </div>
       <div class="row" style="background: #f0f2f5;">
-        <div class="col-sm-2 col-md-1" style="width: 20%;"><label class="col-form-label" style="font-size: 13px;">Tipo
-            Entrega</label></div>
-        <div class="col-5 col-sm-5 col-md-5 col-lg-5 col-xl-5 col-xxl-5"
-          style="text-align: left;padding-right: 0px;width: 44%;"><select class="form-select" id="tipoEntrega-1"
-            style="font-size: 12px;border-color: rgb(159,168,175);">
+        <div class="col-sm-2 col-md-1" style="width: 20%;">
+          <label class="col-form-label" style="font-size: 13px;">Tipo Entrega</label>
+        </div>
+        <div class="col-5 col-sm-5 col-md-5 col-lg-5 col-xl-5 col-xxl-5" style="text-align: left;padding-right: 0px;width: 44%;">
+          <select class="form-select" id="tipoEntrega-1" style="font-size: 12px;border-color: rgb(159,168,175);">
             <optgroup label="Entrega">
               <option value="1" selected="">Directa</option>
               <option value="5">Despacho</option>
@@ -318,7 +319,8 @@
               <option value="3">Retiro LC</option>
               <option value="4">Retiro PH</option>
             </optgroup>
-          </select></div>
+          </select>
+        </div>
       </div>
 
       <div class="row" style="background: #f0f2f5;">
@@ -355,18 +357,18 @@
           <label class="col-form-label" style="font-size: 14px;font-weight: bold;" id="docDueDate"></label>
         </div>
       </div>
+
       <div class="row" style="background: #f0f2f5;">
         <div class="col-sm-1 col-md-1" style="width: 20%;">
           <label class="col-form-label" style="font-size: 13px;">Dirección Facturación</label>
         </div>
-
         <div class="col" style="width: 35%;padding-right: 0px;">
           <select id="direcciones_facturacion" class="form-select" style="font-size: 12px;border-color: rgb(159,168,175);">
               <optgroup label="Direcciones de Facturación">
                   <option value="">Seleccione una dirección de facturación</option>
               </optgroup>
           </select>
-      </div>
+        </div>
 
 
         <div class="col-md-1" style="width: 10%;text-align: left;padding-left: 0px;padding-right: 0px;">
@@ -474,8 +476,9 @@
           <input class="form-control" type="text" style="font-size: 12px;" id="inputNumero">
           <div id="resultados" style="font-size: 11px;"></div>
         </div>
-        <div class="col"><button class="btn btn-primary" type="button" style="font-size: 12px;" id="agregar_productos"
-            hidden>Agregar</button></div>
+        <div class="col">
+          <button class="btn btn-primary" type="button" style="font-size: 12px;" id="agregar_productos" hidden>Agregar</button>
+          </div>
       </div>
       <div class="row">
         <div class="col">
