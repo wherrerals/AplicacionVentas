@@ -64,13 +64,25 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Displaying orders:", orders);
         const tbody = document.querySelector('tbody');
         tbody.innerHTML = '';
-
+    
         orders.forEach(entry => {
             const order = entry.Orders || {};
             const salesPerson = entry.SalesPersons || {};
+            
+            function formatCurrency(value) {
+                const integerValue = Math.floor(value);
+                let formattedValue = integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    
+                if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
+                    formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
+                }
+                
+                return `$ ${formattedValue}`;
+            }
+    
             const vatSumFormatted = formatCurrency(order.DocTotalNeto);
             const docTotalFormatted = formatCurrency(order.DocTotal);
-
+    
             const getStatus = (order) => {
                 if (order.Cancelled === 'Y') return 'Cancelado';
                 else if (order.DocumentStatus === 'O') return 'Abierto';
@@ -78,11 +90,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 else return 'Activo';
             };
             const status = getStatus(order);
-
+    
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><a id="num_sap_${order.DocEntry}" href="ordenventa.html">${order.DocNum}</a></td>
-                <td><a id="cliente_${order.CardCode}" href="cliente.html">${order.CardName || 'Cliente Desconocido'}</a></td>
+                <td><a href="#" class="order-link" data-docentry="${order.DocEntry}">${order.DocNum}</a></td>
+                <td><a href="#" class="cliente-link" data-cadcode="${order.CardCode}">${order.CardCode} - ${order.CardName || 'Cliente Desconocido'}</a></td>
                 <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
                 <td>${order.DocDate}</td>
                 <td>${status}</td>
@@ -91,7 +103,60 @@ document.addEventListener("DOMContentLoaded", function () {
             `;
             tbody.appendChild(tr);
         });
+    
+        // Agrega eventos a los enlaces de orden
+        document.querySelectorAll('.order-link').forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const docEntry = event.target.getAttribute('data-docentry');
+                
+                if (docEntry) {
+                    showLoadingOverlay();
+                    window.location.href = `/ordenesVentas/?docentry=${docEntry}`;
+                } else {
+                    hideLoadingOverlay();
+                    alert("No se pudo obtener el DocEntry de la orden.");
+                }
+            });
+        });
+    
+        // Agrega eventos a los enlaces de clientes
+        document.querySelectorAll('.cliente-link').forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                let cadCode = event.target.getAttribute('data-cadcode');
+    
+                if (cadCode && cadCode.endsWith("C")) {
+                    cadCode = cadCode.slice(0, -1);
+                }
+    
+                if (cadCode) {
+                    showLoadingOverlay();
+                    fetch(`/ventas/informacion_cliente/?rut=${cadCode}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Error al obtener la información del cliente: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Información del cliente:', data);
+                        window.location.href = `/ventas/creacion_clientes/?rut=${cadCode}`;
+                    })
+                    .catch(error => {
+                        hideLoadingOverlay();
+                        console.error('Error en la solicitud AJAX:', error);
+                        alert('Hubo un problema al obtener la información del cliente. Por favor, intenta de nuevo.');
+                    });
+                
+                } else {
+                    hideLoadingOverlay();
+                    alert("No se pudo obtener el RUT del cliente.");
+                }
+            });
+        });
     };
+    
 
     const formatCurrency = (value) => {
         const integerValue = Math.floor(value);
