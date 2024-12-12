@@ -52,6 +52,8 @@ class OdvView(View):
     def get_route_map(self):
         return {
             '/ventas/pruevaGet': self.metodoPrueba, # Listado de cotizaciones, no es necesaria se deja para ver si es usada en otra parte del codigo. 
+            '/ventas/detalles_ODV': self.detallesODV,
+
         }
 
     def post_route_map(self):
@@ -97,3 +99,26 @@ class OdvView(View):
         
     def metodoPrueba(self, request):
         pass
+
+
+    def detallesODV(self, request):
+    
+        docentry = request.GET.get('docentry')
+        client = APIClient()
+
+        documentClient = client.detallesOrdenVentaCliente(docentry)
+        documentLine = client.detallesOrdenVentaLineas(docentry)
+
+
+
+        data = {
+            "Client": documentClient,
+            "DocumentLine": documentLine
+        }
+
+        odv = OrdenVenta()
+
+        lines_data = odv.formatearDatos(data)
+
+
+        return JsonResponse(lines_data, safe=False)

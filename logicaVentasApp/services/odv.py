@@ -74,7 +74,90 @@ class OrdenVenta(Documento):
         filters = {k: v for k, v in filters.items() if v and v != "''"}
 
         return filters
-"""
-and Orders/DocDate ge '2023-05-23' and Orders/DocDate le '2023-05-25' and contains(Orders/DocNum, 12) and contains(Orders/CardCode, '2') and contains(Orders/CardName, 'CA') and contains(SalesPersons/SalesEmployeeName, 'e') 
-and Orders/DocumentStatus eq 'C' and contains(Orders/DocTotal, 0) and Orders/Cancelled eq 'Y'
-"""
+
+    def formatearDatos(self, json_data):
+        # Extraer y limpiar la información del cliente
+
+        print("JSON DATA:", json_data)
+        client_info = json_data["Client"]["value"][0]
+        quotations = client_info.get("Orders", {})
+        salesperson = client_info.get("SalesPersons", {})
+        contact_employee = client_info.get("BusinessPartners/ContactEmployees", {})
+
+        # Formatear los datos de cliente
+        cliente = {
+            "Orders": {
+                "DocEntry": quotations.get("DocEntry"),
+                "DocNum": quotations.get("DocNum"),
+                "CardCode": quotations.get("CardCode"),
+                "CardName": quotations.get("CardName"),
+                "TransportationCode": quotations.get("TransportationCode"),
+                "Address": quotations.get("Address"),
+                "Address2": quotations.get("Address2"),
+                "DocDate": quotations.get("DocDate"),
+                "DocumentStatus": quotations.get("DocumentStatus"),
+                "Cancelled": quotations.get("Cancelled"),
+                "U_LED_TIPVTA": quotations.get("U_LED_TIPVTA"),
+                "U_LED_TIPDOC": quotations.get("U_LED_TIPDOC"),
+                "U_LED_NROPSH": quotations.get("U_LED_NROPSH"),
+                "NumAtCard": quotations.get("NumAtCard"),
+                "VatSum": quotations.get("VatSum"),
+                "DocTotal": quotations.get("DocTotal"),
+                "DocTotalNeto": quotations.get("DocTotalNeto"),
+            },
+            "SalesPersons": {
+                "SalesEmployeeCode": salesperson.get("SalesEmployeeCode"),
+                "SalesEmployeeName": salesperson.get("SalesEmployeeName"),
+                "U_LED_SUCURS": salesperson.get("U_LED_SUCURS"),
+            },
+            "ContactEmployee": {
+                "InternalCode": contact_employee.get("InternalCode"),
+                "FirstName": contact_employee.get("FirstName"),
+            }
+        }
+
+        # Extraer y limpiar la información de líneas de documento
+        document_lines = []
+        for line_info in json_data["DocumentLine"]["value"]:
+            line = line_info.get("Orders/DocumentLines", {})
+            warehouse_info = line_info.get("Items/ItemWarehouseInfoCollection", {})
+            
+            document_line = {
+                "DocEntry": line.get("DocEntry"),
+                "LineNum": line.get("LineNum"),
+                "ItemCode": line.get("ItemCode"),
+                "ItemDescription": line.get("ItemDescription"),
+                "WarehouseCode": line.get("WarehouseCode"),
+                "Quantity": line.get("Quantity"),
+                "UnitPrice": line.get("UnitPrice"),
+                "GrossPrice": line.get("GrossPrice"),
+                "DiscountPercent": line.get("DiscountPercent"),
+                "Price": line.get("Price"),
+                "PriceAfterVAT": line.get("PriceAfterVAT"),
+                "LineTotal": line.get("LineTotal"),
+                "GrossTotal": line.get("GrossTotal"),
+                "ShipDate": line.get("ShipDate"),
+                "Address": line.get("Address"),
+                "ShippingMethod": line.get("ShippingMethod"),
+                "FreeText": line.get("FreeText"),
+                "BaseType": line.get("BaseType"),
+                "GrossBuyPrice": line.get("GrossBuyPrice"),
+                "BaseEntry": line.get("BaseEntry"),
+                "BaseLine": line.get("BaseLine"),
+                "LineStatus": line.get("LineStatus"),
+                "WarehouseInfo": {
+                    "WarehouseCode": warehouse_info.get("WarehouseCode"),
+                    "InStock": warehouse_info.get("InStock"),
+                    "Committed": warehouse_info.get("Committed"),
+                    "SalesStock": warehouse_info.get("SalesStock"),
+                }
+            }
+            document_lines.append(document_line)
+
+        # Formar el diccionario final
+        resultado = {
+            "Cliente": cliente,
+            "DocumentLines": document_lines
+        }
+
+        return resultado
