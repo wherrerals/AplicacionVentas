@@ -420,6 +420,7 @@ def actualizarAgregarContacto(request, socio):
 
 @login_required
 def agregarDireccion(request, socio):
+    print("estamos aqui")
     if request.method == "POST":
         nombredirecciones = request.POST.getlist('nombre_direccion[]')
         ciudades = request.POST.getlist('ciudad[]')

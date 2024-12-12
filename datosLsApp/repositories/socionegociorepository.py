@@ -47,6 +47,21 @@ class SocioNegocioRepository:
             SocioNegocioDB
         """
         return SocioNegocioDB.objects.create(**kwargs)
+    
+    @staticmethod
+    def crearClienteEmpresa(**kwargs):
+        """
+        Crea un cliente empresa en la base de datos
+        
+        params:
+            kwargs: dict
+
+            - Datos del cliente empresa a crear
+        
+        return:
+            SocioNegocioDB
+        """
+        return SocioNegocioDB.objects.create(**kwargs)
 
     @staticmethod
     def buscarClientesPorRut(rut):

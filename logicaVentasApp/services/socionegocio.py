@@ -31,7 +31,7 @@ class SocioNegocio:
         self.email = request.POST.get('emailSN')
         self.nombre = request.POST.get('nombreSN')
         self.apellido = request.POST.get('apellidoSN')
-        self.razon_social = request.POST.get('grupoSN')
+        self.razon_social = request.POST.get('nombreSN')
         self.giro = request.POST.get('giroSN')
         self.telefono = request.POST.get('telefonoSN')
         
@@ -48,7 +48,7 @@ class SocioNegocio:
         self.validarRut()
         self.validarEmail()
         self.validarNombre()
-        self.validarApellido()
+        #self.validarApellido()
         self.validarTelefono()
         self.tamañotelefono()
 
@@ -225,16 +225,20 @@ class SocioNegocio:
         return tiposn
 
     def crearNuevoCliente(self, codigosn, tiposn, grupoSN, tipoCliente):
+        print("Creando nuevo cliente...")
+        print(f"Grupo de cliente: {grupoSN}")
         
         with transaction.atomic():
+
             if self.gruposn == '100':
+                print("creando cliente persona")
                 cliente = self.crearClientePersona(codigosn, self.rut, tiposn, tipoCliente, self.email, grupoSN)
                 
             elif self.gruposn == '105':
+                print("creando cliente empresa")
                 cliente = self.crearClienteEmpresa(codigosn, tiposn, grupoSN, tipoCliente)
             else:
                 raise ValidationError(f"Grupo de cliente no válido: {self.gruposn}")
-
             SocioNegocio.agregarDireccionYContacto(self.request, cliente)
             print("Cliente creado exitosamente.")
             print(f"Cliente creado: {cliente}")
@@ -271,7 +275,6 @@ class SocioNegocio:
         )
 
 
-    @staticmethod
     def crearClienteEmpresa(self, codigosn, tiposn, grupoSN, tipoCliente):
         """
         Método para crear un cliente empresa.
@@ -283,16 +286,15 @@ class SocioNegocio:
             tipoCliente (TipoClienteDB): Tipo de cliente.
 
         Returns:
-            Si el cliente se creó exitosamente, retorna un JsonResponse con un mensaje de éxito.
-            Si hubo un error, retorna un JsonResponse con un mensaje de error y un código de estado
+            JsonResponse: Mensaje de éxito o error según el resultado.
         """
-
-        print(f"Creando cliente empresa - Razón Social: {self.razon_social}, RUT: {self.rut}, Email: {self.email}")
-        return SocioNegocioRepository.crearCliente(
-            codigoSN=codigosn, nombre=self.nombre, razonSocial=self.nombre, rut=self.rut, giro=self.giro,
+        return SocioNegocioRepository.crearClienteEmpresa(
+            codigoSN=codigosn, nombre=self.nombre, razonSocial=self.razon_social, rut=self.rut, giro=self.giro,
             telefono=self.telefono, email=self.email, grupoSN=grupoSN, tipoSN=tiposn,
             tipoCliente=tipoCliente
         )
+
+
 
 
     @staticmethod
@@ -353,6 +355,8 @@ class SocioNegocio:
                         Si hubo un error, retorna un mensaje de error y un código de estado 400.
         """
         print("Agregando dirección y contacto...")
+        print(f"Cliente: {cliente}")
+        print(f"Request: {request.POST}")
         from showromVentasApp.views.view import agregarDireccion, agregarContacto
 
         # Capturar datos de dirección y contacto desde el request
@@ -639,17 +643,38 @@ class SocioNegocio:
 
         self.logger.info("Preparando JSON para el socio de negocio...")
 
-        camposRequeridos = ['rutSN', 'nombreSN', 'apellidoSN', 'grupoSN', 'telefonoSN', 'emailSN']
-        for campo in camposRequeridos:
-            if not jsonData.get(campo):
-                raise ValueError(f"El campo '{campo}' es obligatorio.")
+        print(f"Datos recibidos: {jsonData}")
+        #imprimir los campos requeridos
+        print("Validando campos requeridos...")
+        print(f"rutSN: {jsonData.get('rutSN')}")
+        print(f"nombreSN: {jsonData.get('nombreSN')}")
+        print(f"apellidoSN: {jsonData.get('apellidoSN')}")
+        print(f"grupoSN: {jsonData.get('grupoSN')}")
+        print(f"telefonoSN: {jsonData.get('telefonoSN')}")
+        print(f"emailSN: {jsonData.get('emailSN')}")
 
+        if jsonData.get('grupoSN') == '100':
+            camposRequeridos = ['rutSN', 'nombreSN', 'apellidoSN', 'grupoSN', 'telefonoSN', 'emailSN']
+            for campo in camposRequeridos:
+                if not jsonData.get(campo):
+                    raise ValueError(f"El campo '{campo}' es obligatorio.")
+        else:
+            camposRequeridos = ['rutSN', 'nombreSN', 'grupoSN', 'telefonoSN', 'emailSN']
+            for campo in camposRequeridos:
+                if not jsonData.get(campo):
+                    raise ValueError(f"El campo '{campo}' es obligatorio.")
+
+        print("Datos obligatorios encontrados.")
 
         cardCode = jsonData['rutSN']
         cardCodeSinGuion = SocioNegocio.generarCodigoSN(cardCode)
         nombreCompleto = "{nombre} {apellido}".format(nombre=jsonData['nombreSN'], apellido=jsonData['apellidoSN'])
 
+        print(f"CardCode: {cardCodeSinGuion}")
+
         cliente, direcciones, contactos = self.obtenerDatosCliente(cardCode)
+
+        print(f"Cliente encontrado: {cliente}")
 
         # Preparar JSON
         cabezera = self._prepararCabecera(jsonData, cardCodeSinGuion, nombreCompleto)
@@ -1073,11 +1098,13 @@ class SocioNegocio:
 
         """
         name, lastname  = data.get('CardName').split(' ', 1)
+        razonsocial = data.get('CardName')
 
         # Datos principales del socio de negocio
         socio_negocio = {
             "codigoSN": data.get("CardCode", ""),
             "nombreCompleto": data.get("CardName", ""),
+            "razonSocial": razonsocial or "Null",
             "nombre": name or "Null",  # Asumiendo que 'CardName' contiene nombre completo
             "apellido": lastname or "None",  # Si solo hay un campo de nombre, apellido se mantiene igual
             "email": data.get("EmailAddress", "") or "Null",
@@ -1135,7 +1162,8 @@ class SocioNegocio:
 
     def guardarClienteCompleto(self, data):
         # Crear el cliente principal usando el método del repositorio
-
+        print("Guardando cliente completo...")
+        print(f"Datos a guardar: {data}")
         # Acceder a los datos del cliente
         socio_negocio = data["SocioNegocio"]
 
@@ -1149,19 +1177,35 @@ class SocioNegocio:
             raise ValueError("No se encontró el grupo, tipo de socio de negocio o tipo de cliente")
             # Maneja el error según sea necesario, como lanzar una excepción o crear un nuevo grupo
         
-        
-        cliente = SocioNegocioRepository.crearCliente(
-            codigoSN=socio_negocio["codigoSN"],
-            nombre=socio_negocio["nombre"],
-            apellido=socio_negocio["apellido"],
-            email=socio_negocio["email"],
-            telefono=socio_negocio["telefono"],
-            giro = socio_negocio["giro"],
-            rut=socio_negocio["rut"],
-            grupoSN=grupo, 
-            tipoSN=tipo,
-            tipoCliente=tipo_cliente
-        )
+        if grupo == "100":
+            cliente = SocioNegocioRepository.crearCliente(
+                codigoSN=socio_negocio["codigoSN"],
+                nombre=socio_negocio["nombre"],
+                apellido=socio_negocio["apellido"],
+                email=socio_negocio["email"],
+                telefono=socio_negocio["telefono"],
+                giro = socio_negocio["giro"],
+                rut=socio_negocio["rut"],
+                grupoSN=grupo, 
+                tipoSN=tipo,
+                tipoCliente=tipo_cliente
+            )
+
+        else:
+            cliente = SocioNegocioRepository.crearClienteEmpresa(
+                codigoSN=socio_negocio["codigoSN"],
+                nombre=socio_negocio["nombre"],
+                razonSocial=socio_negocio["razonSocial"],
+                email=socio_negocio["email"],
+                telefono=socio_negocio["telefono"],
+                giro = socio_negocio["giro"],
+                rut=socio_negocio["rut"],
+                grupoSN=grupo, 
+                tipoSN=tipo,
+                tipoCliente=tipo_cliente
+            )
+            
+
 
         # Crear las direcciones asociadas al cliente usando el método del repositorio
         for direccion in data.get("Direcciones", []):
