@@ -1,40 +1,72 @@
 {
-    "DocDate": "2024-12-10",
-    "DocDueDate": "2024-12-13",
-    "TaxDate": "2024-12-10",
-    "CardCode": "5936687C",
-    "PaymentGroupCode": -1,
-    "SalesPersonCode": 22,
-    "TransportationCode": 1,
-    "U_LED_TIPVTA": 1,
-    "U_LED_TIPDOC": "RESE",
-    "U_LED_FORENV": 1,
-    "DocumentLines": [
-        {
-            "LineNum": 0,
-            "ItemCode": "A10002075",
-            "Quantity": 1,
-            "ShipDate": "2024-12-13",
-            "DiscountPercent": null,
-            "WarehouseCode": "GR",
-            "CostingCode": "LC",
-            "ShippingMethod": 2,
-            "COGSCostingCode": "LC",
-            "CostingCode2": "AV",
-            "COGSCostingCode2": "AV"
-        },
-        {
-            "LineNum": 1,
-            "ItemCode": "A10002075",
-            "Quantity": 1,
-            "ShipDate": "2024-12-13",
-            "DiscountPercent": null,
-            "WarehouseCode": "GR",
-            "CostingCode": "LC",
-            "ShippingMethod": 2,
-            "COGSCostingCode": "LC",
-            "CostingCode2": "AV",
-            "COGSCostingCode2": "AV"
-        }
-    ]
-}'
+    "Client": {
+        "odata.metadata": "$metadata#Collection(Edm.ComplexType)",
+        "value": [
+            {
+                "Orders": {
+                    "DocEntry": 201882,
+                    "DocNum": 152436,
+                    "CardCode": "13441391C",
+                    "CardName": "SEBASTIAN SANTA CRUZ HOLMES",
+                    "TransportationCode": 1,
+                    "Address": "STGO\r\rSTGO\rCHILE",
+                    "Address2": "STGO\r\rSTGO\rCHILE",
+                    "DocDate": "2024-03-06",
+                    "DocumentStatus": "C",
+                    "Cancelled": "N",
+                    "U_LED_TIPVTA": "TIEN",
+                    "U_LED_TIPDOC": "BOLE",
+                    "U_LED_NROPSH": "246775",
+                    "NumAtCard": "",
+                    "VatSum": 11116.0,
+                    "DocTotal": 69620.0,
+                    "DocTotalNeto": 58504
+                },
+                "SalesPersons": {
+                    "SalesEmployeeCode": 37,
+                    "SalesEmployeeName": "LC - Gennesis Jugador",
+                    "U_LED_SUCURS": "LC"
+                },
+                "BusinessPartners/ContactEmployees": {
+                    "InternalCode": 69002,
+                    "FirstName": "SEBASTIAN SANTA CRUZ HOLMES"
+                }
+            }
+        ]
+    },
+    "DocumentLine": {
+        "odata.metadata": "$metadata#Collection(Edm.ComplexType)",
+        "value": [
+            {
+                "Orders": {
+                    "DocEntry": 201882,
+                    "DocNum": 152436,
+                    "CardCode": "13441391C",
+                    "CardName": "SEBASTIAN SANTA CRUZ HOLMES",
+                    "TransportationCode": 1,
+                    "Address": "STGO\r\rSTGO\rCHILE",
+                    "Address2": "STGO\r\rSTGO\rCHILE",
+                    "DocDate": "2024-03-06",
+                    "DocumentStatus": "C",
+                    "Cancelled": "N",
+                    "U_LED_TIPVTA": "TIEN",
+                    "U_LED_TIPDOC": "BOLE",
+                    "U_LED_NROPSH": "246775",
+                    "NumAtCard": "",
+                    "VatSum": 11116.0,
+                    "DocTotal": 69620.0,
+                    "DocTotalNeto": 58504
+                },
+                "SalesPersons": {
+                    "SalesEmployeeCode": 37,
+                    "SalesEmployeeName": "LC - Gennesis Jugador",
+                    "U_LED_SUCURS": "LC"
+                },
+                "BusinessPartners/ContactEmployees": {
+                    "InternalCode": 69002,
+                    "FirstName": "SEBASTIAN SANTA CRUZ HOLMES"
+                }
+            }
+        ]
+    }
+}

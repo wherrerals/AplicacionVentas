@@ -1,5 +1,6 @@
 from django.urls import path
 from showromVentasApp.views.cotizacionview import CotizacionView
+from showromVentasApp.views.odvView import OdvView
 from showromVentasApp.views.socionegocioview import SocioNegocioView
 from showromVentasApp.views.productoview import Productos
 from showromVentasApp.views import view
@@ -19,6 +20,7 @@ urlpatterns = [
     path('filtrar_socios_negocio/', SocioNegocioView.as_view(), name='filtrar_socios_negocio'),
     path('listado_productos/', Productos.as_view(), name='listado_productos'),
     path('crear_cotizacion/', CotizacionView.as_view(), name='crear_cotizacion'),
+    path('listado_odv/', OdvView.as_view(), name='listado_odv'),
     #path('crear_cliente/', SocioNegocioView.as_view(), name='crear_cliente'),
     path('cambiar_estado_cotizacion/', CotizacionView.as_view(), name='cambiar_estado_cotizacion'),
     # Rutas adicionales
@@ -45,6 +47,7 @@ urlpatterns = [
     path('obtener_comuna_id/', view.obtenerComunasId, name='obtener_comuna_id'),
     path('obtener_stock_bodegas/', view.obtenerStockBodegas, name='obtener_stock'),
     path('detalles_cotizacion/', cotizacionView.detallesCotizacion, name='detalles_cotizacion'),
+    path('detalles_ODV/', OdvView.as_view(), name='detalles_ODV'),
     path('ordenesVentas/', view.odv, name='ordenesVentas'),
     path('pruebas/', view.pryebas, name='pruebas'),
     #path('obtener_receta/', view.pryebas, name='obtener_receta'),

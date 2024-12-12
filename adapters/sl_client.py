@@ -376,7 +376,38 @@ class APIClient:
         response = self.session.get(url, verify=False)
         response.raise_for_status()
         return response.json()
+    
+    def detallesOrdenVentaCliente(self, docEntry):
+        """
+        https://182.160.29.24:50003/b1s/v1/$crossjoin(Quotations,SalesPersons,BusinessPartners/ContactEmployees)?$expand=Quotations($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address, Address2,DocDate,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)
+        &$filter=Quotations/DocEntry eq 165332 and Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Quotations/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode
+        """
+        crossjoin = "Orders,SalesPersons,BusinessPartners/ContactEmployees"
+        expand = "Orders($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address,Address2,DocDate,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
+        filter = f"Orders/DocEntry eq {docEntry} and Orders/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Orders/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode"
+        url = f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
 
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        return response.json()
+    
+    
+    def detallesOrdenVentaLineas(self, docEntry):
+        """
+        https://182.160.29.24:50003/b1s/v1/$crossjoin(Orders,Orders/DocumentLines,Items/ItemWarehouseInfoCollection)?$expand=Orders/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)
+        &$filter=Orders/DocEntry eq 201882 and Orders/DocumentLines/DocEntry eq Orders/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq Orders/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq Orders/DocumentLines/WarehouseCode
+        """
+
+        crossjoin = "Orders,Orders/DocumentLines,Items/ItemWarehouseInfoCollection"
+        expand = "Orders/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
+        filter= f"Orders/DocEntry eq {docEntry} and Orders/DocumentLines/DocEntry eq Orders/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq Orders/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq Orders/DocumentLines/WarehouseCode"
+    
+        url = f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
+
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        return response.json()
+    
     def getDataSN(self, top=20, skip=0, filters=None):
         """
         Recupera datos de socios de negocio desde la API con filtros opcionales.
@@ -502,6 +533,8 @@ class APIClient:
         response.raise_for_status()
         print(url)
         return response.json()
+    
+
 
     
 
