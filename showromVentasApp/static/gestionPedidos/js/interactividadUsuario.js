@@ -116,19 +116,33 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     } else {
-        console.error('No se encontró el enlace "Duplicar". Verifica el id.');
+        //console.error('No se encontró el enlace "Duplicar". Verifica el id.');
     }
 });
 
-document.getElementById("cerrar").addEventListener("click", function(event) {
-    event.preventDefault();
-    handleAction("cerrar");
-});
+const cerrarButton = document.getElementById("cerrar");
 
-document.getElementById("cancelar").addEventListener("click", function(event) {
-    event.preventDefault();
-    handleAction("cancelar");
-});
+// Verificar si el elemento existe antes de agregar el evento
+if (cerrarButton) {
+    cerrarButton.addEventListener("click", function(event) {
+        event.preventDefault();
+        handleAction("cerrar");
+    });
+} else {
+    //console.warn('El botón con ID "cerrar" no existe en el DOM.');
+}
+
+const cancelarButton = document.getElementById("cancelar");
+if (cancelarButton) {
+    cancelarButton.addEventListener("click", function(event) {
+        event.preventDefault();
+        handleAction("cancelar");
+    });
+    } else {
+        //console.warn('El botón con ID "cerrar" no existe en el DOM.');
+    }
+
+
 
 function handleAction(action) {
     const numeroCotizacion = document.getElementById("numero_cotizacion").innerText;

@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
       if (diasVencidosLabel) {
         diasVencidosLabel.textContent = fechaFormateada;
       } else {
-        console.error('Elemento con ID "docDueDate" no encontrado.');
+        //console.error('Elemento con ID "docDueDate" no encontrado.');
       }
     }
   

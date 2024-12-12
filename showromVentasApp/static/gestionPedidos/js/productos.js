@@ -66,6 +66,7 @@ class Producto {
         let newRow = document.createElement('tbody');
         newRow.className = 'product-row';
         newRow.innerHTML = `
+        <tr>
             <tr>
                 <td style="font-size: 12px; background: transparent; border-style: none; padding-bottom: 0px;" rowspan="2">
                     <div class="row">
