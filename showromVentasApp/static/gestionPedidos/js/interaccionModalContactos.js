@@ -23,6 +23,7 @@ $(document).ready(function() {
                     'telefono': telefono,
                     'celular': celular,
                     'email': email,
+                    'codigoInternoSap': 0,
                     "contacto_id": contactoid,
                 });
             } else {

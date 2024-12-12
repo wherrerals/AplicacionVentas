@@ -923,6 +923,8 @@ class SocioNegocio:
             telefonos = [contacto.get('telefono', '').strip() for contacto in contactos]
             celulares = [contacto.get('celular', '').strip() for contacto in contactos]
             emails = [contacto.get('email', '').strip() for contacto in contactos]
+            codigosInternoSap = 1
+            
 
             # Verifica la longitud de todas las listas
             if not all(len(lst) == len(nombres) for lst in [apellidos, telefonos, celulares, emails]):
@@ -943,7 +945,7 @@ class SocioNegocio:
                             ContactoRepository.actualizarContacto(contacto_obj, nombre, apellidos[i], telefonos[i], celulares[i], emails[i])
                     else:
                         try:
-                            ContactoRepository.crearContacto(socio, nombre, apellidos[i], telefonos[i], emails[i], celulares[i])
+                            ContactoRepository.crearContacto(socio, codigosInternoSap, nombre, apellidos[i], telefonos[i], emails[i], celulares[i])
                         except Exception as e:
                             print(f"Error al crear el contacto: {str(e)}")
                             return JsonResponse({'success': False, 'message': f'Error al crear el contacto: {str(e)}'}, status=500)

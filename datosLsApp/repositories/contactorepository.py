@@ -83,6 +83,7 @@ class ContactoRepository:
             email_contacto: str - Email del contacto
 
         """
+        print(f"toda la data: {socio}, {codigo_interno_sap}, {nombre_contacto}, {apellido_contacto}, {telefono_contacto}, {email_contacto}, {celular_contacto}")
         try:
 
             socio_obj = get_object_or_404(SocioNegocioDB, codigoSN=socio)
