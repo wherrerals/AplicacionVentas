@@ -66,57 +66,82 @@ class Producto {
         newRow.className = 'product-row';
         newRow.innerHTML = `
             <tr>
-                <td rowspan="2">
+                <td style="font-size: 12px;background: transparent;border-style: none;padding-bottom: 0px;"rowspan="2">
                     <div class="row">
-                        <div class="col-6"><small>${contprod}) ${this.productoCodigo}</small></div>
-                        <div class="col-6 text-center"><img src="${this.imagen}" width="50" height="50"></div>
+                        <div class="col-md-11 col-xxl-6" style="font-size: 14px;font-weight: bold;"><small style="font-weight: bold;"><small>${contprod})</small><small>&nbsp;&nbsp;</small><small>${this.productoCodigo}</small></div>
+                        <div class="col-md-11 col-xxl-7" style="text-align: center;"><img src="${this.imagen}" width="50" height="50" style="width: 50px;height: 50px;"></div>
                     </div>
                 </td>
-                <td rowspan="2">
+                <td style="font-size: 12px;background: transparent;border-style: none;padding-bottom: 0px;"rowspan="2">
                     <div class="row">
-                        <select class="form-select">
+                    <div class="col-sm-12 col-lg-12 col-xl-11 col-xxl-10">
+                        <select class="form-select" style="font-size: 11px;">
+                          <optgroup label="Bodega">
                             <option value="12" ${this.sucursal === 'GR' ? 'selected' : ''}>GR</option>
                             <option value="13" ${this.sucursal === 'LC' ? 'selected' : ''}>LC</option>
                             <option value="14" ${this.sucursal === 'PH' ? 'selected' : ''}>PH</option>
                             <option value="15" ${this.sucursal === 'ME' ? 'selected' : ''}>ME</option>
+                            </optgroup>
                         </select>
-                        <small name="stock_bodega">Stock: </small>
-                        <small name="stock_total">Total: </small>
+                    </div>
+                    <div class="col" style="text-align: center;">
+                        <small style="font-size: 12px;" name="stock_bodega">Stock: </small>
+                        <small name="stock_total" id="stock_total">Total: </small>
+                    </div>
                     </div>
                 </td>
-                <td>
-                    <div><small>Precio: ${this.precioVenta}</small></div>
-                    <div><small>Antes: ${this.precioLista}</small></div>
-                    <div><small>Descuento: ${this.precioDescuento}</small></div>
+                <td style="background: transparent;border-style: none;padding-bottom: 0px;" rowspan="2">
+                    <div style="font-size: 12px;"><small>Precio: ${this.precioVenta}</small></div>
+                    <div style="font-size: 11px;"><small style="color: rgb(153,153,153);">Antes: ${this.precioLista}</small>
+                    </div>
+                    <div class="row" style="font-size: 11px;">
+                    <div div class="col-sm-4 col-md-3 col-xl-2" style="padding-right: 0px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-arrow-right-circle-fill" style="font-size: 18px;">
+                    <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z">
+                    </path>
+                    </svg></div>
+                      <div class="col-sm-7 col-md-8"><small id="descuento" style="color: rgb(255,0,0);">Max: ${this.precioDescuento}</small></div>
+                    </div>
                 </td>
-                <td>
-                    <input type="number" class="form-control" value="0" id="agg_descuento">
+                <td style="font-size: 12px;background: transparent;border-style: none;">
+                    <div><input class="form-control" type="number" style="font-size: 12px;width: 40px; value="0" id="agg_descuento">
                 </td>   
-                <td>${this.precioSinDescuento}</td>
-                <td>
-                    <input type="number" class="form-control" value="${this.cantidad}">
+                <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">${this.precioSinDescuento}</td>
+                <td style="font-size: 12px;background: transparent;border-style: none;">
+                    <input type="number" class="form-control" value="${this.cantidad}" style="font-size: 12px;width: 65px;">
                 </td>
-                <td><span>${this.totalProducto}</span></td>
+                <td style="font-size: 11px;font-weight: bold;background: transparent;border-style: none;text-align: center;"><span>${this.totalProducto}</span></td>
             </tr>
-            <tr>
-                <td colspan="3">
-                    <input type="text" class="form-control" placeholder="Comentario">
+            <tr  style="font-size: 12px;background: transparent;">
+                <td  style="font-size: 11px;background: transparent;padding-top: 0px;border-style: none;padding-bottom: 0px;" colspan="3">
+                    <input class="form-control" type="text" placeholder="Comentario" style="font-size: 12px;">
                 </td>
-                <td>
-                    <a href="#" class="bi bi-trash" id="eliminarp"></a>
-                </td>
+                    <td style="background: transparent;padding-top: 8px;padding-left: 50px;border-style: none;padding-bottom: 0px;">
+                        <a class="navbar-brand d-flex align-items-center bi bi-trash" href="#" style="width: 18px;"  id="eliminarp">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-trash" style="width: 18px;height: 18px;">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z">
+                                </path>
+                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z">
+                                </path>
+                            </svg>
+                        </a>
+                    </td>
             </tr>
-            <tr>
-                <td colspan="2"><span>${this.nombre}</span></td>
-                <td colspan="2">
-                    <select class="form-select" id="tipoEntrega">
+            <tr style="font-size: 12px;background: transparent;">
+                <td colspan="3" style="padding-top: 0px;background: transparent;">
+                    <span>${this.nombre}</span>
+                </td>
+                <td style="font-size: 12px;background: transparent;" colspan="2">
+                    <select class="form-select" id="tipoEntrega" style="font-size: 12px;">
+                      <optgroup label="Entrega">
                         <option value="1" ${this.tipoEntrega === 'Directa' ? 'selected' : ''}>Directa</option>
                         <option value="5" ${this.tipoEntrega === 'Despacho' ? 'selected' : ''}>Despacho</option>
                         <option value="2" ${this.tipoEntrega === 'Retiro' ? 'selected' : ''}>Retiro</option>
+                    </optgroup>
                     </select>
                 </td>
-                <td colspan="2">
-                    <input type="date" class="form-control" value="${this.fechaEntrega}">
+                <td td colspan="2" style="background: transparent;">
+                    <input class="form-control" type="date" name="fechaEntrega" style="width: 90%;font-size: 13px;" value="${this.fechaEntrega}">
                 </td>
             </tr>
         `;

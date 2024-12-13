@@ -547,7 +547,7 @@
               </thead>
               {% if DocumentLines %}
               <!--<p>DocumentLines: {{ DocumentLines|default:"No data" }}</p>-->       
-                {% include 'tabla_document_lines.html.html' %}
+                {% include 'tabla_ordeventa_lines.html.html' %}
               {% endif %}      
             </table>
           </div>
@@ -653,7 +653,6 @@
   <script src="{% static 'gestionPedidos/js/ajax_clientes.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/interfazUsuario.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/interactividadUsuario.js' %}"></script>
-  <script src="{% static 'gestionPedidos/js/productos.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/borrar_etiquetas.js' %}"></script>
 <!--   <script src="{% static 'gestionPedidos/js/clients_insert.js' %}"></script>-->  
   <script src="{% static 'gestionPedidos/js/productosInteraccion.js' %}"></script>
