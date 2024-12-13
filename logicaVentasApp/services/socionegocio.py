@@ -987,22 +987,8 @@ class SocioNegocio:
 
 
     def infoCliente(self, identificador, buscar_por_nombre=False):
-        """
-        Método para buscar un socio de negocio por nombre o rut.
-
-        Args:
-            identificador (str): Nombre o rut del socio de negocio.
-            buscar_por_nombre (bool): Indica si se busca por nombre o por rut.
-
-        Returns:
-            list: Lista de diccionarios con los datos de los socios de negocio.
-            dict: Diccionario con error en caso de excepción.
-        """
-        logger.info(f"Buscando socio negocio - Identificador: {identificador}, "
-                f"Buscar por nombre: {buscar_por_nombre}")
 
         try:
-            # Validar que el identificador no esté vacío
             if not identificador or not identificador.strip():
                 return {'error': 'El identificador está vacío'}
 
@@ -1014,9 +1000,9 @@ class SocioNegocio:
 
             # Si no hay resultados, retornar lista vacía
             if not resultados_clientes:
-                logger.info(f"No se encontraron resultados para el identificador: {identificador}")
                 return []
 
+            # Lista para almacenar los resultados formateados
             resultados_formateados = []
 
             # Procesar cada socio encontrado
@@ -1161,11 +1147,9 @@ class SocioNegocio:
 
 
     def guardarClienteCompleto(self, data):
-        # Crear el cliente principal usando el método del repositorio
-        print("Guardando cliente completo...")
-        print(f"Datos a guardar: {data}")
-        # Acceder a los datos del cliente
         socio_negocio = data["SocioNegocio"]
+        print(f"Nombre: " + socio_negocio["nombre"])
+        print(f"Apellido: " + socio_negocio["apellido"])
 
         # Obtener la instancia de GrupoSNDB
         try:
@@ -1177,7 +1161,8 @@ class SocioNegocio:
             raise ValueError("No se encontró el grupo, tipo de socio de negocio o tipo de cliente")
             # Maneja el error según sea necesario, como lanzar una excepción o crear un nuevo grupo
         
-        if grupo == "100":
+        if socio_negocio["grupoSN"] == 105:
+            print("Creando cliente persona...")
             cliente = SocioNegocioRepository.crearCliente(
                 codigoSN=socio_negocio["codigoSN"],
                 nombre=socio_negocio["nombre"],
@@ -1192,6 +1177,7 @@ class SocioNegocio:
             )
 
         else:
+            print("Creando cliente empresa...")
             cliente = SocioNegocioRepository.crearClienteEmpresa(
                 codigoSN=socio_negocio["codigoSN"],
                 nombre=socio_negocio["nombre"],
@@ -1261,11 +1247,10 @@ class SocioNegocio:
         Returns:
             JsonResponse: Respuesta con los datos del cliente si se encontró, o un mensaje de error.
         """
-        print("Respondiendo información del cliente...")
-        resultados = self.infoCliente(rut)
+        data_client = self.infoCliente(rut)
 
-        if resultados:
-            return JsonResponse(resultados, status=200, safe=False)
+        if data_client:
+            return JsonResponse(data_client, status=200, safe=False)
         return JsonResponse({'success': False, 'message': 'No se encontraron resultados'}, status=404)
 
     def crearYresponderCliente(self, carCode, rut):
