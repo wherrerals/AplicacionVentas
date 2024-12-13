@@ -102,18 +102,19 @@ function agregarInteractividad(newRow, codigoProducto) {
         let totalIva = 0;
         let totalBruto = 0;
         let totalNeto = 0;
-
+    
         productos.forEach(producto => {
             const valores = producto.calcularValores();
             totalIva += parseFloat(valores.iva);
             totalBruto += parseFloat(valores.bruto);
             totalNeto += parseFloat(valores.neto);
         });
-
-        console.log('Total IVA:', totalIva, 'Total Bruto:', totalBruto, 'Total Neto:', totalNeto, "version calcula bien los valores de todos los productos");  
-
-        valorIva.textContent = '$' + totalIva.toFixed(0);
-        valorBruto.textContent = '$' + totalBruto.toFixed(0);
-        valorNeto.textContent = '$' + totalNeto.toFixed(0);
+    
+        console.log('Total IVA:', totalIva, 'Total Bruto:', totalBruto, 'Total Neto:', totalNeto);
+    
+        document.querySelector('#iva').textContent = `$${totalIva.toFixed(0)}`;
+        document.querySelector('#total_bruto').textContent = `$${totalBruto.toFixed(0)}`;
+        document.querySelector('#total_neto').textContent = `$${totalNeto.toFixed(0)}`;
     }
+    
 }

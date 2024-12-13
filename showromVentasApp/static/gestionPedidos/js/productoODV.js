@@ -38,21 +38,28 @@ class Producto {
                 "14": "PH",
                 "15": "ME"
             };
-
-            const stockTotal = stockData.reduce((total, bodega) => total + bodega.stock, 0);
-
-            const stockTotalElem = row.querySelector('[name="stock_total"]');
-            stockTotalElem.textContent = `Total: ${stockTotal}`;
-
+    
             const selectBodega = row.querySelector('.form-select');
             const valueSeleccionado = selectBodega.value;
             const bodegaSeleccionada = bodegaMap[valueSeleccionado];
             const stockBodega = stockData.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock || 0;
-
+    
+            // Actualizar el texto del stock de la bodega seleccionada
             const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
             stockBodegaElem.textContent = `Stock: ${stockBodega}`;
+    
+            // Establecer el valor máximo del campo cantidad
+            const cantidadInput = row.querySelector('#calcular_cantidad');
+            cantidadInput.max = stockBodega;
+    
+            // Validar que el valor actual no exceda el stock
+            if (parseInt(cantidadInput.value, 10) > stockBodega) {
+                cantidadInput.value = stockBodega;
+            }
         }
     }
+
+    
 
     crearFila(contprod) {
         let newRow = document.createElement('tbody');
@@ -155,15 +162,94 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
 
     document.getElementById('productos').appendChild(newRow);
 
-    newRow.querySelector('#eliminarp').addEventListener('click', function() {
+    // Crear una instancia de valorTributario para este producto
+    let valorTributarioProducto = new valorTributario(productoCodigo, precioVenta * cantidad);
+    productos.push(valorTributarioProducto);
+
+    console.log('Producto agregado:', valorTributarioProducto);
+
+    // Agregar eventos
+    newRow.querySelector('#eliminarp').addEventListener('click', function () {
         newRow.remove();
         const event = new CustomEvent('productoEliminado', { detail: { codigoProducto: productoCodigo } });
         document.dispatchEvent(event);
     });
 
-    producto.actualizarStock(newRow);
-
+    // Actualizar stock al cambiar bodega
     newRow.querySelector('.form-select').addEventListener('change', function () {
         producto.actualizarStock(newRow);
     });
+
+    // Validar que la cantidad no supere el stock
+    const cantidadInput = newRow.querySelector('input[type="number"]');
+    cantidadInput.addEventListener('input', function () {
+        const max = parseInt(cantidadInput.max, 10) || 0;
+        if (parseInt(cantidadInput.value, 10) > max) {
+            cantidadInput.value = max;
+        }
+        calcularPrecioTotal(); // Recalcular el precio total
+    });
+
+    const descuentoInput = newRow.querySelector('#agg_descuento');
+    descuentoInput.addEventListener('input', aplicarDescuento);
+
+    calcularPrecioTotal();
+
+    // Función para calcular el precio total
+    function calcularPrecioTotal() {
+        const cantidad = parseFloat(cantidadInput.value) || 0;
+        const precioUnitario = parseFloat(precioVenta) || 0;
+        const precioTotal = cantidad * precioUnitario;
+        const descuento = parseFloat(descuentoInput.value) || 0;
+
+        // Calcular el precio con descuento
+        const precioFinal = descuento === 0 ? precioTotal : precioTotal - (precioTotal * (descuento / 100));
+        const precioConDescuento = descuento === 0 ? 0 : precioUnitario * (1 - (descuento / 100));
+
+        // Actualizar la instancia de valorTributario
+        valorTributarioProducto.modificarPrecioFinal(precioFinal);
+
+        newRow.querySelector('#precio_Venta').textContent = precioFinal.toFixed(2);
+        newRow.querySelector('#Precio_Descuento').textContent = precioConDescuento.toFixed(2);
+
+        actualizarValores(); // Actualizar los valores totales
+    }
+
+    // Función para aplicar el descuento
+    function aplicarDescuento() {
+        calcularPrecioTotal();
+    }
+
+    // Escuchar el evento productoEliminado para actualizar los valores totales
+    document.addEventListener('productoEliminado', function (event) {
+        const codigoProducto = event.detail.codigoProducto;
+
+        // Eliminar el producto del array de valorTributario
+        const index = productos.findIndex(producto => producto.codigoProducto === codigoProducto);
+        if (index > -1) {
+            productos.splice(index, 1);
+        }
+
+        actualizarValores(); // Actualizar los valores totales
+    });
+
+    // Función para actualizar los valores de IVA, bruto y neto
+    function actualizarValores() {
+        let totalIva = 0;
+        let totalBruto = 0;
+        let totalNeto = 0;
+
+        productos.forEach(producto => {
+            const valores = producto.calcularValores();
+            totalIva += parseFloat(valores.iva);
+            totalBruto += parseFloat(valores.bruto);
+            totalNeto += parseFloat(valores.neto);
+        });
+
+        console.log('Total IVA:', totalIva, 'Total Bruto:', totalBruto, 'Total Neto:', totalNeto);
+
+        document.querySelector('#iva small').textContent = `$${totalIva.toFixed(0)}`;
+        document.querySelector('#total_bruto small').textContent = `$${totalBruto.toFixed(0)}`;
+        document.querySelector('#total_neto small').textContent = `$${totalNeto.toFixed(0)}`;
+    }
 }
