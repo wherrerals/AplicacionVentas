@@ -314,8 +314,8 @@ document.addEventListener("DOMContentLoaded", function () {
 const attachImmediateClearListeners = () => {
     // Lista de inputs a observar
     const inputsToWatch = [
-        { id: 'buscar_num_sap', filterKey: 'docNum' }, 
-        { id: 'buscar_cliente', filterKey: 'cardName' }, 
+        { id: 'buscar_num_sap', filterKey: 'docNum' },
+        { id: 'buscar_cliente', filterKey: 'cardName' },
         { id: 'buscar_bruto', filterKey: 'docTotal' }
     ];
 
@@ -323,19 +323,49 @@ const attachImmediateClearListeners = () => {
     inputsToWatch.forEach(({ id, filterKey }) => {
         const input = document.getElementById(id);
 
-        input.addEventListener('input', function () {
-            if (this.value === '') {
-                console.log(`Input cleared: ${id}, removing filter: ${filterKey}`);
+        if (input) { // Validar que el input exista
+            input.addEventListener('input', function () {
                 const filters = getFilterData(); // Obtiene los filtros actuales
-                filters[filterKey] = ''; // Elimina el filtro correspondiente
-                console.log("Filters after clearing input:", filters);
-                applyFiltersAndFetchData(filters); // Aplica la búsqueda con los filtros actualizados
-            }
-        });
+                const inputValue = this.value.trim();
+
+                if (inputValue === '') {
+                    // Si el campo está vacío, elimina el filtro y ejecuta la búsqueda
+                    console.log(`Input cleared: ${id}, removing filter: ${filterKey}`);
+                    filters[filterKey] = ''; // Elimina el filtro correspondiente
+                } else {
+                    // Si tiene texto, actualiza el filtro con el valor del input
+                    console.log(`Input updated: ${id}, applying filter: ${filterKey}`);
+                    filters[filterKey] = inputValue;
+                }
+
+                // Aplica la búsqueda con los filtros actualizados
+                console.log("Filters after change:", filters);
+                applyFiltersAndFetchData(filters);
+            });
+        } else {
+            console.warn(`Input with ID "${id}" not found. Ensure the HTML element exists.`);
+        }
     });
 };
+
 
 // Llamar esta función después de cargar la página
 document.addEventListener("DOMContentLoaded", function () {
     attachImmediateClearListeners(); // Activa los listeners para eliminar filtros inmediatamente
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const buscarBrutoInput = document.getElementById("buscar_bruto");
+    const buscarNetoInput = document.getElementById("buscar_neto");
+
+    if (buscarBrutoInput && buscarNetoInput) {
+        buscarBrutoInput.addEventListener("input", function () {
+            const brutoValue = parseFloat(this.value) || 0; // Leer el valor de buscar_bruto
+            const netoValue = brutoValue * 0.84; // Calcular el valor neto
+            buscarNetoInput.value = `$${netoValue.toFixed(2)}`;
+            
+        });
+    } else {
+        console.warn("No se encontraron los elementos con id buscar_bruto o buscar_neto.");
+    }
 });
