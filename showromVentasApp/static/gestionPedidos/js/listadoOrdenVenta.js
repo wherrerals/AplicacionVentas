@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const getSkip = (page) => (page - 1) * recordsPerPage;
 
     const applyFiltersAndFetchData = (filters, page = 1) => {
-        console.log("Applying filters:", filters, "Page:", page);
+        //console.log("Applying filters:", filters, "Page:", page);
         showLoader();
         const skip = getSkip(page); // Calcular el número de registros a omitir
         const filterData = {
@@ -260,6 +260,48 @@ document.addEventListener("DOMContentLoaded", function () {
             applyFiltersAndFetchData(filters);
         }
     });
+
+    const attachImmediateClearListeners = () => {
+        // Lista de inputs a observar
+        const inputsToWatch = [
+            { id: 'buscar_num_sap', filterKey: 'docNum' },
+            { id: 'buscar_cliente', filterKey: 'cardName' },
+            { id: 'buscar_bruto', filterKey: 'docTotal' }
+        ];
+    
+        // Agrega eventos a cada input
+        inputsToWatch.forEach(({ id, filterKey }) => {
+            const input = document.getElementById(id);
+    
+            if (input) { // Validar que el input exista
+                input.addEventListener('input', function () {
+                    const filters = getFilterData(); // Obtiene los filtros actuales
+                    const inputValue = this.value.trim();
+    
+                    if (inputValue === '') {
+                        // Si el campo está vacío, elimina el filtro y ejecuta la búsqueda
+                        console.log(`Input cleared: ${id}, removing filter: ${filterKey}`);
+                        filters[filterKey] = ''; // Elimina el filtro correspondiente
+                        applyFiltersAndFetchData(filters); // Update data when the field is cleared
+                    } else {
+                        // Si tiene texto, actualiza el filtro con el valor del input
+                        console.log(`Input updated: ${id}, applying filter: ${filterKey}`);
+                        filters[filterKey] = inputValue;
+                        applyFiltersAndFetchData(filters); // Update data when the field is cleared
+
+                    }
+    
+                    // Aplica la búsqueda con los filtros actualizados
+                    console.log("Filters after change:", filters);
+                    applyFiltersAndFetchData(filters);
+                });
+            } else {
+                console.warn(`Input with ID "${id}" not found. Ensure the HTML element exists.`);
+            }
+        });
+    };
+
+    attachImmediateClearListeners(); // Activa los listeners para eliminar filtros inmediatamente
 });
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -311,49 +353,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-const attachImmediateClearListeners = () => {
-    // Lista de inputs a observar
-    const inputsToWatch = [
-        { id: 'buscar_num_sap', filterKey: 'docNum' },
-        { id: 'buscar_cliente', filterKey: 'cardName' },
-        { id: 'buscar_bruto', filterKey: 'docTotal' }
-    ];
-
-    // Agrega eventos a cada input
-    inputsToWatch.forEach(({ id, filterKey }) => {
-        const input = document.getElementById(id);
-
-        if (input) { // Validar que el input exista
-            input.addEventListener('input', function () {
-                const filters = getFilterData(); // Obtiene los filtros actuales
-                const inputValue = this.value.trim();
-
-                if (inputValue === '') {
-                    // Si el campo está vacío, elimina el filtro y ejecuta la búsqueda
-                    console.log(`Input cleared: ${id}, removing filter: ${filterKey}`);
-                    filters[filterKey] = ''; // Elimina el filtro correspondiente
-                } else {
-                    // Si tiene texto, actualiza el filtro con el valor del input
-                    console.log(`Input updated: ${id}, applying filter: ${filterKey}`);
-                    filters[filterKey] = inputValue;
-                }
-
-                // Aplica la búsqueda con los filtros actualizados
-                console.log("Filters after change:", filters);
-                applyFiltersAndFetchData(filters);
-            });
-        } else {
-            console.warn(`Input with ID "${id}" not found. Ensure the HTML element exists.`);
-        }
-    });
-};
-
-
-// Llamar esta función después de cargar la página
-document.addEventListener("DOMContentLoaded", function () {
-    attachImmediateClearListeners(); // Activa los listeners para eliminar filtros inmediatamente
-});
-
 document.addEventListener("DOMContentLoaded", function () {
     const buscarBrutoInput = document.getElementById("buscar_bruto");
     const buscarNetoInput = document.getElementById("buscar_neto");
@@ -369,3 +368,4 @@ document.addEventListener("DOMContentLoaded", function () {
         console.warn("No se encontraron los elementos con id buscar_bruto o buscar_neto.");
     }
 });
+
