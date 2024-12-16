@@ -16,6 +16,8 @@ import requests
 from requests.exceptions import RequestException
 import urllib3
 
+from logicaVentasApp.services.socionegocio import SocioNegocio
+
 # Desactivar las advertencias de SSL inseguro (solo para desarrollo)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -154,30 +156,6 @@ class CotizacionView(View):
         render (request, 'cotizacion.html', {'DocumentLines': lines_data}) 
         """
     
-    def obtenerDetallesCotizacion(self, request, *args, **kwargs):
-        docEntry = kwargs.get('docEntry')
-        print("DocEntry:", docEntry)
-        
-        if not docEntry:
-            return JsonResponse({'error': 'DocEntry no proporcionado'}, status=400) 
-        
-        # Llamar al servicio de cotización
-        lines_data, error = Cotizacion.buscarDocumentosCotizacion(docEntry)
-
-        print("*" * 10)
-        print("Lines data:", lines_data)  # Verificar los datos de las líneas de documento
-        
-        # Verificar si se encontró un error
-        if error:
-            return render(request, 'error.html', {'error': error}, status=404 if 'No se encontró' in error else 500)
-        
-        print("*" * 10)
-        print(lines_data)
-        
-        # Renderizar la página HTML con los datos
-        #return JsonResponse({'DocumentLines': lines_data}, status=200)
-        return render(request,'cotizacion.html', {'DocumentLines': lines_data})
-    
 
     @csrf_exempt
     def crearOActualizarCotizacion(self, request):
@@ -230,25 +208,70 @@ class CotizacionView(View):
                 return JsonResponse({'error': 'JSON inválido'}, status=400)
     
     def detallesCotizacion(self, request):
-    
+        # Obtener el parámetro 'docentry' de la solicitud
         docentry = request.GET.get('docentry')
         client = APIClient()
 
+        # Llamar al método para obtener los detalles del cliente
         documentClient = client.detalleCotizacionCliente(docentry)
         documentLine = client.detalleCotizacionLineas(docentry)
 
+        print("Document Client:", documentClient)
 
+        # Extraer los datos de la clave 'value', asegurándose de manejar la estructura correctamente
+        quotations_data = documentClient.get('value', [{}])[0].get('Quotations', {})
+        cardCode = quotations_data.get('CardCode')
+        rut = quotations_data.get('FederalTaxID')
+
+        sn = SocioNegocio(request)
+        
+        # Preparar la estructura de datos para enviar como respuesta
         data = {
             "Client": documentClient,
             "DocumentLine": documentLine
         }
 
-        cotiza = Cotizacion()
+        # Verificar si el socio de negocio ya existe en la base de datos
+        if sn.verificarSocioDB(cardCode):
+            cotiza = Cotizacion()
+            lines_data = cotiza.formatearDatos(data)
 
-        lines_data = cotiza.formatearDatos(data)
+            return JsonResponse(lines_data, safe=False)
+        else:
+            # Crear el cliente en caso de que no exista y responder
+            sn.crearYresponderCliente(cardCode, rut)
+            cotiza = Cotizacion()
+            lines_data = cotiza.formatearDatos(data)
+            return JsonResponse(lines_data, safe=False)
 
 
-        return JsonResponse(lines_data, safe=False)
 
 
     
+    def obtenerDetallesCotizacion(self, request, *args, **kwargs):
+        pass
+"""         docEntry = kwargs.get('docEntry')
+        print("DocEntry:", docEntry)
+        
+        if not docEntry:
+            return JsonResponse({'error': 'DocEntry no proporcionado'}, status=400) 
+        
+        # Llamar al servicio de cotización
+        lines_data, error = Cotizacion.buscarDocumentosCotizacion(docEntry)
+
+
+        print("*" * 10)
+
+        print("*" * 10)
+        print("Lines data:", lines_data)  # Verificar los datos de las líneas de documento
+        
+        # Verificar si se encontró un error
+        if error:
+            return render(request, 'error.html', {'error': error}, status=404 if 'No se encontró' in error else 500)
+        
+        print("*" * 10)
+        print(lines_data)
+        
+        # Renderizar la página HTML con los datos
+        #return JsonResponse({'DocumentLines': lines_data}, status=200)
+        return render(request,'cotizacion.html', {'DocumentLines': lines_data}) """

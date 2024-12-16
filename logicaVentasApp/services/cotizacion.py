@@ -560,6 +560,7 @@ class Cotizacion(Documento):
             line = line_info.get("Quotations/DocumentLines", {})
             warehouse_info = line_info.get("Items/ItemWarehouseInfoCollection", {})
             
+            # Construye la línea
             document_line = {
                 "DocEntry": line.get("DocEntry"),
                 "LineNum": line.get("LineNum"),
@@ -590,7 +591,11 @@ class Cotizacion(Documento):
                     "SalesStock": warehouse_info.get("SalesStock"),
                 }
             }
-            document_lines.append(document_line)
+            
+            # Agrega la línea solo si el Price es mayor a 0
+            if document_line["Price"] and document_line["Price"] > 0:
+                document_lines.append(document_line)
+
 
         # Formar el diccionario final
         resultado = {
