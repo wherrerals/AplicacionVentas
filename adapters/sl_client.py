@@ -534,9 +534,39 @@ class APIClient:
         print(url)
         return response.json()
     
+    #usando patch actualizar las cotizaciones
+    def actualizarCotizacionesSL(self, docEntry, data):
+        self.__login()
+        url = f"{self.base_url}Quotations({docEntry})"
+        
+        # Definir los encabezados, incluyendo el encabezado B1S-ReplaceCollectionsOnPatch
+        headers = {
+            'B1S-ReplaceCollectionsOnPatch': 'true',  # Encabezado adicional
+            'Content-Type': 'application/json',  # Asegúrate de incluir este encabezado si es necesario
+        }
 
+        try:
+            print(f"URL: {url}")
+            print(f"Data being sent: {data}")
 
-    
+            # Hacer la solicitud PATCH incluyendo los encabezados
+            response = self.session.patch(url, json=data, headers=headers, verify=False)
+            print(f"Respuesta completa: {response.status_code} - {response.text}")
+
+            print(response)
+
+            if response.status_code == 204:
+                return {'success': True, 'message': 'Cotización actualizada correctamente.'}
+            else:
+                response.raise_for_status()
+                print("Respuesta de la API:", response.json())
+                return response.json()
+        except requests.exceptions.HTTPError as e:
+            print(f"Error en la solicitud a la API: {e}")
+            if 'response' in locals() and response is not None:
+                print(f"Cuerpo de la respuesta del servidor: {response.text}")
+            raise
+
 
 """
 https://182.160.29.24:50003/b1s/v1/$crossjoin(Orders,SalesPersons)?$expand=Orders($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)&$orderby=DocNum desc&$

@@ -7,6 +7,9 @@ function submitForm() {
     // Capturar los datos del documento
     const fechaSolo = new Date().toISOString().split('T')[0]; // Salida en formato YYYY-MM-DD
 
+
+    const docNum = document.getElementById("numero_cotizacion").textContent; //listo
+    const docEntry = document.getElementById("numero_cotizacion").getAttribute("data-docEntry")
     const docDate = fechaSolo; //listo 
     const docDueDate = document.getElementById("docDueDate").textContent; //listo
     const taxDate = fechaSolo; // listo
@@ -39,13 +42,12 @@ function submitForm() {
         const quantity = row.querySelector("[name='cantidad']").value;
         //const shipDate = row.querySelector("[name='fecha_envio']").value;
         const discount = row.querySelector("#agg_descuento").value;
-        const bodegaElement = "LC";//row.querySelector("[name='bodegas']");
-        const costingCode = "LC"; //row.querySelector("[name='costingCode']").value;
-        //const shippingMethod = 2; //row.querySelector("[name='shippingMethod']").value;
-        const cogsCostingCode = "LC";//row.querySelector("[name='cogsCostingCode']").value;
-        const costingCode2 = "AV";//row.querySelector("[name='costingCode2']").value;
-        const cogsCostingCode2 = "AV"; //row.querySelector("[name='cogsCostingCode2']").value;
-
+        const bodegaElement = "LC"; //capturar bodega
+        const costingCode = "LC"; //capturar bodega
+        const cogsCostingCode = "LC"; //capturar bodega
+        const costingCode2 = "AV"; 
+        const cogsCostingCode2 = "AV"; 
+        
         const warehouseCode = bodegaElement //? bodegaElement.value : null;
         
 
@@ -68,6 +70,8 @@ function submitForm() {
 
     // Crea el objeto final que será enviado en formato JSON
     const documentData = {
+        "DocNum": docNum,
+        "DocEntry": docEntry, 
         "DocDate": docDate,
         "DocDueDate": docDueDate,
         "TaxDate": taxDate,
