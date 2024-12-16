@@ -230,11 +230,11 @@ class SocioNegocio:
         
         with transaction.atomic():
 
-            if self.gruposn == '100':
+            if self.gruposn == '105':
                 print("creando cliente persona")
                 cliente = self.crearClientePersona(codigosn, self.rut, tiposn, tipoCliente, self.email, grupoSN)
                 
-            elif self.gruposn == '105':
+            elif self.gruposn == '100':
                 print("creando cliente empresa")
                 cliente = self.crearClienteEmpresa(codigosn, tiposn, grupoSN, tipoCliente)
             else:
@@ -1008,10 +1008,10 @@ class SocioNegocio:
             # Procesar cada socio encontrado
             for socio in resultados_clientes:
                 try:
-                    # Prefetch de direcciones y contactos
+                    # Obtener direcciones y contactos del socio
                     direcciones = DireccionDB.objects.filter(
-                        SocioNegocio=socio
-                    ).select_related('comuna', 'region')
+                        SocioNegocio=socio # Filtrar por el socio actual
+                    ).select_related('comuna', 'region') # 
                     
                     contactos = ContactoDB.objects.filter(
                         SocioNegocio=socio

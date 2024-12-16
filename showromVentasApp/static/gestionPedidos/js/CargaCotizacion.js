@@ -35,6 +35,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const canceled = data.Cliente.Quotations.Cancelled;
             let cardCode = data.Cliente.Quotations.CardCode;
             const DocumentStatus = data.Cliente.Quotations.DocumentStatus;
+            const docEntry = data.Cliente.Quotations.DocEntry;
+
+            console.log("docEntry: ", docEntry);
+
   
             if (cardCode.endsWith("C")) {
               cardCode = cardCode.slice(0, -1);
@@ -51,8 +55,13 @@ document.addEventListener("DOMContentLoaded", function () {
             if (showroomElement) {
               showroomElement.innerText = sucursal;
             }
+
+            const docEntryElement = document.getElementById("numero_cotizacion");
+            if (docEntryElement) {
+              docEntryElement.setAttribute("data-docEntry", docEntry);
+            }
   
-            const numeroCotizacionElement = document.getElementById("numero_cotizacion");
+            const numeroCotizacionElement = document.getElementById("numero_cotizacion");            
             if (numeroCotizacionElement) {
               numeroCotizacionElement.textContent = `${numCotizacion}`;
             }

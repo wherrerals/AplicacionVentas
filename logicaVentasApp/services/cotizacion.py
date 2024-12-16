@@ -73,21 +73,7 @@ class Cotizacion(Documento):
         if not self.cliente or not self.items:
             raise ValueError("Faltan datos obligatorios para la cotización.")
     
-    def crearOActualizarCotizacion(self):
-        """
-        Crea o actualiza una cotización.
-
-        Returns:
-            dict: Respuesta de la API.
-
-        Raises:
-            ValueError: Si faltan datos obligatorios.
-        """
-        self.validarDatosObligatorios()
-        if self.docEntry:
-            return self.actualizarDocumento()
-        else:
-            return self.crearDocumento()
+        
     
     
     def validarDatosObligatorios(self, data, required_fields):
@@ -353,6 +339,64 @@ class Cotizacion(Documento):
             'DocumentLines': lineas_json,
         }
     
+    def prepararJsonCotizacionAC(self, jsonData):
+        """
+        Prepara los datos JSON específicos de la cotización.
+
+        Args:
+            jsonData (dict): Datos de la cotización.
+        
+        Returns:
+            dict: Datos de la cotización preparados para ser enviados a SAP.
+        """
+            
+        # Determinar el tipo de venta basado en el vendedor
+
+        # Datos de las líneas
+        lineas = jsonData.get('DocumentLines', [])
+        lineas_json = [
+            {
+                'lineNum': linea.get('LineNum'),
+                'ItemCode': linea.get('ItemCode'),
+                'Quantity': linea.get('Quantity'),
+                'ShipDate': linea.get('ShipDate'),
+                'DiscountPercent': linea.get('DiscountPercent'),
+                'WarehouseCode': linea.get('WarehouseCode'),
+                'CostingCode': linea.get('CostingCode'),
+                'ShippingMethod': linea.get('ShippingMethod'),
+                'COGSCostingCode': linea.get('COGSCostingCode'),
+                'CostingCode2': linea.get('CostingCode2'),
+                'COGSCostingCode2': linea.get('COGSCostingCode2'),
+            }
+            for linea in lineas
+        ]
+
+        # Combina cabecera y líneas en un solo diccionario
+        return {
+            'DocumentLines': lineas_json,
+        }
+
+    def actualizarDocumento(self,docnum, docentry, data):
+        
+        docentry = docentry
+
+        try:
+            docentry = int(docentry)
+            jsonData = self.prepararJsonCotizacionAC(data)
+            
+            response = self.client.actualizarCotizacionesSL(docentry, jsonData)
+
+            if 'success' in response:
+                return {
+                    'success': 'Cotización creada exitosamente',
+                    'docNum': docnum
+                }
+
+        
+        except Exception as e:
+            logger.error(f"Error al actualizar la cotización: {str(e)}")
+            return {'error': str(e)}
+
     def crearDocumento(self, data):
         """
         Crea una nueva cotización y maneja las excepciones según el código de respuesta.

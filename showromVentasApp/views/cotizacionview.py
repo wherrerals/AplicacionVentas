@@ -68,7 +68,7 @@ class CotizacionView(View):
         
         return {
             '/ventas/listado_Cotizaciones_filtrado': self.filtrarCotizaciones,
-            '/ventas/crear_cotizacion': self.crearCotizacion,
+            '/ventas/crear_cotizacion': self.crearOActualizarCotizacion,
             '/ventas/cambiar_estado_cotizacion': self.actualizarEstadosCotizacion,
         }
 
@@ -177,23 +177,39 @@ class CotizacionView(View):
         # Renderizar la página HTML con los datos
         #return JsonResponse({'DocumentLines': lines_data}, status=200)
         return render(request,'cotizacion.html', {'DocumentLines': lines_data})
+    
 
     @csrf_exempt
-    def crearCotizacion(self, request):
-        print("probando")
-        print("Request body:", request.body)
-        if request.method == 'POST':
-            try:
-                other = None
-                data = json.loads(request.body)
-                cotizacion = Cotizacion()
+    def crearOActualizarCotizacion(self, request):
+        try:
+            # Cargar datos del cuerpo de la solicitud
+            data = json.loads(request.body)
+
+            # Obtener `DocEntry` si está presente
+            docEntry = data.get('DocEntry')
+            docnum = data.get('DocNum')
+            print("DocEntry recibido:", docEntry)
+
+            cotizacion = Cotizacion()  # Instancia del modelo o clase de negocio
+
+            if docEntry:
+                print("Actualizando cotización con DocEntry:", docEntry)
+                # Si `DocEntry` está presente, se realiza una actualización
+                print("Actualizando cotización con DocEntry:", docEntry)
+                actualizacion = cotizacion.actualizarDocumento(docnum, docEntry, data)
+                return JsonResponse(actualizacion, status=200)
+            else:
+                # Si no está presente, se crea una nueva cotización
+                print("Creando nueva cotización")
                 creacion = cotizacion.crearDocumento(data)
-                print("Creacion:", creacion)
                 return JsonResponse(creacion, status=201)
-            except json.JSONDecodeError as e:
-                return JsonResponse({'error': 'JSON inválido'}, status=400)
-    
-    
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'JSON inválido'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': f'Error inesperado: {str(e)}'}, status=500)
+
+
     def actualizarEstadosCotizacion(self, request):
         
 
