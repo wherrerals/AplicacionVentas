@@ -59,6 +59,7 @@ class OdvView(View):
     def post_route_map(self):
         
         return {
+            '/ventas/crear_odv': self.crearOActualizarODV,
             '/ventas/listado_odv': self.filtrarODV,
         }
     def handle_invalid_route(self, request):
@@ -124,10 +125,12 @@ class OdvView(View):
         return JsonResponse(lines_data, safe=False)
     
     @csrf_exempt
-    def crearOActualizarCotizacion(self, request):
+    def crearOActualizarODV(self, request):
         try:
             # Cargar datos del cuerpo de la solicitud
             data = json.loads(request.body)
+
+            print("Data recibida:", data)
 
             # Obtener `DocEntry` si está presente
             docEntry = data.get('DocEntry')

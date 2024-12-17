@@ -68,7 +68,7 @@ class Producto {
             <tr>
                 <td style="font-size: 12px;background: transparent;border-style: none;padding-bottom: 0px;"rowspan="2">
                     <div class="row">
-                        <div class="col-md-11 col-xxl-6" style="font-size: 14px;font-weight: bold;"><small style="font-weight: bold;"><small>${contprod})</small><small>&nbsp;&nbsp;</small><small>${this.productoCodigo}</small></div>
+                        <div class="col-md-11 col-xxl-6" style="font-size: 14px;font-weight: bold;"><small style="font-weight: bold;"><small>${contprod})</small><small>&nbsp;&nbsp;</small><small name="sku_producto">${this.productoCodigo}</small></div>
                         <div class="col-md-11 col-xxl-7" style="text-align: center;"><img src="${this.imagen}" width="50" height="50" style="width: 50px;height: 50px;"></div>
                     </div>
                 </td>
@@ -96,7 +96,7 @@ class Producto {
                     </div>
                     <div class="row" style="font-size: 11px;">
                     <div div class="col-sm-4 col-md-3 col-xl-2" style="padding-right: 0px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-arrow-right-circle-fill" style="font-size: 18px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="mostrar-descuento" class="bi bi-arrow-right-circle-fill" style="font-size: 18px;">
                     <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z">
                     </path>
                     </svg></div>
@@ -104,11 +104,11 @@ class Producto {
                     </div>
                 </td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
-                    <div><input class="form-control" type="number" style="font-size: 12px;width: 40px; value="0" id="agg_descuento">
+                    <div><input class="form-control" type="number" style="font-size: 12px;width: 60px; value="0" id="agg_descuento">
                 </td>   
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">${this.precioSinDescuento}</td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
-                    <input type="number" class="form-control" value="${this.cantidad}" style="font-size: 12px;width: 65px;">
+                    <input class="form-control" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad}">
                 </td>
                 <td style="font-size: 11px;font-weight: bold;background: transparent;border-style: none;text-align: center;"><span>${this.totalProducto}</span></td>
             </tr>
@@ -158,6 +158,18 @@ class Producto {
         this.limitarMaxDescuento(newRow);
         return newRow;
     }
+
+      
+    // Método para alternar la visibilidad del descuento
+    alternarMaxDescuento(row) {
+        let elemento = row.querySelector('#descuento');
+        if (elemento.getAttribute('hidden') !== null) {
+            elemento.removeAttribute('hidden');
+        } else {
+            elemento.setAttribute('hidden', '');
+        }
+    }
+  
 
     limitarMaxDescuento(row) {
         let descuentoMaxElem = row.querySelector('#descuento');

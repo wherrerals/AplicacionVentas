@@ -21,6 +21,7 @@ urlpatterns = [
     path('listado_productos/', Productos.as_view(), name='listado_productos'),
     path('crear_cotizacion/', CotizacionView.as_view(), name='crear_cotizacion'),
     path('listado_odv/', OdvView.as_view(), name='listado_odv'),
+    path('crear_odv/', OdvView.as_view(), name='crear_odv'),
     #path('crear_cliente/', SocioNegocioView.as_view(), name='crear_cliente'),
     path('cambiar_estado_cotizacion/', CotizacionView.as_view(), name='cambiar_estado_cotizacion'),
     # Rutas adicionales

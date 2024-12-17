@@ -82,12 +82,11 @@ class Producto {
                     <div class="row">
                         <div class="col-sm-12 col-lg-12 col-xl-11 col-xxl-10">
                           <select class="form-select bodega-select" style="font-size: 11px;>
-                              <optgroup label="Bodega">
-                                  <option value="GR" ${this.sucursal === 'GR' ? 'selected' : ''}>GR</option>
-                                  <option value="LC" ${this.sucursal === 'LC' ? 'selected' : ''}>LC</option>
-                                  <option value="PH" ${this.sucursal === 'PH' ? 'selected' : ''}>PH</option>
-                                  <option value="ME" ${this.sucursal === 'ME' ? 'selected' : ''}>ME</option>
-                              </optgroup>
+                            <optgroup label="Bodega">
+                            <option value="LC">LC</option>
+                            <option value="PH">PH</option>
+                            <option value="ME">ME</option>
+                            </optgroup>
                           </select>
                         </div>
                         <div class="col" style="text-align: center;">
@@ -144,6 +143,7 @@ class Producto {
             </tr>
             </tr>
         `;
+        
 
         // Agregar evento mouseover para mostrar stock en otras tiendas
         const precioVentaElem = newRow.querySelector('#stock_total');
@@ -205,6 +205,7 @@ class Producto {
       // Contador de productos
       console.log("cantidad: ", cantidad);
       console.log("sucursal: ", sucursal);
+      
       let contprod = document.querySelectorAll('#productos tbody').length + 1;
       
       let producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal);

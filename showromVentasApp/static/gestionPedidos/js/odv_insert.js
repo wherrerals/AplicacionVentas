@@ -8,16 +8,16 @@ document.addEventListener("DOMContentLoaded", function() {
         const fechaSolo = new Date().toISOString().split('T')[0]; // Salida en formato YYYY-MM-DD
     
     
-        const docNum = document.getElementById("numero_cotizacion").textContent; //listo
-        const docEntry = document.getElementById("numero_cotizacion").getAttribute("data-docEntry")
+        const docNum = document.getElementById("numero_orden").textContent; //listo
+        const docEntry = document.getElementById("numero_orden").getAttribute("data-docEntry")
         const docDate = fechaSolo; //listo 
-        const docDueDate = document.getElementById("docDueDate").textContent; //listo
+        const fechaentrega = document.getElementById("fecha_entrega").value; //listo
         const taxDate = fechaSolo; // listo
         const rut = document.getElementById("inputCliente").getAttribute("data-codigoSN"); //listo
         const cardCode = rut;//listo
         const pgc = -1; //listo
-        const spcInt  = document.getElementById("vendedor_data").getAttribute("data-codeVen"); //listo
-        const spc  = parseInt(spcInt, 10); //listo Convertir a entero con base 10
+        //const spcInt  = document.getElementById("vendedor_data").getAttribute("data-codeVen"); //listo
+        //const spc  = parseInt(spcInt, 10); //listo Convertir a entero con base 10
         const trnasp = document.getElementById("tipoEntrega-1").value; //listo
         const ulfen = 1; //document.getElementById("uledforenv").value;
     
@@ -27,9 +27,6 @@ document.addEventListener("DOMContentLoaded", function() {
             return;
         }
         const ultd = tipoDocElement.value; //listo
-    
-        console.log('Fecha del documento:', docDate);
-        console.log('Fecha de vencimiento del documento:', docDueDate);
     
         // Captura las líneas del documento
         const lines = [];
@@ -56,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 "LineNum": index,
                 "ItemCode": itemCode,
                 "Quantity": parseFloat(quantity),
-                "ShipDate": docDueDate, //shipDate,
+                "ShipDate": fechaentrega, //shipDate,
                 "DiscountPercent": parseFloat(discount),//pendiente porcentaje de descuento
                 "WarehouseCode": warehouseCode, //pendiente bodega
                 "CostingCode": costingCode, // Pendiente código de sucursal, lc, Ph, gr, rs
@@ -73,11 +70,11 @@ document.addEventListener("DOMContentLoaded", function() {
             "DocNum": docNum,
             "DocEntry": docEntry, 
             "DocDate": docDate,
-            "DocDueDate": docDueDate,
+            "DocDueDate": fechaentrega,
             "TaxDate": taxDate,
             "CardCode": cardCode,
             "PaymentGroupCode": pgc,  
-            "SalesPersonCode": spc,
+            "SalesPersonCode": 20,
             "TransportationCode": trnasp,
             "U_LED_TIPDOC": ultd,
             "U_LED_FORENV": ulfen,
@@ -88,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const jsonData = JSON.stringify(documentData);
         
             // Enviar los datos al backend usando fetch
-            fetch('/ventas/crear_cotizacion/', {
+            fetch('/ventas/crear_odv/', {
                 method: 'POST', // Método POST para enviar datos
                 headers: {
                     'Content-Type': 'application/json', // Indica que el cuerpo es JSON
@@ -111,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     // Mostrar el número de documento y el mensaje de éxito en un popup bonito
                     Swal.fire({
                         icon: 'success',
-                        title: 'Cotización creada',
+                        title: 'Orden de Venta creada',
                         text: `Número de documento: ${data.docNum}`,
                         confirmButtonText: 'Aceptar'
                     });
