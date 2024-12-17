@@ -1301,6 +1301,8 @@ class SocioNegocio:
 
     def prepararJsonCliente(self, jsonData: dict):
 
+        print("Preparando datos para el cliente...")
+        print(f"Datos JSON: {jsonData}")
 
         if jsonData.get('grupoSN') == '100':
             camposRequeridos = ['rutSN', 'nombreSN', 'apellidoSN', 'grupoSN', 'telefonoSN', 'emailSN']

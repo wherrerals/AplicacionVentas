@@ -161,3 +161,70 @@ class OrdenVenta(Documento):
         }
 
         return resultado
+
+    def actualizarDocumento(self,docnum, docentry, data):
+        
+        docentry = docentry
+
+        try:
+            docentry = int(docentry)
+            jsonData = self.prepararJsonCotizacionAC(data)
+            
+            response = self.client.actualizarCotizacionesSL(docentry, jsonData)
+
+            if 'success' in response:
+                return {
+                    'success': 'Cotización creada exitosamente',
+                    'docNum': docnum
+                }
+
+        
+        except Exception as e:
+            logger.error(f"Error al actualizar la cotización: {str(e)}")
+            return {'error': str(e)}
+        
+    def crearDocumento(self, data):
+        """
+        Crea una nueva cotización y maneja las excepciones según el código de respuesta.
+
+        Args:
+            data (dict): Datos de la cotización.
+
+        Returns:
+            dict: Respuesta de la API.
+        """
+        try:
+            # Verificar los datos antes de preparar el JSON
+            errores = self.validarDatosCotizacion(data)
+            if errores:
+                return {'error': errores}
+
+            # Preparar el JSON para la cotización
+            jsonData = self.prepararJsonCotizacion(data)
+            
+            # Realizar la solicitud a la API
+            response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
+            
+            # Verificar si response es un diccionario
+            if isinstance(response, dict):
+                # Si contiene DocEntry, es un éxito
+                if 'DocEntry' in response:
+                    doc_num = response.get('DocNum')
+                    return {
+                        'success': 'Cotización creada exitosamente',
+                        'docNum': doc_num
+                    }
+                
+                # Si contiene un mensaje de error, manejarlo
+                elif 'error' in response:
+                    error_message = response.get('error', 'Error desconocido')
+                    return {'error': f"Error: {error_message}"}
+                else:
+                    return {'error': 'Respuesta inesperada de la API.'}
+            
+            else:
+                return {'error': 'La respuesta de la API no es válida.'}
+        
+        except Exception as e:
+            # Manejo de excepciones generales
+            logger.error(f"Error al crear la cotización: {str(e)}")
