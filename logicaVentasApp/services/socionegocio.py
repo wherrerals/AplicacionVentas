@@ -50,68 +50,7 @@ class SocioNegocio:
         self.validarNombre()
         #self.validarApellido()
         self.validarTelefono()
-        self.tamañotelefono()
-
-        
-    def crearOActualizarCliente(self):
-        print("Creando o actualizando cliente...")
-        if not self.verificarRutValido(self.rut):
-            return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)
-        
-        try:
-            self.validarDatosObligatorios()
-            
-            rut = self.rut
-            
-            codigoSN = SocioNegocio.generarCodigoSN(rut)
-            clienteExistente = SocioNegocioRepository.obtenerPorRut(self.rut)
-
-            logger.info(f"Cliente existente: {clienteExistente}")
-                        
-            if clienteExistente is not None:
-                return self.procesarClienteExistente(codigoSN, clienteExistente, datosNuevos=self.request.POST)
-            
-            self.procesarNuevoCliente()
-            return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
-        except ValidationError as e:
-            return self.manejarErrorValidacion(e)
-        except Exception as e:
-            return self.manejarErrorGeneral(e)
-        
-    def procesarNuevoCliente(self):
-        """
-        Procesa la creación de un nuevo cliente y lo sincroniza con SAP.
-        """
-        try:
-            print("Procesando nuevo cliente...")
-
-            # Generar código único para el cliente
-            codigoSN = SocioNegocio.generarCodigoSN(self.rut)
-            if not codigoSN:
-                raise ValueError("No se pudo generar el código del cliente.")
-
-            # Obtener datos relacionados
-            gruposn = self.obtenerGrupoSN()
-            tipocliente = self.obtenerTipoCliente()
-            tiposn = self.obtenerTipoSN()
-
-            # Crear el cliente en la base de datos dentro de una transacción
-            with transaction.atomic():
-                cliente = self.crearNuevoCliente(codigoSN, tiposn, gruposn, tipocliente)
-
-                # Preparar datos para SAP
-                jsonData = self.prepararJsonCliente(self.request.POST)
-                if not jsonData:
-                    raise ValueError("Datos JSON inválidos para la sincronización con SAP.")
-
-                # Sincronizar con SAP
-                self.creacionSocioSAP(jsonData)
-
-            print("Cliente procesado con éxito.")
-            return cliente  # Retorna el cliente creado, si aplica
-
-        except Exception as e: 
-            return JsonResponse({'success': False, 'message': 'Error al procesar el cliente'}, status=500)
+        self.tamañotelefono()        
 
     def procesarClienteExistente(self, codigosn, datosCliente, datosNuevos):
         
@@ -230,11 +169,11 @@ class SocioNegocio:
         
         with transaction.atomic():
 
-            if self.gruposn == '100':
+            if self.gruposn == '105':
                 print("creando cliente persona")
                 cliente = self.crearClientePersona(codigosn, self.rut, tiposn, tipoCliente, self.email, grupoSN)
                 
-            elif self.gruposn == '105':
+            elif self.gruposn == '100':
                 print("creando cliente empresa")
                 cliente = self.crearClienteEmpresa(codigosn, tiposn, grupoSN, tipoCliente)
             else:
@@ -638,51 +577,6 @@ class SocioNegocio:
             print(f"Error al verificar socio de negocio en SAP: {str(e)}")
             return False
     
-    def prepararJsonCliente(self, jsonData: dict):
-        print("Preparando JSON para el socio de negocio...")
-
-        self.logger.info("Preparando JSON para el socio de negocio...")
-
-        print(f"Datos recibidos: {jsonData}")
-        #imprimir los campos requeridos
-        print("Validando campos requeridos...")
-        print(f"rutSN: {jsonData.get('rutSN')}")
-        print(f"nombreSN: {jsonData.get('nombreSN')}")
-        print(f"apellidoSN: {jsonData.get('apellidoSN')}")
-        print(f"grupoSN: {jsonData.get('grupoSN')}")
-        print(f"telefonoSN: {jsonData.get('telefonoSN')}")
-        print(f"emailSN: {jsonData.get('emailSN')}")
-
-        if jsonData.get('grupoSN') == '100':
-            camposRequeridos = ['rutSN', 'nombreSN', 'apellidoSN', 'grupoSN', 'telefonoSN', 'emailSN']
-            for campo in camposRequeridos:
-                if not jsonData.get(campo):
-                    raise ValueError(f"El campo '{campo}' es obligatorio.")
-        else:
-            camposRequeridos = ['rutSN', 'nombreSN', 'grupoSN', 'telefonoSN', 'emailSN']
-            for campo in camposRequeridos:
-                if not jsonData.get(campo):
-                    raise ValueError(f"El campo '{campo}' es obligatorio.")
-
-        print("Datos obligatorios encontrados.")
-
-        cardCode = jsonData['rutSN']
-        cardCodeSinGuion = SocioNegocio.generarCodigoSN(cardCode)
-        nombreCompleto = "{nombre} {apellido}".format(nombre=jsonData['nombreSN'], apellido=jsonData['apellidoSN'])
-
-        print(f"CardCode: {cardCodeSinGuion}")
-
-        cliente, direcciones, contactos = self.obtenerDatosCliente(cardCode)
-
-        print(f"Cliente encontrado: {cliente}")
-
-        # Preparar JSON
-        cabezera = self._prepararCabecera(jsonData, cardCodeSinGuion, nombreCompleto)
-        bp_addresses_json = self._prepararDireciones(direcciones)
-        contact_employees_json = self._prepararContactos(contactos)
-
-        return { **cabezera , 'BPAddresses': bp_addresses_json, 'ContactEmployees': contact_employees_json}
-    
     def obtenerDatosCliente(self, cardCode):
         
         try:
@@ -987,22 +881,8 @@ class SocioNegocio:
 
 
     def infoCliente(self, identificador, buscar_por_nombre=False):
-        """
-        Método para buscar un socio de negocio por nombre o rut.
-
-        Args:
-            identificador (str): Nombre o rut del socio de negocio.
-            buscar_por_nombre (bool): Indica si se busca por nombre o por rut.
-
-        Returns:
-            list: Lista de diccionarios con los datos de los socios de negocio.
-            dict: Diccionario con error en caso de excepción.
-        """
-        logger.info(f"Buscando socio negocio - Identificador: {identificador}, "
-                f"Buscar por nombre: {buscar_por_nombre}")
 
         try:
-            # Validar que el identificador no esté vacío
             if not identificador or not identificador.strip():
                 return {'error': 'El identificador está vacío'}
 
@@ -1014,18 +894,18 @@ class SocioNegocio:
 
             # Si no hay resultados, retornar lista vacía
             if not resultados_clientes:
-                logger.info(f"No se encontraron resultados para el identificador: {identificador}")
                 return []
 
+            # Lista para almacenar los resultados formateados
             resultados_formateados = []
 
             # Procesar cada socio encontrado
             for socio in resultados_clientes:
                 try:
-                    # Prefetch de direcciones y contactos
+                    # Obtener direcciones y contactos del socio
                     direcciones = DireccionDB.objects.filter(
-                        SocioNegocio=socio
-                    ).select_related('comuna', 'region')
+                        SocioNegocio=socio # Filtrar por el socio actual
+                    ).select_related('comuna', 'region') # 
                     
                     contactos = ContactoDB.objects.filter(
                         SocioNegocio=socio
@@ -1161,11 +1041,9 @@ class SocioNegocio:
 
 
     def guardarClienteCompleto(self, data):
-        # Crear el cliente principal usando el método del repositorio
-        print("Guardando cliente completo...")
-        print(f"Datos a guardar: {data}")
-        # Acceder a los datos del cliente
         socio_negocio = data["SocioNegocio"]
+        print(f"Nombre: " + socio_negocio["nombre"])
+        print(f"Apellido: " + socio_negocio["apellido"])
 
         # Obtener la instancia de GrupoSNDB
         try:
@@ -1177,7 +1055,8 @@ class SocioNegocio:
             raise ValueError("No se encontró el grupo, tipo de socio de negocio o tipo de cliente")
             # Maneja el error según sea necesario, como lanzar una excepción o crear un nuevo grupo
         
-        if grupo == "100":
+        if socio_negocio["grupoSN"] == 105:
+            print("Creando cliente persona...")
             cliente = SocioNegocioRepository.crearCliente(
                 codigoSN=socio_negocio["codigoSN"],
                 nombre=socio_negocio["nombre"],
@@ -1192,6 +1071,7 @@ class SocioNegocio:
             )
 
         else:
+            print("Creando cliente empresa...")
             cliente = SocioNegocioRepository.crearClienteEmpresa(
                 codigoSN=socio_negocio["codigoSN"],
                 nombre=socio_negocio["nombre"],
@@ -1261,11 +1141,10 @@ class SocioNegocio:
         Returns:
             JsonResponse: Respuesta con los datos del cliente si se encontró, o un mensaje de error.
         """
-        print("Respondiendo información del cliente...")
-        resultados = self.infoCliente(rut)
+        data_client = self.infoCliente(rut)
 
-        if resultados:
-            return JsonResponse(resultados, status=200, safe=False)
+        if data_client:
+            return JsonResponse(data_client, status=200, safe=False)
         return JsonResponse({'success': False, 'message': 'No se encontraron resultados'}, status=404)
 
     def crearYresponderCliente(self, carCode, rut):
@@ -1330,3 +1209,127 @@ class SocioNegocio:
 
         ab = 1 + 2
         pass
+
+
+#Creacion Socio Negocio
+
+    def crearOActualizarCliente(self):
+        
+        print("Creando o actualizando cliente...")
+        if not self.verificarRutValido(self.rut):
+            return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)
+        
+        try:
+            self.validarDatosObligatorios()
+            
+            rut = self.rut
+            
+            codigoSN = SocioNegocio.generarCodigoSN(rut)
+
+            clienteExistente = SocioNegocioRepository.obtenerPorRut(self.rut)
+
+            logger.info(f"Cliente existente: {clienteExistente}")
+                        
+            if clienteExistente is not None:
+                return self.procesarClienteExistente(codigoSN, clienteExistente, datosNuevos=self.request.POST)
+            
+            self.procesarNuevoCliente()
+            
+            return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
+        except ValidationError as e:
+            return self.manejarErrorValidacion(e)
+        except Exception as e:
+            return self.manejarErrorGeneral(e)
+
+    def procesarNuevoCliente(self):
+        """
+        Procesa la creación de un nuevo cliente y lo sincroniza con SAP.
+        """
+        try:
+            print("Procesando nuevo cliente...")
+
+            # Generar código único para el cliente
+            codigoSN = SocioNegocio.generarCodigoSN(self.rut)
+            if not codigoSN:
+                raise ValueError("No se pudo generar el código del cliente.")
+
+            # Obtener datos relacionados
+            gruposn = self.obtenerGrupoSN()
+            tipocliente = self.obtenerTipoCliente()
+            tiposn = self.obtenerTipoSN()
+
+            # Crear el cliente en la base de datos dentro de una transacción
+            with transaction.atomic():
+                cliente = self.crearNuevoCliente(codigoSN, tiposn, gruposn, tipocliente)
+
+                # Preparar datos para SAP
+                print("Preparando datos para SAP...")
+                print(f"data: {self.request.POST}")
+                jsonData = self.prepararJsonCliente(self.request.POST)
+                if not jsonData:
+                    raise ValueError("Datos JSON inválidos para la sincronización con SAP.")
+
+                # Sincronizar con SAP
+                self.creacionSocioSAP(jsonData)
+
+            print("Cliente procesado con éxito.")
+            return cliente  # Retorna el cliente creado, si aplica
+
+        except Exception as e: 
+            return JsonResponse({'success': False, 'message': 'Error al procesar el cliente'}, status=500)
+        
+    def crearNuevoCliente(self, codigosn, tiposn, grupoSN, tipoCliente):
+        print("Creando nuevo cliente...")
+        print(f"Grupo de cliente: {grupoSN}")
+        
+        with transaction.atomic():
+
+            if self.gruposn == '105':
+                print("creando cliente persona")
+                cliente = self.crearClientePersona(codigosn, self.rut, tiposn, tipoCliente, self.email, grupoSN)
+                
+            elif self.gruposn == '100':
+                print("creando cliente empresa")
+                cliente = self.crearClienteEmpresa(codigosn, tiposn, grupoSN, tipoCliente)
+            else:
+                raise ValidationError(f"Grupo de cliente no válido: {self.gruposn}")
+            SocioNegocio.agregarDireccionYContacto(self.request, cliente)
+            print("Cliente creado exitosamente.")
+            print(f"Cliente creado: {cliente}")
+
+        return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
+
+    def prepararJsonCliente(self, jsonData: dict):
+
+        print("Preparando datos para el cliente...")
+        print(f"Datos JSON: {jsonData}")
+
+        if jsonData.get('grupoSN') == '100':
+            camposRequeridos = ['rutSN', 'nombreSN', 'apellidoSN', 'grupoSN', 'telefonoSN', 'emailSN']
+            for campo in camposRequeridos:
+                if not jsonData.get(campo):
+                    raise ValueError(f"El campo '{campo}' es obligatorio.")
+        else:
+            camposRequeridos = ['rutSN', 'nombreSN', 'grupoSN', 'telefonoSN', 'emailSN']
+            for campo in camposRequeridos:
+                if not jsonData.get(campo):
+                    raise ValueError(f"El campo '{campo}' es obligatorio.")
+
+        print("Datos obligatorios encontrados.")
+
+        cardCode = jsonData['rutSN']
+        cardCodeSinGuion = SocioNegocio.generarCodigoSN(cardCode)
+        nombreCompleto = "{nombre} {apellido}".format(nombre=jsonData['nombreSN'], apellido=jsonData['apellidoSN'])
+
+        print(f"CardCode: {cardCodeSinGuion}")
+
+        cliente, direcciones, contactos = self.obtenerDatosCliente(cardCode)
+
+        print(f"Cliente encontrado: {cliente}")
+
+        # Preparar JSON
+        cabezera = self._prepararCabecera(jsonData, cardCodeSinGuion, nombreCompleto)
+        bp_addresses_json = self._prepararDireciones(direcciones)
+        contact_employees_json = self._prepararContactos(contactos)
+
+        return { **cabezera , 'BPAddresses': bp_addresses_json, 'ContactEmployees': contact_employees_json}

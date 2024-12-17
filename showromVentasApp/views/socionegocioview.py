@@ -207,14 +207,12 @@ class SocioNegocioView(FormView):
         return:
             JsonResponse con la información del cliente, o un mensaje de error
         """
+
         if request.method != 'GET':
             return JsonResponse({'error': 'Método no permitido'}, status=405)
-
         rut = request.GET.get('rut')
-
         if not rut:
             return JsonResponse({'error': 'No se proporcionó un RUT de socio de negocio'}, status=400)
-
         try:
             socio_negocio_service = SocioNegocio(request)
             cardCode = socio_negocio_service.generarCardCode(rut)
@@ -282,4 +280,5 @@ class SocioNegocioView(FormView):
         except Exception as e:
             print("Error:", e)  # Verifica el error específico que está ocurriendo
             return JsonResponse({'error': str(e)}, status=500)
+
 

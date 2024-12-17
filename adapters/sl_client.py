@@ -228,6 +228,43 @@ class APIClient:
         except requests.exceptions.RequestException as e:
             print(f"Error en la solicitud a la API: {e}")
             raise
+
+    def crearODV(self, data=None, headers=None):
+        """
+        permite la creacion de cotizaciones en la base de datos de SAP
+
+        Parámetros:
+            endpoint : str, opcional
+                El endpoint donde se creara la cotizacion (por defecto es '').
+            data : dict, opcional
+                Un diccionario de pares clave-valor para crear la cotizacion.
+            headers : dict, opcional
+                Un diccionario de pares clave-valor para los encabezados de la solicitud.
+        RETURNS:
+            si la creacion de la cotizacion es exitosa retorna un diccionario con la respuesta de la API en formato JSON.
+            si la creacion de la cotizacion no es exitosa retorna un diccionario con un mensaje de error.
+            si la conexion con la API falla retorna un diccionario con un mensaje de error.
+            si el tiempo de espera de la API se agota retorna un diccionario con un mensaje de error.
+            si la respuesta de la API contiene un error de estado retorna un diccionario con un mensaje de error.
+            si se produce un error al analizar JSON retorna un diccionario con un mensaje de error.
+        """
+        print("Probando la conexión con la API...")
+        self.__login()
+        url = f"{self.base_url}Orders"
+        print(url)
+        try:
+
+        # Imprimir el JSON y los headers para ver qué se está enviando
+            print(f"URL: {url}")
+            print(f"Data being sent: {json.dumps(data, indent=4)}")
+
+            response = self.session.post(url, json=data, headers=headers, verify=False)
+            response.raise_for_status()
+            return response.json()
+        
+        except requests.exceptions.RequestException as e:
+            print(f"Error en la solicitud a la API: {e}")
+            raise
     
     def actualizarEstadoDocumentoSL(self, endpoint, docNum, estado):
         """
@@ -346,7 +383,7 @@ class APIClient:
         """
 
         crossjoin = "Quotations,SalesPersons,BusinessPartners/ContactEmployees"
-        expand = "Quotations($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address,Address2,DocDate,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
+        expand = "Quotations($select=DocEntry,DocNum, FederalTaxID, CardCode,CardName,TransportationCode,Address,Address2,DocDate,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
         filter = f"Quotations/DocEntry eq {docEntry} and Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Quotations/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode"    
         url = f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
 
@@ -534,9 +571,39 @@ class APIClient:
         print(url)
         return response.json()
     
+    #usando patch actualizar las cotizaciones
+    def actualizarCotizacionesSL(self, docEntry, data):
+        self.__login()
+        url = f"{self.base_url}Quotations({docEntry})"
+        
+        # Definir los encabezados, incluyendo el encabezado B1S-ReplaceCollectionsOnPatch
+        headers = {
+            'B1S-ReplaceCollectionsOnPatch': 'true',  # Encabezado adicional
+            'Content-Type': 'application/json',  # Asegúrate de incluir este encabezado si es necesario
+        }
 
+        try:
+            print(f"URL: {url}")
+            print(f"Data being sent: {data}")
 
-    
+            # Hacer la solicitud PATCH incluyendo los encabezados
+            response = self.session.patch(url, json=data, headers=headers, verify=False)
+            print(f"Respuesta completa: {response.status_code} - {response.text}")
+
+            print(response)
+
+            if response.status_code == 204:
+                return {'success': True, 'message': 'Cotización actualizada correctamente.'}
+            else:
+                response.raise_for_status()
+                print("Respuesta de la API:", response.json())
+                return response.json()
+        except requests.exceptions.HTTPError as e:
+            print(f"Error en la solicitud a la API: {e}")
+            if 'response' in locals() and response is not None:
+                print(f"Cuerpo de la respuesta del servidor: {response.text}")
+            raise
+
 
 """
 https://182.160.29.24:50003/b1s/v1/$crossjoin(Orders,SalesPersons)?$expand=Orders($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)&$orderby=DocNum desc&$

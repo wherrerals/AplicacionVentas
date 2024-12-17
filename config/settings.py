@@ -72,7 +72,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'showromVentasApp.context_processors.grupos_usuario'
+                'showromVentasApp.context_processors.grupos_usuario',
+                'showromVentasApp.context_processors.vendedor_codigo'
             ],
         },
     },
@@ -89,9 +90,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
         'USER':'root',
-        #'PASSWORD':'Ea7hava5*', #led_studio
+        'PASSWORD':'Ea7hava5*', #led_studio
         #'PASSWORD':'Ea7hava5}', #home
-        'PASSWORD':'qwerty', #nico
+        #'PASSWORD':'qwerty', #nico
         #'HOST':'localhost',
         'PORT':'3306',
     }

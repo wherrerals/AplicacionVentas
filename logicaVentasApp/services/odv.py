@@ -161,3 +161,205 @@ class OrdenVenta(Documento):
         }
 
         return resultado
+
+    def actualizarDocumento(self,docnum, docentry, data):
+        
+        docentry = docentry
+
+        try:
+            docentry = int(docentry)
+            jsonData = self.prepararJsonCotizacionAC(data)
+            
+            response = self.client.actualizarCotizacionesSL(docentry, jsonData)
+
+            if 'success' in response:
+                return {
+                    'success': 'Cotización creada exitosamente',
+                    'docNum': docnum
+                }
+
+        
+        except Exception as e:
+            logger.error(f"Error al actualizar la cotización: {str(e)}")
+            return {'error': str(e)}
+        
+    def crearDocumento(self, data):
+        """
+        Crea una nueva cotización y maneja las excepciones según el código de respuesta.
+
+        Args:
+            data (dict): Datos de la cotización.
+
+        Returns:
+            dict: Respuesta de la API.
+        """
+        print("Creando documento")
+
+        try:
+            # Verificar los datos antes de preparar el JSON
+            errores = self.validarDatosODV(data)
+            if errores:
+                return {'error': errores}
+
+            # Preparar el JSON para la cotización
+            jsonData = self.prepararJsonODV(data)
+
+            sl = APIClient()
+            
+            # Realizar la solicitud a la API
+            response = sl.crearODV(jsonData)
+            
+            # Verificar si response es un diccionario
+            if isinstance(response, dict):
+                # Si contiene DocEntry, es un éxito
+                if 'DocEntry' in response:
+                    doc_num = response.get('DocNum')
+                    return {
+                        'success': 'Cotización creada exitosamente',
+                        'docNum': doc_num
+                    }
+                
+                # Si contiene un mensaje de error, manejarlo
+                elif 'error' in response:
+                    error_message = response.get('error', 'Error desconocido')
+                    return {'error': f"Error: {error_message}"}
+                else:
+                    return {'error': 'Respuesta inesperada de la API.'}
+            
+            else:
+                return {'error': 'La respuesta de la API no es válida.'}
+        
+        except Exception as e:
+            # Manejo de excepciones generales
+            logger.error(f"Error al crear la cotización: {str(e)}")
+
+    def validarDatosODV(self, data):
+        """
+        Verifica que los datos de la cotización sean correctos.
+
+        Args:
+            data (dict): Datos de la cotización.
+
+        Returns:
+            str: Mensajes de error si hay problemas con los datos, o vacío si son correctos.
+        """
+        print(f"Validando datos: {data}")
+        errores = []
+
+        # Verificar que el cardcode esté presente
+        if not data.get('CardCode'):
+            errores.append("No se a ingresado cliente para la Cotizacion.")
+
+        if not data.get('DocumentLines'):
+            errores.append("La cotización debe tener al menos una línea de documento.")
+
+        # Verificar que la cantidad sea válida (mayor que cero)
+        for item in data.get('DocumentLines', []):
+            cantidad = item.get('Quantity', 0)
+            if cantidad <= 0:
+                errores.append(f"La cantidad del artículo {item.get('ItemCode')} debe ser mayor a cero.")
+
+        # Verificar que otros campos importantes estén presentes (esto depende de los campos requeridos)
+        if not data.get('DocDate'):
+            errores.append("La fecha del documento es obligatoria.")
+
+        if not data.get('DocDueDate'):
+            errores.append("La fecha de vencimiento es obligatoria.")
+
+        # Si hay errores, retornarlos como una cadena
+        return ' '.join(errores)
+    
+    def prepararJsonODV(self, jsonData):
+        """
+        Prepara los datos JSON específicos de la cotización.
+
+        Args:
+            jsonData (dict): Datos de la cotización.
+        
+        Returns:
+            dict: Datos de la cotización preparados para ser enviados a SAP.
+        """
+            
+        # Determinar el tipo de venta basado en el vendedor
+        print("Preparando JSON")
+        codigo_vendedor = jsonData.get('SalesPersonCode')
+        tipo_venta = self.tipoVentaTipoVendedor(codigo_vendedor)
+        
+        # Si el tipo de venta por vendedor no es válido ('NA'), determinar por líneas
+        if tipo_venta == 'NA':
+            lineas = jsonData.get('DocumentLines', [])
+            tipo_venta = self.tipoVentaTipoLineas(lineas)
+        
+        # Datos de la cabecera
+        cabecera = {
+            'DocDate': jsonData.get('DocDate'),
+            'DocDueDate': jsonData.get('DocDueDate'),
+            'TaxDate': jsonData.get('TaxDate'),
+            'CardCode': jsonData.get('CardCode'),
+            'PaymentGroupCode': jsonData.get('PaymentGroupCode'),
+            'SalesPersonCode': jsonData.get('SalesPersonCode'),
+            'TransportationCode': jsonData.get('TransportationCode'),
+            #'U_LED_NROPSH': jsonData.get('U_LED_NROPSH'),
+            'U_LED_TIPVTA': tipo_venta,  # Tipo de venta calculado
+            'U_LED_TIPDOC': jsonData.get('U_LED_TIPDOC'), # Tipo de documento boleta o factura
+            'U_LED_FORENV': jsonData.get('TransportationCode'), # Forma de envio de la cotización
+        }
+
+        # Datos de las líneas
+        lineas = jsonData.get('DocumentLines', [])
+        lineas_json = [
+            {
+                'lineNum': linea.get('LineNum'),
+                'ItemCode': linea.get('ItemCode'),
+                'Quantity': linea.get('Quantity'),
+                'ShipDate': linea.get('ShipDate'),
+                'DiscountPercent': linea.get('DiscountPercent'),
+                'WarehouseCode': linea.get('WarehouseCode'),
+                'CostingCode': linea.get('CostingCode'),
+                'ShippingMethod': linea.get('ShippingMethod'),
+                'COGSCostingCode': linea.get('COGSCostingCode'),
+                'CostingCode2': linea.get('CostingCode2'),
+                'COGSCostingCode2': linea.get('COGSCostingCode2'),
+            }
+            for linea in lineas
+        ]
+
+        # Combina cabecera y líneas en un solo diccionario
+        return {
+            **cabecera,
+            'DocumentLines': lineas_json,
+        }
+
+    @staticmethod
+    def tipoVentaTipoVendedor(codigo_vendedor):
+        """
+        Asigna el tipo de venta a la cotización.
+
+        Args:
+            tipo_venta (str): Tipo de venta.
+        """
+        repo = VendedorRepository()
+        tipo_vendedor = repo.obtenerTipoVendedor(codigo_vendedor)
+
+        if tipo_vendedor == 'PR':
+            return 'PROY'
+        elif tipo_vendedor == 'CD':
+            return 'ECCO'
+        else:
+            return 'NA'
+    
+
+    @staticmethod
+    def tipoVentaTipoLineas(lineas):
+        """
+        Asigna el tipo de venta a las líneas de la cotización.
+
+        - Si todas las lineas son del mismo warehouse, se asigna el tipo de venta: TIEN.
+        - Si las lineas son de diferentes warehouses, se asigna el tipo de venta: RESE.
+
+        Args:
+            lineas (list): Líneas de la cotización.
+        """
+
+        warehouses = set(linea.get('WarehouseCode') for linea in lineas)
+        return 'TIEN' if len(warehouses) == 1 else 'RESE'

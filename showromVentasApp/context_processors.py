@@ -15,9 +15,16 @@ def usuario_actual(request):
 
     return {'usuario_actual': request.user}
 
-def vendedor_actual(request):
-    #print("Ejecutando context processor vendedor_actual")
-    if isinstance(request.user, AnonymousUser):
-        return {'vendedor_actual': None}
+def vendedor_codigo(request):
+    if request.user.is_authenticated:
+        usuario_db = getattr(request.user, 'usuariodb', None)  # Asegúrate de que `usuariodb` sea el related_name o nombre del modelo relacionado.
+        return {'codigo_vendedor': usuario_db.vendedor_codigo if usuario_db else None}
+    return {'codigo_vendedor': None}
 
-    return {'vendedor_actual': request.user.vendedor}
+
+def usuario_actual(request):
+    #print("Ejecutando context processor usuario_actual")
+    if isinstance(request.user, AnonymousUser):
+        return {'usuario_actual': None}
+
+    return {'usuario_actual': request.user}

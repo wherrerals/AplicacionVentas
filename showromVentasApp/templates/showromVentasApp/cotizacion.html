@@ -9,6 +9,7 @@
   <title>Ventas Showroom V0.1</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <script src="{% static 'gestionPedidos/js/quotations_insert.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/sucursales_select.js.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles.min.css' %}">
@@ -63,7 +64,7 @@
         <p style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);">Nº</p>
       </div>
       <div class="col" style="text-align: left;padding-top: 12px;">
-        <p id="numero_cotizacion" style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);"></p>
+        <p id="numero_cotizacion" data-docEntry="" style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);"></p>
       </div>
       <div class="col" style="text-align: right;padding-top: 12px;">
         <p style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);" ></p><!-- Estados -->
@@ -155,13 +156,13 @@
                           <!-- Columna derecha: Radio buttons -->
                           <div class="col-sm-6">
                             <div class="form-check">
-                              <input class="form-check-input" type="radio" id="formCheck-5" name="grupoSN" value="100" style="border-color: rgb(159,168,175);" checked="" 
+                              <input class="form-check-input" type="radio" id="formCheck-5" name="grupoSN" value="105" style="border-color: rgb(159,168,175);" checked="" 
                               onchange="cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow')">
                               <label class="form-check-label" for="formCheck-5">Persona</label>
                             </div>
 
                             <div class="form-check">
-                              <input class="form-check-input" type="radio" id="formCheck-6" name="grupoSN" value="105" style="border-color: rgb(159,168,175);" 
+                              <input class="form-check-input" type="radio" id="formCheck-6" name="grupoSN" value="100" style="border-color: rgb(159,168,175);" 
                               onchange="cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow')">
                               <label class="form-check-label" for="formCheck-6">Empresa</label>
                             </div>
