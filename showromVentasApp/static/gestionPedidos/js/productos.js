@@ -30,30 +30,34 @@ class Producto {
 
     async actualizarStock(row) {
         const stockData = await this.obtenerStock(this.productoCodigo);
+    
         if (stockData) {
-            // Mapear las bodegas para obtener una relación de value -> código
+            // Mapear las bodegas válidas (excluyendo GR)
             const bodegaMap = {
-                "12": "GR",
-                "13": "LC",
-                "14": "PH",
-                "15": "ME"
+                "LC": "LC",
+                "PH": "PH",
+                "ME": "ME"
             };
     
-            // Calcular el stock total sumando los valores
-            const stockTotal = stockData.reduce((total, bodega) => total + bodega.stock, 0);
+            // Filtrar los datos de stock excluyendo la bodega "GR"
+            const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
+    
+            // Calcular el stock total sumando solo las bodegas válidas
+            const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock, 0);
     
             // Mostrar el stock total
             const stockTotalElem = row.querySelector('[name="stock_total"]');
             stockTotalElem.textContent = `Total: ${stockTotal}`;
+    
             // Obtener el value de la bodega seleccionada
             const selectBodega = row.querySelector('.form-select');
             const valueSeleccionado = selectBodega.value;
     
-            // Usar el mapa para obtener el código correspondiente a partir del value
+            // Usar el mapa para obtener el código correspondiente
             const bodegaSeleccionada = bodegaMap[valueSeleccionado];
     
             // Encontrar el stock de la bodega seleccionada
-            const stockBodega = stockData.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock || 0;
+            const stockBodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock || 0;
     
             // Mostrar el stock de la bodega seleccionada
             const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
@@ -145,18 +149,22 @@ class Producto {
             </tr>
         `;
         
+    // Agregar evento mouseover para mostrar stock en otras tiendas
+    const precioVentaElem = newRow.querySelector('#stock_total');
+    precioVentaElem.addEventListener('mouseover', async () => {
+    const stockData = await this.obtenerStock(this.productoCodigo);
+    if (stockData) {
+        // Filtrar las bodegas para excluir "GR"
+        const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
 
-        // Agregar evento mouseover para mostrar stock en otras tiendas
-        const precioVentaElem = newRow.querySelector('#stock_total');
-        precioVentaElem.addEventListener('mouseover', async () => {
-            const stockData = await this.obtenerStock(this.productoCodigo);
-            if (stockData) {
-                // Crear el contenido del tooltip
-                const tooltipContent = stockData
-                    .map(bodega => `${bodega.bodega}: ${bodega.stock}`)
-                    .join('\n');
-                precioVentaElem.title = `Stock en otras tiendas:\n${tooltipContent}`;
-            }
+        // Crear el contenido del tooltip solo con las bodegas válidas
+        const tooltipContent = stockFiltrado
+            .map(bodega => `${bodega.bodega}: ${bodega.stock}`)
+            .join('\n');
+
+        // Asignar el contenido del tooltip
+        precioVentaElem.title = `Stock en otras tiendas:\n${tooltipContent}`;
+    }
         });
         
         this.limitarMaxDescuento(newRow);

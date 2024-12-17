@@ -223,15 +223,13 @@ class Producto {
     
         // Función para validar y limitar la cantidad
         const validarCantidad = () => {
-            // Obtener el stock de bodega desde el texto del elemento
             let maxStock = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
             let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
     
-            // Validar que el valor no exceda el stock ni sea negativo
             if (cantidadActual > maxStock) {
-                cantidadInput.value = maxStock; // Limita al máximo stock
+                cantidadInput.value = maxStock;
             } else if (cantidadActual < 1) {
-                cantidadInput.value = 1; // Establece un mínimo de 1
+                cantidadInput.value = 1;
             }
         };
     
