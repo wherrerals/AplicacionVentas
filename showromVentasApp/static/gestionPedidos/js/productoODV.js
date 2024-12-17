@@ -31,41 +31,40 @@ class Producto {
 
     async actualizarStock(row) {
         const stockData = await this.obtenerStock(this.productoCodigo);
+    
         if (stockData) {
-            // Mapear las bodegas para obtener una relación de value -> código
+            // Mapear las bodegas válidas (excluyendo GR)
             const bodegaMap = {
-                "12": "GR",
-                "13": "LC",
-                "14": "PH",
-                "15": "ME"
+                "LC": "LC",
+                "PH": "PH",
+                "ME": "ME"
             };
     
-            // Calcular el stock total sumando los valores
-            const stockTotal = stockData.reduce((total, bodega) => total + bodega.stock, 0);
+            // Filtrar los datos de stock excluyendo la bodega "GR"
+            const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
+    
+            // Calcular el stock total sumando solo las bodegas válidas
+            const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock, 0);
     
             // Mostrar el stock total
             const stockTotalElem = row.querySelector('[name="stock_total"]');
             stockTotalElem.textContent = `Total: ${stockTotal}`;
+    
             // Obtener el value de la bodega seleccionada
             const selectBodega = row.querySelector('.form-select');
             const valueSeleccionado = selectBodega.value;
     
-            // Usar el mapa para obtener el código correspondiente a partir del value
+            // Usar el mapa para obtener el código correspondiente
             const bodegaSeleccionada = bodegaMap[valueSeleccionado];
     
             // Encontrar el stock de la bodega seleccionada
-            const stockBodega = stockData.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock || 0;
+            const stockBodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock || 0;
     
             // Mostrar el stock de la bodega seleccionada
             const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
             stockBodegaElem.textContent = `Stock: ${stockBodega}`;
         }
     }
-
-
-
-
-
     
 
     crearFila(contprod) {
@@ -127,7 +126,7 @@ class Producto {
                 <td style="font-size: 12px;background: transparent;border-style: none;">    
                     <input class="form-control" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad}">
                 </td>
-                <td style="font-size: 11px;font-weight: bold;background: transparent;border-style: none;text-align: center; id="precio_Venta" "><span>${this.totalProducto}</span></td>
+                <td style="font-size: 11px;font-weight: bold;background: transparent;border-style: none;text-align: center; id="precio_Venta"><span>${this.totalProducto}</span></td>
             </tr>
             <tr  style="font-size: 12px;background: transparent;">
                 <td  style="font-size: 11px;background: transparent;padding-top: 0px;border-style: none;padding-bottom: 0px;" colspan="3">
@@ -163,25 +162,32 @@ class Producto {
             </tr>
         `;
 
-        // Agregar evento mouseover para mostrar stock en otras tiendas
-        const precioVentaElem = newRow.querySelector('#stock_total');
-        precioVentaElem.addEventListener('mouseover', async () => {
-            const stockData = await this.obtenerStock(this.productoCodigo);
-            if (stockData) {
-                // Crear el contenido del tooltip
-                const tooltipContent = stockData
-                    .map(bodega => `${bodega.bodega}: ${bodega.stock}`)
-                    .join('\n');
-                precioVentaElem.title = `Stock en otras tiendas:\n${tooltipContent}`;
-            }
-        });
+    // Agregar evento mouseover para mostrar stock en otras tiendas
+    const precioVentaElem = newRow.querySelector('#stock_total');
+    precioVentaElem.addEventListener('mouseover', async () => {
+    const stockData = await this.obtenerStock(this.productoCodigo);
+    if (stockData) {
+        // Filtrar las bodegas para excluir "GR"
+        const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
+
+        // Crear el contenido del tooltip solo con las bodegas válidas
+        const tooltipContent = stockFiltrado
+            .map(bodega => `${bodega.bodega}: ${bodega.stock}`)
+            .join('\n');
+
+        // Asignar el contenido del tooltip
+        precioVentaElem.title = `Stock en otras tiendas:\n${tooltipContent}`;
+    }
+});
+
 
         this.limitarMaxDescuento(newRow);
+        this.limitarCantidad(newRow);
         return newRow;
-    }
+        }
 
         // Método para alternar la visibilidad del descuento
-        alternarMaxDescuento(row) {
+    alternarMaxDescuento(row) {
             let elemento = row.querySelector('#descuento');
             if (elemento.getAttribute('hidden') !== null) {
                 elemento.removeAttribute('hidden');
@@ -210,7 +216,36 @@ class Producto {
             }
         });
     }
+
+    limitarCantidad(row) {
+        let cantidadInput = row.querySelector('#calcular_cantidad');
+        let stockBodegaElem = row.querySelector('[name="stock_bodega"]'); // Referencia al elemento de stock
+    
+        // Función para validar y limitar la cantidad
+        const validarCantidad = () => {
+            // Obtener el stock de bodega desde el texto del elemento
+            let maxStock = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
+            let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
+    
+            // Validar que el valor no exceda el stock ni sea negativo
+            if (cantidadActual > maxStock) {
+                cantidadInput.value = maxStock; // Limita al máximo stock
+            } else if (cantidadActual < 1) {
+                cantidadInput.value = 1; // Establece un mínimo de 1
+            }
+        };
+    
+        // Agregar evento para validar en tiempo real
+        cantidadInput.addEventListener('input', validarCantidad);
+        cantidadInput.addEventListener('change', validarCantidad);
+    
+        // Si el stock cambia dinámicamente (llamado después de actualizar stock)
+        const stockBodegaObserver = new MutationObserver(validarCantidad);
+        stockBodegaObserver.observe(stockBodegaElem, { childList: true, subtree: true });
+    }
+    
 }
+
 
 function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, tipoEntrega, fechaEntrega) {
     let contprod = document.querySelectorAll('#productos tbody').length + 1;
