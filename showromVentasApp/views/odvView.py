@@ -59,6 +59,7 @@ class OdvView(View):
     def post_route_map(self):
         
         return {
+            '/ventas/crear_odv': self.crearOActualizarODV,
             '/ventas/listado_odv': self.filtrarODV,
         }
     def handle_invalid_route(self, request):
@@ -122,3 +123,35 @@ class OdvView(View):
 
 
         return JsonResponse(lines_data, safe=False)
+    
+    @csrf_exempt
+    def crearOActualizarODV(self, request):
+        try:
+            # Cargar datos del cuerpo de la solicitud
+            data = json.loads(request.body)
+
+            print("Data recibida:", data)
+
+            # Obtener `DocEntry` si está presente
+            docEntry = data.get('DocEntry')
+            docnum = data.get('DocNum')
+            print("DocEntry recibido:", docEntry)
+
+            odv  =  OrdenVenta()  # Instancia del modelo o clase de negocio
+
+            if docEntry:
+                print("Actualizando cotización con DocEntry:", docEntry)
+                # Si `DocEntry` está presente, se realiza una actualización
+                print("Actualizando cotización con DocEntry:", docEntry)
+                actualizacion = odv.actualizarDocumento(docnum, docEntry, data)
+                return JsonResponse(actualizacion, status=200)
+            else:
+                # Si no está presente, se crea una nueva cotización
+                print("Creando nueva cotización")
+                creacion = odv.crearDocumento(data)
+                return JsonResponse(creacion, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'JSON inválido'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': f'Error inesperado: {str(e)}'}, status=500)

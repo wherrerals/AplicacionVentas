@@ -281,3 +281,4 @@ class SocioNegocioView(FormView):
             print("Error:", e)  # Verifica el error específico que está ocurriendo
             return JsonResponse({'error': str(e)}, status=500)
 
+

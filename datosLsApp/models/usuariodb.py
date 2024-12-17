@@ -18,3 +18,8 @@ class UsuarioDB(models.Model):
     
     def __str__(self):
         return f'{self.nombre}'
+
+    @property
+    def vendedor_codigo(self):
+        """Devuelve el código del vendedor asociado al usuario."""
+        return self.vendedor.codigo if self.vendedor else None

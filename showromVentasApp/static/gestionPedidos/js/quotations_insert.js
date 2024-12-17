@@ -42,13 +42,15 @@ function submitForm() {
         const quantity = row.querySelector("[name='cantidad']").value;
         //const shipDate = row.querySelector("[name='fecha_envio']").value;
         const discount = row.querySelector("#agg_descuento").value;
-        const bodegaElement = "LC"; //capturar bodega
-        const costingCode = "LC"; //capturar bodega
-        const cogsCostingCode = "LC"; //capturar bodega
+            // Capturar el valor seleccionado en el select de bodega
+        const bodegaSelect = row.querySelector(".bodega-select"); // Selecciona el <select> dentro de la fila
+        const warehouseCode = bodegaSelect ? bodegaSelect.value : null;
+
+        const costingCode = warehouseCode; //capturar bodega
+        const cogsCostingCode = warehouseCode; //capturar bodega
         const costingCode2 = "AV"; 
         const cogsCostingCode2 = "AV"; 
         
-        const warehouseCode = bodegaElement //? bodegaElement.value : null;
         
 
         // Crea un objeto con los datos de la línea
