@@ -42,8 +42,6 @@ function submitForm() {
         const quantity = row.querySelector("[name='cantidad']").value;
         //const shipDate = row.querySelector("[name='fecha_envio']").value;
         const discount = row.querySelector("#agg_descuento").value;
-        const bodegaElement = "LC"; //capturar bodega
-
             // Capturar el valor seleccionado en el select de bodega
         const bodegaSelect = row.querySelector(".bodega-select"); // Selecciona el <select> dentro de la fila
         const warehouseCode = bodegaSelect ? bodegaSelect.value : null;

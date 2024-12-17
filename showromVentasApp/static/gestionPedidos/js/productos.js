@@ -83,9 +83,9 @@ class Producto {
                         <div class="col-sm-12 col-lg-12 col-xl-11 col-xxl-10">
                           <select class="form-select bodega-select" style="font-size: 11px;>
                             <optgroup label="Bodega">
-                            <option value="LC">LC</option>
-                            <option value="PH">PH</option>
-                            <option value="ME">ME</option>
+                            <option value="LC" ${this.sucursal === 'LC' ? 'selected' : ''}>LC</option>
+                            <option value="PH" ${this.sucursal === 'PH' ? 'selected' : ''}>PH</option>
+                            <option value="ME" ${this.sucursal === 'ME' ? 'selected' : ''}>ME</option>
                             </optgroup>
                           </select>
                         </div>

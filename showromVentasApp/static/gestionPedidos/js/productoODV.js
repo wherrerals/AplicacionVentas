@@ -59,6 +59,8 @@ class Producto {
         }
     }
 
+
+
     
 
     crearFila(contprod) {
@@ -75,12 +77,11 @@ class Producto {
                 <td style="font-size: 12px;background: transparent;border-style: none;padding-bottom: 0px;"rowspan="2">
                     <div class="row">
                     <div class="col-sm-12 col-lg-12 col-xl-11 col-xxl-10">
-                        <select class="form-select" style="font-size: 11px;">
+                        <select class="form-select bodega-select" style="font-size: 11px;">
                           <optgroup label="Bodega">
-                            <option value="12" ${this.sucursal === 'GR' ? 'selected' : ''}>GR</option>
-                            <option value="13" ${this.sucursal === 'LC' ? 'selected' : ''}>LC</option>
-                            <option value="14" ${this.sucursal === 'PH' ? 'selected' : ''}>PH</option>
-                            <option value="15" ${this.sucursal === 'ME' ? 'selected' : ''}>ME</option>
+                            <option value="LC" ${this.sucursal === 'LC' ? 'selected' : ''}>LC</option>
+                            <option value="PH" ${this.sucursal === 'PH' ? 'selected' : ''}>PH</option>
+                            <option value="ME" ${this.sucursal === 'ME' ? 'selected' : ''}>ME</option>
                             </optgroup>
                         </select>
                     </div>
