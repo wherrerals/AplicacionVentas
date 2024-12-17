@@ -103,6 +103,7 @@ class Producto {
                     <div style="font-size: 11px;">
                         <small style="color: rgb(153,153,153);" name="precio_lista">Antes: ${this.precioLista}</small>
                     </div>
+
                     <div class="row" style="font-size: 11px;">
                         <div class="col-sm-4 col-md-3 col-xl-2" style="padding-right: 0px;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="mostrar-descuento" class="bi bi-arrow-right-circle-fill" style="font-size: 18px;">
@@ -157,6 +158,7 @@ class Producto {
                 precioVentaElem.title = `Stock en otras tiendas:\n${tooltipContent}`;
             }
         });
+        
         this.limitarMaxDescuento(newRow);
         return newRow;
     }

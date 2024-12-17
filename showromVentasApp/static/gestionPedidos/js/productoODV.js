@@ -32,6 +32,7 @@ class Producto {
     async actualizarStock(row) {
         const stockData = await this.obtenerStock(this.productoCodigo);
         if (stockData) {
+            // Mapear las bodegas para obtener una relación de value -> código
             const bodegaMap = {
                 "12": "GR",
                 "13": "LC",
@@ -39,23 +40,25 @@ class Producto {
                 "15": "ME"
             };
     
+            // Calcular el stock total sumando los valores
+            const stockTotal = stockData.reduce((total, bodega) => total + bodega.stock, 0);
+    
+            // Mostrar el stock total
+            const stockTotalElem = row.querySelector('[name="stock_total"]');
+            stockTotalElem.textContent = `Total: ${stockTotal}`;
+            // Obtener el value de la bodega seleccionada
             const selectBodega = row.querySelector('.form-select');
             const valueSeleccionado = selectBodega.value;
+    
+            // Usar el mapa para obtener el código correspondiente a partir del value
             const bodegaSeleccionada = bodegaMap[valueSeleccionado];
+    
+            // Encontrar el stock de la bodega seleccionada
             const stockBodega = stockData.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock || 0;
     
-            // Actualizar el texto del stock de la bodega seleccionada
+            // Mostrar el stock de la bodega seleccionada
             const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
             stockBodegaElem.textContent = `Stock: ${stockBodega}`;
-    
-            // Establecer el valor máximo del campo cantidad
-            const cantidadInput = row.querySelector('#calcular_cantidad');
-            cantidadInput.max = stockBodega;
-    
-            // Validar que el valor actual no exceda el stock
-            if (parseInt(cantidadInput.value, 10) > stockBodega) {
-                cantidadInput.value = stockBodega;
-            }
         }
     }
 
@@ -90,27 +93,38 @@ class Producto {
                     </div>
                     </div>
                 </td>
+                
                 <td style="background: transparent;border-style: none;padding-bottom: 0px;" rowspan="2">
-                    <div style="font-size: 12px;"><small>Precio: ${this.precioVenta}</small></div>
-                    <div style="font-size: 11px;"><small style="color: rgb(153,153,153);">Antes: ${this.precioLista}</small>
+                    <div style="font-size: 12px;">
+                        <small name="precio_venta" >Precio: ${this.precioVenta}</small>
                     </div>
+                    <div style="font-size: 11px;">
+                        <small style="color: rgb(153,153,153); name="precio_lista">Antes: ${this.precioLista}</small>
+                    </div>
+
                     <div class="row" style="font-size: 11px;">
-                    <div div class="col-sm-4 col-md-3 col-xl-2" style="padding-right: 0px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-arrow-right-circle-fill" style="font-size: 18px;">
-                    <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z">
-                    </path>
-                    </svg></div>
-                      <div class="col-sm-7 col-md-8"><small id="descuento" style="color: rgb(255,0,0);">Max: ${this.precioDescuento}</small></div>
+                        <div class="col-sm-4 col-md-3 col-xl-2" style="padding-right: 0px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="mostrar-descuento" class="bi bi-arrow-right-circle-fill" style="font-size: 18px;">
+                                <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"></path>
+                            </svg>
+                        </div>
+                        <div class="col-sm-7 col-md-8">
+                            <small style="color: rgb(255,0,0);" id="descuento" name="descuento_max" hidden>Max: ${this.precioDescuento}</small>
+                        </div>
                     </div>
                 </td>
+
                 <td style="font-size: 12px;background: transparent;border-style: none;">
-                    <div><input class="form-control" type="number" style="font-size: 12px;width: 40px; value="0" id="agg_descuento">
-                </td>   
-                <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">${this.precioSinDescuento}</td>
-                <td style="font-size: 12px;background: transparent;border-style: none;">
-                    <input type="number" class="form-control" value="${this.cantidad}" style="font-size: 12px;width: 65px;">
+                    <div>
+                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="0">
+                    </div>
                 </td>
-                <td style="font-size: 11px;font-weight: bold;background: transparent;border-style: none;text-align: center;"><span>${this.totalProducto}</span></td>
+                   
+                <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center; id="Precio_Descuento">${this.precioSinDescuento}</td>
+                <td style="font-size: 12px;background: transparent;border-style: none;">    
+                    <input class="form-control" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad}">
+                </td>
+                <td style="font-size: 11px;font-weight: bold;background: transparent;border-style: none;text-align: center; id="precio_Venta" "><span>${this.totalProducto}</span></td>
             </tr>
             <tr  style="font-size: 12px;background: transparent;">
                 <td  style="font-size: 11px;background: transparent;padding-top: 0px;border-style: none;padding-bottom: 0px;" colspan="3">
@@ -146,18 +160,34 @@ class Producto {
             </tr>
         `;
 
-        const stockTotalElem = newRow.querySelector('#stock_total');
-        stockTotalElem.addEventListener('mouseover', async () => {
+        // Agregar evento mouseover para mostrar stock en otras tiendas
+        const precioVentaElem = newRow.querySelector('#stock_total');
+        precioVentaElem.addEventListener('mouseover', async () => {
             const stockData = await this.obtenerStock(this.productoCodigo);
             if (stockData) {
-                const tooltipContent = stockData.map(bodega => `${bodega.bodega}: ${bodega.stock}`).join('\n');
-                stockTotalElem.title = `Stock en otras tiendas:\n${tooltipContent}`;
+                // Crear el contenido del tooltip
+                const tooltipContent = stockData
+                    .map(bodega => `${bodega.bodega}: ${bodega.stock}`)
+                    .join('\n');
+                precioVentaElem.title = `Stock en otras tiendas:\n${tooltipContent}`;
             }
         });
 
         this.limitarMaxDescuento(newRow);
         return newRow;
     }
+
+        // Método para alternar la visibilidad del descuento
+        alternarMaxDescuento(row) {
+            let elemento = row.querySelector('#descuento');
+            if (elemento.getAttribute('hidden') !== null) {
+                elemento.removeAttribute('hidden');
+            } else {
+                elemento.setAttribute('hidden', '');
+            }
+        }
+  
+        
 
     limitarMaxDescuento(row) {
         let descuentoMaxElem = row.querySelector('#descuento');
@@ -193,88 +223,35 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
 
     console.log('Producto agregado:', valorTributarioProducto);
 
-    // Agregar eventos
+    
+    newRow.querySelector('#mostrar-descuento').addEventListener('click', function() {
+        producto.alternarMaxDescuento(newRow);
+      });
+
     newRow.querySelector('#eliminarp').addEventListener('click', function () {
         newRow.remove();
         const event = new CustomEvent('productoEliminado', { detail: { codigoProducto: productoCodigo } });
         document.dispatchEvent(event);
     });
 
-    // Actualizar stock al cambiar bodega
-    newRow.querySelector('.form-select').addEventListener('change', function () {
-        producto.actualizarStock(newRow);
-    });
 
     // Validar que la cantidad no supere el stock
-    const cantidadInput = newRow.querySelector('input[type="number"]');
+    const cantidadInput = newRow.querySelector('#calcular_cantidad');
     cantidadInput.addEventListener('input', function () {
         const max = parseInt(cantidadInput.max, 10) || 0;
         if (parseInt(cantidadInput.value, 10) > max) {
             cantidadInput.value = max;
         }
-        calcularPrecioTotal(); // Recalcular el precio total
     });
 
-    const descuentoInput = newRow.querySelector('#agg_descuento');
-    descuentoInput.addEventListener('input', aplicarDescuento);
+    producto.actualizarStock(newRow);
 
-    calcularPrecioTotal();
-
-    // Función para calcular el precio total
-    function calcularPrecioTotal() {
-        const cantidad = parseFloat(cantidadInput.value) || 0;
-        const precioUnitario = parseFloat(precioVenta) || 0;
-        const precioTotal = cantidad * precioUnitario;
-        const descuento = parseFloat(descuentoInput.value) || 0;
-
-        // Calcular el precio con descuento
-        const precioFinal = descuento === 0 ? precioTotal : precioTotal - (precioTotal * (descuento / 100));
-        const precioConDescuento = descuento === 0 ? 0 : precioUnitario * (1 - (descuento / 100));
-
-        // Actualizar la instancia de valorTributario
-        valorTributarioProducto.modificarPrecioFinal(precioFinal);
-
-        newRow.querySelector('#precio_Venta').textContent = precioFinal.toFixed(2);
-        newRow.querySelector('#Precio_Descuento').textContent = precioConDescuento.toFixed(2);
-
-        actualizarValores(); // Actualizar los valores totales
-    }
-
-    // Función para aplicar el descuento
-    function aplicarDescuento() {
-        calcularPrecioTotal();
-    }
-
-    // Escuchar el evento productoEliminado para actualizar los valores totales
-    document.addEventListener('productoEliminado', function (event) {
-        const codigoProducto = event.detail.codigoProducto;
-
-        // Eliminar el producto del array de valorTributario
-        const index = productos.findIndex(producto => producto.codigoProducto === codigoProducto);
-        if (index > -1) {
-            productos.splice(index, 1);
-        }
-
-        actualizarValores(); // Actualizar los valores totales
+    // Evento para actualizar el stock al cambiar de bodega
+    newRow.querySelector('.form-select').addEventListener('change', function () {
+        producto.actualizarStock(newRow);
     });
+  
+    // Llamar a la función agregarInteractividad si es necesario
+    agregarInteractividad(newRow, productoCodigo); 
 
-    // Función para actualizar los valores de IVA, bruto y neto
-    function actualizarValores() {
-        let totalIva = 0;
-        let totalBruto = 0;
-        let totalNeto = 0;
-
-        productos.forEach(producto => {
-            const valores = producto.calcularValores();
-            totalIva += parseFloat(valores.iva);
-            totalBruto += parseFloat(valores.bruto);
-            totalNeto += parseFloat(valores.neto);
-        });
-
-        console.log('Total IVA:', totalIva, 'Total Bruto:', totalBruto, 'Total Neto:', totalNeto);
-
-        document.querySelector('#iva small').textContent = `$${totalIva.toFixed(0)}`;
-        document.querySelector('#total_bruto small').textContent = `$${totalBruto.toFixed(0)}`;
-        document.querySelector('#total_neto small').textContent = `$${totalNeto.toFixed(0)}`;
-    }
 }
