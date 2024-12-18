@@ -67,15 +67,29 @@
 
     <div class="row" style="background: #f0f2f5;">
       <div class="col-sm-5">
-        <p>Vendedor:&nbsp;<strong></strong>&nbsp;</p>
+        <p>Vendedor:&nbsp;
+          {% if request.user.is_authenticated %}
+            <strong id="vendedor_data" data-codeVen="{{ codigo_vendedor }}">
+              {{ vendedor_nombre }}
+            </strong>
+          {% else %}
+            <strong>No asignado</strong>
+          {% endif %}
+        </p>
       </div>
       <div class="col">
-        <p>Showroom:&nbsp;<strong></strong></p>
+        <p>Showroom:&nbsp;
+          <strong id="sucursal">{{ showroom }}</strong>
+        </p>
       </div>
       <div class="col">
-        <p>Estado:&nbsp;<strong></strong></p>
+        <p>Estado:&nbsp;
+          <strong id="estado" data-estado="bost_Open">Abierta</strong>
+        </p>
       </div>
     </div>
+    
+    
     
     <form>
       <div class="row" style="background: #f0f2f5;">
