@@ -170,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 if (docEntry) {
                     showLoadingOverlay();
-                    window.location.href = `/ordenesVentas/?docentry=${docEntry}`;
+                    window.location.href = `/ventas/ordenesVentas/?docentry=${docEntry}`;
                 } else {
                     hideLoadingOverlay();
                     alert("No se pudo obtener el DocEntry de la orden.");

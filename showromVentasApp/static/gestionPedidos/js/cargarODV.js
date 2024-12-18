@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Manejo de docEntry
     const docEntry = getQueryParam('docentry');
     if (docEntry) {
-      const vendedorDataElement = document.querySelector("#vendedor_data");
+      const vendedorDataElement = document.getElementById("vendedor_data");
       const showroomElement = document.getElementById("sucursal");
       const estadoElement = document.getElementById('estado');
   
@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
         estadoElement.innerText = "Cargando...";
       }
   
-      fetch(`/ventas/detalles_cotizacion/?docentry=${docEntry}`)
+      fetch(`/ventas/detalles_ODV/?docentry=${docEntry}`)
         .then(response => {
           if (!response.ok) throw new Error('Error al obtener la información de la cotización');
           return response.json();
@@ -30,15 +30,24 @@ document.addEventListener("DOMContentLoaded", function () {
             // Extracción de datos principales
             const salesEmployeeName = data.Cliente.SalesPersons.SalesEmployeeName;
             const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
-            const numCotizacion = data.Cliente.Quotations.DocNum;
-            const docDate = data.Cliente.Quotations.DocDate;
-            const canceled = data.Cliente.Quotations.Cancelled;
-            let cardCode = data.Cliente.Quotations.CardCode;
-            const DocumentStatus = data.Cliente.Quotations.DocumentStatus;
-            const docEntry = data.Cliente.Quotations.DocEntry;
+            const numCotizacion = data.Cliente.Orders.DocNum;
+            const docDate = data.Cliente.Orders.DocDate;
+            const canceled = data.Cliente.Orders.Cancelled;
+            let cardCode = data.Cliente.Orders.CardCode;
+            const DocumentStatus = data.Cliente.Orders.DocumentStatus;
+            const docEntry = data.Cliente.Orders.DocEntry;
+
+           //console log de todo
 
             console.log("docEntry: ", docEntry);
             console.log("salesEmployeeName: ", salesEmployeeName);
+            console.log("sucursal: ", sucursal);
+            console.log("numCotizacion: ", numCotizacion);
+            console.log("docDate: ", docDate);
+            console.log("canceled: ", canceled);
+            console.log("cardCode: ", cardCode);
+            console.log("DocumentStatus: ", DocumentStatus);
+            console.log("docEntry: ", docEntry);
 
   
             if (cardCode.endsWith("C")) {
@@ -62,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
               docEntryElement.setAttribute("data-docEntry", docEntry);
             }
   
-            const numeroCotizacionElement = document.getElementById("numero_cotizacion");            
+            const numeroCotizacionElement = document.getElementById("numero_orden");            
             if (numeroCotizacionElement) {
               numeroCotizacionElement.textContent = `${numCotizacion}`;
             }
