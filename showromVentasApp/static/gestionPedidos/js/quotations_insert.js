@@ -47,9 +47,11 @@ function submitForm() {
         const warehouseCode = bodegaSelect ? bodegaSelect.value : null;
 
         const costingCode = warehouseCode; //capturar bodega
-        const cogsCostingCode = warehouseCode; //capturar bodega
+        const cogsCostingCode = warehouseCode; 
         const costingCode2 = "AV"; 
         const cogsCostingCode2 = "AV"; 
+
+        console.log('warehouseCode:', warehouseCode);
         
         
 
