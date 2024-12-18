@@ -8,14 +8,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     const getFilterData = () => {
-        return {
+        // Captura el valor seleccionado en el filtro tipoSN
+        const tipoSNValue = document.querySelector('[name="tipoSN"]').value.trim();
+
+        // Convierte el valor a "Persona" o "Empresa"
+        const tipoSNText = tipoSNValue === "105" ? "Persona" : tipoSNValue === "100" ? "Empresa" : "";
+
+        const filters = {
             codigo: document.querySelector('[name="codigo"]').value.trim(),
             nombre: document.querySelector('[name="nombre"]').value.trim(),
-            tipo: document.querySelector('[name="tipo"]').value.trim(),
             telefono: document.querySelector('[name="telefono"]').value.trim(),
-            email: document.querySelector('[name="email"]').value.trim()
+            email: document.querySelector('[name="email"]').value.trim(),
+            tipoSN: document.querySelector('[name="tipoSN"]').value.trim() //Captura el codigo
+            //tipoSN: tipoSNText //Captura el Nombre
         };
+        
+        console.log("Filtros capturados:", filters);
+        return filters;
     };
+    
 
     const fetchAndDisplayData = (page = 1) => {
         if (!hasMoreData && page > currentPage) return;
@@ -37,6 +48,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 skip: skip,
                 filters: filters,
             };
+
+                    // Agrega un console.log para verificar el payload antes de enviarlo
+        console.log("Payload enviado al servidor:", payload);
 
             fetch(baseURL, {
                 method: 'POST',
