@@ -301,6 +301,30 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     };
 
+    
+    // Evento para aplicar búsqueda automáticamente al cambiar el estado
+    const applyFiltersOnChange = (filterIds) => {
+        filterIds.forEach((filterId) => {
+            const filterElement = document.getElementById(filterId);
+            if (filterElement) {
+                filterElement.addEventListener("change", function () {
+                    const filters = getFilterData(); // Obtiene los filtros actuales
+                    console.log(`${filterId} cambiado, aplicando filtros:`, filters);
+                    applyFiltersAndFetchData(filters); // Ejecuta la búsqueda automáticamente
+                });
+            } else {
+                console.warn(`No se encontró el elemento con id=${filterId}.`);
+            }
+        });
+    };
+    
+    // Llama a la función con los IDs de los filtros que deseas observar
+    applyFiltersOnChange(["filtro_estado", "filtro_vendedor"]);
+    
+    
+    
+
+
     attachImmediateClearListeners(); // Activa los listeners para eliminar filtros inmediatamente
 });
 
