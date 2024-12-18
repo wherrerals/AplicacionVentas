@@ -319,13 +319,16 @@ document.addEventListener("DOMContentLoaded", function () {
             // Si es una fecha en formato YYYY-MM-DD
             console.log("Applying filter: Date");
             filters.fecha_doc = searchText;
-        } else if (["abierto", "cerrado", "cancelado"].includes(searchText.toLowerCase())) {
+        } else if (["abierto", "cerrado", "cancelado", "Abierto", "Cerrado", "Cancelado"].includes(searchText)) {
             // Si es un estado (Abierto, Cerrado, Cancelado)
             console.log("Applying filter: Document Status");
             const estadoMap = {
-                abierto: "O",
-                cerrado: "C",
-                cancelado: "Y"
+                "abierto": "O",
+                "cerrado": "C",
+                "cancelado": "Y",
+                "Abierto": "O",
+                "Cerrado": "C",
+                "Cancelado": "Y"
             };
             filters.DocumentStatus = estadoMap[searchText.toLowerCase()];
         } else {
