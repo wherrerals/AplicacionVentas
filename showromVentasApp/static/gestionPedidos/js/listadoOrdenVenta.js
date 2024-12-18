@@ -60,6 +60,64 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     };
 
+    const applyGeneralSearch = () => {
+        const searchText = document.getElementById("buscar").value.trim();
+        const filters = getFilterData(); // Obtén los filtros actuales
+
+        // Identificar el campo donde escribir el valor ingresado
+        if (!isNaN(searchText)) {
+            filters.docNum = searchText;
+            document.getElementById("buscar_num_sap").value = searchText;
+        } else if (searchText.toLowerCase() === "míos" || searchText.toLowerCase() === "todos") {
+            const vendedorMap = {
+                "míos": "12",
+                "todos": ""
+            };
+            filters.salesEmployeeName = vendedorMap[searchText.toLowerCase()];
+            document.getElementById("filtro_vendedor").value = vendedorMap[searchText.toLowerCase()];
+        } else if (/^\d{4}-\d{2}-\d{2}$/.test(searchText)) {
+            filters.fecha_doc = searchText;
+        } else if (["abierto", "cerrado", "cancelado", "Abierto", "Cerrado", "Cancelado"].includes(searchText)) {
+            const estadoMap = {
+                "abierto": "O",
+                "cerrado": "C",
+                "cancelado": "Y",
+                "Abierto": "O",
+                "Cerrado": "C",
+                "Cancelado": "Y"
+            };
+            filters.DocumentStatus = estadoMap[searchText.toLowerCase()];
+            document.getElementById("filtro_estado").value = estadoMap[searchText.toLowerCase()];
+        } else if (/^\d+(\.\d{1,2})?$/.test(searchText)) {
+            filters.docTotal = searchText;
+            document.getElementById("buscar_bruto").value = searchText;
+        } else {
+            filters.cardName = searchText;
+            document.getElementById("buscar_cliente").value = searchText;
+        }
+
+        document.getElementById("buscar").value = "";
+        
+        // Actualizar los filtros en el backend
+        applyFiltersAndFetchData(filters);
+    };
+
+
+
+    // Evento para capturar "Enter" en el campo de búsqueda
+    document.getElementById("buscar").addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            applyGeneralSearch();
+        }
+    });
+
+    // Evento para aplicar el filtro al hacer clic en la lupa
+    document.getElementById("lupa-busqueda").addEventListener("click", function () {
+        applyGeneralSearch();
+    });
+    
+
     const displayOrders = (orders) => {
         console.log("Displaying orders:", orders);
         const tbody = document.querySelector('tbody');
@@ -329,54 +387,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    const applyGeneralSearch = () => {
-        const searchText = document.getElementById("buscar").value.trim();
-        console.log("Search text entered:", searchText);
-
-        // Verifica el tipo de filtro según el texto ingresado
-        const filters = getFilterData(); // Carga los filtros existentes
-        if (!isNaN(searchText)) {
-            // Si es un número, buscar por SAP (Número de documento)
-            console.log("Applying filter: SAP Number");
-            filters.docNum = searchText;
-        } else if (/^\d{4}-\d{2}-\d{2}$/.test(searchText)) {
-            // Si es una fecha en formato YYYY-MM-DD
-            console.log("Applying filter: Date");
-            filters.fecha_doc = searchText;
-        } else if (["abierto", "cerrado", "cancelado", "Abierto", "Cerrado", "Cancelado"].includes(searchText)) {
-            // Si es un estado (Abierto, Cerrado, Cancelado)
-            console.log("Applying filter: Document Status");
-            const estadoMap = {
-                "abierto": "O",
-                "cerrado": "C",
-                "cancelado": "Y",
-                "Abierto": "O",
-                "Cerrado": "C",
-                "Cancelado": "Y"
-            };
-            filters.DocumentStatus = estadoMap[searchText.toLowerCase()];
-        } else {
-            // Si no es ninguno de los anteriores, buscar por nombre del cliente
-            console.log("Applying filter: Customer Name");
-            filters.cardName = searchText;
-        }
-
-        console.log("Filters to apply:", filters);
-        applyFiltersAndFetchData(filters); // Aplica los filtros
-    };
-
-    // Evento para capturar "Enter" en el campo de búsqueda
-    document.getElementById("buscar").addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            applyGeneralSearch();
-        }
-    });
-
-    // Evento para aplicar el filtro al hacer clic en la lupa
-    document.getElementById("lupa-busqueda").addEventListener("click", function () {
-        applyGeneralSearch();
-    });
+    
 });
 
 
