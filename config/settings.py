@@ -12,11 +12,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-fexe1oq@sx@j&x3m#tw(#x(r!g32fylgea=whky=#ge^vn5f*h'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '192.168.3.41', '192.168.3.42']
+#DEBUG = False   
+
+#En este se debe colocar la ip de la maquina en la que se esta trabajando o la ip de la maquina en la que se va a desplegar la aplicacion
+ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '192.168.3.41', '192.168.3.42', '127.0.0.1']
 #ALLOWED_HOSTS = []
-#ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.3.41']
 #python manage.py runserver 192.168.3.41:8000
 
 
@@ -28,10 +31,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'AplicacionVentas',
+    'config',
     'datosLsApp',
     'logicaVentasApp',
-    'showromVentasApp'    
+    'showromVentasApp',
+    'taskApp',
+
 ]
 
 MIDDLEWARE = [
@@ -45,12 +50,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'AplicacionVentas.urls'
+ROOT_URLCONF = 'config.urls'
 
 #/Users/Cuervo/Documents/AplicacionVentas/showromVentasApp/templates/showromVentasApp
 #/Users/nicor/Universidad/Practica/AplicacionVentas/showromVentasApp/templates/showromVentasApp
 #/Users/William Herrera/Documents/Proyectoledstudio/AplicacionVentas/showromVentasApp/templates/showromVentasApp
-
 
 TEMPLATES = [
     {
@@ -68,13 +72,14 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'showromVentasApp.context_processors.grupos_usuario',
+                'showromVentasApp.context_processors.vendedor_codigo'
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'AplicacionVentas.wsgi.application'
-
+WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -85,16 +90,27 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
         'USER':'root',
-        #'PASSWORD':'Ea7hava5}', #home
         'PASSWORD':'Ea7hava5*', #led_studio
+        #'PASSWORD':'Ea7hava5}', #home
         #'PASSWORD':'qwerty', #nico
-        'HOST':'localhost',
+        #'HOST':'localhost',
         'PORT':'3306',
     }
 }
 
-# settings.py
+# Configuración de Celery con RabbitMQ como broker
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost//'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'rpc://'
+# Configuración de rutas de tareas a colas específicas
+CELERY_TASK_ROUTES = {
+    'taskApp.tasks.sync_products': {'queue': 'sync_queue'},  # Asigna la tarea a una cola específica
+}
+# Otras configuraciones
+CELERY_TASK_CREATE_MISSING_QUEUES = True
 
+#Configuracion para docker
 """ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -142,7 +158,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -154,23 +169,17 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-
 LOGIN_REDIRECT_URL = '/ventas'
 #LOGIN_REDIRECT_URL = '/Users/Cuervo/Documents/AplicacionVentas/showromVentasApp/templates/login'
-
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

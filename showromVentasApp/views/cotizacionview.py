@@ -6,12 +6,17 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+from django.core.exceptions import ObjectDoesNotExist
 from adapters.sl_client import APIClient
+from datosLsApp.models.regiondb import RegionDB
+from datosLsApp.models.usuariodb import UsuarioDB
 from logicaVentasApp.services.cotizacion import Cotizacion
 import json
 import requests
 from requests.exceptions import RequestException
 import urllib3
+
+from logicaVentasApp.services.socionegocio import SocioNegocio
 
 # Desactivar las advertencias de SSL inseguro (solo para desarrollo)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -56,14 +61,16 @@ class CotizacionView(View):
     
     def get_route_map(self):
         return {
-            '/ventas/listado_Cotizaciones': self.listarCotizaciones,
+            '/ventas/listado_Cotizaciones': self.listarCotizaciones, # Listado de cotizaciones, no es necesaria se deja para ver si es usada en otra parte del codigo. 
             '/ventas/obtener_detalles_cotizacion': self.obtenerDetallesCotizacion,
+            '/ventas/detalles_cotizacion': self.detallesCotizacion,
         }
 
     def post_route_map(self):
+        
         return {
             '/ventas/listado_Cotizaciones_filtrado': self.filtrarCotizaciones,
-            '/ventas/crear_cotizacion': self.crearCotizacion,
+            '/ventas/crear_cotizacion': self.crearOActualizarCotizacion,
             '/ventas/cambiar_estado_cotizacion': self.actualizarEstadosCotizacion,
         }
 
@@ -149,46 +156,41 @@ class CotizacionView(View):
         render (request, 'cotizacion.html', {'DocumentLines': lines_data}) 
         """
     
-    def obtenerDetallesCotizacion(self, request, *args, **kwargs):
-        docEntry = kwargs.get('docEntry')
-        print("DocEntry:", docEntry)
-        
-        if not docEntry:
-            return JsonResponse({'error': 'DocEntry no proporcionado'}, status=400) 
-        
-        # Llamar al servicio de cotización
-        lines_data, error = Cotizacion.buscarDocumentosCotizacion(docEntry)
-
-        print("*" * 10)
-        print("Lines data:", lines_data)  # Verificar los datos de las líneas de documento
-        
-        # Verificar si se encontró un error
-        if error:
-            return render(request, 'error.html', {'error': error}, status=404 if 'No se encontró' in error else 500)
-        
-        print("*" * 10)
-        print(lines_data)
-        
-        # Renderizar la página HTML con los datos
-        #return JsonResponse({'DocumentLines': lines_data}, status=200)
-        return render(request,'cotizacion.html', {'DocumentLines': lines_data})
 
     @csrf_exempt
-    def crearCotizacion(self, request):
-        print("probando")
-        if request.method == 'POST':
-            try:
-                other = None
-                data = json.loads(request.body)
-                cotizacion = Cotizacion()
+    def crearOActualizarCotizacion(self, request):
+        try:
+            # Cargar datos del cuerpo de la solicitud
+            data = json.loads(request.body)
+
+            # Obtener `DocEntry` si está presente
+            docEntry = data.get('DocEntry')
+            docnum = data.get('DocNum')
+            print("DocEntry recibido:", docEntry)
+
+            cotizacion = Cotizacion()  # Instancia del modelo o clase de negocio
+
+            if docEntry:
+                print("Actualizando cotización con DocEntry:", docEntry)
+                # Si `DocEntry` está presente, se realiza una actualización
+                print("Actualizando cotización con DocEntry:", docEntry)
+                actualizacion = cotizacion.actualizarDocumento(docnum, docEntry, data)
+                return JsonResponse(actualizacion, status=200)
+            else:
+                # Si no está presente, se crea una nueva cotización
+                print("Creando nueva cotización")
                 creacion = cotizacion.crearDocumento(data)
-                print("Creacion:", creacion)
                 return JsonResponse(creacion, status=201)
-            except json.JSONDecodeError as e:
-                return JsonResponse({'error': 'JSON inválido'}, status=400)
-    
-    
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'JSON inválido'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': f'Error inesperado: {str(e)}'}, status=500)
+
+
     def actualizarEstadosCotizacion(self, request):
+        
+
         if request.method == 'POST':
             try:
                 print("Actualizando estado de cotización")
@@ -205,3 +207,71 @@ class CotizacionView(View):
             except json.JSONDecodeError as e:
                 return JsonResponse({'error': 'JSON inválido'}, status=400)
     
+    def detallesCotizacion(self, request):
+        # Obtener el parámetro 'docentry' de la solicitud
+        docentry = request.GET.get('docentry')
+        client = APIClient()
+
+        # Llamar al método para obtener los detalles del cliente
+        documentClient = client.detalleCotizacionCliente(docentry)
+        documentLine = client.detalleCotizacionLineas(docentry)
+
+        # Extraer los datos de la clave 'value', asegurándose de manejar la estructura correctamente
+        quotations_data = documentClient.get('value', [{}])[0].get('Quotations', {})
+        cardCode = quotations_data.get('CardCode')
+        rut = quotations_data.get('FederalTaxID')
+
+        sn = SocioNegocio(request)
+        
+        # Preparar la estructura de datos para enviar como respuesta
+        data = {
+            "Client": documentClient,
+            "DocumentLine": documentLine
+        }
+
+        # Verificar si el socio de negocio ya existe en la base de datos
+        if sn.verificarSocioDB(cardCode):
+            cotiza = Cotizacion()
+            lines_data = cotiza.formatearDatos(data)
+
+            print("Lines data:", lines_data)  # Verificar los datos de las líneas de documento
+
+            return JsonResponse(lines_data, safe=False)
+        else:
+            # Crear el cliente en caso de que no exista y responder
+            sn.crearYresponderCliente(cardCode, rut)
+            cotiza = Cotizacion()
+            lines_data = cotiza.formatearDatos(data)
+            return JsonResponse(lines_data, safe=False)
+
+
+
+
+    
+    def obtenerDetallesCotizacion(self, request, *args, **kwargs):
+        pass
+"""         docEntry = kwargs.get('docEntry')
+        print("DocEntry:", docEntry)
+        
+        if not docEntry:
+            return JsonResponse({'error': 'DocEntry no proporcionado'}, status=400) 
+        
+        # Llamar al servicio de cotización
+        lines_data, error = Cotizacion.buscarDocumentosCotizacion(docEntry)
+
+
+        print("*" * 10)
+
+        print("*" * 10)
+        print("Lines data:", lines_data)  # Verificar los datos de las líneas de documento
+        
+        # Verificar si se encontró un error
+        if error:
+            return render(request, 'error.html', {'error': error}, status=404 if 'No se encontró' in error else 500)
+        
+        print("*" * 10)
+        print(lines_data)
+        
+        # Renderizar la página HTML con los datos
+        #return JsonResponse({'DocumentLines': lines_data}, status=200)
+        return render(request,'cotizacion.html', {'DocumentLines': lines_data}) """

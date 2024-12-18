@@ -8,12 +8,12 @@ class ContactoDB(models.Model):
         verbose_name = 'Contacto'
         verbose_name_plural = 'Contacto'
 
-    codigoInternoSap = models.IntegerField()
+    codigoInternoSap = models.IntegerField(default=0)
     nombreCompleto = models.CharField(max_length=255)
     nombre = models.CharField(max_length=255,null = False)
     apellido = models.CharField(max_length=255,null = False)
-    telefono = models.CharField(max_length=10)
-    celular = models.CharField(max_length=10,null = False)
+    telefono = models.CharField(max_length=20)
+    celular = models.CharField(max_length=20,null = False)
     email = models.EmailField(null = False)
     SocioNegocio = models.ForeignKey(SocioNegocioDB, on_delete=models.CASCADE, default=1, null=True)
 

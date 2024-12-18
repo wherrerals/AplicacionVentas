@@ -8,7 +8,7 @@ from datosLsApp.models.direcciondb import DireccionDB
 from datosLsApp.models.documentodb import DocumentoDB
 from datosLsApp.models.gruposndb import GrupoSNDB
 from datosLsApp.models.inventariodb import InventarioDB
-from datosLsApp.models.itemdb import ItemDB
+from datosLsApp.models.lineadb import LineaDB
 from datosLsApp.models.productodb import ProductoDB
 from datosLsApp.models.regiondb import RegionDB
 from datosLsApp.models.socionegociodb import SocioNegocioDB
@@ -22,3 +22,4 @@ from datosLsApp.models.tipotelefonodb import TipoTelefonoDB
 from datosLsApp.models.tipoventadb import TipoVentaDB
 from datosLsApp.models.usuariodb import UsuarioDB
 from datosLsApp.models.vendedordb import VendedorDB
+from datosLsApp.models.stockbodegasdb import StockBodegasDB

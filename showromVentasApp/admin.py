@@ -2,10 +2,13 @@ from django.contrib import admin
 from datosLsApp.models import (
     CondicionPagoDB, DocumentoDB, TipoDocTributarioDB, SucursalDB, 
     TipoVentaDB, VendedorDB, ProductoDB, BodegaDB, InventarioDB, 
-    ItemDB, SocioNegocioDB, UsuarioDB, ContactoDB, DireccionDB, ComunaDB,
+    LineaDB, SocioNegocioDB, UsuarioDB, ContactoDB, DireccionDB, ComunaDB,
     GrupoSNDB, TipoSNDB, TipoClienteDB
 )
+
 from datosLsApp.models.regiondb import RegionDB
+from datosLsApp.models.stockbodegasdb import StockBodegasDB
+
 
 # Modificaciones en administrador
 admin.site.site_header = 'Led Studio'
@@ -29,7 +32,7 @@ class CondicionPagoper(admin.ModelAdmin):
     list_display = ('codigo', 'nombre')
 
 class VendedorDBper(admin.ModelAdmin):
-    list_display = ('codigo', 'nombre', 'sucursal')
+    list_display = ('codigo', 'nombre')
 
 class DocumentoDBper(admin.ModelAdmin):
     list_display = ('docEntry', 'folio', 'totalAntesDelDescuento', 'totalDocumento', 'vendedor')
@@ -41,7 +44,7 @@ class Productosper(admin.ModelAdmin):
     list_display = ('codigo', 'nombre', 'stockTotal', 'precioLista', 'precioVenta')
     search_fields = ['codigo', 'nombre']
 
-class ItemDBper(admin.ModelAdmin):
+class LineaDBper(admin.ModelAdmin):
     list_display = ('producto', 'cantidad', 'descuento')
 
 class SocioNegocioDBper(admin.ModelAdmin):
@@ -50,7 +53,7 @@ class SocioNegocioDBper(admin.ModelAdmin):
 
 
 class UsuarioDBper(admin.ModelAdmin):
-    list_display = ('nombre', 'email', 'telefono', 'sucursal', 'usuarios')
+    list_display = ('nombre', 'email', 'telefono', 'usuarios', 'sucursal', 'vendedor')
 
 class ContactoDBper(admin.ModelAdmin):
     list_display = ('nombreCompleto',)
@@ -67,6 +70,15 @@ class TipoSNDBper(admin.ModelAdmin):
 class TipoClienteDBper(admin.ModelAdmin):
     list_display = ('codigo', 'nombre')
 
+class RegionDBper(admin.ModelAdmin):
+    list_display = ('numero', 'nombre')
+
+class ComunaDBper(admin.ModelAdmin):
+    list_display = ('codigo', 'nombre', 'region')
+
+class stockBodegasDBper(admin.ModelAdmin):
+    list_display = ('idProducto', 'idBodega', 'stock', 'stockDisponibleReal')
+
 # Register your models here.
 admin.site.register(TipoDocTributarioDB, TipoDocTributarioDBper)
 admin.site.register(SucursalDB, SucursalDBper)
@@ -77,7 +89,7 @@ admin.site.register(CondicionPagoDB, CondicionPagoper)
 admin.site.register(ProductoDB, Productosper)
 admin.site.register(BodegaDB, BodegaDBper)
 admin.site.register(InventarioDB, InventarioDBper)
-admin.site.register(ItemDB, ItemDBper)
+admin.site.register(LineaDB, LineaDBper)
 admin.site.register(SocioNegocioDB, SocioNegocioDBper)
 admin.site.register(UsuarioDB, UsuarioDBper)
 admin.site.register(ContactoDB, ContactoDBper)
@@ -86,5 +98,6 @@ admin.site.register(GrupoSNDB, GrupoSnDBper)
 admin.site.register(TipoSNDB, TipoSNDBper)
 admin.site.register(TipoClienteDB, TipoClienteDBper)
 #admin.site.register(DireccionDB, DireccionDBper)
-admin.site.register(ComunaDB)
-admin.site.register(RegionDB)
+admin.site.register(ComunaDB, ComunaDBper)
+admin.site.register(RegionDB, RegionDBper)
+admin.site.register(StockBodegasDB, stockBodegasDBper)

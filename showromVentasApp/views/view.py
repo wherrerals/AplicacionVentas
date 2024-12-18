@@ -1,5 +1,5 @@
 #Django modulos
-from django.shortcuts import render, redirect  
+from django.shortcuts import get_object_or_404, render, redirect  
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib.auth.hashers import make_password
@@ -11,11 +11,20 @@ from django.http import JsonResponse, HttpResponse
 from datosLsApp.models.usuariodb import User 
 from datosLsApp.models import (ProductoDB, SocioNegocioDB, UsuarioDB, RegionDB, GrupoSNDB, TipoSNDB, TipoClienteDB, DireccionDB, ComunaDB, ContactoDB)
 from adapters.sl_client import APIClient
-
-
+from datosLsApp.repositories.comunarepository import ComunaRepository
+from datosLsApp.repositories.regionrepository import RegionRepository
+from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
+from logicaVentasApp.services.cotizacion import Cotizacion
+from logicaVentasApp.services.producto import Producto
+from logicaVentasApp.services.socionegocio import SocioNegocio
 #librerias Python usadas
 import requests
 import json
+
+from logicaVentasApp.services.comuna import Comuna
+from datosLsApp.models.stockbodegasdb import StockBodegasDB
+from taskApp.tasks import sync_products
+from celery.exceptions import TimeoutError
 
 #Inicio vistas Renderizadoras
 
@@ -28,19 +37,70 @@ Decoradores usados:
 @login_required
 def home(request):
     """
-    Rendereriza la pagina principal y muestra el nombre del usuario que ha iniciado sesión
+    Rendereriza la pagina principal y muestra el nombre del usuario y sus grupos que ha iniciado sesión
 
     Args: 
         request (HttpRequest): La petición HTTP recibida.
 
     Returns:
-        HttpResponse: Si el ususario esta autenticado renderiza el template 'home.html' con el nombre de usuario.
-        HttpResponse: Si el usuario no esta autenticado redirige a el template del login.
+        HttpResponse: Si el usuario está autenticado, renderiza el template 'home.html' con el nombre de usuario y los grupos.
+        HttpResponse: Si el usuario no está autenticado, redirige al template del login.
     """
-
     if request.user.is_authenticated:
-        username = request.user.username 
-        return render(request, 'home.html', {'username': username}) # Accede al nombre de usuario y permite su uso en el template
+        username = request.user.username
+
+        try:
+            usuario = UsuarioDB.objects.get(usuarios=request.user)
+            nombreUser = usuario.nombre
+
+
+        except UsuarioDB.DoesNotExist:
+            return JsonResponse({'error': 'No se encontró el usuario relacionado con el usuario autenticado'}, status=404)
+        
+
+        
+        context = {
+            'username': username,
+            'nombreuser': nombreUser,
+        }
+
+        return render(request, 'home.html', context)
+
+@login_required  
+def odv(request):
+    # Verifica si el usuario está autenticado
+    if request.user.is_authenticated:
+        # Obtiene el nombre de usuario del modelo User de Django
+        username = request.user.username
+
+        # Intenta obtener el objeto UsuarioDB relacionado con el usuario autenticado
+        try:
+            usuario = UsuarioDB.objects.get(usuarios=request.user)
+            sucurs = usuario.sucursal  # Accede a la sucursal a través del modelo UsuarioDB
+            nombreUser = usuario.nombre  # Accede al nombre del usuario a través del modelo UsuarioDB
+            codVen = usuario.vendedor.codigo  # Accede al código del vendedor a través del modelo UsuarioDB
+
+        except UsuarioDB.DoesNotExist:
+            # Maneja el caso en que no se encuentre el usuario relacionado
+            JsonResponse({'error': 'No se encontró el usuario relacionado con el usuario autenticado'}, status=404)
+
+        # Obtiene el parámetro DocNum de la URL, o None si no está presente
+        doc_num = request.GET.get('docNum', None)
+
+        # Obtiene todas las regiones de la base de datos
+        regiones = RegionDB.objects.all()
+
+        # Contexto para renderizar el template
+        context = {
+            'docnum': doc_num,
+            'username': username,
+            'regiones': regiones,
+            'sucursal': sucurs,
+            'nombreuser': nombreUser,
+            'codigoVendedor': codVen
+        }
+    
+    return render(request, "ordenventa.html", context)
 
 
 @login_required
@@ -72,6 +132,29 @@ def list_quotations(request):
     
     return render(request, "lista_cotizaciones.html")
 
+def enlazarComunas(request):
+    """
+    Obtiene las comunas de una región y las devuelve en formato JSON.
+
+    Args:
+        request (HttpRequest): La petición HTTP recibida.
+
+    Returns:
+        JsonResponse: Si no se proporciona un ID de región, devuelve un error 400.
+        JsonResponse: Las comunas de la región solicitada en formato JSON.
+    """
+
+    print("Enlazando comunas")
+    if request.method == 'GET':
+        id_Region = request.GET.get('idRegion')
+        
+        if not id_Region:
+            return JsonResponse({'error': 'No se proporcionó un ID de región'}, status=400)
+        
+        comuna_service = Comuna()
+
+    return comuna_service.obtenerComunas(id_Region)
+
 @login_required
 def quotations(request):
     """
@@ -98,9 +181,11 @@ def quotations(request):
             usuario = UsuarioDB.objects.get(usuarios=request.user)
             sucurs = usuario.sucursal  # Accede a la sucursal a través del modelo UsuarioDB
             nombreUser = usuario.nombre  # Accede al nombre del usuario a través del modelo UsuarioDB
-        
-        except UsuarioDB.DoesNotExist: 
-            pass
+            codVen = usuario.vendedor.codigo  # Accede al código del vendedor a través del modelo UsuarioDB
+
+        except UsuarioDB.DoesNotExist:
+            # Maneja el caso en que no se encuentre el usuario relacionado
+            JsonResponse({'error': 'No se encontró el usuario relacionado con el usuario autenticado'}, status=404)
 
         # Obtiene el parámetro DocNum de la URL, o None si no está presente
         doc_num = request.GET.get('docNum', None)
@@ -114,12 +199,12 @@ def quotations(request):
             'username': username,
             'regiones': regiones,
             'sucursal': sucurs,
-            'nombreuser': nombreUser
+            'nombreuser': nombreUser,
+            'codigoVendedor': codVen
         }
 
         # Renderiza el template con el contexto
         return render(request, 'cotizacion.html', context)
-
 
 @login_required
 def lista_ovs(request):
@@ -275,6 +360,7 @@ def registrarCuenta(request):
     return render(request,"micuenta.html",{'email': email, "nombre": nombre, "telefono":telefono,"mensaje_error_contrasena": mensaje})
 
 #agregaado vista para modificar los datos
+
 @login_required
 def mis_datos(request):
 
@@ -324,8 +410,40 @@ def mis_datos(request):
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 
 
+def actualizarAgregarDirecion(request, socio):
+    if request.method == "POST":
+        try:
+            print("Estos son los datos:", request.POST)
+            # Delegamos la lógica de procesamiento al servicio
+            result = SocioNegocio.procesarDirecciones(request.POST, socio)
+            return JsonResponse(result['data'], status=result['status'])
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+    return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
+
+
+def actualizarAgregarContacto(request, socio):
+    if request.method == "POST":
+        try:
+            print("Estos son los datos:", request.POST)
+            # Delegamos la lógica de procesamiento al servicio
+            result = SocioNegocio.procesarContactos(request.POST, socio)
+            
+
+            return JsonResponse(result['data'], status=result['status'])
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=500)
+
+    return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
+
+
+
 @login_required
 def agregarDireccion(request, socio):
+    print("estamos aqui")
     if request.method == "POST":
         nombredirecciones = request.POST.getlist('nombre_direccion[]')
         ciudades = request.POST.getlist('ciudad[]')
@@ -334,11 +452,10 @@ def agregarDireccion(request, socio):
         paises = request.POST.getlist('pais[]')
         regiones = request.POST.getlist('region[]')
         comunas = request.POST.getlist('comuna[]')
-        print(f"nombre direccion: " , nombredirecciones)
-        print(f"nombres de cuidades: " , ciudades)
-        print(f"tipo de direcciones: " , tipos)
 
-
+        print(f"nombre direccion: ", nombredirecciones)
+        print(f"nombres de ciudades: ", ciudades)
+        print(f"tipo de direcciones: ", tipos)
 
         for i in range(len(nombredirecciones)):
             nombredireccion = nombredirecciones[i]
@@ -349,11 +466,11 @@ def agregarDireccion(request, socio):
             region = regiones[i]
             comuna = comunas[i]
 
-            # Verificar si existe un campo requerido
-            if nombredireccion:
+            if nombredireccion:  # Verificar si el nombre de la dirección está presente
                 fregion = RegionDB.objects.get(numero=region)
                 fcomuna = ComunaDB.objects.get(codigo=comuna)
 
+                # Crear la dirección principal
                 DireccionDB.objects.create(
                     nombreDireccion=nombredireccion,
                     ciudad=ciudad,
@@ -365,44 +482,86 @@ def agregarDireccion(request, socio):
                     pais=pais
                 )
                 print(f"Dirección {i+1} creada con éxito")
+
+                # Verificar y duplicar si es necesario
+                tipo_faltante = '12' if tipo == '13' else '13'
+                DireccionDB.objects.create(
+                    nombreDireccion=nombredireccion,
+                    ciudad=ciudad,
+                    calleNumero=callenumero,
+                    comuna=fcomuna,
+                    region=fregion,
+                    tipoDireccion=tipo_faltante,
+                    SocioNegocio=socio,
+                    pais=pais
+                )
+                print(f"Dirección duplicada con tipo {tipo_faltante} creada con éxito")
             else:
                 print(f"No se ha creado la dirección {i+1} porque algunos campos están vacíos.")
-    return redirect("/")
+        
+        return redirect("/")
+
 
 
 
 
 @login_required
-def agregarContacto(request, cliente):
+def agregarContacto(request, cliente, **kwargs):
+    print(f"RUT del cliente: {cliente}")
+    print("Data recibida: ", request.POST)
+
+    clienteNoIncluido = None
+    if cliente is None:
+        clienteNoIncluido = "No se ha incluido el cliente en la solicitud."
+
     if request.method == "POST":
-        nombres = request.POST.getlist('nombre[]')
-        apellidos = request.POST.getlist('apellido[]')
-        telefonos = request.POST.getlist('telefono[]')
-        celulares = request.POST.getlist('celular[]')
-        emails = request.POST.getlist('email[]')
+        # Determinar si estamos trabajando con un contacto único o múltiples
+        if 'nombre' in kwargs:
+            # Caso: contacto único enviado desde kwargs
+            nombres = [kwargs.get('nombre')]
+            apellidos = [kwargs.get('apellido')]
+            telefonos = [kwargs.get('telefono')]
+            celulares = [kwargs.get('celular')]
+            emails = [kwargs.get('email')]
+        elif 'nombre' in request.POST:
+            # Caso: contacto único enviado desde POST
+            nombres = [request.POST.get('nombre')]
+            apellidos = [request.POST.get('apellido')]
+            telefonos = [request.POST.get('telefono')]
+            celulares = [request.POST.get('celular')]
+            emails = [request.POST.get('email')]
+        elif 'nombre[]' in request.POST:
+            # Caso: múltiples contactos enviados desde POST
+            nombres = request.POST.getlist('nombre[]')
+            apellidos = request.POST.getlist('apellido[]')
+            telefonos = request.POST.getlist('telefono[]')
+            celulares = request.POST.getlist('celular[]')
+            emails = request.POST.getlist('email[]')
+        else:
+            nombres = []
+            apellidos = []
+            telefonos = []
+            celulares = []
+            emails = []
 
-        clienteNoIncluido = None
+        print(f"Contactos recibidos: {nombres}")
+        print(f"Apellidos recibidos: {apellidos}")
 
-        if cliente is None:
-            clienteNoIncluido = "No se ha incluido el cliente en la solicitud."
-
-
-        print(f"contactos recibidos: " ,nombres)
-        print(f"contactos recibidos: " ,apellidos)
-
+        # Iterar sobre los contactos recibidos
         for i in range(len(nombres)):
             nombre = nombres[i]
-            apellido = apellidos[i]
-            telefono = telefonos[i]
-            celular = celulares[i]
-            email = emails[i]
+            apellido = apellidos[i] if i < len(apellidos) else None
+            telefono = telefonos[i] if i < len(telefonos) else None
+            celular = celulares[i] if i < len(celulares) else None
+            email = emails[i] if i < len(emails) else None
 
             # Verificar si los campos requeridos están completos
             if nombre and apellido:
                 nombreCompleto = f"{nombre} {apellido}"
 
+                # Crear el contacto en la base de datos
                 ContactoDB.objects.create(
-                    codigoInternoSap=1,  # Aquí deberías manejar la lógica del código interno si es variable
+                    codigoInternoSap=1,  # Aquí puedes manejar la lógica del código interno si es variable
                     nombreCompleto=nombreCompleto,
                     nombre=nombre,
                     apellido=apellido,
@@ -411,10 +570,12 @@ def agregarContacto(request, cliente):
                     email=email,
                     SocioNegocio=cliente
                 )
-                print(f"Contacto {i+1} creado con éxito")
+                print(f"Contacto {i+1} creado con éxito: {nombreCompleto}")
             else:
                 print(f"No se ha creado el contacto {i+1} porque algunos campos están vacíos.")
+
     return render(request, "cotizacion.html", {'clienteNoIncluido': clienteNoIncluido})
+
 
 """
 Este metodo sirve para poder guardar los contactos de un cliente en la base de datos a traves de una peticion AJAX
@@ -577,3 +738,113 @@ def quotate_items(request, docEntry):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     
+def probandoSL(request):
+    client = APIClient()
+    docentry = 143563
+
+    documentClient = client.detalleCotizacionCliente(docentry)
+    documentLine = client.detalleCotizacionLineas(docentry)
+
+
+    data = {
+        "Client": documentClient,
+        "DocumentLine": documentLine
+    }
+
+    cotiza = Cotizacion()
+
+    lines_data = cotiza.formatearDatos(data)
+
+
+    return JsonResponse(lines_data, safe=False)
+
+
+def obtenerStockBodegas(request):
+    producto_id = request.GET.get('idProducto')  # Obtener el ID del producto
+
+    if not producto_id:
+        return JsonResponse({'error': 'Falta el parámetro: idProducto es obligatorio'}, status=400)
+
+    try:
+        repo = StockBodegasRepository()
+        stock_por_bodegas = repo.consultarStockPorProducto(producto_id)
+
+        # Crear la respuesta con la información de todas las bodegas asociadas
+        data = [
+            {
+                'bodega': item.idBodega.codigo,
+                'stock': item.stock
+            }
+            for item in stock_por_bodegas
+        ]
+
+        return JsonResponse(data, safe=False, status=200)
+
+    except StockBodegasDB.DoesNotExist:
+        return JsonResponse({'error': 'No se encontró stock para este producto'}, status=404)
+
+def obtenerRegionesId(request):
+    numeroRegion = request.GET.get('numero')  # Obtener el ID de la región
+
+    if not numeroRegion:
+        return JsonResponse({'error': 'Falta el parámetro: idRegion es obligatorio'}, status=400)
+
+    try:
+        region = RegionRepository()
+
+        region = region.obtenerRegionPorId(numeroRegion)
+
+        print(f"Región encontrada: {region}")
+
+        data = {
+            'numero': region.numero,
+            'nombre': region.nombre        
+            }
+
+        return JsonResponse(data, status=200)
+
+    except RegionDB.DoesNotExist:
+        return JsonResponse({'error': 'No se encontró la región solicitada'}, status=404)
+
+def  obtenerComunasId(request):
+    codigo_comuna = request.GET.get('codigo')  # Obtener el ID de la comuna
+
+    if not codigo_comuna:
+        return JsonResponse({'error': 'Falta el parámetro: idComuna es obligatorio'}, status=400)
+
+    try:
+        comuna = ComunaRepository()
+
+        comuna = comuna.obtenerComunaPorId(codigo_comuna)
+
+        data = {
+            'codigo': comuna.codigo,
+            'nombre': comuna.nombre,
+            'region': comuna.region.nombre
+        }
+
+        return JsonResponse(data, status=200)
+
+    except ComunaDB.DoesNotExist:
+        return JsonResponse({'error': 'No se encontró la comuna solicitada'}, status=404)
+
+def trigger_sync(request):
+    try:
+        sync_products.delay()  # Dispara la tarea encolada
+        return JsonResponse({'status': 'Sincronización en cola'})
+    except TimeoutError:
+        return JsonResponse({'status': 'Error: RabbitMQ no está disponible'}, status=500)
+    
+def pruebas(request):
+    
+    pro = Producto()
+    obtenerReceta = pro.obtenerReceta("B25400084K2")
+
+    return JsonResponse(obtenerReceta, safe=False)
+
+def pryebas(request):
+    sl = APIClient()
+
+    odv = sl.getODV()
+
+    return JsonResponse(odv, safe=False)

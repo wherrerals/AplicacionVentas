@@ -2,11 +2,13 @@ import json
 from django.http import JsonResponse
 from requests import request
 from adapters.sl_client import APIClient
+from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from logicaVentasApp.services.documento import Documento
 import logging
 logger = logging.getLogger(__name__)
 
 class Cotizacion(Documento):
+
     """
     Clase para manejar las cotizaciones en la aplicación.
 
@@ -29,13 +31,16 @@ class Cotizacion(Documento):
         eliminarDocumento: Elimina una cotización.
         actualizarEstadoDocumento: Actualiza el estado de una cotización.
     """
+    
     def __init__(self, request=None):
+        
         """
         Inicializa una nueva instancia de la clase Cotizacion.
 
         Args:
             request (dict): Datos de la cotización.
         """
+
         super().__init__(request)
         self.client = APIClient()
         self.cliente = None
@@ -68,21 +73,7 @@ class Cotizacion(Documento):
         if not self.cliente or not self.items:
             raise ValueError("Faltan datos obligatorios para la cotización.")
     
-    def crearOActualizarCotizacion(self):
-        """
-        Crea o actualiza una cotización.
-
-        Returns:
-            dict: Respuesta de la API.
-
-        Raises:
-            ValueError: Si faltan datos obligatorios.
-        """
-        self.validarDatosObligatorios()
-        if self.docEntry:
-            return self.actualizarDocumento()
-        else:
-            return self.crearDocumento()
+        
     
     
     def validarDatosObligatorios(self, data, required_fields):
@@ -114,6 +105,9 @@ class Cotizacion(Documento):
 
         filters = {}
 
+        if data.get('fecha_doc'):
+            filters['Quotations/DocDate ge'] = str(f"'{data.get('fecha_doc')}'")
+            filters['Quotations/DocDate le'] = str(f"'{data.get('fecha_doc')}'")
         if data.get('fecha_inicio'):
             filters['Quotations/DocDate ge'] = str(f"'{data.get('fecha_inicio')}'")
         if data.get('fecha_fin'):
@@ -121,19 +115,41 @@ class Cotizacion(Documento):
         if data.get('docNum'):
             docum = int(data.get('docNum'))
             filters['contains(Quotations/DocNum,'] = f"{docum})"
-        if data.get('carCode'):
-            filters['contains(Quotations/CardCode,'] = f"'{data.get('carCode')}'"
-        if data.get('cardNAme'):
-            filters['contains(Quotations/CardName,'] = f"'{data.get('cardNAme')}')"
+
+        if data.get('carData'):
+            car_data = data.get('carData')
+            
+            if car_data.isdigit():  # Si es un número
+                filters['contains(Quotations/CardCode,'] = f"'{car_data}')"
+            else:  # Si contiene letras (nombre)
+                filters['contains(Quotations/CardName,'] = f"'{car_data}')"
+
         if data.get('salesEmployeeName'):
-            filters['contains(SalesPersons/SalesEmployeeName,'] = f"'{data.get('salesEmployeeName')}'"
+            numecode = int(data.get('salesEmployeeName'))
+            filters['contains(SalesPersons/SalesEmployeeCode,'] = f"{numecode})" 
+        
+        #if data.get('DocumentStatus'):
+        #   filters['Quotations/DocumentStatus eq'] = f"'{data.get('DocumentStatus')}'"
+
+        #if data.get('cancelled'):
+        #    filters['Quotations/Cancelled eq'] = f"'{data.get('cancelled')}'"
+
         if data.get('DocumentStatus'):
-            filters['Quotations/DocumentStatus eq'] = f"'{data.get('DocumentStatus')}'"
+            document_status = data.get('DocumentStatus')
+
+            if document_status == 'O':
+                filters['Quotations/DocumentStatus eq'] = "'O'"
+            elif document_status == 'C':
+                filters['Quotations/DocumentStatus eq'] = "'C'"
+                filters['Quotations/Cancelled eq'] = "'N'"
+                
+            else:
+                filters['Quotations/Cancelled eq'] = "'Y'"
+
         if data.get('docTotal'):
             docTotal = float(data.get('docTotal'))
-            filters['contains(Quotations/DocTotal,'] = f"{docTotal})"
-        if data.get('cancelled'):
-            filters['Quotations/Cancelled eq'] = f"'{data.get('cancelled')}'"
+            filters['Quotations/DocTotal eq'] = f"{docTotal}"
+
 
         # Limpiar filtros vacíos o inválidos
         filters = {k: v for k, v in filters.items() if v and v != "''"}
@@ -152,12 +168,8 @@ class Cotizacion(Documento):
             tuple: Líneas de documento de la cotización, mensaje de error.
         """
         try:
-            print("-" * 10)
-            print(f"Fetching quotation items for DocEntry: {doc_entry}")
-            client = APIClient()
+            client = APIClient() 
             data = client.obtenerCotizacionesDE('Quotations', doc_entry)
-            print(f"Data received: {data}")
-            print("-" * 10)
 
             if 'value' not in data:
                 return None, 'No se encontraron datos de cotización'
@@ -166,6 +178,7 @@ class Cotizacion(Documento):
 
             try:
                 doc_entry_int = int(doc_entry)
+
             except ValueError:
                 return None, f'El valor de DocEntry proporcionado ({doc_entry}) no es un número válido'
             
@@ -231,6 +244,40 @@ class Cotizacion(Documento):
             }
             for line in documentLines
         ]
+    
+    @staticmethod
+    def tipoVentaTipoVendedor(codigo_vendedor):
+        """
+        Asigna el tipo de venta a la cotización.
+
+        Args:
+            tipo_venta (str): Tipo de venta.
+        """
+        repo = VendedorRepository()
+        tipo_vendedor = repo.obtenerTipoVendedor(codigo_vendedor)
+
+        if tipo_vendedor == 'PR':
+            return 'PROY'
+        elif tipo_vendedor == 'CD':
+            return 'ECCO'
+        else:
+            return 'NA'
+
+    @staticmethod
+    def tipoVentaTipoLineas(lineas):
+        """
+        Asigna el tipo de venta a las líneas de la cotización.
+
+        - Si todas las lineas son del mismo warehouse, se asigna el tipo de venta: TIEN.
+        - Si las lineas son de diferentes warehouses, se asigna el tipo de venta: RESE.
+
+        Args:
+            lineas (list): Líneas de la cotización.
+        """
+
+        warehouses = set(linea.get('WarehouseCode') for linea in lineas)
+        return 'TIEN' if len(warehouses) == 1 else 'RESE'
+        
 
     def prepararJsonCotizacion(self, jsonData):
         """
@@ -242,6 +289,15 @@ class Cotizacion(Documento):
         Returns:
             dict: Datos de la cotización preparados para ser enviados a SAP.
         """
+            
+        # Determinar el tipo de venta basado en el vendedor
+        codigo_vendedor = jsonData.get('SalesPersonCode')
+        tipo_venta = self.tipoVentaTipoVendedor(codigo_vendedor)
+        
+        # Si el tipo de venta por vendedor no es válido ('NA'), determinar por líneas
+        if tipo_venta == 'NA':
+            lineas = jsonData.get('DocumentLines', [])
+            tipo_venta = self.tipoVentaTipoLineas(lineas)
         
         # Datos de la cabecera
         cabecera = {
@@ -252,17 +308,17 @@ class Cotizacion(Documento):
             'PaymentGroupCode': jsonData.get('PaymentGroupCode'),
             'SalesPersonCode': jsonData.get('SalesPersonCode'),
             'TransportationCode': jsonData.get('TransportationCode'),
-            'U_LED_NROPSH': jsonData.get('U_LED_NROPSH'),
-            'U_LED_TIPVTA': jsonData.get('U_LED_TIPVTA'),
-            'U_LED_TIPDOC': jsonData.get('U_LED_TIPDOC'),
-            'U_LED_FORENV': jsonData.get('U_LED_FORENV'),
+            #'U_LED_NROPSH': jsonData.get('U_LED_NROPSH'),
+            'U_LED_TIPVTA': tipo_venta,  # Tipo de venta calculado
+            'U_LED_TIPDOC': jsonData.get('U_LED_TIPDOC'), # Tipo de documento boleta o factura
+            'U_LED_FORENV': jsonData.get('TransportationCode'), # Forma de envio de la cotización
         }
 
         # Datos de las líneas
         lineas = jsonData.get('DocumentLines', [])
         lineas_json = [
             {
-                'lineNum': linea.get('lineNum'),
+                'lineNum': linea.get('LineNum'),
                 'ItemCode': linea.get('ItemCode'),
                 'Quantity': linea.get('Quantity'),
                 'ShipDate': linea.get('ShipDate'),
@@ -283,8 +339,64 @@ class Cotizacion(Documento):
             'DocumentLines': lineas_json,
         }
     
+    def prepararJsonCotizacionAC(self, jsonData):
+        """
+        Prepara los datos JSON específicos de la cotización.
 
-    
+        Args:
+            jsonData (dict): Datos de la cotización.
+        
+        Returns:
+            dict: Datos de la cotización preparados para ser enviados a SAP.
+        """
+            
+        # Determinar el tipo de venta basado en el vendedor
+
+        # Datos de las líneas
+        lineas = jsonData.get('DocumentLines', [])
+        lineas_json = [
+            {
+                'lineNum': linea.get('LineNum'),
+                'ItemCode': linea.get('ItemCode'),
+                'Quantity': linea.get('Quantity'),
+                'ShipDate': linea.get('ShipDate'),
+                'DiscountPercent': linea.get('DiscountPercent'),
+                'WarehouseCode': linea.get('WarehouseCode'),
+                'CostingCode': linea.get('CostingCode'),
+                'ShippingMethod': linea.get('ShippingMethod'),
+                'COGSCostingCode': linea.get('COGSCostingCode'),
+                'CostingCode2': linea.get('CostingCode2'),
+                'COGSCostingCode2': linea.get('COGSCostingCode2'),
+            }
+            for linea in lineas
+        ]
+
+        # Combina cabecera y líneas en un solo diccionario
+        return {
+            'DocumentLines': lineas_json,
+        }
+
+    def actualizarDocumento(self,docnum, docentry, data):
+        
+        docentry = docentry
+
+        try:
+            docentry = int(docentry)
+            jsonData = self.prepararJsonCotizacionAC(data)
+            
+            response = self.client.actualizarCotizacionesSL(docentry, jsonData)
+
+            if 'success' in response:
+                return {
+                    'success': 'Cotización creada exitosamente',
+                    'docNum': docnum
+                }
+
+        
+        except Exception as e:
+            logger.error(f"Error al actualizar la cotización: {str(e)}")
+            return {'error': str(e)}
+
     def crearDocumento(self, data):
         """
         Crea una nueva cotización y maneja las excepciones según el código de respuesta.
@@ -296,6 +408,11 @@ class Cotizacion(Documento):
             dict: Respuesta de la API.
         """
         try:
+            # Verificar los datos antes de preparar el JSON
+            errores = self.validarDatosCotizacion(data)
+            if errores:
+                return {'error': errores}
+
             # Preparar el JSON para la cotización
             jsonData = self.prepararJsonCotizacion(data)
             
@@ -307,7 +424,6 @@ class Cotizacion(Documento):
                 # Si contiene DocEntry, es un éxito
                 if 'DocEntry' in response:
                     doc_num = response.get('DocNum')
-
                     return {
                         'success': 'Cotización creada exitosamente',
                         'docNum': doc_num
@@ -328,6 +444,40 @@ class Cotizacion(Documento):
             logger.error(f"Error al crear la cotización: {str(e)}")
             return {'error': str(e)}
 
+    def validarDatosCotizacion(self, data):
+        """
+        Verifica que los datos de la cotización sean correctos.
+
+        Args:
+            data (dict): Datos de la cotización.
+
+        Returns:
+            str: Mensajes de error si hay problemas con los datos, o vacío si son correctos.
+        """
+        errores = []
+
+        # Verificar que el cardcode esté presente
+        if not data.get('CardCode'):
+            errores.append("No se a ingresado cliente para la Cotizacion.")
+
+        if not data.get('DocumentLines'):
+            errores.append("La cotización debe tener al menos una línea de documento.")
+
+        # Verificar que la cantidad sea válida (mayor que cero)
+        for item in data.get('DocumentLines', []):
+            cantidad = item.get('Quantity', 0)
+            if cantidad <= 0:
+                errores.append(f"La cantidad del artículo {item.get('ItemCode')} debe ser mayor a cero.")
+
+        # Verificar que otros campos importantes estén presentes (esto depende de los campos requeridos)
+        if not data.get('DocDate'):
+            errores.append("La fecha del documento es obligatoria.")
+
+        if not data.get('DocDueDate'):
+            errores.append("La fecha de vencimiento es obligatoria.")
+
+        # Si hay errores, retornarlos como una cadena
+        return ' '.join(errores)
 
     def eliminarDocumento(self, docEntry):
         """
@@ -364,3 +514,93 @@ class Cotizacion(Documento):
         except Exception as e:
             logger.error(f"Error al actualizar el estado de la cotización: {str(e)}")
             return {'error': str(e)}
+        
+    def formatearDatos(self, json_data):
+        # Extraer y limpiar la información del cliente
+        client_info = json_data["Client"]["value"][0]
+        quotations = client_info.get("Quotations", {})
+        salesperson = client_info.get("SalesPersons", {})
+        contact_employee = client_info.get("BusinessPartners/ContactEmployees", {})
+
+        # Formatear los datos de cliente
+        cliente = {
+            "Quotations": {
+                "DocEntry": quotations.get("DocEntry"),
+                "DocNum": quotations.get("DocNum"),
+                "CardCode": quotations.get("CardCode"),
+                "CardName": quotations.get("CardName"),
+                "TransportationCode": quotations.get("TransportationCode"),
+                "Address": quotations.get("Address"),
+                "Address2": quotations.get("Address2"),
+                "DocDate": quotations.get("DocDate"),
+                "DocumentStatus": quotations.get("DocumentStatus"),
+                "Cancelled": quotations.get("Cancelled"),
+                "U_LED_TIPVTA": quotations.get("U_LED_TIPVTA"),
+                "U_LED_TIPDOC": quotations.get("U_LED_TIPDOC"),
+                "U_LED_NROPSH": quotations.get("U_LED_NROPSH"),
+                "NumAtCard": quotations.get("NumAtCard"),
+                "VatSum": quotations.get("VatSum"),
+                "DocTotal": quotations.get("DocTotal"),
+                "DocTotalNeto": quotations.get("DocTotalNeto"),
+            },
+            "SalesPersons": {
+                "SalesEmployeeCode": salesperson.get("SalesEmployeeCode"),
+                "SalesEmployeeName": salesperson.get("SalesEmployeeName"),
+                "U_LED_SUCURS": salesperson.get("U_LED_SUCURS"),
+            },
+            "ContactEmployee": {
+                "InternalCode": contact_employee.get("InternalCode"),
+                "FirstName": contact_employee.get("FirstName"),
+            }
+        }
+
+        # Extraer y limpiar la información de líneas de documento
+        document_lines = []
+        for line_info in json_data["DocumentLine"]["value"]:
+            line = line_info.get("Quotations/DocumentLines", {})
+            warehouse_info = line_info.get("Items/ItemWarehouseInfoCollection", {})
+            
+            # Construye la línea
+            document_line = {
+                "DocEntry": line.get("DocEntry"),
+                "LineNum": line.get("LineNum"),
+                "ItemCode": line.get("ItemCode"),
+                "ItemDescription": line.get("ItemDescription"),
+                "WarehouseCode": line.get("WarehouseCode"),
+                "Quantity": line.get("Quantity"),
+                "UnitPrice": line.get("UnitPrice"),
+                "GrossPrice": line.get("GrossPrice"),
+                "DiscountPercent": line.get("DiscountPercent"),
+                "Price": line.get("Price"),
+                "PriceAfterVAT": line.get("PriceAfterVAT"),
+                "LineTotal": line.get("LineTotal"),
+                "GrossTotal": line.get("GrossTotal"),
+                "ShipDate": line.get("ShipDate"),
+                "Address": line.get("Address"),
+                "ShippingMethod": line.get("ShippingMethod"),
+                "FreeText": line.get("FreeText"),
+                "BaseType": line.get("BaseType"),
+                "GrossBuyPrice": line.get("GrossBuyPrice"),
+                "BaseEntry": line.get("BaseEntry"),
+                "BaseLine": line.get("BaseLine"),
+                "LineStatus": line.get("LineStatus"),
+                "WarehouseInfo": {
+                    "WarehouseCode": warehouse_info.get("WarehouseCode"),
+                    "InStock": warehouse_info.get("InStock"),
+                    "Committed": warehouse_info.get("Committed"),
+                    "SalesStock": warehouse_info.get("SalesStock"),
+                }
+            }
+            
+            # Agrega la línea solo si el Price es mayor a 0
+            if document_line["Price"] and document_line["Price"] > 0:
+                document_lines.append(document_line)
+
+
+        # Formar el diccionario final
+        resultado = {
+            "Cliente": cliente,
+            "DocumentLines": document_lines
+        }
+
+        return resultado

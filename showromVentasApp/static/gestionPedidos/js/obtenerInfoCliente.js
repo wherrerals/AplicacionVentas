@@ -29,13 +29,12 @@ $(document).ready(function(){
 // Función para traer información completa del cliente (modularizada)
 function traerInformacionCliente(clienteId) {
 
-    let buscarClientesUrl = '/ventas/buscar_clientes/'; // URL para buscar clientes
+    let buscarClientesUrl = `/ventas/buscar_clientes/?numero=${clienteId}`;
+
     $.ajax({
 
         url: buscarClientesUrl, // URL de la solicitud
-        data: {
-            'numero': clienteId  // numero es el rut del cliente
-        },
+        type: 'GET', // Método de la solicitud
         dataType: 'json',
         
         success: function(data) {
@@ -47,11 +46,22 @@ function traerInformacionCliente(clienteId) {
                 console.log('contacto de Cliente encontrado:', cliente.contactos);
                 console.log('direcciones de Cliente encontrado:', cliente.direcciones);
                 // Llamar a las funciones para actualizar contactos y direcciones
+                const nombre = cliente.nombre;
+                const apellido = cliente.apellido;
+                const codigoSN = cliente.codigoSN;
+
+                $('#inputCliente').attr('data-rut', clienteId);
+
+                $('#inputCliente').attr('data-codigoSN', codigoSN);        
+
+                $('#inputCliente').val(codigoSN + " - " + nombre + ' ' + apellido);
+
                 
                 actualizarContactos(cliente.contactos);
                 actualizarDirecciones(cliente.direcciones, '#direcciones_despacho', "12");
                 actualizarDirecciones(cliente.direcciones, '#direcciones_facturacion', "13");
-            } else {
+                cargarInformacionClienteEnModal(cliente);
+            } else { 
                 console.log('No se encontraron clientes con el número proporcionado.');
             }
         },
@@ -92,11 +102,11 @@ function actualizarDirecciones(direcciones, selectId, tipoDireccion) {
     select.empty();
     // Filtrar las direcciones según el tipoDireccion
     const direccionesFiltradas = direcciones.filter(function(direccion) {
-        console.log("tipo direccion de contacto", direccion.tipoDireccion)
+        //console.log("tipo direccion de contacto", direccion.tipoDireccion)
         return direccion.tipoDireccion === tipoDireccion;
     });
 
-    console.log(direccionesFiltradas);
+    //console.log(direccionesFiltradas);
     if (direccionesFiltradas.length > 0) {
         direccionesFiltradas.forEach(function(direccion) {
             let option = $('<option></option>');

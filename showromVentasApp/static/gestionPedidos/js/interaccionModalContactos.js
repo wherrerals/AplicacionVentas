@@ -23,6 +23,7 @@ $(document).ready(function() {
                     'telefono': telefono,
                     'celular': celular,
                     'email': email,
+                    'codigoInternoSap': 0,
                     "contacto_id": contactoid,
                 });
             } else {
@@ -44,9 +45,15 @@ $(document).ready(function() {
         let clienteRut = $('#inputCliente').data('rut');
         console.log('Cliente RUT capturado:', clienteRut);
 
+        const rutCliemte = document.getElementById("inputCliente").getAttribute("data-codigoSN");
+
+
         // Enviar los contactos al backend mediante AJAX
+        
+
+        let urlguardarCont = `/ventas/guardar_contactos/${rutCliemte}/`;
         $.ajax({
-            url: '/guardar_contactos/',  // URL del endpoint en Django
+            url: urlguardarCont,  // URL del endpoint en Django
             type: 'POST',
             data: {
                 'contactos': JSON.stringify(contactos),
@@ -60,7 +67,7 @@ $(document).ready(function() {
                 if (response.success) {
                     alert('Contactos guardados correctamente');
                     $('#contactoModal').modal('hide');
-                    location.reload();
+                    //location.reload();
                 } else {
                     alert('Error al guardar contactos: ' + response.message);
                 }
@@ -68,6 +75,43 @@ $(document).ready(function() {
             error: function(xhr, status, error) {
                 console.error('Error al guardar contactos:', error);
                 alert('Ha ocurrido un error al guardar los contactos.');
+            }
+        });
+    });
+});
+
+$(document).ready(function () {
+    // Escuchar cambios en los inputs de nombre y apellido
+    $(document).on('input', 'input[name="nombre[]"], input[name="apellido[]"]', function () {
+        // Recorrer cada fila de contacto
+        $('#listaContactos .col-sm-5').each(function () {
+            let nombre = $(this).find('input[name="nombre[]"]').val();
+            let apellido = $(this).find('input[name="apellido[]"]').val();
+            let contactoid = $(this).find('input[name="contacto_id[]"]').val();
+
+            // Crear texto para mostrar en el selector
+            let nuevoTexto = `${nombre} ${apellido}`;
+
+            // Verificar si el selector existe
+            if ($('#contactos_cliete').length > 0) {
+                console.log('Selector contactos_cliete encontrado.');
+
+                // Buscar si la opción ya existe en el selector
+                let opcionExistente = $(`#contactos_cliete option[value="${contactoid}"]`);
+
+                if (opcionExistente.length > 0) {
+                    // Si la opción existe, actualiza el texto
+                    opcionExistente.text(nuevoTexto);
+                    console.log(`Opción actualizada: ${nuevoTexto}`);
+                } else if (contactoid) {
+                    // Si no existe, agregarla y seleccionarla
+                    $(`#contactos_cliete`).append(
+                        `<option value="${contactoid}">${nuevoTexto}</option>`
+                    );
+                    console.log(`Nueva opción agregada: ${nuevoTexto}`);
+                }
+            } else {
+                console.log('El selector contactos_cliete no existe.');
             }
         });
     });

@@ -1,6 +1,19 @@
 from datosLsApp.models import SocioNegocioDB
 
 class SocioNegocioRepository:
+
+    """
+    Repositorio de Socios de Negocio
+
+    Metodos disponibles:
+
+    - obtenerPorRut(rut)
+    - crearCliente(**kwargs)
+    - buscarClientesPorRut(rut)
+    - buscarClientesPorNombre(nombre)
+    - obtenerPorCodigoSN(codigoSN)
+
+    """
     
     @staticmethod
     def obtenerPorRut(rut):
@@ -34,18 +47,95 @@ class SocioNegocioRepository:
             SocioNegocioDB
         """
         return SocioNegocioDB.objects.create(**kwargs)
-
+    
     @staticmethod
-    def buscarClientesPorRut(rut):
+    def crearClienteEmpresa(**kwargs):
         """
-        Obtiene los clientes que contengan el rut ingresado
-
+        Crea un cliente empresa en la base de datos
+        
         params:
-            rut: str
+            kwargs: dict
 
-            - Rut del cliente a buscar
+            - Datos del cliente empresa a crear
         
         return:
             SocioNegocioDB
         """
+        return SocioNegocioDB.objects.create(**kwargs)
+
+    @staticmethod
+    def buscarClientesPorRut(rut):
+        """
+        Busca clientes por rut
+        
+        params:
+            rut: str - Rut del cliente a buscar
+        
+        return:
+            QuerySet - Clientes encontrados
+            """
         return SocioNegocioDB.objects.filter(rut__icontains=rut)
+
+    @staticmethod
+    def buscarClientesPorNombre(nombre):
+        return SocioNegocioDB.objects.filter(nombre__icontains=nombre)
+    
+    def obtenerPorCodigoSN(self, codigoSN):
+        """
+        Obtiene un socio de negocio por su código
+        
+        params:
+            codigoSN: str
+
+            - Código del socio de negocio a buscar
+        
+        return:
+            SocioNegocioDB | None
+        """
+        try:
+            return SocioNegocioDB.objects.get(codigoSN__icontains=codigoSN)
+        except SocioNegocioDB.DoesNotExist:
+            return None
+
+    @staticmethod
+    def actualizarCliente(codigoSN, datosActualizados):
+        try:
+            cliente = SocioNegocioDB.objects.get(codigoSN=codigoSN)
+            
+            # Actualizar atributos comunes
+            cliente.nombre = datosActualizados.get('nombreSN', cliente.nombre)
+            cliente.apellido = datosActualizados.get('apellidoSN', cliente.apellido)
+            cliente.rut = datosActualizados.get('rutSN', cliente.rut)
+            cliente.telefono = datosActualizados.get('telefono', cliente.telefono)
+            cliente.giro = datosActualizados.get('giroSN', cliente.giro)
+            cliente.email = datosActualizados.get('emailSN', cliente.email)
+
+            cliente.save()
+
+            return {'success': True, 'message': 'Cliente persona actualizado correctamente', 'cliente': cliente}
+        
+        except SocioNegocioDB.DoesNotExist:
+            return {'success': False, 'message': f'Cliente con código {codigoSN} no encontrado'}
+        except Exception as e:
+            return {'success': False, 'message': f'Error al actualizar cliente: {str(e)}'}
+
+    @staticmethod
+    def actualizarClienteEmpresa(codigoSN, datosActualizados):
+        try:
+            cliente = SocioNegocioDB.objects.get(codigoSN=codigoSN)
+            
+            # Actualizar atributos específicos de empresa
+            cliente.razonSocial = datosActualizados.get('razonSocial', cliente.razonSocial)
+            cliente.rut = datosActualizados.get('rut', cliente.rut)
+            cliente.telefono = datosActualizados.get('telefono', cliente.telefono)
+            cliente.giro = datosActualizados.get('giro', cliente.giro)
+            cliente.email = datosActualizados.get('email', cliente.email)
+
+            cliente.save()
+
+            return {'success': True, 'message': 'Cliente empresa actualizado correctamente', 'cliente': cliente}
+        
+        except SocioNegocioDB.DoesNotExist:
+            return {'success': False, 'message': f'Cliente con código {codigoSN} no encontrado'}
+        except Exception as e:
+            return {'success': False, 'message': f'Error al actualizar cliente: {str(e)}'}

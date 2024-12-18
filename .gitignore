@@ -200,3 +200,7 @@ AplicacionVentas/__pycache__/wsgi.cpython-311.pyc
 
 #ignorar cache de python
 *.pyc  
+
+# Ignorar el archivo celerybeat-schedule
+celerybeat-schedule
+celerybeat-schedule.*

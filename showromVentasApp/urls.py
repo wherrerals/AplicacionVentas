@@ -1,5 +1,6 @@
 from django.urls import path
 from showromVentasApp.views.cotizacionview import CotizacionView
+from showromVentasApp.views.odvView import OdvView
 from showromVentasApp.views.socionegocioview import SocioNegocioView
 from showromVentasApp.views.productoview import Productos
 from showromVentasApp.views import view
@@ -12,11 +13,16 @@ urlpatterns = [
     path('listado_Cotizaciones/', CotizacionView.as_view(), name='listado_Cotizaciones'),
     path('listado_Cotizaciones_filtrado/', CotizacionView.as_view(), name='listado_Cotizaciones_filtrado'),
     path('agregar_editar_clientes/', SocioNegocioView.as_view(), name='agregar_editar_clientes'),
+    path('listado_socios_negocio/', SocioNegocioView.as_view(), name='listado_socios_negocio'),
+    path('informacion_cliente/', SocioNegocioView.as_view(), name='informacion_cliente'),
     path('buscar_clientes/', SocioNegocioView.as_view(), name='busquedaClientes'),
     path('verificar_cliente/', SocioNegocioView.as_view(), name='verificar_cliente'),
+    path('filtrar_socios_negocio/', SocioNegocioView.as_view(), name='filtrar_socios_negocio'),
     path('listado_productos/', Productos.as_view(), name='listado_productos'),
     path('crear_cotizacion/', CotizacionView.as_view(), name='crear_cotizacion'),
-    path('crear_cliente/', SocioNegocioView.as_view(), name='crear_cliente'),
+    path('listado_odv/', OdvView.as_view(), name='listado_odv'),
+    path('crear_odv/', OdvView.as_view(), name='crear_odv'),
+    #path('crear_cliente/', SocioNegocioView.as_view(), name='crear_cliente'),
     path('cambiar_estado_cotizacion/', CotizacionView.as_view(), name='cambiar_estado_cotizacion'),
     # Rutas adicionales
     path('lista_cotizaciones/', view.list_quotations, name="lista_cotizaciones"),
@@ -35,6 +41,17 @@ urlpatterns = [
     path('agregar_direccion/', view.agregarDireccion, name='agregar_direccion'),
     path('obtener_detalles_cotizacion/<int:docEntry>/', cotizacionView.obtenerDetallesCotizacion, name='obtener_detalles_cotizacion'),
     path('guardar_contactos/', view.guardarContactosAJAX, name='guardar_contactos_ajx'), 
+    path('guardar_direcciones/<str:socio>/', view.actualizarAgregarDirecion, name='guardar_direccion'),
+    path('guardar_contactos/<str:socio>/', view.actualizarAgregarContacto, name='guardar_contactos'),
+    path('obtener_comunas_por_region/', view.enlazarComunas, name='obtener_comunas_por_region'),
+    path('obter_region_id/', view.obtenerRegionesId, name='obtener_region_id'),
+    path('obtener_comuna_id/', view.obtenerComunasId, name='obtener_comuna_id'),
+    path('obtener_stock_bodegas/', view.obtenerStockBodegas, name='obtener_stock'),
+    path('detalles_cotizacion/', cotizacionView.detallesCotizacion, name='detalles_cotizacion'),
+    path('detalles_ODV/', OdvView.as_view(), name='detalles_ODV'),
+    path('ordenesVentas/', view.odv, name='ordenesVentas'),
+    path('pruebas/', view.pryebas, name='pruebas'),
+    #path('obtener_receta/', view.pryebas, name='obtener_receta'),
 ]
 
 """ Este es el path que estaba probando

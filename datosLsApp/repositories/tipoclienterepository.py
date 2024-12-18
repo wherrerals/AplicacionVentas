@@ -1,6 +1,16 @@
 from datosLsApp.models import TipoClienteDB
 
 class TipoClienteRepository:
+
+    """
+    Repositorio de Tipos de Cliente
+
+    Metodos disponibles:
+
+    - obtenerTipoClientePorCodigo(codigo)
+    - obtenerTodosTiposClientes()
+    
+    """
     
     @staticmethod
     def obtenerTipoClientePorCodigo(codigo):
