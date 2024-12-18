@@ -1,5 +1,5 @@
 class Producto {
-    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, tipoEntrega, fechaEntrega) {
+    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, tipoEntrega, fechaEntrega = new Date().toISOString().split('T')[0]) {
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
         this.imagen = imagen;
@@ -100,7 +100,7 @@ class Producto {
                 
                 <td style="background: transparent;border-style: none;padding-bottom: 0px;" rowspan="2">
                     <div style="font-size: 12px;">
-                        <small name="precio_venta" data-precio-unitario="100.00">Precio: ${this.precioVenta}</small>
+                        <small name="precio_venta" data-precio-unitario="100.00">${this.precioVenta}</small>
                     </div>
                     <div style="font-size: 11px;">
                         <small style="color: rgb(153,153,153); name="precio_lista">Antes: ${this.precioLista}</small>
@@ -129,7 +129,7 @@ class Producto {
                     <input class="form-control" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad}">
                 </td>
                 <td style="font-size: 11px;font-weight: bold;background: transparent;border-style: none;text-align: center;">
-                <span id="precio_Venta">${this.totalProducto}</span>
+                    <span id="precio_Venta">${this.totalProducto}</span>
                 </td>
             </tr>
             <tr  style="font-size: 12px;background: transparent;">
