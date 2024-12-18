@@ -168,9 +168,11 @@ class OrdenVenta(Documento):
 
         try:
             docentry = int(docentry)
-            jsonData = self.prepararJsonCotizacionAC(data)
+            jsonData = self.prepararJsonODVAC(data)
             
-            response = self.client.actualizarCotizacionesSL(docentry, jsonData)
+            client = APIClient()
+
+            response = client.actualizarODVSL(docentry, jsonData)
 
             if 'success' in response:
                 return {
@@ -181,8 +183,46 @@ class OrdenVenta(Documento):
         
         except Exception as e:
             logger.error(f"Error al actualizar la cotización: {str(e)}")
+            
             return {'error': str(e)}
+
+    def prepararJsonODVAC(self, jsonData):
+        """
+        Prepara los datos JSON específicos de la cotización.
+
+        Args:
+            jsonData (dict): Datos de la cotización.
         
+        Returns:
+            dict: Datos de la cotización preparados para ser enviados a SAP.
+        """
+            
+        # Determinar el tipo de venta basado en el vendedor
+
+        # Datos de las líneas
+        lineas = jsonData.get('DocumentLines', [])
+        lineas_json = [
+            {
+                'lineNum': linea.get('LineNum'),
+                'ItemCode': linea.get('ItemCode'),
+                'Quantity': linea.get('Quantity'),
+                'ShipDate': linea.get('ShipDate'),
+                'DiscountPercent': linea.get('DiscountPercent'),
+                'WarehouseCode': linea.get('WarehouseCode'),
+                'CostingCode': linea.get('CostingCode'),
+                'ShippingMethod': linea.get('ShippingMethod'),
+                'COGSCostingCode': linea.get('COGSCostingCode'),
+                'CostingCode2': linea.get('CostingCode2'),
+                'COGSCostingCode2': linea.get('COGSCostingCode2'),
+            }
+            for linea in lineas
+        ]
+
+        # Combina cabecera y líneas en un solo diccionario
+        return {
+            'DocumentLines': lineas_json,
+        }
+
     def crearDocumento(self, data):
         """
         Crea una nueva cotización y maneja las excepciones según el código de respuesta.

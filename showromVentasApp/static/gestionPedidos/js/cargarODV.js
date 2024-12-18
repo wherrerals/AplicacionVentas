@@ -66,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
               showroomElement.innerText = sucursal;
             }
 
-            const docEntryElement = document.getElementById("numero_cotizacion");
+            const docEntryElement = document.getElementById("numero_orden");
             if (docEntryElement) {
               docEntryElement.setAttribute("data-docEntry", docEntry);
             }

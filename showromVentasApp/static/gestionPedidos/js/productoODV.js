@@ -31,7 +31,7 @@ class Producto {
 
     async actualizarStock(row) {
         const stockData = await this.obtenerStock(this.productoCodigo);
-    
+
         if (stockData) {
             // Mapear las bodegas válidas (excluyendo GR)
             const bodegaMap = {
@@ -39,37 +39,37 @@ class Producto {
                 "PH": "PH",
                 "ME": "ME"
             };
-    
+
             // Filtrar los datos de stock excluyendo la bodega "GR"
             const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
-    
+
             // Calcular el stock total sumando solo las bodegas válidas
             const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock, 0);
-    
+
             // Mostrar el stock total
             const stockTotalElem = row.querySelector('[name="stock_total"]');
             stockTotalElem.textContent = `Total: ${stockTotal}`;
-    
+
             // Obtener el value de la bodega seleccionada
             const selectBodega = row.querySelector('.form-select');
             const valueSeleccionado = selectBodega.value;
-    
+
             // Usar el mapa para obtener el código correspondiente
             const bodegaSeleccionada = bodegaMap[valueSeleccionado];
-    
+
             // Encontrar el stock de la bodega seleccionada
             const stockBodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock || 0;
-    
+
             // Mostrar el stock de la bodega seleccionada
             const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
             stockBodegaElem.textContent = `Stock: ${stockBodega}`;
         }
     }
-    
 
-    
 
-    crearFila(contprod,valorTipoEntrega) {
+
+
+    crearFila(contprod, valorTipoEntrega) {
         let newRow = document.createElement('tbody');
         newRow.className = 'product-row';
         newRow.innerHTML = `
@@ -167,49 +167,49 @@ class Producto {
         `;
 
 
-    
-    // Limpiar el contenido de inputNumero
-    const inputNumero = document.getElementById('inputNumero');
-    if (inputNumero) {
-        inputNumero.value = ''; // Limpia el campo
-        console.log("Campo 'inputNumero' limpiado.");
-    }
-    
-    // Agregar evento mouseover para mostrar stock en otras tiendas
-    const precioVentaElem = newRow.querySelector('#stock_total');
-    precioVentaElem.addEventListener('mouseover', async () => {
-    const stockData = await this.obtenerStock(this.productoCodigo);
-    if (stockData) {
-        // Filtrar las bodegas para excluir "GR"
-        const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
 
-        // Crear el contenido del tooltip solo con las bodegas válidas
-        const tooltipContent = stockFiltrado
-            .map(bodega => `${bodega.bodega}: ${bodega.stock}`)
-            .join('\n');
+        // Limpiar el contenido de inputNumero
+        const inputNumero = document.getElementById('inputNumero');
+        if (inputNumero) {
+            inputNumero.value = ''; // Limpia el campo
+            console.log("Campo 'inputNumero' limpiado.");
+        }
 
-        // Asignar el contenido del tooltip
-        precioVentaElem.title = `Stock en otras tiendas:\n${tooltipContent}`;
-    }
-});
+        // Agregar evento mouseover para mostrar stock en otras tiendas
+        const precioVentaElem = newRow.querySelector('#stock_total');
+        precioVentaElem.addEventListener('mouseover', async () => {
+            const stockData = await this.obtenerStock(this.productoCodigo);
+            if (stockData) {
+                // Filtrar las bodegas para excluir "GR"
+                const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
+
+                // Crear el contenido del tooltip solo con las bodegas válidas
+                const tooltipContent = stockFiltrado
+                    .map(bodega => `${bodega.bodega}: ${bodega.stock}`)
+                    .join('\n');
+
+                // Asignar el contenido del tooltip
+                precioVentaElem.title = `Stock en otras tiendas:\n${tooltipContent}`;
+            }
+        });
 
 
         this.limitarMaxDescuento(newRow);
         this.limitarCantidad(newRow);
         return newRow;
-        }
+    }
 
-        // Método para alternar la visibilidad del descuento
+    // Método para alternar la visibilidad del descuento
     alternarMaxDescuento(row) {
-            let elemento = row.querySelector('#descuento');
-            if (elemento.getAttribute('hidden') !== null) {
-                elemento.removeAttribute('hidden');
-            } else {
-                elemento.setAttribute('hidden', '');
-            }
+        let elemento = row.querySelector('#descuento');
+        if (elemento.getAttribute('hidden') !== null) {
+            elemento.removeAttribute('hidden');
+        } else {
+            elemento.setAttribute('hidden', '');
         }
-  
-        
+    }
+
+
 
     limitarMaxDescuento(row) {
         let descuentoMaxElem = row.querySelector('#descuento');
@@ -231,30 +231,43 @@ class Producto {
     }
 
     limitarCantidad(row) {
+
+        // Obtener el elemento #numero_orden
+        const numeroOrdenElem = document.getElementById('numero_orden');
+        //const docEntry = numeroOrdenElem?.getAttribute('data-docentry');
+
+        // Verificar si hay un valor en data-docentry
+        if (numeroOrdenElem) {
+            console.log("No se ejecuta limitarCantidad porque data-docentry tiene un valor:", numeroOrdenElem);
+            return;
+        }
+
         let cantidadInput = row.querySelector('#calcular_cantidad');
         let stockBodegaElem = row.querySelector('[name="stock_bodega"]'); // Referencia al elemento de stock
-    
+
+
+
         // Función para validar y limitar la cantidad
         const validarCantidad = () => {
             let maxStock = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
             let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
-    
+
             if (cantidadActual > maxStock) {
                 cantidadInput.value = maxStock;
             } else if (cantidadActual < 1) {
-                cantidadInput.value = 1;
+                cantidadInput.value = 0;
             }
         };
-    
+
         // Agregar evento para validar en tiempo real
         cantidadInput.addEventListener('input', validarCantidad);
         cantidadInput.addEventListener('change', validarCantidad);
-    
+
         // Si el stock cambia dinámicamente (llamado después de actualizar stock)
         const stockBodegaObserver = new MutationObserver(validarCantidad);
         stockBodegaObserver.observe(stockBodegaElem, { childList: true, subtree: true });
     }
-    
+
 }
 
 
@@ -275,10 +288,10 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
 
     console.log('Producto agregado:', valorTributarioProducto);
 
-    
-    newRow.querySelector('#mostrar-descuento').addEventListener('click', function() {
+
+    newRow.querySelector('#mostrar-descuento').addEventListener('click', function () {
         producto.alternarMaxDescuento(newRow);
-      });
+    });
 
     newRow.querySelector('#eliminarp').addEventListener('click', function () {
         newRow.remove();
@@ -303,8 +316,8 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
         producto.actualizarStock(newRow);
     });
     const inputNumero = document.getElementById("inputNumero");
-  
+
     // Llamar a la función agregarInteractividad si es necesario
-    agregarInteractividad(newRow, productoCodigo); 
+    agregarInteractividad(newRow, productoCodigo);
 
 }
