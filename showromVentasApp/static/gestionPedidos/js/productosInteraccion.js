@@ -1,3 +1,4 @@
+// Dependencias: valorTributario.js
 class valorTributario {
   constructor(codigoProducto, precioFinal) {
       this.codigoProducto = codigoProducto;

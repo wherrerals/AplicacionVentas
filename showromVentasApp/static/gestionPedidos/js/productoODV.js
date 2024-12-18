@@ -234,10 +234,10 @@ class Producto {
 
         // Obtener el elemento #numero_orden
         const numeroOrdenElem = document.getElementById('numero_orden');
-        //const docEntry = numeroOrdenElem?.getAttribute('data-docentry');
+        const docEntry = numeroOrdenElem?.getAttribute('data-docentry');
 
         // Verificar si hay un valor en data-docentry
-        if (numeroOrdenElem) {
+        if (docEntry) {
             console.log("No se ejecuta limitarCantidad porque data-docentry tiene un valor:", numeroOrdenElem);
             return;
         }
@@ -281,12 +281,6 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     const newRow = producto.crearFila(contprod, tipoEntregaSeleccionado); // Crear la fila del producto
 
     document.getElementById('productos').appendChild(newRow); // Agregar la fila al tbody
-
-    // Crear una instancia de valorTributario para este producto
-    let valorTributarioProducto = new valorTributario(productoCodigo, precioVenta * cantidad); // Crear una instancia de valorTributario
-    productos.push(valorTributarioProducto);
-
-    console.log('Producto agregado:', valorTributarioProducto);
 
 
     newRow.querySelector('#mostrar-descuento').addEventListener('click', function () {
