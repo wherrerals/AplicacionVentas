@@ -272,18 +272,18 @@ class Producto {
 
 
 function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, tipoEntrega, fechaEntrega) {
-    let contprod = document.querySelectorAll('#productos tbody').length + 1;
+    let contprod = document.querySelectorAll('#productos tbody').length + 1; // Contador de productos
 
-    const tipoEntregaSeleccionado = document.getElementById('tipoEntrega-1')?.value || '1';
+    const tipoEntregaSeleccionado = document.getElementById('tipoEntrega-1')?.value || '1'; // Obtener el valor del tipo de entrega seleccionado
 
     // Crear instancia del producto
     const producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, tipoEntregaSeleccionado, fechaEntrega);
-    const newRow = producto.crearFila(contprod, tipoEntregaSeleccionado);
+    const newRow = producto.crearFila(contprod, tipoEntregaSeleccionado); // Crear la fila del producto
 
-    document.getElementById('productos').appendChild(newRow);
+    document.getElementById('productos').appendChild(newRow); // Agregar la fila al tbody
 
     // Crear una instancia de valorTributario para este producto
-    let valorTributarioProducto = new valorTributario(productoCodigo, precioVenta * cantidad);
+    let valorTributarioProducto = new valorTributario(productoCodigo, precioVenta * cantidad); // Crear una instancia de valorTributario
     productos.push(valorTributarioProducto);
 
     console.log('Producto agregado:', valorTributarioProducto);
