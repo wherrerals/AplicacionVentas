@@ -164,6 +164,15 @@ class Producto {
             </tr>
         `;
 
+
+    
+    // Limpiar el contenido de inputNumero
+    const inputNumero = document.getElementById('inputNumero');
+    if (inputNumero) {
+        inputNumero.value = ''; // Limpia el campo
+        console.log("Campo 'inputNumero' limpiado.");
+    }
+    
     // Agregar evento mouseover para mostrar stock en otras tiendas
     const precioVentaElem = newRow.querySelector('#stock_total');
     precioVentaElem.addEventListener('mouseover', async () => {
@@ -291,6 +300,7 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     newRow.querySelector('.form-select').addEventListener('change', function () {
         producto.actualizarStock(newRow);
     });
+    const inputNumero = document.getElementById("inputNumero");
   
     // Llamar a la función agregarInteractividad si es necesario
     agregarInteractividad(newRow, productoCodigo); 
