@@ -389,6 +389,7 @@ class SocioNegocio:
                     'direcciones': direcciones_formateadas,
                     'contactos': contactos_formateados
                 })
+                print(f"Resultados formateados: {resultados_formateados}")
 
             return resultados_formateados
         

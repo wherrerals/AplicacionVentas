@@ -23,7 +23,8 @@ document.addEventListener("DOMContentLoaded", function () {
                   return response.json();
               })
               .then(data => {
-                  //console.log("Datos del cliente:", data);
+              
+                  console.log("Datos del cliente:", data);
                   document.getElementById("nombreSN").value = data[0].nombre || '';
                   document.getElementById("apellidoSN").value = data[0].apellido || '';
                   document.getElementById("rutSN").value = data[0].rut || '';
@@ -36,6 +37,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
                   document.getElementById("rutSN").setAttribute("data-rut", data[0].rut || '');
                   document.getElementById("rutSN").readOnly = true;
+
+                    // Lógica para seleccionar "Empresa" o "Persona"
+                    if (data[0].giro && data[0].giro.trim() !== "") {
+                      // Si tiene razón social (giro), es "Empresa"
+                      document.getElementById("formCheck-6").checked = true; // Empresa
+                  } else {
+                      // Si no tiene razón social (giro), es "Persona"
+                      document.getElementById("formCheck-5").checked = true; // Persona
+                  }
+
+                  // Actualizar etiquetas y mostrar/ocultar campos dinámicamente
+                  cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow');
 
                   // Llama a cargarContactos después de asignar data-rut
                   cargarContactos();
@@ -347,10 +360,7 @@ function cargarDirecciones() {
                               </div>
                           </div>
                       `;
-                      console.log("region de la wea", direccion.region);
-                      console.log("comuna de la wea", direccion.comuna);
-                      console.log("region numero de la wea", direccion.region_numero);
-                      console.log("Comuna numero de la wea", direccion.comuna_codigo);
+
 
                       $('#dir').append(direccionElemento);
 
@@ -360,7 +370,7 @@ function cargarDirecciones() {
 
 
                       $(document).on('click', `#editar_dir_${index}`, function() {
-                          console.log("Habilitando edición para la dirección con index:", index);
+                          //console.log("Habilitando edición para la dirección con index:", index);
                           
                           // Hacer los campos editables
                           $(`#tipoDireccion_${index}`).prop('disabled', false);
@@ -381,7 +391,7 @@ function cargarDirecciones() {
                           $(`#nombreDireccion_${index}`).attr('name', 'direccion[]');
                           $(`#contacto_id_${index}`).attr('name', 'direccionid[]');
                       
-                          console.log("Edición habilitada para la dirección con index:", index);
+                          //console.log("Edición habilitada para la dirección con index:", index);
                       });
                       
 
@@ -423,9 +433,9 @@ $(document).on('change', '[id^="region_"]', function () {
   const index = $(this).attr('id').split('_')[1]; // Extraer el índice dinámico del ID
   const comunaSelect = $(`#comuna_${index}`); // Seleccionar el select de comuna correspondiente
 
-  console.log("Región seleccionada:", regionId);
-  console.log("Index detectado:", index);
-  console.log("Select de comunas encontrado:", comunaSelect);
+  //console.log("Región seleccionada:", regionId);
+  //console.log("Index detectado:", index);
+  //console.log("Select de comunas encontrado:", comunaSelect);
 
   if (regionId) {
     cargarComunas(regionId, comunaSelect); // Llamar a la función para cargar comunas
@@ -436,7 +446,7 @@ $(document).on('change', '[id^="region_"]', function () {
 
 // Función para cargar comunas y seleccionar la correspondiente
 function cargarComunas(regionId, comunaSelect, comunaSeleccionada = null) {
-  console.log("Cargando comunas para la región con ID:", regionId);
+  //console.log("Cargando comunas para la región con ID:", regionId);
 
   $.ajax({
     url: `/ventas/obtener_comunas_por_region/?idRegion=${regionId}`, // Asegúrate de que esta ruta sea la correcta
@@ -452,7 +462,7 @@ function cargarComunas(regionId, comunaSelect, comunaSeleccionada = null) {
         $(comunaSelect).append(`<option value="${comuna.codigo}" ${selected}>${comuna.nombre}</option>`);
       });
 
-      console.log("Select de comunas actualizado.");
+      //console.log("Select de comunas actualizado.");
     },
     error: function (xhr, status, error) {
       console.error("Error al cargar comunas:", error);
