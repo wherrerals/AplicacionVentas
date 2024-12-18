@@ -196,6 +196,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const direccion = document.getElementById('nombreDireccion_0')?.value || 'No disponible';
             const contactoNombre = document.getElementById('nombre_0')?.value || '';
             const contactoApellido = document.getElementById('apellido_0')?.value || '';
+            const contactoSelect = document.getElementById('contactos_cliete');
+            const contactoNombreCompleto = contactoSelect.options[contactoSelect.selectedIndex].text.trim();
+            const direcconSelect = document.getElementById('direcciones_despacho');
+            const direccionCompleta = direcconSelect.options[direcconSelect.selectedIndex].text.trim();
+                    
+
+
             const telefonoSN = document.getElementById('telefonoSN')?.value || 'No disponible';
             const emailSN = document.getElementById('emailSN')?.value || 'No disponible';
 
@@ -216,6 +223,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 showroomDireccion = 'Av. Padre Hurtado Nte 1199, 7640280 Vitacura, Región Metropolitana';
             } else if (showroomCode === 'GR') {
                 showroomDireccion = 'Av. Pdte. Eduardo Frei Montalva #550, Av. Pdte. Eduardo Frei Montalva 520, 8640000 Renca, Región Metropolitana';
+            } else if (showroomCode === 'PR') {
+                showroomDireccion = 'PR -- No especificado'; 
             } else {
                 showroomDireccion = 'Showroom no especificado';
             }
@@ -286,8 +295,10 @@ document.addEventListener('DOMContentLoaded', function () {
             pdf.text(`${rutSN}`, 10, yPosition);
             pdf.text(`${nombreSN} ${apellidoSN}`, 10, yPosition + 6);
             pdf.text(`${grupoSN}`, 10, yPosition + 12);
-            pdf.text(`${direccion}`, 10, yPosition + 18);
-            pdf.text(`Contacto: ${contactoNombre} ${contactoApellido}`, 10, yPosition + 24);    
+            //pdf.text(`${direccion}`, 10, yPosition + 18);
+            pdf.text(`${direccionCompleta}`, 10, yPosition + 18);
+            pdf.text(`Contacto: ${contactoNombreCompleto}`, 10, yPosition + 24); 
+            //pdf.text(`Contacto: ${contactoNombre} ${contactoApellido}`, 10, yPosition + 24);    
             pdf.text(`Teléfono: ${telefonoSN}`, 10, yPosition + 30);
             pdf.text(`Email: ${emailSN}`, 10, yPosition + 36);
 
