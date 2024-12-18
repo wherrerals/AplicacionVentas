@@ -4,11 +4,13 @@ def grupos_usuario(request):
     if isinstance(request.user, AnonymousUser):
         return {'grupos_usuario': []}
     grupos_usuario = list(request.user.groups.values_list('name', flat=True))
+    print(f"Grupos del usuario: {grupos_usuario}")
     return {'grupos_usuario': grupos_usuario}
 
 def usuario_actual(request):
     if isinstance(request.user, AnonymousUser):
         return {'usuario_actual': None}
+    
     return {'usuario_actual': request.user}
 
 def vendedor_codigo(request):

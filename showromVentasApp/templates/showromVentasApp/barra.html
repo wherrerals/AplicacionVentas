@@ -25,7 +25,7 @@
                     <span class="visually-hidden">Toggle navigation</span>
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                {% if 'Vendedor' in grupos_usuario %}
+                {% if 'Vendedor' in grupos_usuario  or 'Administrador' in grupos_usuario%}
                 <div class="collapse navbar-collapse" id="navcol-2">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
@@ -35,16 +35,21 @@
                             <a class="nav-link" href="{% url 'lista_ovs' %}">Órdenes de Venta</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'lista_solic_devoluciones' %}">Solicitudes de Devolución</a>
-                        </li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'lista_clientes' %}">Clientes</a>
+                            <a class="nav-link" href="{% url 'lista_clientes' %}">Clientes</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">Reportes</a>
                         </li>
+                {% endif %}
+
+                {% if 'Administrador' in grupos_usuario %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'lista_solic_devoluciones' %}">Solicitudes de Devolución</a>
+                        </li>
+                {% endif %}
                     </ul>
                 </div>
-                {% endif %}
+
             </a>
         </div>
     </nav>
