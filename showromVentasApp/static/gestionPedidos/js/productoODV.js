@@ -67,7 +67,9 @@ class Producto {
     }
     
 
-    crearFila(contprod) {
+    
+
+    crearFila(contprod,valorTipoEntrega) {
         let newRow = document.createElement('tbody');
         newRow.className = 'product-row';
         newRow.innerHTML = `
@@ -149,11 +151,11 @@ class Producto {
                 </td>
                 <td style="font-size: 12px;background: transparent;" colspan="2">
                     <select class="form-select" id="tipoEntrega" style="font-size: 12px;">
-                      <optgroup label="Entrega">
-                        <option value="1" ${this.tipoEntrega === 'Directa' ? 'selected' : ''}>Directa</option>
-                        <option value="5" ${this.tipoEntrega === 'Despacho' ? 'selected' : ''}>Despacho</option>
-                        <option value="2" ${this.tipoEntrega === 'Retiro' ? 'selected' : ''}>Retiro</option>
-                    </optgroup>
+                        <optgroup label="Entrega">
+                            <option value="1" ${valorTipoEntrega === '1' ? 'selected' : ''}>Directa</option>
+                            <option value="5" ${valorTipoEntrega === '5' ? 'selected' : ''}>Despacho</option>
+                            <option value="2" ${['2', '3', '4'].includes(valorTipoEntrega) ? 'selected' : ''}>Retiro</option>
+                        </optgroup>
                     </select>
                 </td>
                 <td td colspan="2" style="background: transparent;">
@@ -248,8 +250,11 @@ class Producto {
 function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, tipoEntrega, fechaEntrega) {
     let contprod = document.querySelectorAll('#productos tbody').length + 1;
 
-    let producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, tipoEntrega, fechaEntrega);
-    let newRow = producto.crearFila(contprod);
+    const tipoEntregaSeleccionado = document.getElementById('tipoEntrega-1')?.value || '1';
+
+    // Crear instancia del producto
+    const producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, tipoEntregaSeleccionado, fechaEntrega);
+    const newRow = producto.crearFila(contprod, tipoEntregaSeleccionado);
 
     document.getElementById('productos').appendChild(newRow);
 
