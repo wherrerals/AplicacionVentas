@@ -24,6 +24,13 @@ document.addEventListener('DOMContentLoaded', function () {
     sumarTresDias();
 });
 
+
+document.addEventListener('DOMContentLoaded', function () {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+    document.getElementById('fecha_entrega').value = formattedDate;
+});
+
 // Oculta el botón de acciones si no hay número de cotización y deshabilita campos relacionados
 document.addEventListener('DOMContentLoaded', function () {
     const elementosMonitoreados = [
