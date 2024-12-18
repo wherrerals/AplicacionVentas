@@ -50,6 +50,7 @@ urlpatterns = [
     path('detalles_cotizacion/', cotizacionView.detallesCotizacion, name='detalles_cotizacion'),
     path('detalles_ODV/', OdvView.as_view(), name='detalles_ODV'),
     path('ordenesVentas/', view.odv, name='ordenesVentas'),
+    path('imagen/', view.onbtenerImgProducto, name='imagen'),
     path('pruebas/', view.pryebas, name='pruebas'),
     #path('obtener_receta/', view.pryebas, name='obtener_receta'),
 ]

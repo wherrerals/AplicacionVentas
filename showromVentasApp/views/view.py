@@ -848,3 +848,21 @@ def pryebas(request):
     odv = sl.getODV()
 
     return JsonResponse(odv, safe=False)
+
+def onbtenerImgProducto(request):
+    codigo = request.GET.get('codigo')
+
+    if not codigo:
+        return JsonResponse({'error': 'Falta el parámetro: idProducto es obligatorio'}, status=400)
+
+    try:
+        producto = ProductoDB.objects.get(codigo=codigo)
+
+        data = {
+            'imagen': producto.imagen
+        }
+
+        return JsonResponse(data, status=200)
+
+    except ProductoDB.DoesNotExist:
+        return JsonResponse({'error': 'No se encontró el producto solicitado'}, status=404)
