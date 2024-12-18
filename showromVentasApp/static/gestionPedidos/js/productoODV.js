@@ -100,7 +100,7 @@ class Producto {
                 
                 <td style="background: transparent;border-style: none;padding-bottom: 0px;" rowspan="2">
                     <div style="font-size: 12px;">
-                        <small name="precio_venta" >Precio: ${this.precioVenta}</small>
+                        <small name="precio_venta" data-precio-unitario="100.00">Precio: ${this.precioVenta}</small>
                     </div>
                     <div style="font-size: 11px;">
                         <small style="color: rgb(153,153,153); name="precio_lista">Antes: ${this.precioLista}</small>
@@ -124,11 +124,13 @@ class Producto {
                     </div>
                 </td>
                    
-                <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center; id="Precio_Descuento">${this.precioSinDescuento}</td>
+                <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${this.precioSinDescuento}</td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">    
                     <input class="form-control" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad !== undefined ? this.cantidad : 0}">
                 </td>
-                <td style="font-size: 11px;font-weight: bold;background: transparent;border-style: none;text-align: center; id="precio_Venta"><span>${this.totalProducto}</span></td>
+                <td style="font-size: 11px;font-weight: bold;background: transparent;border-style: none;text-align: center;">
+                <span id="precio_Venta">${this.totalProducto}</span>
+                </td>
             </tr>
             <tr  style="font-size: 12px;background: transparent;">
                 <td  style="font-size: 11px;background: transparent;padding-top: 0px;border-style: none;padding-bottom: 0px;" colspan="3">

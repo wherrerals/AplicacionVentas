@@ -1,61 +1,65 @@
-document.addEventListener('DOMContentLoaded', function() {
-  function formatNumber(num) {
-      return num < 10 ? '0' + num : num;
-  }
+document.addEventListener('DOMContentLoaded', function () {
+    function formatNumber(num) {
+        return num < 10 ? '0' + num : num;
+    }
 
-  function sumarTresDias() {
-      let hoy = new Date();
-      let tresDiasDespues = new Date(hoy.getTime() + (3 * 24 * 60 * 60 * 1000));
+    function sumarTresDias() {
+        let hoy = new Date();
+        let tresDiasDespues = new Date(hoy.getTime() + (3 * 24 * 60 * 60 * 1000));
 
-      let dia = formatNumber(tresDiasDespues.getDate());
-      let mes = formatNumber(tresDiasDespues.getMonth() + 1);
-      let año = tresDiasDespues.getFullYear();
+        let dia = formatNumber(tresDiasDespues.getDate());
+        let mes = formatNumber(tresDiasDespues.getMonth() + 1);
+        let año = tresDiasDespues.getFullYear();
 
-      let fechaFormateada = año + '-' + mes + '-' + dia;
+        let fechaFormateada = año + '-' + mes + '-' + dia;
 
-      let diasVencidosLabel = document.getElementById('docDueDate');
-      if (diasVencidosLabel) {
-          diasVencidosLabel.textContent = fechaFormateada;
-      } else {
-          //console.error('Elemento con ID "docDueDate" no encontrado.');
-      }
-  }
+        let diasVencidosLabel = document.getElementById('docDueDate');
+        if (diasVencidosLabel) {
+            diasVencidosLabel.textContent = fechaFormateada;
+        } else {
+            //console.error('Elemento con ID "docDueDate" no encontrado.');
+        }
+    }
 
-  sumarTresDias();
+    sumarTresDias();
 });
 
 // Oculta el botón de acciones si no hay número de cotización y deshabilita campos relacionados
 document.addEventListener('DOMContentLoaded', function () {
-  const numeroCotizacion = document.getElementById('numero_cotizacion');
-  const botonAcciones = document.querySelector('.btn.btn-primary.dropdown-toggle');
+    const elementosMonitoreados = [
+        document.getElementById('numero_cotizacion'),
+        document.getElementById('numero_orden')
+    ].filter(elemento => elemento); // Filtra elementos nulos o indefinidos
 
-  // Campos que se deben deshabilitar
-  const camposADeshabilitar = [
-      document.getElementById('inputCliente'),
-      document.getElementById('contactos_cliete'),
-      document.getElementById('direcciones_despacho'),
-      document.getElementById('tipoEntrega-1'),
-      document.getElementById('direcciones_facturacion')
-  ];
+    const botonAcciones = document.querySelector('.btn.btn-primary.dropdown-toggle');
 
-  function checkNumeroCotizacion() {
-      const tieneTexto = numeroCotizacion.textContent.trim() !== '';
+    // Campos que se deben deshabilitar
+    const camposADeshabilitar = [
+        document.getElementById('inputCliente'),
+        document.getElementById('contactos_cliete'),
+        document.getElementById('direcciones_despacho'),
+        document.getElementById('tipoEntrega-1'),
+        document.getElementById('direcciones_facturacion')
+    ].filter(campo => campo); // Filtra campos nulos o indefinidos
 
-      // Ocultar o mostrar el botón de acciones
-      botonAcciones.style.display = tieneTexto ? 'inline-block' : 'none';
+    function checkElementos() {
+        const tieneTexto = elementosMonitoreados.some(elemento => elemento.textContent.trim() !== '');
 
-      // Deshabilitar o habilitar campos
-      camposADeshabilitar.forEach(campo => {
-          if (campo) {
-              campo.disabled = tieneTexto;
-          }
-      });
-  }
+        // Ocultar o mostrar el botón de acciones
+        botonAcciones.style.display = tieneTexto ? 'inline-block' : 'none';
 
-  // Verificar el estado inicial
-  checkNumeroCotizacion();
+        // Deshabilitar o habilitar campos
+        camposADeshabilitar.forEach(campo => {
+            campo.disabled = tieneTexto;
+        });
+    }
 
-  // Observar cambios en el contenido del número de cotización
-  const observer = new MutationObserver(checkNumeroCotizacion);
-  observer.observe(numeroCotizacion, { childList: true, subtree: true });
+    // Verificar el estado inicial
+    checkElementos();
+
+    // Configurar observadores para todos los elementos monitoreados
+    elementosMonitoreados.forEach(elemento => {
+        const observer = new MutationObserver(checkElementos);
+        observer.observe(elemento, { childList: true, subtree: true });
+    });
 });

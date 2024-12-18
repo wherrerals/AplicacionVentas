@@ -216,8 +216,6 @@ class CotizacionView(View):
         documentClient = client.detalleCotizacionCliente(docentry)
         documentLine = client.detalleCotizacionLineas(docentry)
 
-        print("Document Client:", documentClient)
-
         # Extraer los datos de la clave 'value', asegurándose de manejar la estructura correctamente
         quotations_data = documentClient.get('value', [{}])[0].get('Quotations', {})
         cardCode = quotations_data.get('CardCode')
@@ -235,6 +233,8 @@ class CotizacionView(View):
         if sn.verificarSocioDB(cardCode):
             cotiza = Cotizacion()
             lines_data = cotiza.formatearDatos(data)
+
+            print("Lines data:", lines_data)  # Verificar los datos de las líneas de documento
 
             return JsonResponse(lines_data, safe=False)
         else:
