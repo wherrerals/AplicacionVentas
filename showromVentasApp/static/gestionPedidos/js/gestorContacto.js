@@ -59,11 +59,11 @@ class ContactoManager {
         </div>
         <div class="row">
             <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Teléfono</label></div>
-            <div class="col"><input class="form-control" type="tel" name="telefono[]" style="font-size: 12px;border-color: rgb(159,168,175);"></div>
+            <div class="col"><input class="form-control" type="tel" name="telefono[]" value="+56" style="font-size: 12px;border-color: rgb(159,168,175);"></div>
         </div>
         <div class="row">
             <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Celular</label></div>
-            <div class="col"><input class="form-control" name="celular[]" type="tel" style="font-size: 12px;border-color: rgb(159,168,175);"></div>
+            <div class="col"><input class="form-control" name="celular[]" value="+56" type="tel" style="font-size: 12px;border-color: rgb(159,168,175);"></div>
         </div>
         <div class="row">
             <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Email</label></div>
