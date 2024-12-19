@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function sumarTresDias() {
         let hoy = new Date();
-        let tresDiasDespues = new Date(hoy.getTime() + (3 * 24 * 60 * 60 * 1000));
+        let tresDiasDespues = new Date(hoy.getTime() + (10 * 24 * 60 * 60 * 1000));
 
         let dia = formatNumber(tresDiasDespues.getDate());
         let mes = formatNumber(tresDiasDespues.getMonth() + 1);
@@ -43,10 +43,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // Campos que se deben deshabilitar
     const camposADeshabilitar = [
         document.getElementById('inputCliente'),
-        document.getElementById('contactos_cliete'),
-        document.getElementById('direcciones_despacho'),
-        document.getElementById('tipoEntrega-1'),
-        document.getElementById('direcciones_facturacion')
+        //document.getElementById('contactos_cliete'),
+        //document.getElementById('direcciones_despacho'),
+        //document.getElementById('tipoEntrega-1'),
+        //document.getElementById('direcciones_facturacion')
     ].filter(campo => campo); // Filtra campos nulos o indefinidos
 
     function checkElementos() {

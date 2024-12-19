@@ -133,7 +133,7 @@ class Producto {
             </tr> 
             <tr style="font-size: 12px;background: transparent;">
                 <td style="font-size: 11px;background: transparent;padding-top: 0px;border-style: none;padding-bottom: 0px;"colspan="3">
-                    <input class="form-control" type="text" placeholder="Comentario" style="font-size: 12px;">
+                    <input class="form-control" type="text" placeholder="Comentario" id="comentarios-1" style="font-size: 12px;">
                 </td>
                 <td style="background: transparent;padding-top: 8px;padding-left: 50px;border-style: none;padding-bottom: 0px;">
                     <a class="navbar-brand d-flex align-items-center" href="#" style="width: 18px;">

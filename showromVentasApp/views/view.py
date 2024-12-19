@@ -577,43 +577,39 @@ def agregarContacto(request, cliente, **kwargs):
     return render(request, "cotizacion.html", {'clienteNoIncluido': clienteNoIncluido})
 
 
-"""
-Este metodo sirve para poder guardar los contactos de un cliente en la base de datos a traves de una peticion AJAX
-        creada en los modales, cuando se desea agregar un contacto o editar un contacto de un cliente ya existente.
-        Con este estaba probando pero no lo logre. (no empece con el de direcciones)
-"""
-
 @login_required
 def guardarContactosAJAX(request):
-    
     if request.method == "POST":
-        # Parsear los datos de contactos desde el request
-        contactos_json = request.POST.get('contactos')
-        contactos = json.loads(contactos_json)
-
-        cliente_id = request.POST.get('cliente')
-        cliente = SocioNegocioDB.objects.get(rut=cliente_id)
-
-        # Verificar que el cliente exista
-        if not cliente:
+        # Parsear los datos del cliente
+        cliente_id = request.POST.get('rutSN')  # Verificar que este campo corresponde al RUT
+        try:
+            cliente = SocioNegocioDB.objects.get(rut=cliente_id)
+        except SocioNegocioDB.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Cliente no encontrado'})
 
-        # Iterar sobre los contactos recibidos
-        for contacto in contactos:
-            nombre = contacto['nombre']
-            apellido = contacto['apellido']
-            telefono = contacto.get('telefono')
-            celular = contacto.get('celular')
-            email = contacto.get('email')
+        # Obtener las listas de contactos desde el QueryDict
+        nombres = request.POST.getlist('nombre[]')
+        apellidos = request.POST.getlist('apellido[]')
+        telefonos = request.POST.getlist('telefono[]')
+        celulares = request.POST.getlist('celular[]')
+        emails = request.POST.getlist('email[]')
 
-            # Verificar si los campos requeridos están completos
+        # Iterar sobre los contactos
+        for i in range(len(nombres)):
+            nombre = nombres[i]
+            apellido = apellidos[i]
+            telefono = telefonos[i] if i < len(telefonos) else None
+            celular = celulares[i] if i < len(celulares) else None
+            email = emails[i] if i < len(emails) else None
+
+            # Verificar que los campos requeridos estén completos
             if nombre and apellido:
-                nombreCompleto = f"{nombre} {apellido}"
+                nombre_completo = f"{nombre} {apellido}"
 
                 # Crear o actualizar el contacto
                 ContactoDB.objects.create(
-                    codigoInternoSap=1,  # Aquí deberías manejar la lógica del código interno si es variable
-                    nombreCompleto=nombreCompleto,
+                    codigoInternoSap=1,  # Ajustar esta lógica según sea necesario
+                    nombreCompleto=nombre_completo,
                     nombre=nombre,
                     apellido=apellido,
                     telefono=telefono,
@@ -621,7 +617,7 @@ def guardarContactosAJAX(request):
                     email=email,
                     SocioNegocio=cliente
                 )
-                print(f"Contacto {nombreCompleto} creado con éxito")
+                print(f"Contacto {nombre_completo} creado con éxito")
             else:
                 print(f"No se ha creado el contacto porque algunos campos están vacíos.")
 

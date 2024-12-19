@@ -305,6 +305,8 @@ class Cotizacion(Documento):
             'DocDueDate': jsonData.get('DocDueDate'),
             'TaxDate': jsonData.get('TaxDate'),
             'CardCode': jsonData.get('CardCode'),
+            'NumAtCard': jsonData.get('NumAtCard'),
+            'Comments': jsonData.get('Comments'),
             'PaymentGroupCode': jsonData.get('PaymentGroupCode'),
             'SalesPersonCode': jsonData.get('SalesPersonCode'),
             'TransportationCode': jsonData.get('TransportationCode'),
@@ -322,6 +324,7 @@ class Cotizacion(Documento):
                 'ItemCode': linea.get('ItemCode'),
                 'Quantity': linea.get('Quantity'),
                 'ShipDate': linea.get('ShipDate'),
+                'FreeText': linea.get('FreeText'),
                 'DiscountPercent': linea.get('DiscountPercent'),
                 'WarehouseCode': linea.get('WarehouseCode'),
                 'CostingCode': linea.get('CostingCode'),
@@ -389,7 +392,8 @@ class Cotizacion(Documento):
             if 'success' in response:
                 return {
                     'success': 'Cotización creada exitosamente',
-                    'docNum': docnum
+                    'docNum': docnum,
+                    'docEntry': docentry
                 }
 
         
@@ -424,9 +428,12 @@ class Cotizacion(Documento):
                 # Si contiene DocEntry, es un éxito
                 if 'DocEntry' in response:
                     doc_num = response.get('DocNum')
+                    doc_entry = response.get('DocEntry')
                     return {
                         'success': 'Cotización creada exitosamente',
-                        'docNum': doc_num
+                        'docNum': doc_num,
+                        'docEntry': doc_entry
+
                     }
                 
                 # Si contiene un mensaje de error, manejarlo

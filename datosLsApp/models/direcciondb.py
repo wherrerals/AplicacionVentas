@@ -23,7 +23,7 @@ class DireccionDB(models.Model):
     region = models.ForeignKey(RegionDB,on_delete=models.CASCADE, default=1)
 
     def __str__(self):
-        return f"{self.rowNum}"
+        return f"{self.nombreDireccion}"
     
 
 

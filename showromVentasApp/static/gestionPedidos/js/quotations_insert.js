@@ -1,8 +1,10 @@
 // Crear un nuevo documento de ventas
 document.addEventListener("DOMContentLoaded", function() {
 
-document.getElementById("saveButton").addEventListener("click", submitForm);
-
+  // Asignar el evento 'click' a ambos botones
+  document.getElementById("saveButton").addEventListener("click", submitForm);
+  document.getElementById("saveButton2").addEventListener("click", submitForm);
+  
 function submitForm() {
     // Capturar los datos del documento
     const fechaSolo = new Date().toISOString().split('T')[0]; // Salida en formato YYYY-MM-DD
@@ -20,6 +22,9 @@ function submitForm() {
     const spc  = parseInt(spcInt, 10); //listo Convertir a entero con base 10
     const trnasp = document.getElementById("tipoEntrega-1").value; //listo
     const ulfen = 1; //document.getElementById("uledforenv").value;
+    const referencia = document.getElementById("referencia").value; //listo
+    const observaciones = document.getElementById("Observaciones-1").value; //selecionando observaciones por fila de producto por medio de id
+
 
     const tipoDocElement = document.querySelector("[name='tipoDocTributario']:checked");
     if (!tipoDocElement) {
@@ -44,6 +49,7 @@ function submitForm() {
         const discount = row.querySelector("#agg_descuento").value;
             // Capturar el valor seleccionado en el select de bodega
         const bodegaSelect = row.querySelector(".bodega-select"); // Selecciona el <select> dentro de la fila
+        const comentarios = row.querySelector("#comentarios-1").value; //selecionando comentarios por fila de producto por medio de id
         const warehouseCode = bodegaSelect ? bodegaSelect.value : null;
 
         const costingCode = warehouseCode; //capturar bodega
@@ -61,6 +67,7 @@ function submitForm() {
             "ItemCode": itemCode,
             "Quantity": parseFloat(quantity),
             "ShipDate": docDueDate, //shipDate,
+            "FreeText": comentarios,
             "DiscountPercent": parseFloat(discount),//pendiente porcentaje de descuento
             "WarehouseCode": warehouseCode, //pendiente bodega
             "CostingCode": costingCode, // Pendiente código de sucursal, lc, Ph, gr, rs
@@ -77,7 +84,9 @@ function submitForm() {
         "DocNum": docNum,
         "DocEntry": docEntry, 
         "DocDate": docDate,
+        "NumAtCard": referencia,
         "DocDueDate": docDueDate,
+        "Comments": observaciones,
         "TaxDate": taxDate,
         "CardCode": cardCode,
         "PaymentGroupCode": pgc,  
@@ -109,41 +118,47 @@ function submitForm() {
             }
         })
         .then(data => {
-            console.log('Documento creado exitosamente:', data);
+            console.log('Operación exitosa:', data);
             // Puedes hacer algo aquí como redirigir al usuario o mostrar un mensaje de éxito
             if (data.success) {
-                // Mostrar el número de documento y el mensaje de éxito en un popup bonito
+                const numeroCotizacion = document.getElementById('numero_cotizacion');
+                const esActualizacion = numeroCotizacion && numeroCotizacion.getAttribute('data-docentry');
+        
+                // Determinar si es creación o actualización
+                const titulo = esActualizacion ? 'Cotización actualizada' : 'Cotización creada';
+                const mensaje = esActualizacion 
+                    ? `La cotización fue actualizada exitosamente. N°: ${data.docNum}` 
+                    : `La cotización fue creada exitosamente. N°: ${data.docNum}`;
+        
+                // Mostrar el mensaje dinámico en el popup
                 Swal.fire({
                     icon: 'success',
-                    title: 'Cotización creada',
-                    text: `Número de documento: ${data.docNum}`,
+                    title: titulo,
+                    text: mensaje,
                     confirmButtonText: 'Aceptar'
                 });
-
-                const numeroCotizacion = document.getElementById('numero_cotizacion');
-                
+        
                 if (numeroCotizacion) {
                     numeroCotizacion.textContent = `${data.docNum}`;
+                    numeroCotizacion.setAttribute('data-docEntry', `${data.docEntry}`);
                 }
-
+        
                 bloquearCampos();
-
+        
             } else {
                 // Mostrar el mensaje de error en un popup
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: `Error al crear la cotización: ${data.error}`,
+                    text: `Error al realizar la operación: ${data.error}`,
                     confirmButtonText: 'Aceptar'
                 });
             }
         })
-
-
         .catch(error => {
-            console.error('Hubo un error al crear el documento:', error);
+            console.error('Hubo un error durante la operación:', error);
         });
-    }
+}        
 
     // Función para obtener el token CSRF (si usas Django)
     function getCSRFToken() {
