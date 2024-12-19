@@ -4,7 +4,7 @@ function togglePassword() {
 
     // Verificar si los elementos existen antes de agregar el evento
     if (toggleButton && passwordInput) {
-        toggleButton.addEventListener("click", function() {
+        toggleButton.addEventListener("click", function () {
             if (passwordInput.type === "password") {
                 passwordInput.type = "text";
                 toggleButton.textContent = "Ocultar";
@@ -24,7 +24,7 @@ function toggleRepeatPassword() {
 
     // Verificar si los elementos existen antes de agregar el evento
     if (toggleButton && passwordInput) {
-        toggleButton.addEventListener("click", function() {
+        toggleButton.addEventListener("click", function () {
             if (passwordInput.type === "password") {
                 passwordInput.type = "text";
                 toggleButton.textContent = "Ocultar";
@@ -124,7 +124,7 @@ const cerrarButton = document.getElementById("cerrar");
 
 // Verificar si el elemento existe antes de agregar el evento
 if (cerrarButton) {
-    cerrarButton.addEventListener("click", function(event) {
+    cerrarButton.addEventListener("click", function (event) {
         event.preventDefault();
         handleAction("cerrar");
     });
@@ -134,13 +134,13 @@ if (cerrarButton) {
 
 const cancelarButton = document.getElementById("cancelar");
 if (cancelarButton) {
-    cancelarButton.addEventListener("click", function(event) {
+    cancelarButton.addEventListener("click", function (event) {
         event.preventDefault();
         handleAction("cancelar");
     });
-    } else {
-        //console.warn('El botón con ID "cerrar" no existe en el DOM.');
-    }
+} else {
+    //console.warn('El botón con ID "cerrar" no existe en el DOM.');
+}
 
 
 
@@ -150,9 +150,12 @@ function handleAction(action) {
 
     // Crear objeto de datos a enviar
     const payload = {
-        DocEntry: numeroCotizacion,
+        DocNum: numeroCotizacion,
         Estado: estado
     };
+
+    // Limpiar mensajes previos antes de mostrar nuevos
+    limpiarMensajes();
 
     // Realizar POST con los datos
     fetch('/ventas/cambiar_estado_cotizacion/', {
@@ -162,20 +165,28 @@ function handleAction(action) {
         },
         body: JSON.stringify(payload)
     })
-    .then(response => {
-        if (response.ok) {
-            console.log("Acción realizada con éxito:", payload);
-        } else {
-            console.error("Error en la respuesta del servidor.");
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("Respuesta del servidor:", data);
-    })
-    .catch(error => {
-        console.error("Error al realizar el POST:", error);
-    });
+        .then(response => {
+            if (response.ok) {
+                return response.json(); // Continuar para procesar la respuesta del servidor
+            } else {
+                // Mostrar mensaje de error con el estado de la respuesta
+                mostrarMensaje("Error en la solicitud. Estado: " + response.statusText, "error");
+                throw new Error("Respuesta no exitosa del servidor.");
+            }
+        })
+        .then(data => {
+            if (data.success) { // Suponiendo que el servidor retorna un campo 'success'
+                mostrarMensaje("Acción realizada con éxito.", "success");
+            } else {
+                mostrarMensaje(data.message || "Se produjo un error desconocido.", "error");
+            }
+        })
+        .catch(error => {
+            // Mostrar mensaje de error si falla el POST
+            console.error("Error al realizar el POST:", error);
+            mostrarMensaje("Error al procesar la solicitud: " + error.message, "error");
+        });
+
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -200,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const contactoNombreCompleto = contactoSelect.options[contactoSelect.selectedIndex].text.trim();
             const direcconSelect = document.getElementById('direcciones_despacho');
             const direccionCompleta = direcconSelect.options[direcconSelect.selectedIndex].text.trim();
-                    
+
 
 
             const telefonoSN = document.getElementById('telefonoSN')?.value || 'No disponible';
@@ -224,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else if (showroomCode === 'GR') {
                 showroomDireccion = 'Av. Pdte. Eduardo Frei Montalva #550, Av. Pdte. Eduardo Frei Montalva 520, 8640000 Renca, Región Metropolitana';
             } else if (showroomCode === 'PR') {
-                showroomDireccion = 'PR -- No especificado'; 
+                showroomDireccion = 'PR -- No especificado';
             } else {
                 showroomDireccion = 'Showroom no especificado';
             }
@@ -297,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function () {
             pdf.text(`${grupoSN}`, 10, yPosition + 12);
             //pdf.text(`${direccion}`, 10, yPosition + 18);
             pdf.text(`${direccionCompleta}`, 10, yPosition + 18);
-            pdf.text(`Contacto: ${contactoNombreCompleto}`, 10, yPosition + 24); 
+            pdf.text(`Contacto: ${contactoNombreCompleto}`, 10, yPosition + 24);
             //pdf.text(`Contacto: ${contactoNombre} ${contactoApellido}`, 10, yPosition + 24);    
             pdf.text(`Teléfono: ${telefonoSN}`, 10, yPosition + 30);
             pdf.text(`Email: ${emailSN}`, 10, yPosition + 36);
@@ -350,25 +361,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 pdf.text(`Página | ${pageNumber} de ${totalPages}`, columnWidth * 3 + 5, pageHeight - 8);
             };
 
-                    // Añadir tabla de totales
-                    const agregarTablaTotales = () => {
-                        const totalNeto = document.getElementById('total_neto')?.textContent || '$0';
-                        const iva = document.getElementById('iva')?.textContent || '$0';
-                        const totalBruto = document.getElementById('total_bruto')?.textContent || '$0';
-        
-                        const startY = yPosition + 50; // Espacio adicional debajo de los detalles
-        
-                        pdf.setFontSize(10);
-                        pdf.text('Subtotal Neto:', 10, startY);
-                        pdf.text(totalNeto, 80, startY);
-        
-                        pdf.text('IVA 19%:', 10, startY + 10);
-                        pdf.text(iva, 80, startY + 10);
-        
-                        pdf.text('Total a Pagar:', 10, startY + 20);
-                        pdf.text(totalBruto, 80, startY + 20);
-                    };
-                    agregarTablaTotales();
+            // Añadir tabla de totales
+            const agregarTablaTotales = () => {
+                const totalNeto = document.getElementById('total_neto')?.textContent || '$0';
+                const iva = document.getElementById('iva')?.textContent || '$0';
+                const totalBruto = document.getElementById('total_bruto')?.textContent || '$0';
+
+                const startY = yPosition + 50; // Espacio adicional debajo de los detalles
+
+                pdf.setFontSize(10);
+                pdf.text('Subtotal Neto:', 10, startY);
+                pdf.text(totalNeto, 80, startY);
+
+                pdf.text('IVA 19%:', 10, startY + 10);
+                pdf.text(iva, 80, startY + 10);
+
+                pdf.text('Total a Pagar:', 10, startY + 20);
+                pdf.text(totalBruto, 80, startY + 20);
+            };
+            agregarTablaTotales();
 
             // Configurar contenido del PDF
             const totalPages = 2; // Cambiar dinámicamente según el contenido

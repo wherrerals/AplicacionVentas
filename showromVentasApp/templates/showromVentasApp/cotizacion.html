@@ -14,6 +14,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles.min.css' %}">
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles2.css' %}">
+  <link rel="stylesheet" href="{% static 'gestionPedidos/css/style3.css' %}">
 
 </head>
 
@@ -36,7 +37,6 @@
         <a class="btn btn-primary" role="button" style="font-size: 12px;" href="{% url 'generar_cotizacion' %}">+ Nueva Cotización</a>
       </div>
 
-      
       <div class="col" style="text-align: right;padding-right: 0px;">
         <div class="dropdown">
           <button class="btn btn-primary dropdown-toggle" aria-expanded="false" data-bs-toggle="dropdown" type="button" style="font-size: 12px;">Acciones&nbsp;</button>
@@ -52,6 +52,9 @@
         </div>
       </div>
     </div>
+
+    <div id="contenedor-mensajes-3"></div>
+
     <div class="row">
       <div class="col">
         <p></p>
@@ -191,7 +194,7 @@
                             <label class="col-form-label" style="font-size: 13px;">Teléfono</label>
                           </div>
                           <div class="col-sm-4">
-                            <input class="form-control" type="tel" name="telefonoSN" id="telefonoSN" value="{{ telefono }}" style="border-color: rgb(159,168,175); font-size: 12px;">
+                            <input class="form-control" type="tel" name="telefonoSN" id="telefonoSN" value="{{ telefono|default:"+56" }}" style="border-color: rgb(159,168,175); font-size: 12px;">
                           </div>
                           <div class="col-sm-2" style="text-align: right;">
                             <label class="col-form-label" style="font-size: 13px;">Email</label>

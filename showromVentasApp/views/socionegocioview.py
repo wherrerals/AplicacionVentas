@@ -135,7 +135,7 @@ class SocioNegocioView(FormView):
     def busquedaSocioNegocio(self, request):
         """
         Método para buscar un socio de negocio
-        
+
         args: 
             request: HttpRequest
 
@@ -151,6 +151,8 @@ class SocioNegocioView(FormView):
 
                 # Búsqueda por número (rut)
                 if numero:
+                    # Limpiar la "C" al final del número si existe
+                    numero = numero.rstrip('C')
                     resultados_por_numero = SocioNegocio.buscarSocioNegocio(numero)
                     resultados.extend(resultados_por_numero)
 
@@ -167,6 +169,7 @@ class SocioNegocioView(FormView):
             return JsonResponse({'error': 'No se proporcionó un número o nombre válido'})
 
         return JsonResponse({'error': 'Método no permitido'}, status=405)
+
         
     def verificarSapSocio(self, request):
         """

@@ -56,7 +56,11 @@ function limpiarMensajes() {
 }
 
 function mostrarMensaje(mensaje, tipo) {
-    const contenedorMensajes = document.getElementById('contenedor-mensajes') || document.body;
+    // Buscar los contenedores donde se mostrarán los mensajes
+    const contenedorMensajes1 = document.getElementById('contenedor-mensajes') || document.body;
+    const contenedorMensajes3 = document.getElementById('contenedor-mensajes-3') || document.body;
+
+    // Crear el mensaje
     const div = document.createElement('div');
 
     // Usar clases de Bootstrap para los mensajes
@@ -66,14 +70,26 @@ function mostrarMensaje(mensaje, tipo) {
         ${mensaje}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
-    
 
-    contenedorMensajes.appendChild(div);
+    // Agregar el mensaje al contenedor principal
+    contenedorMensajes1.appendChild(div);
 
-    // Eliminar automáticamente el mensaje después de 5 segundos
+    // Si existe el contenedor adicional, clonar el mensaje y agregarlo
+    if (contenedorMensajes3 !== document.body) {
+        const divClone = div.cloneNode(true);
+        contenedorMensajes3.appendChild(divClone);
+
+        // Programar eliminación del mensaje clonado
+        setTimeout(() => {
+            divClone.classList.remove('show');  // Desvanecer el mensaje
+            setTimeout(() => divClone.remove(), 150);  // Removerlo del DOM
+        }, 5000);
+    }
+
+    // Programar eliminación del mensaje original
     setTimeout(() => {
         div.classList.remove('show');  // Desvanecer el mensaje
-        setTimeout(() => div.remove(), 150);  // Luego removerlo del DOM
+        setTimeout(() => div.remove(), 150);  // Removerlo del DOM
     }, 5000);
 }
 
