@@ -8,6 +8,8 @@ from datosLsApp.models import (
 
 from datosLsApp.models.regiondb import RegionDB
 from datosLsApp.models.stockbodegasdb import StockBodegasDB
+from datosLsApp.models.confiDescuentosDB import ConfiDescuentosDB
+from datosLsApp.models.confiEmpresaDB import ConfiEmpresaDB 
 
 
 # Modificaciones en administrador
@@ -101,3 +103,5 @@ admin.site.register(TipoClienteDB, TipoClienteDBper)
 admin.site.register(ComunaDB, ComunaDBper)
 admin.site.register(RegionDB, RegionDBper)
 admin.site.register(StockBodegasDB, stockBodegasDBper)
+admin.site.register(ConfiDescuentosDB)
+admin.site.register(ConfiEmpresaDB)
