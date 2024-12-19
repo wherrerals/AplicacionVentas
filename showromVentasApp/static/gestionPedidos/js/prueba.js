@@ -3,6 +3,7 @@ const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
 document.getElementById('forCrearPedidos').addEventListener('submit', function(event) {
     event.preventDefault();
+    showLoadingOverlay();
 
     const formData = new FormData(this);
     const submitButton = this.querySelector('button[type="submit"]');
@@ -17,6 +18,7 @@ document.getElementById('forCrearPedidos').addEventListener('submit', function(e
     })
     .then(response => {
         submitButton.disabled = false;
+        hideLoadingOverlay();
         
         if (!response.ok) {
             if (response.status === 400) {
@@ -29,6 +31,21 @@ document.getElementById('forCrearPedidos').addEventListener('submit', function(e
                 throw new Error('Error desconocido');
             }
         }
+            // Capturar el RUT directamente desde el campo #rutSN
+            const rutSNInput = document.getElementById('rutSN');
+            const rutCliente = rutSNInput.value;
+
+            if (rutCliente) {
+                // Actualizar el valor en el #inputCliente
+                const inputCliente = document.getElementById('inputCliente');
+                inputCliente.value = rutCliente;
+                console.log('Nuevo valor en inputCliente:', rutCliente);
+
+                // Ejecutar la búsqueda con el RUT
+                $('#resultadosClientes').empty(); // Vacía el contenedor de resultados
+                traerInformacionCliente(rutCliente);
+            }
+
         return response.json();
     })
     .then(data => {
@@ -39,13 +56,6 @@ document.getElementById('forCrearPedidos').addEventListener('submit', function(e
         } else {
             mostrarMensaje(data.message || 'Operación exitosa', 'success');
             
-            // Cerrar el modal usando Bootstrap
-            const modalElement = document.getElementById('clienteModal'); // ID de tu modal
-            const modalInstance = bootstrap.Modal.getInstance(modalElement);
-            if (modalInstance) {
-                modalInstance.hide();
-            }
-
             // Descomenta la siguiente línea si quieres redirigir después de la creación exitosa
             // window.location.href = '/ruta-exitosa/';
         }
@@ -63,11 +73,7 @@ function limpiarMensajes() {
 }
 
 function mostrarMensaje(mensaje, tipo) {
-    // Buscar los contenedores donde se mostrarán los mensajes
-    const contenedorMensajes1 = document.getElementById('contenedor-mensajes') || document.body;
-    const contenedorMensajes3 = document.getElementById('contenedor-mensajes-3') || document.body;
-
-    // Crear el mensaje
+    const contenedorMensajes = document.getElementById('contenedor-mensajes') || document.body;
     const div = document.createElement('div');
 
     // Usar clases de Bootstrap para los mensajes
@@ -78,24 +84,12 @@ function mostrarMensaje(mensaje, tipo) {
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
 
-    // Agregar el mensaje al contenedor principal
-    contenedorMensajes1.appendChild(div);
+    contenedorMensajes.appendChild(div);
 
-    // Si existe el contenedor adicional, clonar el mensaje y agregarlo
-    if (contenedorMensajes3 !== document.body) {
-        const divClone = div.cloneNode(true);
-        contenedorMensajes3.appendChild(divClone);
-
-        // Programar eliminación del mensaje clonado
-        setTimeout(() => {
-            divClone.classList.remove('show');  // Desvanecer el mensaje
-            setTimeout(() => divClone.remove(), 150);  // Removerlo del DOM
-        }, 5000);
-    }
-
-    // Programar eliminación del mensaje original
+    // Eliminar automáticamente el mensaje después de 5 segundos
     setTimeout(() => {
         div.classList.remove('show');  // Desvanecer el mensaje
-        setTimeout(() => div.remove(), 150);  // Removerlo del DOM
+        setTimeout(() => div.remove(), 150);  // Luego removerlo del DOM
     }, 5000);
 }
+
