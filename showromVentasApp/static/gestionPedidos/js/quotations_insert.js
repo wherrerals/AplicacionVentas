@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("saveButton2").addEventListener("click", submitForm);
   
 function submitForm() {
+    showLoadingOverlay();
     // Capturar los datos del documento
     const fechaSolo = new Date().toISOString().split('T')[0]; // Salida en formato YYYY-MM-DD
 
@@ -157,6 +158,10 @@ function submitForm() {
         })
         .catch(error => {
             console.error('Hubo un error durante la operación:', error);
+        })
+        .finally(() => {
+            // Ocultar el overlay en cualquier caso
+            hideLoadingOverlay();
         });
 }        
 
