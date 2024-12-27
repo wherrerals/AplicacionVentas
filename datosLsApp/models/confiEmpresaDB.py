@@ -2,10 +2,10 @@ from django.db import models
 
 class ConfiEmpresaDB(models.Model):
     class Meta:
-        db_table = "Descuento"
+        db_table = "ConfiEmpresa"
         
-        verbose_name = 'Descuento'
-        verbose_name_plural = 'Descuento'
+        verbose_name = 'ConfiEmpresa'
+        verbose_name_plural = 'ConfiEmpresa'
 
     
     id = models.AutoField(primary_key= True)

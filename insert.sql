@@ -20,11 +20,11 @@ VALUES
     ('I', 'Privado','Persona Natural');
 
 -- Insert para Sucursal
-insert into sucursal (codigo, nombre)
+insert into Sucursal (codigo, nombre)
 values
-	('LC', 'Las condes'),
-    ('PH', 'Padre Hurtado'),
-    ('GR', 'Grajales');
+	('LC', 'LC'),
+    ('PH', 'PH'),
+    ('GR', 'PH');
 
 -- Insert para Bodega
 insert into bodega (codigo, nombre, descripcion)
@@ -35,7 +35,7 @@ values
 	('ME', 'Mersan', 'bodega');
     
 -- Insert regiones
-INSERT INTO region (numero, nombre) VALUES
+INSERT INTO Region (numero, nombre) VALUES
 (15, 'Región de Arica y Parinacota'),
 (1, 'Región de Tarapacá'),
 (2, 'Región de Antofagasta'),
@@ -55,7 +55,7 @@ INSERT INTO region (numero, nombre) VALUES
 
 
 
-INSERT INTO comuna (codigo, nombre, region_id) VALUES
+INSERT INTO Comuna (codigo, nombre, region_id) VALUES
 -- Región de Tarapacá (1)
 ('01101', 'Iquique', 1),
 ('01107', 'Alto Hospicio', 1),
@@ -435,7 +435,7 @@ INSERT INTO comuna (codigo, nombre, region_id) VALUES
 
 
 
--- Para testear:
+/* -- Para testear:
 
 -- Insert para Producto
 INSERT INTO producto (codigo, nombre, imagen, stockTotal, precioLista, precioVenta, dsctoMaxTienda, dctoMaxProyectos, linkProducto)
@@ -485,3 +485,4 @@ INSERT INTO stockbodegas (stock, idBodega_id, idProducto_id) VALUES
 (5, 'PH', 'N10400418'),
 (5, 'GR', 'N10400418'),
 (5, 'ME', 'N10400418');
+ */
