@@ -27,7 +27,8 @@ class DireccionManager {
 
     // Crear una nueva fila para la dirección
     let newRow = document.createElement('div');
-    newRow.className = "col-sm-5";
+    newRow.className = "col-sm-5 direcciones";
+    //newroww de id para poder eliminar
     newRow.style = "font-size: 12px;background: #f0f2f5;width: 230px; margin-right: 10px;";
     newRow.innerHTML = `
         <div class="col-sm-12" style="width: 100%;height: 10px;"><span>&nbsp;</span></div>
@@ -37,6 +38,15 @@ class DireccionManager {
             <div class="col" style="text-align: center;">
               <span style="font-weight: bold;">Dirección Nº ${this.contdir}</span></div>
             <div class="col-sm-12" style="height: 5px;background: transparent;"><span>&nbsp;</span></div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-9"><span></span>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" id="formCheck-1" name="dirDespacho" value="1" style="border-color: rgb(159,168,175);" checked="">
+                <label class="form-check-label" for="formCheck-3">Principal</label>
+              </div>
+            </div>
           </div>
   
           <div class="row">
@@ -58,7 +68,7 @@ class DireccionManager {
               <label class="col-form-label" style="font-size: 13px;">Tipo</label>
             </div>
             <div class="col">
-              <select class="form-select" name="tipodireccion[]" style="font-size: 12px;border-color: rgb(159,168,175);">
+              <select class="form-select" id="direccionSN" name="tipodireccion[]" style="font-size: 12px;border-color: rgb(159,168,175);">
                 <optgroup label="Tipo">
                   <option value="12" ${tipoDireccion === 'Despacho' ? 'selected' : ''}>Despacho</option>
                   <option value="13" ${tipoDireccion === 'Facturación' ? 'seleced' : ''}>Facturación</option>
@@ -72,7 +82,7 @@ class DireccionManager {
               <label class="col-form-label" style="font-size: 13px;">Nombre</label> 
             </div>
             <div class="col">
-              <input class="form-control" type="text" name="nombre_direccion[]" id="nombre_direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
+              <input class="form-control" type="text" id="nombreDireccionSN" name="nombre_direccion[]" id="nombre_direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
             </div>
           </div>
 
@@ -81,7 +91,7 @@ class DireccionManager {
               <label class="col-form-label" style="font-size: 13px;">País</label>
             </div>
             <div class="col">
-              <select class="form-select" name="pais[]" style="font-size: 12px;border-color: rgb(159,168,175);">
+              <select class="form-select" id="paisSN" name="pais[]" style="font-size: 12px;border-color: rgb(159,168,175);">
                 <optgroup label="País">
                   <option value="Chile" selected="">Chile</option>
                 </optgroup>
@@ -94,7 +104,7 @@ class DireccionManager {
               <label class="col-form-label" style="font-size: 13px;">Región</label>
             </div>
             <div class="col">
-              <select class="form-select" name="region[]" style="font-size: 12px;border-color: rgb(159,168,175);">
+              <select class="form-select" name="region[]" id="regionSN" style="font-size: 12px;border-color: rgb(159,168,175);">
                 <optgroup label="Región">
                   <option value="15">Arica y Parinacota</option>
                   <option value="1">Tarapacá</option>
@@ -123,7 +133,7 @@ class DireccionManager {
               <label class="col-form-label" style="font-size: 13px;">Comuna</label>
             </div>
             <div class="col">
-              <select class="form-select" name="comuna[]" style="font-size: 12px;border-color: rgb(159,168,175);">
+              <select class="form-select" id="comunaSN" name="comuna[]" style="font-size: 12px;border-color: rgb(159,168,175);">
                 <option value="">Seleccione una comuna</option>
                 <!-- Las comunas se cargarán dinámicamente aquí -->
               </select>
@@ -135,7 +145,7 @@ class DireccionManager {
               <label class="col-form-label" style="font-size: 13px;">Ciudad</label>
             </div>
             <div class="col">
-              <input class="form-control" type="text" name="ciudad[]" id="ciudad" style="border-color: rgb(159,168,175);font-size: 12px;">
+              <input class="form-control" type="text"  name="ciudad[]" id="ciudad" style="border-color: rgb(159,168,175);font-size: 12px;">
             </div>
           </div>
 
@@ -154,75 +164,75 @@ class DireccionManager {
       
         <div class="col-sm-1" style="padding: 0px;width: 20px;"><span></span></div>
       `;
-  
-      // Agregar la nueva fila al contenedor indicado
+
+    // Agregar la nueva fila al contenedor indicado
     let container = document.getElementById(containerId);
     container.style.display = "flex";
     container.style.flexDirection = "row";
     container.style.overflowX = "auto"; // Permitir desplazamiento horizontal
     container.appendChild(newRow);
-      
-      container.appendChild(newRow);
-      newRow.querySelector('#eliminar_dir').addEventListener('click', () => newRow.remove());
-    }
+
+    container.appendChild(newRow);
+    newRow.querySelector('#eliminar_dir').addEventListener('click', () => newRow.remove());
   }
-  
+}
 
-  // Crear una instancia de DireccionManager al cargar la página
-  $(document).ready(() => {
-    new DireccionManager();
-  });
 
-  
+// Crear una instancia de DireccionManager al cargar la página
+$(document).ready(() => {
+  new DireccionManager();
+});
+
+
 // Inicializa los eventos y configuraciones
 function initDireccionManager() {
-    $(document).ready(() => {
-        // Evento para abrir el modal de despacho
-        $('#dirDespModal').on('show.bs.modal', () => {
-            let clienteRut = $('#inputCliente').attr('data-rut');
-            console.log("RUT del cliente:", clienteRut);
-            if (clienteRut) {
-                cargarDirecciones(clienteRut, "12", '#listaDireccionDespacho'); // Cargar solo direcciones de despacho (tipo 12)
-            } else {
-                $('#listaDireccionDespacho').html('<p>No se ha seleccionado un cliente.</p>');
-            }
-        });
-
-        // Evento para abrir el modal de facturación
-        $('#dirFactModal').on('show.bs.modal', () => {
-            let clienteRut = $('#inputCliente').attr('data-rut');
-            console.log("RUT del cliente:", clienteRut);
-            if (clienteRut) {
-                cargarDirecciones(clienteRut, "13", '#listaDireccionFacturacion'); // Cargar solo direcciones de facturación (tipo 13)
-            } else {
-                $('#listaDireccionFacturacion').html('<p>No se ha seleccionado un cliente.</p>');
-            }
-        });
+  $(document).ready(() => {
+    // Evento para abrir el modal de despacho
+    $('#dirDespModal').on('show.bs.modal', () => {
+      let clienteRut = $('#inputCliente').attr('data-rut');
+      console.log("RUT del cliente:", clienteRut);
+      if (clienteRut) {
+        cargarDirecciones(clienteRut, "12", '#listaDireccionDespacho'); // Cargar solo direcciones de despacho (tipo 12)
+      } else {
+        $('#listaDireccionDespacho').html('<p>No se ha seleccionado un cliente.</p>');
+      }
     });
+
+    // Evento para abrir el modal de facturación
+    $('#dirFactModal').on('show.bs.modal', () => {
+      let clienteRut = $('#inputCliente').attr('data-rut');
+      console.log("RUT del cliente:", clienteRut);
+      if (clienteRut) {
+        cargarDirecciones(clienteRut, "13", '#listaDireccionFacturacion'); // Cargar solo direcciones de facturación (tipo 13)
+      } else {
+        $('#listaDireccionFacturacion').html('<p>No se ha seleccionado un cliente.</p>');
+      }
+    });
+  });
 }
 
 // Función para cargar direcciones del cliente seleccionado
 function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
-    let buscarClientesUrl = '/ventas/buscar_clientes/';
+  let buscarClientesUrl = '/ventas/buscar_clientes/';
 
-    $.ajax({
-        url: buscarClientesUrl,
-        data: { 'numero': clienteRut },
-        dataType: 'json',
-        success: (data) => {
-            $(listaSelector).empty(); // Limpiar el contenido previo
+  $.ajax({
+    url: buscarClientesUrl,
+    data: { 'numero': clienteRut },
+    dataType: 'json',
+    success: (data) => {
+      $(listaSelector).empty(); // Limpiar el contenido previo
 
-            if (data.resultadosClientes && data.resultadosClientes.length > 0) {
-                const cliente = data.resultadosClientes[0];
-                const direcciones = cliente.direcciones || [];
-                console.log("Direcciones encontradas:", direcciones);
+      if (data.resultadosClientes && data.resultadosClientes.length > 0) {
+        const cliente = data.resultadosClientes[0];
+        const direcciones = cliente.direcciones || [];
+        console.log("Direcciones encontradas:", direcciones);
 
-                // Filtrar direcciones por tipo
-                const direccionesFiltradas = direcciones.filter(direccion => direccion.tipoDireccion === tipoDireccion);
+        // Filtrar direcciones por tipo
+        const direccionesFiltradas = direcciones.filter(direccion => direccion.tipoDireccion === tipoDireccion);
 
-                if (direccionesFiltradas.length > 0) {
-                    direccionesFiltradas.forEach((direccion, index) => {
-                        let direccionElemento = `
+        if (direccionesFiltradas.length > 0) {
+          direccionesFiltradas.forEach((direccion, index) => {
+            let direccionElemento = `
 
                              <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 230px; margin-right: 10px;">
                                 <div class="row">
@@ -346,72 +356,72 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                 </div>
                             </div>
                         `;
-                        //console.log("region: ", direccion.region);
-                        //console.log("comuna: ", direccion.comuna);
-                        //console.log("region numero: ", direccion.region_numero);
-                        //console.log("Comuna numero: ", direccion.comuna_codigo);
-                        $(listaSelector).append(direccionElemento); // Agregar la dirección al modal correspondiente
+            //console.log("region: ", direccion.region);
+            //console.log("comuna: ", direccion.comuna);
+            //console.log("region numero: ", direccion.region_numero);
+            //console.log("Comuna numero: ", direccion.comuna_codigo);
+            $(listaSelector).append(direccionElemento); // Agregar la dirección al modal correspondiente
 
-                        const regionSelect = $(`#region_${index}`);
-                        const comunaSelect = $(`#comuna_${index}`);
-                        cargarComunas(direccion.region_numero, comunaSelect, direccion.comuna_codigo);
+            const regionSelect = $(`#region_${index}`);
+            const comunaSelect = $(`#comuna_${index}`);
+            cargarComunas(direccion.region_numero, comunaSelect, direccion.comuna_codigo);
 
-                        $(document).on('click', `#editar_dir_${index}`, function() {
-                          console.log("Habilitando edición para la dirección con index:", index);
-                          
-                          // Hacer los campos editables
-                          $(`#tipoDireccion_${index}`).prop('disabled', false)
-                          $(`#direccion_${index}`).prop('disabled', false);
-                          $(`#pais_${index}`).prop('disabled', false);
-                          $(`#region_${index}`).prop('disabled', false);
-                          $(`#ciudad_${index}`).prop('disabled', false);
-                          $(`#comuna_${index}`).prop('disabled', false);
-                          $(`#nombreDireccion_${index}`).prop('disabled', false);
-                          
-                          // Añadir los atributos name a los campos editados
-                          $(`#tipoDireccion_${index}`).attr('name', 'tipodireccion[]');
-                          $(`#direccion_${index}`).attr('name', 'nombre_direccion[]');
-                          $(`#pais_${index}`).attr('name', 'pais[]');
-                          $(`#region_${index}`).attr('name', 'region[]');
-                          $(`#ciudad_${index}`).attr('name', 'ciudad[]');
-                          $(`#comuna_${index}`).attr('name', 'comuna[]').attr('data-comuna', direccion.comuna);
-                          $(`#nombreDireccion_${index}`).attr('name', 'direccion[]');
-                          $(`#contacto_id_${index}`).attr('name', 'direccionid[]');
+            $(document).on('click', `#editar_dir_${index}`, function () {
+              console.log("Habilitando edición para la dirección con index:", index);
 
-                          let tipoDireccion = $(`input[name="tipodireccion[]"]`).val();
-                          console.log('Valor capturado de tipoDireccion:', tipoDireccion);
+              // Hacer los campos editables
+              $(`#tipoDireccion_${index}`).prop('disabled', false)
+              $(`#direccion_${index}`).prop('disabled', false);
+              $(`#pais_${index}`).prop('disabled', false);
+              $(`#region_${index}`).prop('disabled', false);
+              $(`#ciudad_${index}`).prop('disabled', false);
+              $(`#comuna_${index}`).prop('disabled', false);
+              $(`#nombreDireccion_${index}`).prop('disabled', false);
 
-                      
-                          console.log("Edición habilitada para la dirección con index:", index);
-                      });
-                      
+              // Añadir los atributos name a los campos editados
+              $(`#tipoDireccion_${index}`).attr('name', 'tipodireccion[]');
+              $(`#direccion_${index}`).attr('name', 'nombre_direccion[]');
+              $(`#pais_${index}`).attr('name', 'pais[]');
+              $(`#region_${index}`).attr('name', 'region[]');
+              $(`#ciudad_${index}`).attr('name', 'ciudad[]');
+              $(`#comuna_${index}`).attr('name', 'comuna[]').attr('data-comuna', direccion.comuna);
+              $(`#nombreDireccion_${index}`).attr('name', 'direccion[]');
+              $(`#contacto_id_${index}`).attr('name', 'direccionid[]');
 
-                        $(`#eliminar_dir_${index}`).on('click', function() {
-                          if (confirm('¿Estás seguro que deseas eliminar esta direccion?')) {
-                              $(this).closest('.col-sm-5').remove();
-                          }
-                      });
-                      
-                    });
-                } else {
-                    console.log(`No hay direcciones de tipo ${tipoDireccion} para este cliente`);
-                    $(listaSelector).html(`<p id="dirmens1">No hay direcciones disponibles de este tipo.</p>`);
-                }
-            } else {
-                console.log("No se encontraron clientes con el RUT proporcionado");
-                $(listaSelector).html('<p id="dirmens1>Error al cargar direcciones.</p>');
-            }
-        },
-        error: (xhr, status, error) => {
-            console.error('Error al obtener las direcciones del cliente:', error);
-            $(listaSelector).html('<p id="dirmens1>Error al cargar direcciones.</p>');
+              let tipoDireccion = $(`input[name="tipodireccion[]"]`).val();
+              console.log('Valor capturado de tipoDireccion:', tipoDireccion);
+
+
+              console.log("Edición habilitada para la dirección con index:", index);
+            });
+
+
+            $(`#eliminar_dir_${index}`).on('click', function () {
+              if (confirm('¿Estás seguro que deseas eliminar esta direccion?')) {
+                $(this).closest('.col-sm-5').remove();
+              }
+            });
+
+          });
+        } else {
+          console.log(`No hay direcciones de tipo ${tipoDireccion} para este cliente`);
+          $(listaSelector).html(`<p id="dirmens1">No hay direcciones disponibles de este tipo.</p>`);
         }
-    });
+      } else {
+        console.log("No se encontraron clientes con el RUT proporcionado");
+        $(listaSelector).html('<p id="dirmens1>Error al cargar direcciones.</p>');
+      }
+    },
+    error: (xhr, status, error) => {
+      console.error('Error al obtener las direcciones del cliente:', error);
+      $(listaSelector).html('<p id="dirmens1>Error al cargar direcciones.</p>');
+    }
+  });
 }
 
 // Inicializar la gestión de direcciones al cargar la página
 $(document).ready(() => {
-    initDireccionManager();
+  initDireccionManager();
 });
 
 

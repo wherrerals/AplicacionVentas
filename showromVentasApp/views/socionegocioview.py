@@ -82,22 +82,27 @@ class SocioNegocioView(FormView):
             return handler(request)
         return JsonResponse({'error': 'Invalid URL'}, status=404)
 
+
+
+    def agregarSN(self, request):
+
+        if request.method == 'POST':
+            
+
+            pass
+
     def agregarSocioNegocio(self, request):
+        
+        print("Datos Socio Negocio:", request.body) 
         if request.method == 'POST':
 
             try:
-                request.POST = request.POST.copy() # Copiar el QueryDict para poder modificarlo
-
-                # Crear instancia del socio de negocio y llamar al servicio
                 socioNegoService = SocioNegocio(request)
 
-                # Llamar al servicio para crear o actualizar el cliente
                 response = socioNegoService.crearOActualizarCliente()
 
-                # Si la respuesta es un JsonResponse, obtenemos su contenido
                 response_data = json.loads(response.content)
 
-                # Manejar la respuesta según el valor de 'success'
                 if response_data.get('success'):
                     return JsonResponse(
                         {
@@ -109,7 +114,6 @@ class SocioNegocioView(FormView):
                     )
 
                 else:
-                    # Si 'success' es False, enviamos un mensaje de error
                     return JsonResponse(
                         {
                             'success': False,
@@ -120,15 +124,12 @@ class SocioNegocioView(FormView):
                     )
 
             except ValidationError as e:
-                # Error de validación, retornamos un mensaje claro
                 return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
             except KeyError as e:
-                # Error por campo faltante en la solicitud
                 return JsonResponse({'success': False, 'error': f"Falta el campo requerido: {str(e)}"}, status=400)
 
             except Exception as e:
-                # Error inesperado, se loguea y se informa al usuario de forma genérica
                 print(f"Error inesperado: {str(e)}")
                 return JsonResponse({'success': False, 'error': 'Error inesperado, contacte con soporte'}, status=500)
             
@@ -213,12 +214,20 @@ class SocioNegocioView(FormView):
 
         if request.method != 'GET':
             return JsonResponse({'error': 'Método no permitido'}, status=405)
+        
         rut = request.GET.get('rut')
+        print("RUT:", rut)
+
         if not rut:
             return JsonResponse({'error': 'No se proporcionó un RUT de socio de negocio'}, status=400)
         try:
+
             socio_negocio_service = SocioNegocio(request)
+
+            print("obtener info cliente")
             cardCode = socio_negocio_service.generarCardCode(rut)
+
+            print("CardCode:", cardCode)
 
             if socio_negocio_service.verificarSocioDB(cardCode):
                 return socio_negocio_service.responderInfoCliente(rut)

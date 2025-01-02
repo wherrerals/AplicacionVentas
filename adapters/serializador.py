@@ -167,5 +167,68 @@ class Serializador:
     
 
 
+    def serializarSN(data):
+
+        print(data)
+        # Decodifica el JSON de entrada
+        client_data = json.loads(data)
+        
+        # Serializa los datos principales del cliente
+        serialized_data = {
+            "CardCode": client_data.get("rutSN", "").replace("-", ""),
+            "CardName": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
+            "CardType": "C",
+            "GroupCode": client_data.get("tipoSN", ""),
+            "Phone1": client_data.get("telefonoSN", ""),
+            "Phone2": client_data.get("telefonoSN", ""),
+            "Notes": client_data.get("giroSN", ""),
+            "PayTermsGrpCode": -1,
+            "FederalTaxID": client_data.get("rutSN", "").split("-")[0],
+            "SalesPersonCode": -1,
+            "Cellular": client_data.get("telefonoSN", ""),
+            "EmailAddress": client_data.get("emailSN", ""),
+            "CardForeignName": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
+            "ShipToDefault": "DESPACHO",
+            "BilltoDefault": "FACTURACION",
+            "DunningTerm": "ESTANDAR",
+            "CompanyPrivate": "cPrivate",
+            "AliasName": client_data.get("nombreSN", ""),
+            "U_Tipo": "N",
+            "U_FE_Export": "N",
+            "BPAddresses": [],
+            "ContactEmployees": []
+        }
+        
+        # Serializa las direcciones
+        for address in client_data.get("direcciones", []):
+            serialized_address = {
+                "AddressName": address.get("nombreDireccion", ""),
+                "Street": address.get("direccion", ""),
+                "City": address.get("ciudad", ""),
+                "County": address.get("tipoDireccion", ""),
+                "Country": address.get("pais", "")[:2].upper(),  # Abreviación del país (e.g., Chile -> CL)
+                "State": address.get("region", ""),
+                "FederalTaxID": client_data.get("rutSN", "").split("-")[0],
+                "TaxCode": "IVA",
+                "AddressType": "bo_ShipTo"
+            }
+            serialized_data["BPAddresses"].append(serialized_address)
+        
+        # Serializa los contactos
+        for contact in client_data.get("contactos", []):
+            serialized_contact = {
+                "Name": f"{contact.get('nombreContacto', '')} {contact.get('apellidoContacto', '')}".strip(),
+                "Phone1": contact.get("telefonoContacto", ""),
+                "MobilePhone": contact.get("telefonoContacto", ""),
+                "E_Mail": contact.get("emailContacto", ""),
+                "FirstName": contact.get("nombreContacto", ""),
+                "LastName": contact.get("apellidoContacto", "")
+            }
+            serialized_data["ContactEmployees"].append(serialized_contact)
+        
+        return serialized_data
+        
+
+
 
 
