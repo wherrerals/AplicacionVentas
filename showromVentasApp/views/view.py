@@ -413,8 +413,6 @@ def mis_datos(request):
 def actualizarAgregarDirecion(request, socio):
     if request.method == "POST":
         try:
-            print("socionegocio", socio)
-
             print("Estos son los datos:", request.POST)
             # Delegamos la lógica de procesamiento al servicio
             result = SocioNegocio.procesarDirecciones(request.POST, socio)
@@ -429,12 +427,9 @@ def actualizarAgregarDirecion(request, socio):
 def actualizarAgregarContacto(request, socio):
     if request.method == "POST":
         try:
-            print("socionegocio", socio)
             print("Estos son los datos:", request.POST)
             # Delegamos la lógica de procesamiento al servicio
             result = SocioNegocio.procesarContactos(request.POST, socio)
-
-            print("Resultado:", result)
             
 
             return JsonResponse(result['data'], status=result['status'])

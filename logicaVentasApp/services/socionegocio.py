@@ -772,6 +772,9 @@ class SocioNegocio:
     def procesarContactos(data, socio):
 
         print("Procesando contactos...")
+        print(f"Datos recibidos: {data}")
+        print(f"Datos recibidos: {data.getlist('contactos')}")
+
         try:
             contactos_json = data.getlist('contactos')
             print(f"Contactos JSON: {contactos_json}")

@@ -39,6 +39,53 @@ class Serializador:
             'Cellular': datos['telefonoSN'],
             'EmailAddress': datos['emailSN'],
         }
+    
+    def mapearDirecciones(self, datos, cardCode):
+        
+        return {
+
+            'BPAddresses': [
+                {   
+                    'RowNum': 0,
+                    'AddressName': datos['nombreDireccion'],
+                    'Street': datos['direccion'],
+                    'City': datos['ciudad'],
+                    'AddressType': datos['tipoDireccion'],
+                    'Country': datos['pais'][:2].upper(),
+                    'State': datos['region'],
+                    'BPCode': cardCode,
+                    'TaxCode': 'IVA',
+                    'AddressType': 'bo_ShipTo'
+                }
+            ]
+            
+        }
+
+    def mapearContactos(self, datos, cardCode):
+        print("actualizando contactos")
+        print("Datos en mapearContactos: ", datos)
+        
+        # Decodificar la lista de contactos desde JSON
+        contactos = json.loads(datos.get('contactos')[0])  # Obtiene y decodifica la lista de contactos
+        
+        # Construir la lista de empleados de contacto
+        contactos_mapeados = []
+        for contacto in contactos:
+            contactos_mapeados.append({
+                'InternalCode': contacto.get('codigoInternoSap'),
+                'Name': f"{contacto.get('nombre')} {contacto.get('apellido')}",
+                'Phone1': contacto.get('telefono'),
+                'MobilePhone': contacto.get('celular'),
+                'E_Mail': contacto.get('email'),
+                'CardCode': cardCode,
+                'FirstName': contacto.get('nombre'),
+                'LastName': contacto.get('apellido'),
+            })
+        
+        return {
+            'ContactEmployees': contactos_mapeados
+        }
+
 
     def formatearDatos(self, json_data):
         # Lista para almacenar todos los productos procesados
