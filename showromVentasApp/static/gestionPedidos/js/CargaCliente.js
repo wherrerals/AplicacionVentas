@@ -236,6 +236,7 @@ function cargarDirecciones() {
                   const direcciones = cliente.direcciones || [];
 
                   direcciones.forEach((direccion, index) => {
+                      console.log("tipoDireccion", direccion.tipoDireccion);
                       let direccionElemento = `
 
                            <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 230px; margin-right: 10px;">

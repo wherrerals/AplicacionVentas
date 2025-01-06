@@ -93,7 +93,6 @@ class SocioNegocioView(FormView):
 
     def agregarSocioNegocio(self, request):
         
-        print("Datos Socio Negocio:", request.body) 
         if request.method == 'POST':
 
             try:

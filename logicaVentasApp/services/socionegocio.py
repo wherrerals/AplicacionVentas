@@ -70,8 +70,8 @@ class SocioNegocio:
         self.tamañotelefono()        
 
     def procesarClienteExistente(self, codigosn, datosCliente, datosNuevos):
-        
-        logger.info(f"Procesando cliente existente con código SN: {codigosn}")
+
+        print("Procesando cliente existente...")
 
         try:
             verificacionSap = self.verificarSocioNegocioSap(codigosn)
@@ -97,22 +97,21 @@ class SocioNegocio:
 
     def actualizarSocioNegocio(self, cardcode, datos):
 
-        print(f"Actualizando socio de negocio con código: {cardcode}")
-
-        logger.info(f"Actualizando socio de negocio con código: {cardcode}")
+        print("Actualizando socio de negocio...")
         print(f"Datos recibidos: {datos}")
 
         repo = SocioNegocioRepository()
 
         try:
             # Verificar grupo de cliente
-            grupo_sn = datos.get('grupoSN')
+            grupo_sn = datos.get('tipoSN')
 
             if not grupo_sn:
                 raise ValueError("El atributo 'gruposn' no está definido o es inválido.")
 
+            print(f"Grupo de cliente: {grupo_sn}")
             # Determinar tipo de cliente
-            if grupo_sn == '100':
+            if grupo_sn == '105':
 
                 logger.info("Actualizando cliente persona...")
                 
@@ -277,7 +276,7 @@ class SocioNegocio:
             raise ValidationError("Faltan datos obligatorios")
         return gruposn, rut, email
 
-    
+    @staticmethod
     def generarCodigoSN(rut):
 
         """
@@ -406,7 +405,6 @@ class SocioNegocio:
                     'direcciones': direcciones_formateadas,
                     'contactos': contactos_formateados
                 })
-                print(f"Resultados formateados: {resultados_formateados}")
 
             return resultados_formateados
         
@@ -770,6 +768,7 @@ class SocioNegocio:
         except json.JSONDecodeError as e:
             return {'data': {'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, 'status': 400}
         
+        
     def procesarContactos(data, socio):
 
         print("Procesando contactos...")
@@ -921,9 +920,12 @@ class SocioNegocio:
 
         Returns:
             dict: Datos del socio de negocio procesados.
-
         """
-        name, lastname  = data.get('CardName').split(' ', 1)
+
+        print("Procesando datos del socio de negocio...")
+        print(f"Datos recibidos para crear en MYSQL: {data}")
+
+        name, lastname = data.get('CardName').split(' ', 1)
         razonsocial = data.get('CardName')
 
         # Datos principales del socio de negocio
@@ -942,10 +944,14 @@ class SocioNegocio:
             "tipoSN": "I",  # Valor fijo según lo especificado
             "tipoCliente": "N"  # Valor fijo según lo especificado
         }
-        
+
         # Direcciones del socio de negocio
         direcciones = []
         for direccion in data.get("BPAddresses", []):
+            address_type = direccion.get("AddressType", "")
+            # Asignar valores según AddressType
+            tipo_direccion = 13 if address_type == "bo_BillTo" else 12 if address_type == "bo_ShipTo" else None
+
             direcciones.append({
                 "rowNum": direccion.get("RowNum", ""),
                 "nombreDireccion": direccion.get("AddressName", ""),
@@ -953,14 +959,12 @@ class SocioNegocio:
                 "ciudad": direccion.get("City", ""),
                 "codigoImpuesto": direccion.get("TaxCode", ""),
                 "SocioNegocio": direccion.get("BPCode", ""),
-                #"region": direccion.get("State", ""),
-                #"comuna": 16214,
+                "tipoDireccion": tipo_direccion,  # Nuevo campo
             })
 
         # Empleados de contacto del socio de negocio
         empleados_contacto = []
         for contacto in data.get("ContactEmployees", []):
-
             fullName = contacto.get("Name", "")
             nombre, apellido = (fullName.split(' ', 1) + [""])[:2]
 
@@ -983,7 +987,6 @@ class SocioNegocio:
         }
 
         return resultado
-    
 
 
     def guardarClienteCompleto(self, data):
@@ -1032,7 +1035,6 @@ class SocioNegocio:
             )
             
 
-
         # Crear las direcciones asociadas al cliente usando el método del repositorio
         for direccion in data.get("Direcciones", []):
             DireccionRepository.crearDireccion(
@@ -1043,7 +1045,7 @@ class SocioNegocio:
                 calle_numero=direccion["calleNumero"],
                 comuna_id=666,
                 region_id=13,  # Valor por defecto
-                tipo_direccion=12,
+                tipo_direccion=direccion["tipoDireccion"],
                 pais=direccion.get("pais", "Chile")  # Valor por defecto
             )
             print (f"Data Direccion: {direccion}")
@@ -1164,8 +1166,8 @@ class SocioNegocio:
     def crearOActualizarCliente(self):
 
         dataSN = self.request
+        print("creando o actualizando cliente...")
 
-        print (f"DataSN: {dataSN}")
         if not self.verificarRutValido(self.rut):
             return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)
         
@@ -1175,9 +1177,13 @@ class SocioNegocio:
             rut = self.rut            
             codigoSN = SocioNegocio.generarCodigoSN(rut)
             clienteExistente = SocioNegocioRepository.obtenerPorRut(self.rut)
+
+            print(f"Cliente existente: {clienteExistente}")
+
+            print(f"Grupo datos actualizar: {dataSN}")
                         
             if clienteExistente is not None:
-                return self.procesarClienteExistente(codigoSN, clienteExistente, datosNuevos=self.request.POST)
+                return self.procesarClienteExistente(codigoSN, clienteExistente, datosNuevos=dataSN)
             
             self.procesarNuevoCliente(dataSN)
             
@@ -1236,14 +1242,15 @@ class SocioNegocio:
 
         return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
 
-
     def serializarSN(self, data):
         # Decodifica el JSON de entrada
-
         print("Serializando datos del cliente...")
 
         rut = data.get("rutSN", "")
-        cardcode = self.generarCardCode(rut)
+        cardcode = self.generarCodigoSN(rut)
+
+        print(f"RUT: {rut}")
+        print(f"Código de cliente: {cardcode}")
         
         client_data = data
         
@@ -1251,8 +1258,8 @@ class SocioNegocio:
         serialized_data = {
             "CardCode": cardcode,
             "CardName": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
-            "CardType": "C",
-            "GroupCode": client_data.get("tipoSN", ""),
+            "CardType": "cCustomer",
+            "GroupCode": int(client_data.get("tipoSN", "")),
             "Phone1": client_data.get("telefonoSN", ""),
             "Phone2": client_data.get("telefonoSN", ""),
             "Notes": client_data.get("giroSN", ""),
@@ -1262,8 +1269,8 @@ class SocioNegocio:
             "Cellular": client_data.get("telefonoSN", ""),
             "EmailAddress": client_data.get("emailSN", ""),
             "CardForeignName": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
-            "ShipToDefault": "DESPACHO",
-            "BilltoDefault": "FACTURACION",
+            #"ShipToDefault": "DESPACHO",
+            #"BilltoDefault": "FACTURACION",
             "DunningTerm": "ESTANDAR",
             "CompanyPrivate": "cPrivate",
             "AliasName": client_data.get("nombreSN", ""),
@@ -1274,30 +1281,63 @@ class SocioNegocio:
         }
         
         # Serializa las direcciones
-        for address in client_data.get("direcciones", []):
+        direcciones = client_data.get("direcciones", [])
+        tipos_direccion = {"13": None, "12": None}
+
+        for address in direcciones:
+            tipo_direccion = address.get("tipoDireccion", "")
             serialized_address = {
                 "AddressName": address.get("nombreDireccion", ""),
                 "Street": address.get("direccion", ""),
                 "City": address.get("ciudad", ""),
-                "County": address.get("tipoDireccion", ""),
+                "County": tipo_direccion,
                 "Country": "CL",  # Abreviación del país (e.g., Chile -> CL)
                 "State": int(address.get("region", "")),
                 "FederalTaxID": client_data.get("rutSN", "").split("-")[0],
                 "TaxCode": "IVA",
-                "AddressType": "bo_ShipTo"
+                "AddressType": "bo_ShipTo" if tipo_direccion == "13" else "bo_BillTo"
             }
             serialized_data["BPAddresses"].append(serialized_address)
+            tipos_direccion[tipo_direccion] = serialized_address
+
+        # Genera la dirección faltante si solo hay una de las dos
+        if tipos_direccion["13"] and not tipos_direccion["12"]:
+            direccion_facturacion = tipos_direccion["13"].copy()
+            direccion_facturacion["County"] = "12"  # Cambia a tipo 12
+            direccion_facturacion["AddressType"] = "bo_BillTo"
+            serialized_data["BPAddresses"].append(direccion_facturacion)
+
+        if tipos_direccion["12"] and not tipos_direccion["13"]:
+            direccion_despacho = tipos_direccion["12"].copy()
+            direccion_despacho["County"] = "13"  # Cambia a tipo 13
+            direccion_despacho["AddressType"] = "bo_ShipTo"
+            serialized_data["BPAddresses"].append(direccion_despacho)
         
         # Serializa los contactos
-        for contact in client_data.get("contactos", []):
-            serialized_contact = {
-                "Name": f"{contact.get('nombreContacto', '')} {contact.get('apellidoContacto', '')}".strip(),
-                "Phone1": contact.get("telefonoContacto", ""),
-                "MobilePhone": contact.get("telefonoContacto", ""),
-                "E_Mail": contact.get("emailContacto", ""),
-                "FirstName": contact.get("nombreContacto", ""),
-                "LastName": contact.get("apellidoContacto", "")
-            }
-            serialized_data["ContactEmployees"].append(serialized_contact)
+        contactos = client_data.get("contactos", [])
         
+        if not contactos:  # Si no hay contactos, genera uno basado en el cliente principal
+            print("No se proporcionaron contactos. Generando un contacto basado en los datos del cliente principal...")
+            contacto_cliente_principal = {
+                "Name": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
+                "Phone1": client_data.get("telefonoSN", ""),
+                "MobilePhone": client_data.get("telefonoSN", ""),
+                "E_Mail": client_data.get("emailSN", ""),
+                "FirstName": client_data.get("nombreSN", ""),
+                "LastName": client_data.get("apellidoSN", "")
+            }
+            serialized_data["ContactEmployees"].append(contacto_cliente_principal)
+        else:
+            for contact in contactos:
+                serialized_contact = {
+                    "Name": f"{contact.get('nombreContacto', '')} {contact.get('apellidoContacto', '')}".strip(),
+                    "Phone1": contact.get("telefonoContacto", ""),
+                    "MobilePhone": contact.get("telefonoContacto", ""),
+                    "E_Mail": contact.get("emailContacto", ""),
+                    "FirstName": contact.get("nombreContacto", ""),
+                    "LastName": contact.get("apellidoContacto", "")
+                }
+                serialized_data["ContactEmployees"].append(serialized_contact)
+
+        print(f"Datos serializados: {serialized_data}")
         return serialized_data

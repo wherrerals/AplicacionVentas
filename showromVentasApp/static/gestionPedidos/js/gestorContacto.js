@@ -135,7 +135,7 @@ $(document).ready(function() {
                               <div class="col-sm-12" style="height: 10px;background: transparent;"><span>&nbsp;</span></div>
                               </div>
 
-                              <input type="hidden" name="contacto_id[]" value="${contacto.id}" id="contacto_id_${index}">
+                              <input type="hidden" name="contacto_id[]" data-bpcode="${contacto.codigoInternoSap}" value="${contacto.id}" id="contacto_id_${index}">
 
 
                               <div class="row">
