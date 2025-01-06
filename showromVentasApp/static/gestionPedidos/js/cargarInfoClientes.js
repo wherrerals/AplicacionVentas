@@ -27,10 +27,10 @@ function cargarInformacionClienteEnModal(cliente) {
 
     // Tipo de cliente (Persona o Empresa)
     if (cliente.razonSocial === '') {
-        $('#formCheck-6').prop('checked', true);  // Persona
+        $('#formCheck-5').prop('checked', true);  // Persona
         //console.log("Tipo de cliente: Persona");
     } else {
-        $('#formCheck-5').prop('checked', true);  // Empresa
+        $('#formCheck-6').prop('checked', true);  // Empresa
         //console.log("Tipo de cliente: Empresa");
     }
 
