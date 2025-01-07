@@ -163,6 +163,13 @@ $(document).ready(function() {
 
                           $('#listaContactos').append(contactoElemento);
 
+                          $(`#nombre_${index}`).attr('name', 'nombre[]');
+                          $(`#apellido_${index}`).attr('name', 'apellido[]');
+                          $(`#telefono_${index}`).attr('name', 'telefono[]');
+                          $(`#celular_${index}`).attr('name', 'celular[]');
+                          $(`#email_${index}`).attr('name', 'email[]');
+                          $(`#contacto_id_${index}`).attr('name', 'contacto_id[]');
+                          
                           // Evento para habilitar la edición
                           $(`#editar_contacto_${index}`).on('click', function() {
                             // Hacer los campos editables
@@ -173,12 +180,7 @@ $(document).ready(function() {
                             $(`#email_${index}`).prop('disabled', false);
                         
                             // Cambiar el nombre para capturar solo si han sido modificados
-                            $(`#nombre_${index}`).attr('name', 'nombre[]');
-                            $(`#apellido_${index}`).attr('name', 'apellido[]');
-                            $(`#telefono_${index}`).attr('name', 'telefono[]');
-                            $(`#celular_${index}`).attr('name', 'celular[]');
-                            $(`#email_${index}`).attr('name', 'email[]');
-                            $(`#contacto_id_${index}`).attr('name', 'contacto_id[]');
+
                         });
 
                           // Evento para eliminar con confirmación
