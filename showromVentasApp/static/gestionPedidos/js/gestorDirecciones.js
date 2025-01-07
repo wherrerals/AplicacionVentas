@@ -366,6 +366,20 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
             const comunaSelect = $(`#comuna_${index}`);
             cargarComunas(direccion.region_numero, comunaSelect, direccion.comuna_codigo);
 
+
+            
+            
+              // Añadir los atributos name a los campos editados
+              $(`#tipoDireccion_${index}`).attr('name', 'tipodireccion[]');
+              $(`#direccion_${index}`).attr('name', 'nombre_direccion[]');
+              $(`#pais_${index}`).attr('name', 'pais[]');
+              $(`#region_${index}`).attr('name', 'region[]');
+              $(`#ciudad_${index}`).attr('name', 'ciudad[]');
+              $(`#comuna_${index}`).attr('name', 'comuna[]').attr('data-comuna', direccion.comuna);
+              $(`#nombreDireccion_${index}`).attr('name', 'direccion[]');
+              $(`#contacto_id_${index}`).attr('name', 'direccionid[]');
+              
+
             $(document).on('click', `#editar_dir_${index}`, function () {
               console.log("Habilitando edición para la dirección con index:", index);
 
@@ -378,15 +392,7 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
               $(`#comuna_${index}`).prop('disabled', false);
               $(`#nombreDireccion_${index}`).prop('disabled', false);
 
-              // Añadir los atributos name a los campos editados
-              $(`#tipoDireccion_${index}`).attr('name', 'tipodireccion[]');
-              $(`#direccion_${index}`).attr('name', 'nombre_direccion[]');
-              $(`#pais_${index}`).attr('name', 'pais[]');
-              $(`#region_${index}`).attr('name', 'region[]');
-              $(`#ciudad_${index}`).attr('name', 'ciudad[]');
-              $(`#comuna_${index}`).attr('name', 'comuna[]').attr('data-comuna', direccion.comuna);
-              $(`#nombreDireccion_${index}`).attr('name', 'direccion[]');
-              $(`#contacto_id_${index}`).attr('name', 'direccionid[]');
+
 
               let tipoDireccion = $(`input[name="tipodireccion[]"]`).val();
               console.log('Valor capturado de tipoDireccion:', tipoDireccion);

@@ -49,7 +49,7 @@ function cambiarLabel(razonSocialRadioName, nombreLabelId, apellidoInputId, apel
 
     if (razonSocialRadio[0].checked) {
         nombreLabel.textContent = 'Nombre';
-        apellidoInput.style.display = 'block'; // Mostrar input de apellido
+        apellidoInput.style.display = 'block'; //   Mostrar input de apellido
         apellidolabel.style.display = 'block'; // Mostrar label de apellido
     } else if (razonSocialRadio[1].checked) {
         nombreLabel.textContent = 'R. Social';

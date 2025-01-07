@@ -2,11 +2,18 @@
 function cargarInformacionClienteEnModal(cliente) {
     // Agregar logs para verificar si los datos están llegando correctamente
     console.log("Cargando información del cliente en el modal:", cliente);
+    console.log("RAzon social: AAAAAAAAAAAAAAAAA", cliente.razonSocial);
 
-    // Nombre y Apellido
-    $('#nombreSN').val(cliente.nombre);
-    $('#apellidoSN').val(cliente.apellido);
-    //console.log("Nombre:", cliente.nombre, "Apellido:", cliente.apellido);
+    if (cliente.nombre){
+        $('#nombreSN').val(cliente.nombre);
+        $('#apellidoSN').val(cliente.apellido);
+
+    }
+    
+    if (cliente.razonSocial) {
+        $('#nombreSN').val(cliente.razonSocial);      
+        console.log("Razón Social:", cliente.razonSocial);  
+    }
 
     // RUT
     $('#rutSN').val(cliente.rut);
@@ -31,6 +38,11 @@ function cargarInformacionClienteEnModal(cliente) {
         //console.log("Tipo de cliente: Persona");
     } else {
         $('#formCheck-6').prop('checked', true);  // Empresa
+        const razonSocialRadioName = 'grupoSN';
+        const nombreLabelId = 'nombreSN';
+        const apellidoInputId = 'apellidoSN';
+        const apellidolabelId = 'apellidorow';
+        cambiarLabel(razonSocialRadioName, nombreLabelId, apellidoInputId, apellidolabelId)
         //console.log("Tipo de cliente: Empresa");
     }
 

@@ -60,6 +60,8 @@ $(document).ready(function () {
     
             // Actualizar el valor de inputCliente
             $('#inputCliente').val(nuevoTexto);
+
+            
     
             // Mostrar en consola para verificar
             console.log("Nuevo valor en inputCliente:", nuevoTexto);
@@ -92,9 +94,13 @@ $(document).ready(function () {
                         clientesElemento.attr('data-apellido', resultado.apellido);
                         clientesElemento.attr('data-codigoSN', resultado.codigoSN);
                         clientesElemento.attr('data-rut', resultado.rut);
-                        clientesElemento.text(
-                            `${resultado.codigoSN} - ${resultado.nombre} ${resultado.apellido}`
-                        );
+                        console.log('razonsocial AAAAAAAAAAAAA', resultado.razonSocial);
+                        if (resultado.nombreSN) {
+                            clientesElemento.text(`${resultado.codigoSN} - ${resultado.nombre} ${resultado.apellido}`);
+                        }
+                        if (resultado.razonSocial) {
+                            clientesElemento.text(`${resultado.codigoSN} - ${resultado.razonSocial}`);
+                        }
                         $('#resultadosClientes').append(clientesElemento);
                     });
                 } else {
