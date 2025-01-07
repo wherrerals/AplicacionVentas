@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                   document.querySelector("#nombreApellidoSN p").textContent = `${data[0].apellido || ''}`;
                   document.querySelector("#rut-display p").textContent = `${data[0].codigoSN || ''}`;                  
-
+                
                   document.getElementById("rutSN").setAttribute("data-rut", data[0].rut || '');
                   document.getElementById("rutSN").readOnly = true;
 
