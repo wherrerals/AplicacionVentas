@@ -1,31 +1,26 @@
 {
-    "nombreSN": "",
-    "apellidoSN": "",
-    "tipoSN": "105",
-    "rutSN": "",
-    "emailSN": "",
-    "giroSN": "+56",
-    "giro": "",
-    "direcciones": [
+    "BPAddresses": [
         {
-            "direccionSN": 0,
-            "tipoDireccion": "12",
-            "nombreDireccion": "",
-            "pais": "Chile",
-            "region": "15",
-            "comuna": "",
-            "ciudad": "",
-            "direccion": ""
-        }
-    ],
-    "contactos": [
+            "AddressName": "DESPACHO",
+            "Street": "MANUEL MONTT 4568",
+            "City": "SANTIAGO",
+            "County": "12",
+            "Country": "CH",
+            "State": "Región de Aysén",
+            "FederalTaxID": "78336920C",
+            "TaxCode": "IVA",
+            "AddressType": "bo_ShipTo"
+        },
         {
-            "contactoSN": 0,
-            "nombreContacto": "",
-            "apellidoContacto": "",
-            "telefonoContacto": "+56",
-            "puestoContacto": "+56",
-            "emailContacto": ""
+            "AddressName": "Listo",
+            "Street": "sadasdasa",
+            "City": "Medellin",
+            "County": "12",
+            "Country": "CH",
+            "State": "Región de Aysén",
+            "FederalTaxID": "78336920C",
+            "TaxCode": "IVA",
+            "AddressType": "bo_ShipTo"
         }
     ]
 }

@@ -14,6 +14,7 @@ from adapters.sl_client import APIClient
 from datosLsApp.repositories.comunarepository import ComunaRepository
 from datosLsApp.repositories.regionrepository import RegionRepository
 from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
+from logicaVentasApp.services.contacto import Contacto
 from logicaVentasApp.services.cotizacion import Cotizacion
 from logicaVentasApp.services.producto import Producto
 from logicaVentasApp.services.socionegocio import SocioNegocio
@@ -420,6 +421,9 @@ def actualizarAgregarDirecion(request, socio):
             rut = data.get('cliente')
             carCode = SocioNegocio.generarCodigoSN(rut)
 
+            SocioNegocio.actualizaroCrearDireccionSL(carCode, request.POST)
+
+
             print("Código de socio de negocio:", carCode)
 
             result = SocioNegocio.procesarDirecciones(request.POST, socio)
@@ -430,14 +434,18 @@ def actualizarAgregarDirecion(request, socio):
 
     return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
 
-
 def actualizarAgregarContacto(request, socio):
     if request.method == "POST":
         try:
+            data = request.POST
+            rut = data.get('cliente')
+            carCode = SocioNegocio.generarCodigoSN(rut)
+
+            SocioNegocio.actualizaroCrearContactosSL(carCode, request.POST)
             print("Estos son los datos:", request.POST)
+
             # Delegamos la lógica de procesamiento al servicio
             result = SocioNegocio.procesarContactos(request.POST, socio)
-            
 
             return JsonResponse(result['data'], status=result['status'])
 
@@ -445,8 +453,6 @@ def actualizarAgregarContacto(request, socio):
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
     return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
-
-
 
 @login_required
 def agregarDireccion(request, socio):

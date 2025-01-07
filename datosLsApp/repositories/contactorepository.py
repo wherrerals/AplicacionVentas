@@ -101,3 +101,18 @@ class ContactoRepository:
             print("nuevo_contacto", nuevo_contacto)
         except Exception as e:
             print("Error en crearContacto", e)
+
+        
+    #eliminar todos los contactos de un socio
+
+    def eliminarContactosPorSocio(socio):
+        """
+        Elimina todos los contactos de un socio
+
+        params:
+            socio: SocioNegocioDB - Socio al que pertenecen los contactos
+        """
+        try:
+            ContactoDB.objects.filter(SocioNegocio=socio).delete()
+        except Exception as e:
+            print("Error en eliminarContactosPorSocio", e)

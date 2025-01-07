@@ -723,7 +723,8 @@ class SocioNegocio:
             # Deserializar el JSON
             direcciones = json.loads(direcciones_json[0])
             print(f"Direcciones deserializadas: {direcciones}")
-            
+
+
             # Extraer campos relevantes
             #autoincementar row num por cada direccion agg
             rownum = 1
@@ -769,7 +770,7 @@ class SocioNegocio:
             return {'data': {'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, 'status': 400}
         
     
-    def actualizaroCrearDireccionSL(self, cardCode, data):
+    def actualizaroCrearDireccionSL(cardCode, data):
         """
         Método para actualizar o crear una dirección en SAP.
 
@@ -782,12 +783,20 @@ class SocioNegocio:
         """
         print("Actualizando o creando dirección en SAP...")
 
-        serializar = Serializador()
-        data = serializar.mapearDirecciones(data, cardCode)
+        direcciones_json = data.getlist('direcciones')
+            
+        # Deserializar el JSON
+        direcciones = json.loads(direcciones_json[0])
+
+        print(f"Direcciones deserializadas: {direcciones}")
+
+        serializar = Serializador('json')
+        datosSerializados = serializar.mapearDirecciones(direcciones, cardCode)
+
         client = APIClient()
 
         try:
-            response = client.actualizarDireccionSL(cardCode, data)
+            response = client.actualizarDireccionSL(cardCode, datosSerializados)
             print(f"Respuesta de la API: {response}")
 
             if isinstance(response, dict):
@@ -795,6 +804,48 @@ class SocioNegocio:
                     return {'success': False, 'message': response.get('error', 'Error desconocido')}
                 else:
                     return {'success': True, 'message': 'Dirección actualizada exitosamente'}
+            else:
+                return {'success': False, 'message': 'Respuesta inesperada de la API'}
+        except ConnectionError as e:
+            return {'success': False, 'message': 'Error de conexión con SAP'}
+        except Exception as e:
+            return {'success': False, 'message': f'Error inesperado: {str(e)}'}
+        
+    def actualizaroCrearContactosSL(cardCode, data):
+        """
+        Método para actualizar o crear una dirección en SAP.
+
+        Args:
+            cardCode (str): Código del socio de negocio.
+            data (dict): Datos de la dirección.
+
+        Returns:
+            dict: Mensaje de éxito o error.
+        """
+        print("Actualizando o creando Conctactos en SAP...")
+
+        contactos_json = data.getlist('contactos')
+            
+        # Deserializar el JSON
+        contactos = json.loads(contactos_json[0])
+
+        print(f"Direcciones deserializadas: {contactos}")
+
+        serializar = Serializador('json')
+
+        datosSerializados = serializar.mapearContactos(contactos, cardCode)
+
+        client = APIClient()
+
+        try:
+            response = client.actualizarContactosSL(cardCode, datosSerializados)
+            print(f"Respuesta de la API: {response}")
+
+            if isinstance(response, dict):
+                if 'error' in response:
+                    return {'success': False, 'message': response.get('error', 'Error desconocido')}
+                else:
+                    return {'success': True, 'message': 'Contacto actualizado exitosamente'}
             else:
                 return {'success': False, 'message': 'Respuesta inesperada de la API'}
         except ConnectionError as e:

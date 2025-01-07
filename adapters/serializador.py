@@ -1,5 +1,7 @@
 import json
 
+from datosLsApp.repositories.regionrepository import RegionRepository
+
 class Serializador:
     def __init__(self, formato):
         self.formato = formato
@@ -41,36 +43,44 @@ class Serializador:
         }
     
     def mapearDirecciones(self, datos, cardCode):
-        
-        return {
 
-            'BPAddresses': [
-                {   
-                    'RowNum': 0,
-                    'AddressName': datos['nombreDireccion'],
-                    'Street': datos['direccion'],
-                    'City': datos['ciudad'],
-                    'AddressType': datos['tipoDireccion'],
-                    'Country': datos['pais'][:2].upper(),
-                    'State': datos['region'],
-                    'BPCode': cardCode,
-                    'TaxCode': 'IVA',
-                    'AddressType': 'bo_ShipTo'
-                }
-            ]
-            
+        repo = RegionRepository()
+        state = repo.obtenerRegionPorId(datos[0].get('region'))
+
+        tipo_direccion = datos[0].get('tipoDireccion')
+
+        if tipo_direccion == "13":
+            tipo_direccion = "bo_ShipTo"
+        else:
+            tipo_direccion = "bo_BillTo"
+        print("State: ", state)
+
+        # Formatear direcciones
+        direcciones_mapeadas = []
+        for direccion in datos:
+            direcciones_mapeadas.append({
+                'AddressName': direccion.get('nombreDireccion'),
+                'Street': direccion.get('direccion'),
+                'City': direccion.get('pais'),
+                'County': direccion.get('comuna'),
+                'Country': "CL", #direccion.get('pais')[:2].upper(),  # Obtener las dos primeras letras del país en mayúsculas
+                'State': direccion.get('region'),#state.nombre,      # Nombre de la región
+                'FederalTaxID': cardCode,  # Código asociado a la dirección
+                'TaxCode': 'IVA',          # Código de impuestos fijo
+                'AddressType': tipo_direccion # Tipo de dirección
+            })
+
+        return {
+            'BPAddresses': direcciones_mapeadas
         }
 
+    
     def mapearContactos(self, datos, cardCode):
-        print("actualizando contactos")
-        print("Datos en mapearContactos: ", datos)
-        
-        # Decodificar la lista de contactos desde JSON
-        contactos = json.loads(datos.get('contactos')[0])  # Obtiene y decodifica la lista de contactos
+
         
         # Construir la lista de empleados de contacto
         contactos_mapeados = []
-        for contacto in contactos:
+        for contacto in datos:
             contactos_mapeados.append({
                 'InternalCode': contacto.get('codigoInternoSap'),
                 'Name': f"{contacto.get('nombre')} {contacto.get('apellido')}",
@@ -81,6 +91,8 @@ class Serializador:
                 'FirstName': contacto.get('nombre'),
                 'LastName': contacto.get('apellido'),
             })
+
+        print("Contactos mapeados: ", contactos_mapeados)
         
         return {
             'ContactEmployees': contactos_mapeados
