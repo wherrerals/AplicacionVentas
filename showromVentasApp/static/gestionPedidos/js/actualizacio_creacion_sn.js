@@ -1,8 +1,11 @@
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-document.getElementById('forCrearPedidos').addEventListener('submit', function (event) {
-    event.preventDefault();
-    showLoadingOverlay();
+const formularios = document.querySelectorAll('#forCrearPedidos, #forCrearCliente');
+
+formularios.forEach(formulario => {
+    formulario.addEventListener('submit', function (event) {
+        event.preventDefault();
+        showLoadingOverlay();
 
     const nombre = document.getElementById('nombreSN').value;
     const apellido = document.getElementById('apellidoSN').value;
@@ -85,7 +88,7 @@ document.getElementById('forCrearPedidos').addEventListener('submit', function (
 
     console.log('Datos del formulario:', dataSN);
 
-    const submitButton = this.querySelector('button[type="submit"]');
+    const submitButton = document.querySelector('button[type="submit"]');
     submitButton.disabled = true;
 
     fetch('/ventas/agregar_editar_clientes/', {  // Verifica que esta ruta coincida con la vista del backend
@@ -113,6 +116,7 @@ document.getElementById('forCrearPedidos').addEventListener('submit', function (
             // Capturar el RUT directamente desde el campo #rutSN
             const rutSNInput = document.getElementById('rutSN');
             const rutCliente = rutSNInput.value;
+            console.log('RUT capturado:', rutCliente);
 
             if (rutCliente) {
                 // Actualizar el valor en el #inputCliente
@@ -150,6 +154,8 @@ document.getElementById('forCrearPedidos').addEventListener('submit', function (
             console.error('Error en la solicitud:', error);
             mostrarMensaje(error.message || 'Ocurrió un error desconocido', 'error');
         });
+});
+
 });
 
 function limpiarMensajes() {

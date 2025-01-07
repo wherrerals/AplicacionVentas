@@ -855,62 +855,57 @@ class SocioNegocio:
         
         
     def procesarContactos(data, socio):
+            """
+            Procesa los contactos reemplazándolos completamente con la nueva data.
+            """
+            print("Procesando contactos...")
+            print(f"Datos recibidos: {data.get('contactos')}")
 
-        print("Procesando contactos...")
-        print(f"Datos recibidos: {data}")
-        print(f"Datos recibidos: {data.getlist('contactos')}")
+            try:
+                # Obtener contactos en formato JSON desde los datos recibidos
+                contactos_json = data.get('contactos')
+                print(f"Contactos JSON: {contactos_json}")
 
-        try:
-            contactos_json = data.getlist('contactos')
-            print(f"Contactos JSON: {contactos_json}")
+                if not contactos_json:
+                    return JsonResponse({'success': False, 'message': 'No se encontraron contactos en el request.'}, status=400)
 
-            if not contactos_json:
-                return JsonResponse({'success': False, 'message': 'No se encontraron contactos en el request.'}, status=400)
+                contactos = json.loads(contactos_json[0])
 
-            contactos = json.loads(contactos_json[0])
+                print(f"Contactos deserializados: {contactos}")
 
-            # Extraer los valores necesarios desde el JSON deserializado
-            nombres = [contacto.get('nombre', '').strip() for contacto in contactos]
-            apellidos = [contacto.get('apellido', '').strip() for contacto in contactos]
-            telefonos = [contacto.get('telefono', '').strip() for contacto in contactos]
-            celulares = [contacto.get('celular', '').strip() for contacto in contactos]
-            emails = [contacto.get('email', '').strip() for contacto in contactos]
-            codigosInternoSap = 1
-            
+                # Eliminar todos los contactos existentes del socio
+                print(f"Eliminando contactos anteriores del socio {socio}...")
+                ContactoRepository.eliminarContactosPorSocio(socio)
 
-            # Verifica la longitud de todas las listas
-            if not all(len(lst) == len(nombres) for lst in [apellidos, telefonos, celulares, emails]):
-                print("Las listas deben tener la misma longitud.")
-                return JsonResponse({'success': False, 'message': 'Las listas deben tener la misma longitud.'}, status=400)
+                print(f"Contactos eliminados. Creando nuevos contactos...")
 
-            for i in range(len(nombres)):
-                nombre = nombres[i]
+                # Crear nuevos contactos
+                for contacto in contactos:
+                    print(f"Procesando contacto: {contacto}")
+                    nombre = contacto.get('nombre', '')
+                    apellido = contacto.get('apellido', '')
+                    telefono = contacto.get('telefono', '')
+                    celular = contacto.get('celular', '')
+                    email = contacto.get('email', '')
+                    codigo_interno_sap = int(contacto.get('contacto_id', ''))
 
-                if nombre:
-                    contacto_id = contactos[i].get('contacto_id')
-
-                    if contacto_id:
-                        contacto_obj = ContactoRepository.obtenerContacto(contacto_id)
-
-                        if contacto_obj:
-                            print(f"Actualizando contacto {i+1}...")
-                            ContactoRepository.actualizarContacto(contacto_obj, nombre, apellidos[i], telefonos[i], celulares[i], emails[i])
-                    else:
+                    print(f"Datos del contacto: {nombre}, {apellido}, {telefono}, {celular}, {email}, {codigo_interno_sap}")
+                    if nombre:
                         try:
-                            ContactoRepository.crearContacto(socio, codigosInternoSap, nombre, apellidos[i], telefonos[i], emails[i], celulares[i])
+                            print(f"Creando nuevo contacto: {nombre} {apellido}")
+                            ContactoRepository.crearContacto(socio, codigo_interno_sap, nombre, apellido, telefono, email, celular)
                         except Exception as e:
                             print(f"Error al crear el contacto: {str(e)}")
                             return JsonResponse({'success': False, 'message': f'Error al crear el contacto: {str(e)}'}, status=500)
+                    else:
+                        print("Nombre vacío. No se procesó este contacto.")
 
-                else:
-                    print(f"No se procesó el contacto {i+1} porque el nombre o apellido está vacío.")
+                return {'data': {'success': True, 'message': 'Contactos procesados y reemplazados con éxito.'}, 'status': 200}
 
-            return {'data': {'success': True, 'message': 'Direcciones procesadas con éxito.'}, 'status': 200}
-        
-        except KeyError as e:
-            return {'data': {'success': False, 'message': f'Falta el campo: {str(e)}'}, 'status': 400}
-        except json.JSONDecodeError as e:
-            return {'data': {'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, 'status': 400}
+            except KeyError as e:
+                return {'data': {'success': False, 'message': f'Falta el campo: {str(e)}'}, 'status': 400}
+            except json.JSONDecodeError as e:
+                return {'data': {'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, 'status': 400}
 
 
     def infoCliente(self, identificador, buscar_por_nombre=False):
@@ -1232,21 +1227,6 @@ class SocioNegocio:
         filters = {k: v for k, v in filters.items() if v and v != "''"}
 
         return filters
-
-
-    
-    """
-    filter=CardType eq 'cCustomer' and contains(CardCode, '10') 
-    and contains(CardName, 'Leonardo') and GroupCode eq 105 and contains(Phone1, '+569') and contains(EmailAddress, '@gmail')
-    """
-    
-    def plp(cls):
-        """
-        clear
-        """
-
-        ab = 1 + 2
-        pass
 
 
 #Creacion Socio Negocio
