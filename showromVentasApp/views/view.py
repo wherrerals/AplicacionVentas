@@ -415,6 +415,13 @@ def actualizarAgregarDirecion(request, socio):
         try:
             print("Estos son los datos:", request.POST)
             # Delegamos la lógica de procesamiento al servicio
+
+            data = request.POST
+            rut = data.get('cliente')
+            carCode = SocioNegocio.generarCodigoSN(rut)
+
+            print("Código de socio de negocio:", carCode)
+
             result = SocioNegocio.procesarDirecciones(request.POST, socio)
             return JsonResponse(result['data'], status=result['status'])
 
