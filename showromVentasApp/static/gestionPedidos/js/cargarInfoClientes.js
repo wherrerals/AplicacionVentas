@@ -2,7 +2,6 @@
 function cargarInformacionClienteEnModal(cliente) {
     // Agregar logs para verificar si los datos están llegando correctamente
     console.log("Cargando información del cliente en el modal:", cliente);
-    console.log("RAzon social: AAAAAAAAAAAAAAAAA", cliente.razonSocial);
 
     if (cliente.nombre){
         $('#nombreSN').val(cliente.nombre);
@@ -11,8 +10,7 @@ function cargarInformacionClienteEnModal(cliente) {
     }
     
     if (cliente.razonSocial) {
-        $('#nombreSN').val(cliente.razonSocial);      
-        console.log("Razón Social:", cliente.razonSocial);  
+        $('#nombreSN').val(cliente.razonSocial); 
     }
 
     // RUT

@@ -83,13 +83,27 @@ function limpiarInformacionCliente() {
     console.log("Información del cliente limpia.");
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    const duplicarOpcion = document.getElementById('duplicar-1');
+const copiarODVButtton = document.getElementById("copiar-ODV");
 
-    duplicarOpcion.addEventListener('click', function () {
-        limpiarInformacionCliente();
+if (copiarODVButtton) {
+    copiarODVButtton.addEventListener('click', (event) => {
+        console.log("Ejecutando...");
+        event.preventDefault(); // Evitar comportamiento predeterminado del botón/enlace
+
+        // Obtener el elemento que contiene el valor del número de cotización
+        const docEntryElement = document.getElementById('numero_cotizacion');
+        const docEntry = docEntryElement ? docEntryElement.textContent.trim() : null;
+
+        if (docEntry) {
+            showLoadingOverlay(); // Mostrar un overlay de carga
+            window.location.href = `/ventas/ordenesVentas/?docentry=${docEntry}`; // Redirigir con el docEntry
+        } else {
+            hideLoadingOverlay(); // Ocultar el overlay si ocurre un error
+            alert("No se pudo obtener el DocEntry de la orden."); // Mostrar alerta de error
+        }
     });
-});
+}
+
 
 const cerrarButton = document.getElementById("cerrar");
 
@@ -113,7 +127,12 @@ if (cancelarButton) {
     //console.warn('El botón con ID "cerrar" no existe en el DOM.');
 }
 
-
+const duplicarbutton = document.getElementById("duplicar-1");
+if (duplicarbutton) {
+    duplicarbutton.addEventListener("click", function (event) {
+        limpiarInformacionCliente();
+    });
+}
 
 function handleAction(action) {
     const numeroCotizacion = document.getElementById("numero_cotizacion").innerText;
