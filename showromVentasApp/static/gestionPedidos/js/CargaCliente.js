@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   document.getElementById("rutSN").readOnly = true;
 
                     // Lógica para seleccionar "Empresa" o "Persona"
-                    if (data[0].giro && data[0].giro.trim() !== "") {
+                    if (data[0].grupoSN && data[0].grupoSN.trim() !== "") {
                       // Si tiene razón social (giro), es "Empresa"
                       document.getElementById("formCheck-6").checked = true; // Empresa
                   } else {
