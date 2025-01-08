@@ -880,6 +880,7 @@ class SocioNegocio:
                 print(f"Contactos eliminados. Creando nuevos contactos...")
 
                 # Crear nuevos contactos
+                
                 for contacto in contactos:
                     print(f"Procesando contacto: {contacto}")
                     nombre = contacto.get('nombre', '')
