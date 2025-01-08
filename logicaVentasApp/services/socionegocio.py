@@ -1397,3 +1397,4 @@ class SocioNegocio:
         
         except json.JSONDecodeError as e:
             return {"data": {"success": False, "message": f"Error al decodificar JSON: {str(e)}",}, "status": 400}
+        
