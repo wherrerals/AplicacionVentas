@@ -30,7 +30,7 @@ class Producto {
 
     async actualizarStock(row) {
         const stockData = await this.obtenerStock(this.productoCodigo);
-    
+
         if (stockData) {
             // Mapear las bodegas válidas (excluyendo GR)
             const bodegaMap = {
@@ -38,33 +38,33 @@ class Producto {
                 "PH": "PH",
                 "ME": "ME"
             };
-    
+
             // Filtrar los datos de stock excluyendo la bodega "GR"
             const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
-    
+
             // Calcular el stock total sumando solo las bodegas válidas
             const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock, 0);
-    
+
             // Mostrar el stock total
             const stockTotalElem = row.querySelector('[name="stock_total"]');
             stockTotalElem.textContent = `Total: ${stockTotal}`;
-    
+
             // Obtener el value de la bodega seleccionada
             const selectBodega = row.querySelector('.form-select');
             const valueSeleccionado = selectBodega.value;
-    
+
             // Usar el mapa para obtener el código correspondiente
             const bodegaSeleccionada = bodegaMap[valueSeleccionado];
-    
+
             // Encontrar el stock de la bodega seleccionada
             const stockBodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock || 0;
-    
+
             // Mostrar el stock de la bodega seleccionada
             const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
             stockBodegaElem.textContent = `Stock: ${stockBodega}`;
         }
     }
-    
+
     // Método para crear una fila en la tabla de productos
     crearFila(contprod) {
         let newRow = document.createElement('tbody');
@@ -148,43 +148,43 @@ class Producto {
             </tr>
             </tr>
         `;
-        
-            function formatCurrency(value) {
-                // Convertimos el valor a número entero
-                const integerValue = Math.floor(value);
-                let formattedValue = integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-            
-                // Si el valor tiene 4 dígitos y no incluye un punto, lo añadimos manualmente
-                if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
-                    formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
-                }
-            
-                // Agregamos el símbolo de peso al principio
-                return `$ ${formattedValue}`;
+
+        function formatCurrency(value) {
+            // Convertimos el valor a número entero
+            const integerValue = Math.floor(value);
+            let formattedValue = integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+            // Si el valor tiene 4 dígitos y no incluye un punto, lo añadimos manualmente
+            if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
+                formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
             }
-            
-    // Agregar evento mouseover para mostrar stock en otras tiendas
-    const precioVentaElem = newRow.querySelector('#stock_total');
-    precioVentaElem.addEventListener('mouseover', async () => {
-    const stockData = await this.obtenerStock(this.productoCodigo);
-    if (stockData) {
-        // Filtrar las bodegas para excluir "GR"
-        const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
 
-        // Crear el contenido del tooltip solo con las bodegas válidas
-        const tooltipContent = stockFiltrado
-            .map(bodega => `${bodega.bodega}: ${bodega.stock}`)
-            .join('\n');
+            // Agregamos el símbolo de peso al principio
+            return `$ ${formattedValue}`;
+        }
 
-        // Asignar el contenido del tooltip
-        precioVentaElem.title = `Stock en otras tiendas:\n${tooltipContent}`;
-    }
+        // Agregar evento mouseover para mostrar stock en otras tiendas
+        const precioVentaElem = newRow.querySelector('#stock_total');
+        precioVentaElem.addEventListener('mouseover', async () => {
+            const stockData = await this.obtenerStock(this.productoCodigo);
+            if (stockData) {
+                // Filtrar las bodegas para excluir "GR"
+                const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
+
+                // Crear el contenido del tooltip solo con las bodegas válidas
+                const tooltipContent = stockFiltrado
+                    .map(bodega => `${bodega.bodega}: ${bodega.stock}`)
+                    .join('\n');
+
+                // Asignar el contenido del tooltip
+                precioVentaElem.title = `Stock en otras tiendas:\n${tooltipContent}`;
+            }
         });
-        
+
         this.limitarMaxDescuento(newRow);
         return newRow;
     }
-  
+
     // Método para alternar la visibilidad del descuento
     alternarMaxDescuento(row) {
         let elemento = row.querySelector('#descuento');
@@ -194,75 +194,74 @@ class Producto {
             elemento.setAttribute('hidden', '');
         }
     }
-  
+
     limitarMaxDescuento(row) {
-      // Obtener el valor del descuento máximo
-      let descuentoMaxElem = row.querySelector('#descuento');
-      let descuentoMax = parseFloat(descuentoMaxElem.textContent.replace('Max: ', ''));
-  
-      // Configurar el input para limitar el valor máximo
-      let inputDescuento = row.querySelector('#agg_descuento');
-      inputDescuento.max = descuentoMax;
-  
-      // Establecer valor inicial de 0 en el input
-      inputDescuento.value = 0;
-  
-      // Validar el valor actual del input
-      inputDescuento.addEventListener('input', function () {
-          let valor = parseFloat(inputDescuento.value);
-  
-          // Si el valor es mayor que el descuento máximo, ajustarlo
-          if (valor > descuentoMax) {
-              inputDescuento.value = descuentoMax;
-          }
-  
-          // Si el valor es menor que 0, ajustarlo a 0
-          if (valor < 0) {
-              inputDescuento.value = 0;
-          }
-      });
-  }
-  }
-  
-  // Función global para manejar la adición de productos
-  function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal) {
-      // Contador de productos
-      console.log("cantidad: ", cantidad);
-      console.log("sucursal: ", sucursal);
-      
-      let contprod = document.querySelectorAll('#productos tbody').length + 1;
-      
-      let producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal);
-      
-      let newRow = producto.crearFila(contprod);
-      
-      document.getElementById('productos').appendChild(newRow);
-    
-      // Agregar eventos
-      newRow.querySelector('#mostrar-descuento').addEventListener('click', function() {
+        // Obtener el valor del descuento máximo
+        let descuentoMaxElem = row.querySelector('#descuento');
+        let descuentoMax = parseFloat(descuentoMaxElem.textContent.replace('Max: ', ''));
+
+        // Configurar el input para limitar el valor máximo
+        let inputDescuento = row.querySelector('#agg_descuento');
+        inputDescuento.max = descuentoMax;
+
+        // Establecer valor inicial de 0 en el input
+        inputDescuento.value = 0;
+
+        // Validar el valor actual del input
+        inputDescuento.addEventListener('input', function () {
+            let valor = parseFloat(inputDescuento.value);
+
+            // Si el valor es mayor que el descuento máximo, ajustarlo
+            if (valor > descuentoMax) {
+                inputDescuento.value = descuentoMax;
+            }
+
+            // Si el valor es menor que 0, ajustarlo a 0
+            if (valor < 0) {
+                inputDescuento.value = 0;
+            }
+        });
+    }
+}
+
+// Función global para manejar la adición de productos
+function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal) {
+    // Contador de productos
+    console.log("cantidad: ", cantidad);
+    console.log("sucursal: ", sucursal);
+
+    let contprod = document.querySelectorAll('#productos tbody').length + 1;
+
+    let producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal);
+
+    let newRow = producto.crearFila(contprod);
+
+    document.getElementById('productos').appendChild(newRow);
+
+    // Agregar eventos
+    newRow.querySelector('#mostrar-descuento').addEventListener('click', function () {
         producto.alternarMaxDescuento(newRow);
-      });
-    
-      newRow.querySelector('#eliminarp').addEventListener('click', function() {
-          // Eliminar la fila del DOM
-          newRow.remove();
-    
-          // Emitir un evento personalizado pasando el código del producto
-          const event = new CustomEvent('productoEliminado', {
-              detail: { codigoProducto: productoCodigo }
-          });
-          console.log('Evento emitido:', event);
-          document.dispatchEvent(event);
-      });
+    });
 
-      producto.actualizarStock(newRow);
+    newRow.querySelector('#eliminarp').addEventListener('click', function () {
+        // Eliminar la fila del DOM
+        newRow.remove();
 
-      // Evento para actualizar el stock al cambiar de bodega
-      newRow.querySelector('.form-select').addEventListener('change', function () {
-          producto.actualizarStock(newRow);
-      });
-    
-      // Llamar a la función agregarInteractividad si es necesario
-      agregarInteractividad(newRow, productoCodigo); 
-  }
-  
+        // Emitir un evento personalizado pasando el código del producto
+        const event = new CustomEvent('productoEliminado', {
+            detail: { codigoProducto: productoCodigo }
+        });
+        console.log('Evento emitido:', event);
+        document.dispatchEvent(event);
+    });
+
+    producto.actualizarStock(newRow);
+
+    // Evento para actualizar el stock al cambiar de bodega
+    newRow.querySelector('.form-select').addEventListener('change', function () {
+        producto.actualizarStock(newRow);
+    });
+
+    // Llamar a la función agregarInteractividad si es necesario
+    agregarInteractividad(newRow, productoCodigo);
+}

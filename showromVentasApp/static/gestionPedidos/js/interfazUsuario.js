@@ -70,3 +70,5 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(elemento, { childList: true, subtree: true });
     });
 });
+
+

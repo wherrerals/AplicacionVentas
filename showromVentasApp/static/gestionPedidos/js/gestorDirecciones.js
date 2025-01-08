@@ -380,25 +380,24 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
               $(`#contacto_id_${index}`).attr('name', 'direccionid[]');
               
 
-            $(document).on('click', `#editar_dir_${index}`, function () {
-              console.log("Habilitando edición para la dirección con index:", index);
-
-              // Hacer los campos editables
-              $(`#tipoDireccion_${index}`).prop('disabled', false)
-              $(`#direccion_${index}`).prop('disabled', false);
-              $(`#pais_${index}`).prop('disabled', false);
-              $(`#region_${index}`).prop('disabled', false);
-              $(`#ciudad_${index}`).prop('disabled', false);
-              $(`#comuna_${index}`).prop('disabled', false);
-              $(`#nombreDireccion_${index}`).prop('disabled', false);
-
-
-
-              let tipoDireccion = $(`input[name="tipodireccion[]"]`).val();
-              console.log('Valor capturado de tipoDireccion:', tipoDireccion);
-
-
-              console.log("Edición habilitada para la dirección con index:", index);
+              $(document).on('click', `[id^="editar_dir_"]`, function () {
+                // Extraer el índice del ID dinámico
+                const index = $(this).attr('id').split('_')[2];
+                console.log("Habilitando edición para la dirección con index:", index);
+            
+                // Hacer los campos editables
+                $(`#tipoDireccion_${index}`).prop('disabled', false);
+                $(`#direccion_${index}`).prop('disabled', false);
+                $(`#pais_${index}`).prop('disabled', false);
+                $(`#region_${index}`).prop('disabled', false);
+                $(`#ciudad_${index}`).prop('disabled', false);
+                $(`#comuna_${index}`).prop('disabled', false);
+                $(`#nombreDireccion_${index}`).prop('disabled', false);
+            
+                let tipoDireccion = $(`#tipoDireccion_${index}`).val();
+                console.log('Valor capturado de tipoDireccion:', tipoDireccion);
+            
+                console.log("Edición habilitada para la dirección con index:", index);
             });
 
 
