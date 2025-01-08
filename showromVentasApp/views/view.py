@@ -1,4 +1,13 @@
-#Django modulos
+from io import BytesIO
+from turtle import width
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import Table, TableStyle, Paragraph
+from reportlab.lib import colors
+from reportlab.lib.units import cm
+from reportlab.lib.styles import getSampleStyleSheet, TA_CENTER
+
 from django.shortcuts import get_object_or_404, render, redirect  
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
@@ -888,3 +897,78 @@ def onbtenerImgProducto(request):
 
     except ProductoDB.DoesNotExist:
         return JsonResponse({'error': 'No se encontró el producto solicitado'}, status=404)
+    
+
+def report(request):
+    #create the HttpResponse header with PDF
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+    
+    #create the PDF object, using the response object as its "file"
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    
+    #header
+    c.setLineWidth(.3)
+    c.setFont('Helvetica', 22)
+    c.drawString(30,750,'Reporte de Ventas')
+    c.setFont('Helvetica', 12)
+    c.drawString(30,735,'Showroom')
+    
+    c.setFont('Helvetica-Bold', 12)
+    c.drawString(480,750,"2024")
+    
+    c.line(460,747,560,747)
+    
+    #table header
+    styles = getSampleStyleSheet()
+    styleBH = styles["Normal"]  
+    styleBH.alignment = TA_CENTER
+    styleBH.fontSize = 10
+    
+    numero = Paragraph('''#''', styleBH)
+    nombre = Paragraph('''Nombre''', styleBH)
+    precio = Paragraph('''Precio''', styleBH)
+    stock = Paragraph('''Stock''', styleBH)
+    precioAnterior = Paragraph('''Precio Anterior''', styleBH)
+    maxDescuento = Paragraph('''Descuento Máximo''', styleBH)
+    total = Paragraph('''Total''', styleBH)
+    data = []
+    
+    #table
+    
+    data.append([numero, nombre, precio, stock, precioAnterior, maxDescuento, total])
+    
+    styles = getSampleStyleSheet()
+    styleN = styles["BodyText"]
+    styleN.alignment = TA_CENTER
+    styleN.fontSize = 7
+    
+    width, height = A4
+    
+    high = 650
+    for producto in ProductoDB.objects.all():
+        this_prod = [producto.codigo, producto.nombre, producto.precioVenta, producto.stockTotal, producto.precioLista, producto.dsctoMaxTienda, producto.stockTotal * producto.precioVenta]
+        data.append(this_prod)
+        high = high - 18
+        
+    #table size
+    table = Table(data, colWidths=[1.9*cm, 3 * cm, 3 * cm, 3 * cm, 3 * cm, 3 * cm, 3 * cm])
+    table.setStyle(TableStyle([
+        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+    ]))
+    
+    #pdf size
+    table.wrapOn(c, width, height)
+    table.drawOn(c, 30, high)
+    c.showPage()
+    
+    c.save()
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+    return response
+    
+    

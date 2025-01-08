@@ -1,5 +1,8 @@
+
+// Función para obtener información de los clientes
 $(document).ready(function(){
-    // Delegamos el evento click al contenedor, para que funcione con elementos creados dinámicamente
+
+    // Delegar el evento click al contenedor para elementos creados dinámicamente
     $('#resultadosClientes').on('click', '.suggestion-item', function(){
         
         let nombre = $(this).attr('data-nombre');
@@ -7,14 +10,14 @@ $(document).ready(function(){
         let clienteId = $(this).attr('data-rut');
         let codigoSN = $(this).attr('data-codigoSN');
 
-        // Rellenar el campo de entrada con el nombre y apellido del cliente seleccionado
+        // Actualizar valores en el DOM (nombre y apellido del cliente seleccionado)
         $('#inputCliente').val(codigoSN + " - " + nombre + ' ' + apellido);
 
         // Asignar el rut como atributo data-rut del input
         $('#inputCliente').attr('data-rut', clienteId);
 
+        // Asignar el codigoSN como atributo data-codigoSN del input
         $('#inputCliente').attr('data-codigoSN', codigoSN);
-
 
         // Asignar el rut como atributo data-rut del input
         console.log("rut del cliente seleccionado: ",clienteId)
@@ -22,11 +25,13 @@ $(document).ready(function(){
         // Limpiar la lista de sugerencias
         $('#resultadosClientes').empty();
  
+        // Llamar a la función para traer la información completa del cliente
         traerInformacionCliente(clienteId);
     });
 });
 
-// Función para traer información completa del cliente (modularizada)
+
+// Función para traer la información completa del cliente
 function traerInformacionCliente(clienteId) {
 
     let buscarClientesUrl = `/ventas/buscar_clientes/?numero=${clienteId}`;
@@ -40,27 +45,29 @@ function traerInformacionCliente(clienteId) {
         success: function(data) {
             if (data.resultadosClientes && data.resultadosClientes.length > 0) {
 
-                // Toma el primer cliente de los resultados (si estás esperando un solo cliente)
+                // Obtener el primer cliente de la lista de resultados
                 const cliente = data.resultadosClientes[0];
-                console.log("informacion del cliente: ",cliente)
-                console.log('contacto de Cliente encontrado:', cliente.contactos);
-                console.log('direcciones de Cliente encontrado:', cliente.direcciones);
-                // Llamar a las funciones para actualizar contactos y direcciones
                 const nombre = cliente.nombre;
                 const apellido = cliente.apellido;
                 const codigoSN = cliente.codigoSN;
 
+                // Asignar el rut como atributo data-rut del input
                 $('#inputCliente').attr('data-rut', clienteId);
 
+                // Asignar el codigoSN como atributo data-codigoSN del input
                 $('#inputCliente').attr('data-codigoSN', codigoSN);        
 
+                // Rellenar el campo de entrada con el nombre y apellido del cliente seleccionado
                 $('#inputCliente').val(codigoSN + " - " + nombre + ' ' + apellido);
-
                 
+                // Actualizar los contactos y direcciones del cliente seleccionado
                 actualizarContactos(cliente.contactos);
                 actualizarDirecciones(cliente.direcciones, '#direcciones_despacho', "12");
                 actualizarDirecciones(cliente.direcciones, '#direcciones_facturacion', "13");
+
+                // Llamar a la función para cargar la información del cliente en el modal
                 cargarInformacionClienteEnModal(cliente);
+
             } else { 
                 console.log('No se encontraron clientes con el número proporcionado.');
             }
@@ -71,15 +78,14 @@ function traerInformacionCliente(clienteId) {
     });
 }
 
-
-
-// Función para actualizar los contactos en el select
+// Función para cargar la información del cliente en el modal
 function actualizarContactos(contactos) {
     let selectContactos = $('#clientes'); // ID del optgroup en el select
 
     // Limpiar el select antes de agregar nuevos contactos
     selectContactos.empty();
 
+    // Verificar si hay contactos disponibles
     if (contactos && contactos.length > 0) {
         contactos.forEach(function(contacto) {
             let option = $('<option></option>');
@@ -88,25 +94,26 @@ function actualizarContactos(contactos) {
             selectContactos.append(option);
         });
     } else {
-        // Si no hay contactos, puedes agregar una opción indicando esto
+
+        // Si no hay contactos disponibles, agregar una opción indicando esto
         let option = $('<option></option>');
         option.text('No hay contactos disponibles');
         selectContactos.append(option);
     }
 }
 
-
-// Función para actualizar los select de direcciones
+// Función para actualizar las direcciones de despacho y facturación
 function actualizarDirecciones(direcciones, selectId, tipoDireccion) {
     let select = $(selectId); 
     select.empty();
+
     // Filtrar las direcciones según el tipoDireccion
     const direccionesFiltradas = direcciones.filter(function(direccion) {
-        //console.log("tipo direccion de contacto", direccion.tipoDireccion)
+
         return direccion.tipoDireccion === tipoDireccion;
     });
 
-    //console.log(direccionesFiltradas);
+    // Verificar si hay direcciones disponibles para el tipo seleccionado
     if (direccionesFiltradas.length > 0) {
         direccionesFiltradas.forEach(function(direccion) {
             let option = $('<option></option>');
@@ -115,7 +122,7 @@ function actualizarDirecciones(direcciones, selectId, tipoDireccion) {
             select.append(option); 
         });
     } else {
-        // Si no hay direcciones disponibles después del filtro, agregar una opción indicando esto
+
         let option = $('<option></option>');
         option.text('No hay direcciones disponibles');
         select.append(option);

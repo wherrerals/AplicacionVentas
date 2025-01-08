@@ -52,6 +52,7 @@ urlpatterns = [
     path('ordenesVentas/', view.odv, name='ordenesVentas'),
     path('imagen/', view.onbtenerImgProducto, name='imagen'),
     path('pruebas/', view.pryebas, name='pruebas'),
+    path('generarPDF/', view.report, name='generarPDF'),
     #path('obtener_receta/', view.pryebas, name='obtener_receta'),
 ]
 

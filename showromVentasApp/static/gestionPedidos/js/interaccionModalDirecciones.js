@@ -1,6 +1,6 @@
-$(document).ready(function() {
+$(document).ready(function () {
     // Asignar evento para el modal de despacho
-    $('#btn-grabar-direcciones-despacho').on('click', function(e) {
+    $('#btn-grabar-direcciones-despacho').on('click', function (e) {
         e.preventDefault(); // Evitar comportamiento por defecto del botón
 
         // Capturar todas las direcciones de despacho en un array
@@ -14,23 +14,23 @@ $(document).ready(function() {
             let comuna = $(this).find('select[name="comuna[]"]').val();
             let direccion = $(this).find('input[name="direccion[]"]').val();
             let direccionId = $(this).find('input[name="direccionid[]"]').val();
-        
+
             // Capturamos el tipo de dirección
             let tipoDireccion = null;
-        
+
             // Verificamos si es un select o un input y obtenemos el valor
             let selectTipoDireccion = $(this).find('select[name="tipodireccion[]"]');
             let inputTipoDireccionStatic = $(this).find('input[name="tipoDireccion_static[]"]');
-        
+
             if (selectTipoDireccion.length) {
                 // Si es un select, tomamos el valor seleccionado
                 tipoDireccion = selectTipoDireccion.find('option:selected').val();
-        
+
                 // Agregamos el evento change para actualizar las direcciones dinámicamente
                 selectTipoDireccion.on('change', function () {
                     const nuevoTipoDireccion = $(this).val();
                     console.log('Tipo de dirección actualizado:', nuevoTipoDireccion);
-        
+
                     // Ejecutar la actualización de direcciones
                     actualizarDirecciones(cliente.direcciones, '#direcciones_despacho', "12");
                     actualizarDirecciones(cliente.direcciones, '#direcciones_facturacion', "13");
@@ -44,13 +44,13 @@ $(document).ready(function() {
                     tipoDireccion = 13;
                 }
             }
-        
+
             // Validar tipo de dirección y otros campos
             if (tipoDireccion === null || !nombreDireccion || !pais || !region || !ciudad || !comuna || !direccion) {
                 console.log('Dirección ignorada porque no tiene todos los campos completos.');
                 return; // Saltar este elemento si falta algún campo
             }
-        
+
             console.log(
                 'Diccionario modificado:',
                 tipoDireccion,
@@ -62,7 +62,7 @@ $(document).ready(function() {
                 direccion,
                 direccionId
             );
-        
+
             direcciones.push({
                 'tipoDireccion': tipoDireccion,
                 'nombreDireccion': nombreDireccion,
@@ -73,17 +73,17 @@ $(document).ready(function() {
                 'direccion': direccion,
                 'direccionId': direccionId
             });
-        
+
             // Obtener el nombre de la comuna seleccionada
             let comunaNombre = $(this).find('select[name="comuna[]"] option:selected').text();
             console.log('Nombre de la comuna seleccionada:', comunaNombre);
-        
+
             let nuevoTexto = `${nombreDireccion} - ${ciudad} ${comunaNombre}`;
             console.log('nuevoTexto: ', nuevoTexto);
-        
+
             // Manejar la opción en el selector de direcciones de despacho
             let opcionExistente = $(`#direcciones_despacho option[value="${nuevoTexto}"]`);
-        
+
             if (opcionExistente.length > 0) {
                 $(`#direcciones_despacho`).val(nuevoTexto);
                 console.log(`Opción seleccionada: ${nuevoTexto}`);
@@ -94,8 +94,8 @@ $(document).ready(function() {
                 console.log(`Nueva opción agregada y seleccionada: ${nuevoTexto}`);
             }
         });
-        
-        
+
+
         // Mostrar en consola el array completo de direcciones
         console.log('Direcciones de despacho capturadas:', direcciones);
 
@@ -110,14 +110,14 @@ $(document).ready(function() {
     });
 
     // Asignar evento para el modal de facturación
-    $('#btn-grabar-direcciones-facturacion').on('click', function(e) {
+    $('#btn-grabar-direcciones-facturacion').on('click', function (e) {
         e.preventDefault(); // Evitar comportamiento por defecto del botón
 
         // Capturar todas las direcciones de facturación en un array
         let direcciones = [];
 
         // Recorrer cada div que contiene las direcciones de facturación
-        $('#listaDireccionFacturacion .col-sm-5').each(function() {
+        $('#listaDireccionFacturacion .col-sm-5').each(function () {
             let tipoDireccion = $(this).find('select[name="tipodireccion[]"]').val();
             let nombreDireccion = $(this).find('input[name="nombre_direccion[]"]').val();
             let pais = $(this).find('select[name="pais[]"]').val();
@@ -174,10 +174,10 @@ $(document).ready(function() {
                 'direcciones': JSON.stringify(direcciones),
                 'cliente': clienteRut
             },
-            headers: { 
+            headers: {
                 "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val()
             },
-            success: function(response) {
+            success: function (response) {
                 console.log('Respuesta del servidor:', response);
                 if (response.success) {
                     alert('Direcciones guardadas correctamente');
@@ -187,7 +187,7 @@ $(document).ready(function() {
                     alert('Error al guardar direcciones: ' + response.message);
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error('Error al guardar direcciones:', error);
                 alert('Ha ocurrido un error al guardar las direcciones.');
             }
