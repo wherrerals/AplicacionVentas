@@ -1343,8 +1343,6 @@ class SocioNegocio:
 
     def procesarDirecciones(data, socio):
         
-        print("Procesando direcciones desde API...")
-
         try:
             direcciones_json = data.get("direcciones")
 
@@ -1353,8 +1351,6 @@ class SocioNegocio:
 
             direcciones = json.loads(direcciones_json[0])
             
-            print(f"Direcciones deserializadas: {direcciones}")
-            print("eliminando direcciones")
             
             print(f"Eliminando direcciones para el socio: {socio}")
             DireccionRepository.eliminarDireccionesPorSocio(socio)
@@ -1366,9 +1362,10 @@ class SocioNegocio:
 
                 if tipoDire == "bo_BillTo":
                     
-                    tipoDireccion = "12"
-                else:
                     tipoDireccion = "13"
+                    
+                else:
+                    tipoDireccion = "12"
 
                 rownum = direccion.get("row_id")
                 nombre_direccion = direccion.get("nombreDireccion")

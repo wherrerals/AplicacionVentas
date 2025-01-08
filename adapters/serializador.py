@@ -43,36 +43,38 @@ class Serializador:
         }
     
     def mapearDirecciones(self, datos, cardCode):
-
         repo = RegionRepository()
-        state = repo.obtenerRegionPorId(datos[0].get('region'))
-
-        tipo_direccion = datos[0].get('tipoDireccion')
-
-        if tipo_direccion == "13":
-            tipo_direccion = "bo_ShipTo"
-        else:
-            tipo_direccion = "bo_BillTo"
-        print("State: ", state)
 
         # Formatear direcciones
         direcciones_mapeadas = []
+
         for direccion in datos:
+            # Obtener tipo de dirección del elemento actual
+            tipo_direccion = direccion.get('tipoDireccion')
+
+            # Mapear el tipo de dirección
+            if tipo_direccion == "12":
+                tipo_direccion = "bo_ShipTo"
+            else:
+                tipo_direccion = "bo_BillTo"
+
+            # Añadir la dirección mapeada
             direcciones_mapeadas.append({
                 'AddressName': direccion.get('nombreDireccion'),
                 'Street': direccion.get('direccion'),
-                'City': direccion.get('pais'),
+                'City': direccion.get('ciudad'),
                 'County': direccion.get('comuna'),
-                'Country': "CL", #direccion.get('pais')[:2].upper(),  # Obtener las dos primeras letras del país en mayúsculas
-                'State': direccion.get('region'),#state.nombre,      # Nombre de la región
+                'Country': "CL",  # Código de país fijo
+                'State': direccion.get('region'),  # Nombre de la región
                 'FederalTaxID': cardCode,  # Código asociado a la dirección
-                'TaxCode': 'IVA',          # Código de impuestos fijo
-                'AddressType': tipo_direccion # Tipo de dirección
+                'TaxCode': 'IVA',  # Código de impuestos fijo
+                'AddressType': tipo_direccion  # Tipo de dirección
             })
 
         return {
             'BPAddresses': direcciones_mapeadas
         }
+
 
     
     def mapearContactos(self, datos, cardCode):

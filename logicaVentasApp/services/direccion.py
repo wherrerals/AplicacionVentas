@@ -9,7 +9,6 @@ class Direccion:
         pass
 
     def procesarDireccionDesdeAPI(self, data, socio):
-        print("Procesando contactos desde API...")
         print(f"Datos recibidos: {data}")
 
         try:
