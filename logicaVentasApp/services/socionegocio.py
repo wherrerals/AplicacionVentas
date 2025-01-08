@@ -697,6 +697,7 @@ class SocioNegocio:
 
             # Calcular el dígito verificador según el módulo 11
             digito_calculado = 11 - residuo
+
             if digito_calculado == 11:
                 digito_calculado = '0'
             elif digito_calculado == 10:
@@ -711,63 +712,6 @@ class SocioNegocio:
             print(f"Error al verificar RUT: {str(e)}")
             return False
 
-    def procesarDirecciones(data, socio):
-
-        try:
-            # Obtener la lista de direcciones como JSON
-            direcciones_json = data.getlist('direcciones')
-            
-            if not direcciones_json:
-                return JsonResponse({'success': False, 'message': 'No se encontraron direcciones en el request.'}, status=400)
-            
-            # Deserializar el JSON
-            direcciones = json.loads(direcciones_json[0])
-            print(f"Direcciones deserializadas: {direcciones}")
-
-
-            # Extraer campos relevantes
-            #autoincementar row num por cada direccion agg
-            rownum = 1
-            tipo = [direccion.get('tipoDireccion') for direccion in direcciones]
-            nombre_direccion = [direccion.get('nombreDireccion') for direccion in direcciones]
-            ciudad = [direccion.get('ciudad') for direccion in direcciones]
-            pais = [direccion.get('pais') for direccion in direcciones]
-            region = [direccion.get('region') for direccion in direcciones]
-            comuna = [direccion.get('comuna') for direccion in direcciones]
-            direccion = [direccion.get('direccion') for direccion in direcciones]
-            
-            # Verificar que las listas tienen la misma longitud
-            if not all(len(lst) == len(nombre_direccion) for lst in [ciudad, direccion, tipo, pais, region, comuna]):
-                return {'data': {'success': False, 'message': 'Las listas deben tener la misma longitud.'}, 'status': 400}
-
-            # Procesar cada dirección
-            for i in range(len(nombre_direccion)):
-                nombredire = nombre_direccion[i].strip()
-                
-                if nombredire:
-                    direccion_id = direcciones[i].get('direccionId')
-
-                    if direccion_id:
-                        # Obtener la dirección existente
-                        direccion_obj = DireccionRepository.obtenerDireccion(direccion_id)
-
-                        # Actualizar si existe, o crear si no
-                        if direccion_obj:
-                            DireccionRepository.actualizarDireccion(direccion_obj, nombredire, ciudad[i], direccion[i], comuna[i], region[i], tipo[i], pais[i])
-                    else:
-                        # Crear la dirección
-                        try:
-                            DireccionRepository.crearDireccion(socio,rownum, nombredire, ciudad[i], direccion[i], comuna[i], region[i], tipo[i], pais[i])
-                        except Exception as e:
-                            print(f"Ocurrió un error al crear la dirección: {str(e)}")
-                else:
-                    print(f"No se procesó la dirección {i+1} porque el nombre está vacío.")
-
-            return {'data': {'success': True, 'message': 'Direcciones procesadas con éxito.'}, 'status': 200}
-        except KeyError as e:
-            return {'data': {'success': False, 'message': f'Falta el campo: {str(e)}'}, 'status': 400}
-        except json.JSONDecodeError as e:
-            return {'data': {'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, 'status': 400}
         
     
     def actualizaroCrearDireccionSL(cardCode, data):
@@ -855,34 +799,19 @@ class SocioNegocio:
         
         
     def procesarContactos(data, socio):
-            """
-            Procesa los contactos reemplazándolos completamente con la nueva data.
-            """
-            print("Procesando contactos...")
-            print(f"Datos recibidos: {data.get('contactos')}")
-
             try:
-                # Obtener contactos en formato JSON desde los datos recibidos
                 contactos_json = data.get('contactos')
-                print(f"Contactos JSON: {contactos_json}")
 
                 if not contactos_json:
                     return JsonResponse({'success': False, 'message': 'No se encontraron contactos en el request.'}, status=400)
 
                 contactos = json.loads(contactos_json[0])
+                
+                print(f"socio: {socio}")
 
-                print(f"Contactos deserializados: {contactos}")
-
-                # Eliminar todos los contactos existentes del socio
-                print(f"Eliminando contactos anteriores del socio {socio}...")
                 ContactoRepository.eliminarContactosPorSocio(socio)
 
-                print(f"Contactos eliminados. Creando nuevos contactos...")
-
-                # Crear nuevos contactos
-                
                 for contacto in contactos:
-                    print(f"Procesando contacto: {contacto}")
                     nombre = contacto.get('nombre', '')
                     apellido = contacto.get('apellido', '')
                     telefono = contacto.get('telefono', '')
@@ -905,6 +834,7 @@ class SocioNegocio:
 
             except KeyError as e:
                 return {'data': {'success': False, 'message': f'Falta el campo: {str(e)}'}, 'status': 400}
+            
             except json.JSONDecodeError as e:
                 return {'data': {'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, 'status': 400}
 
@@ -1410,3 +1340,60 @@ class SocioNegocio:
 
         print(f"Datos serializados: {serialized_data}")
         return serialized_data
+
+    def procesarDirecciones(data, socio):
+        
+        print("Procesando direcciones desde API...")
+
+        try:
+            direcciones_json = data.get("direcciones")
+
+            if not direcciones_json:
+                return JsonResponse({"success": False, "message": "No se encontraron direcciones en el request.", }, status=400)
+
+            direcciones = json.loads(direcciones_json[0])
+            
+            print(f"Direcciones deserializadas: {direcciones}")
+            print("eliminando direcciones")
+            
+            print(f"Eliminando direcciones para el socio: {socio}")
+            DireccionRepository.eliminarDireccionesPorSocio(socio)
+            
+
+            for direccion in direcciones:
+
+                tipoDire = direccion.get("tipoDireccion")
+
+                if tipoDire == "bo_BillTo":
+                    
+                    tipoDireccion = "12"
+                else:
+                    tipoDireccion = "13"
+
+                rownum = direccion.get("row_id")
+                nombre_direccion = direccion.get("nombreDireccion")
+                ciudad = direccion.get("ciudad")
+                pais = direccion.get("pais")
+                region = direccion.get("region")
+                comuna = direccion.get("comuna")
+                direccion = direccion.get("direccion")
+                tipo = tipoDireccion
+
+                print(f"Datos de la dirección: {nombre_direccion}, {ciudad}, {pais}, {region}, {comuna}, {direccion}, {tipo}")
+                
+                if nombre_direccion:
+                    
+                    try:
+                        DireccionRepository.crearDireccion(socio, rownum, nombre_direccion, ciudad, direccion, comuna, region, tipo, pais)
+                    except Exception as e:
+                        print(f"Ocurrió un error al crear la dirección: {str(e)}")
+                else:
+                    print(f"No se procesó la dirección el nombre está vacío.")
+
+            return {"data": {"success": True, "message": "Direcciones procesadas con éxito.",}, "status": 200}
+        
+        except KeyError as e:
+            return {"data": {"success": False, "message": f"Falta el campo: {str(e)}",}, "status": 400}
+        
+        except json.JSONDecodeError as e:
+            return {"data": {"success": False, "message": f"Error al decodificar JSON: {str(e)}",}, "status": 400}
