@@ -712,52 +712,48 @@ class SocioNegocio:
             return False
 
     def procesarDirecciones(data, socio):
-
+        """
+        Método para procesar las direcciones de un socio de negocio.
+        """
         try:
             # Obtener la lista de direcciones como JSON
-            direcciones_json = data.getlist('direcciones')
+            direcciones_json = data.get('direcciones')
+            print(f"Direcciones JSON: {direcciones_json}")
             
             if not direcciones_json:
                 return JsonResponse({'success': False, 'message': 'No se encontraron direcciones en el request.'}, status=400)
             
             # Deserializar el JSON
             direcciones = json.loads(direcciones_json[0])
+
             print(f"Direcciones deserializadas: {direcciones}")
 
+            #print(f"Eliminando contactos anteriores del socio {socio}...")
+            #ContactoRepository.eliminarContactosPorSocio(socio)
 
-            # Extraer campos relevantes
-            #autoincementar row num por cada direccion agg
-            rownum = 1
-            tipo = [direccion.get('tipoDireccion') for direccion in direcciones]
-            nombre_direccion = [direccion.get('nombreDireccion') for direccion in direcciones]
-            ciudad = [direccion.get('ciudad') for direccion in direcciones]
-            pais = [direccion.get('pais') for direccion in direcciones]
-            region = [direccion.get('region') for direccion in direcciones]
-            comuna = [direccion.get('comuna') for direccion in direcciones]
-            direccion = [direccion.get('direccion') for direccion in direcciones]
-            
-            # Verificar que las listas tienen la misma longitud
-            if not all(len(lst) == len(nombre_direccion) for lst in [ciudad, direccion, tipo, pais, region, comuna]):
-                return {'data': {'success': False, 'message': 'Las listas deben tener la misma longitud.'}, 'status': 400}
+            for direccion in direcciones:
 
-            # Procesar cada dirección
-            for i in range(len(nombre_direccion)):
-                nombredire = nombre_direccion[i].strip()
-                
-                if nombredire:
-                    direccion_id = direcciones[i].get('direccionId')
+                tipoDire = direccion.get('tipoDireccion')
 
-                    if direccion_id:
-                        # Obtener la dirección existente
-                        direccion_obj = DireccionRepository.obtenerDireccion(direccion_id)
+                if tipoDire == 'bo_BillTo':
+                    tipoDireccion = '12'
+                else:
+                    tipoDireccion = '13'
+                    print(f"Procesando dirección: {direccion}")
 
-                        # Actualizar si existe, o crear si no
-                        if direccion_obj:
-                            DireccionRepository.actualizarDireccion(direccion_obj, nombredire, ciudad[i], direccion[i], comuna[i], region[i], tipo[i], pais[i])
-                    else:
-                        # Crear la dirección
+                rownum = direccion.get('row_id')
+                nombre_direccion = direccion.get('nombreDireccion')
+                ciudad = direccion.get('ciudad')
+                pais = direccion.get('pais')
+                region = direccion.get('region')
+                comuna = direccion.get('comuna')
+                direccion = direccion.get('direccion')
+                tipo = tipoDireccion
+
+                print(f"Datos de la dirección: {nombre_direccion}, {ciudad}, {pais}, {region}, {comuna}, {direccion}, {tipo}")
+                if nombre_direccion:
                         try:
-                            DireccionRepository.crearDireccion(socio,rownum, nombredire, ciudad[i], direccion[i], comuna[i], region[i], tipo[i], pais[i])
+                            DireccionRepository.crearDireccion(socio,rownum, nombre_direccion, ciudad, direccion, comuna, region, tipo, pais)
                         except Exception as e:
                             print(f"Ocurrió un error al crear la dirección: {str(e)}")
                 else:

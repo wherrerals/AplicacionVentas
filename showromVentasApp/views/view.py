@@ -16,6 +16,7 @@ from datosLsApp.repositories.regionrepository import RegionRepository
 from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
 from logicaVentasApp.services.contacto import Contacto
 from logicaVentasApp.services.cotizacion import Cotizacion
+from logicaVentasApp.services.direccion import Direccion
 from logicaVentasApp.services.producto import Producto
 from logicaVentasApp.services.socionegocio import SocioNegocio
 #librerias Python usadas
@@ -414,8 +415,6 @@ def mis_datos(request):
 def actualizarAgregarDirecion(request, socio):
     if request.method == "POST":
         try:
-            print("Estos son los datos:", request.POST)
-            # Delegamos la lógica de procesamiento al servicio
 
             data = request.POST
             rut = data.get('cliente')
@@ -423,10 +422,15 @@ def actualizarAgregarDirecion(request, socio):
 
             SocioNegocio.actualizaroCrearDireccionSL(carCode, request.POST)
 
+            conexionAPi = APIClient()
+            dataMSQL = conexionAPi.obtenerDataSn(carCode, "BPAddresses")
 
-            print("Código de socio de negocio:", carCode)
+            print(f"Data obtenida de la API: {dataMSQL}")
 
-            result = SocioNegocio.procesarDirecciones(request.POST, socio)
+            
+            result = Direccion().procesarDireccionDesdeAPI(dataMSQL, socio)
+
+            #result = SocioNegocio.procesarDirecciones(request.POST, socio)
             return JsonResponse(result['data'], status=result['status'])
 
         except Exception as e:
@@ -442,19 +446,13 @@ def actualizarAgregarContacto(request, socio):
             carCode = SocioNegocio.generarCodigoSN(rut)
 
             SocioNegocio.actualizaroCrearContactosSL(carCode, request.POST)
-            print("Estos son los datos:", request.POST)
 
             conexionAPi = APIClient()
-
             dataMSQL = conexionAPi.obtenerDataSn(carCode, "ContactEmployees")
 
-            print("Data obtenida de la API:", dataMSQL)
+            print(f"Data obtenida de la API: {dataMSQL}")
 
             result = Contacto().procesarContactosDesdeAPI(dataMSQL, socio)
-            
-            # Delegamos la lógica de procesamiento al servicio
-            #result = SocioNegocio.procesarContactos(contactoSerializado, socio)
-            
 
             return JsonResponse(result['data'], status=result['status'])
 
