@@ -14,7 +14,8 @@ $(document).ready(function() {
             let celular = $(this).find('input[name="celular[]"]').val();
             let email = $(this).find('input[name="email[]"]').val();
             let contactoid = $(this).find('input[name="contacto_id[]"]').val();
-        
+            let codigoInternoSap = $(this).find('input[name="contacto_id[]"]').data('bpcode');
+            console.log('Codigo interno SAP:', codigoInternoSap);
             
             if (nombre && apellido && telefono && celular && email) {
                 contactos.push({
@@ -23,7 +24,7 @@ $(document).ready(function() {
                     'telefono': telefono,
                     'celular': celular,
                     'email': email,
-                    'codigoInternoSap': 0,
+                    'codigoInternoSap': codigoInternoSap,
                     "contacto_id": contactoid,
                 });
             } else {

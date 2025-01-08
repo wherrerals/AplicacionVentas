@@ -635,8 +635,69 @@ class APIClient:
             if 'response' in locals() and response is not None:
                 print(f"Cuerpo de la respuesta del servidor: {response.text}")
             raise
-"""
-https://182.160.29.24:50003/b1s/v1/$crossjoin(Orders,SalesPersons)?$expand=Orders($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)&$orderby=DocNum desc&$
-filter=Orders/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Orders/DocDate ge '2023-05-23' and Orders/DocDate le '2023-05-25' and contains(Orders/DocNum, 12) and contains(Orders/CardCode, '2') and contains(Orders/CardName, 'CA') and contains(SalesPersons/SalesEmployeeName, 'e') 
-and Orders/DocumentStatus eq 'C' and contains(Orders/DocTotal, 0) and Orders/Cancelled eq 'Y'
-"""
+    
+    def actualizarDireccionSL(self, cardCode, data):
+        self.__login()
+        url = f"{self.base_url}BusinessPartners('{cardCode}')"
+
+        headers = {
+            'B1S-ReplaceCollectionsOnPatch': 'true',  # Encabezado adicional
+            'Content-Type': 'application/json',  # Asegúrate de incluir este encabezado si es necesario
+        }
+        try:
+            print(f"URL: {url}")
+            print(f"Data being sent: {data}")
+
+            response = self.session.patch(url, json=data, headers=headers, verify=False)
+            print(f"Respuesta completa: {response.status_code} - {response.text}")
+
+            if response.status_code == 204:
+                return {'success': True, 'message': 'Dirección actualizada correctamente.'}
+            else:
+                response.raise_for_status()
+                print("Respuesta de la API:", response.json())
+                return response.json()
+        except requests.exceptions.HTTPError as e:
+            print(f"Error en la solicitud a la API: {e}")
+            if 'response' in locals() and response is not None:
+                print(f"Cuerpo de la respuesta del servidor: {response.text}")
+            raise
+
+    def actualizarContactosSL(self, cardCode, data):
+        self.__login()
+        url = f"{self.base_url}BusinessPartners('{cardCode}')"
+
+        headers = {
+            'Content-Type': 'application/json',  # Asegúrate de incluir este encabezado si es necesario
+        }
+        try:
+            print(f"URL: {url}")
+            print(f"Data being sent: {data}")
+
+            response = self.session.patch(url, json=data, headers=headers, verify=False)
+            print(f"Respuesta completa: {response.status_code} - {response.text}")
+
+            if response.status_code == 204:
+                return {'success': True, 'message': 'Contacto actualizado correctamente.'}
+            else:
+                response.raise_for_status()
+                print("Respuesta de la API:", response.json())
+                return response.json()
+        except requests.exceptions.HTTPError as e:
+            print(f"Error en la solicitud a la API: {e}")
+            if 'response' in locals() and response is not None:
+                print(f"Cuerpo de la respuesta del servidor: {response.text}")
+            raise
+
+    def obtenerDataSn(self, cardCode, tipo):
+
+        details = f"BusinessPartners('{cardCode}')/{tipo}"
+        url = f"{self.base_url}{details}"
+
+        response = self.session.get(url, verify=False) # Se realiza la solicitud GET
+        response.raise_for_status() # Esto generará una excepción para cualquier código de estado HTTP 4xx/5xx
+        
+        print(url)
+
+        return response.json()
+    

@@ -101,10 +101,10 @@ class Producto {
                 </td>
                 <td style="background: transparent;border-style: none;padding-bottom: 0px;" rowspan="2">
                     <div style="font-size: 12px;">
-                        <small name="precio_venta" data-precio-unitario="100.00">${this.precioVenta}</small>
+                        <small class="numeric-value" name="precio_venta" data-precio-unitario="100.00">${formatCurrency(this.precioVenta)}</small>
                     </div>
                     <div style="font-size: 11px;">
-                        <small style="color: rgb(153,153,153);" name="precio_lista">Antes: ${this.precioLista}</small>
+                        <small class="numeric-value" style="color: rgb(153,153,153);" name="precio_lista">${formatCurrency(this.precioLista)}</small>
                     </div>
 
                     <div class="row" style="font-size: 11px;">
@@ -114,26 +114,26 @@ class Producto {
                             </svg>
                         </div>
                         <div class="col-sm-7 col-md-8">
-                            <small style="color: rgb(255,0,0);" id="descuento" name="descuento_max" hidden>Max: ${this.precioDescuento}</small>
+                            <small  class="numeric-value" style="color: rgb(255,0,0);" id="descuento" name="descuento_max" hidden>Max: ${formatCurrency(this.precioDescuento)}</small>
                         </div>
                     </div>
                 </td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <div>
-                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="0">
+                        <input class="form-control format-number" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="0">
                     </div>
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${this.precioSinDescuento}</td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
-                    <input class="form-control" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad}">
+                    <input class="form-control format-number" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad}">
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
-                    <span id="precio_Venta">${this.totalProducto}</span>
+                    <span id="precio_Venta">${formatCurrency(this.totalProducto)}</span>
                 </td>
             </tr> 
             <tr style="font-size: 12px;background: transparent;">
                 <td style="font-size: 11px;background: transparent;padding-top: 0px;border-style: none;padding-bottom: 0px;"colspan="3">
-                    <input class="form-control" type="text" placeholder="Comentario" style="font-size: 12px;">
+                    <input class="form-control" type="text" placeholder="Comentario" id="comentarios-1" style="font-size: 12px;">
                 </td>
                 <td style="background: transparent;padding-top: 8px;padding-left: 50px;border-style: none;padding-bottom: 0px;">
                     <a class="navbar-brand d-flex align-items-center" href="#" style="width: 18px;">
@@ -147,8 +147,8 @@ class Producto {
                 <td colspan="7" style="padding-top: 0px;background: transparent;"><span>${this.nombre}</span></td>
             </tr>
             </tr>
-        `;
-        
+        `;    
+            
     // Agregar evento mouseover para mostrar stock en otras tiendas
     const precioVentaElem = newRow.querySelector('#stock_total');
     precioVentaElem.addEventListener('mouseover', async () => {

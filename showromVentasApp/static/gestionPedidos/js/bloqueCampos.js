@@ -1,5 +1,5 @@
 // Función para bloquear los campos
-function bloquearCampos() {
+/* function bloquearCampos() {
     // Ejemplo para bloquear el input del cliente
     const clienteInput = document.getElementById("inputCliente");
     if (clienteInput) {
@@ -11,4 +11,5 @@ function bloquearCampos() {
     productInputs.forEach(input => {
         input.disabled = true;
     });
-}
+} */
+

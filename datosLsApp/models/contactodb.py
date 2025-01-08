@@ -10,8 +10,8 @@ class ContactoDB(models.Model):
 
     codigoInternoSap = models.IntegerField(default=0)
     nombreCompleto = models.CharField(max_length=255)
-    nombre = models.CharField(max_length=255,null = False)
-    apellido = models.CharField(max_length=255,null = False)
+    nombre = models.CharField(max_length=255)
+    apellido = models.CharField(max_length=255)
     telefono = models.CharField(max_length=20)
     celular = models.CharField(max_length=20,null = False)
     email = models.EmailField(null = False)

@@ -14,7 +14,9 @@ from adapters.sl_client import APIClient
 from datosLsApp.repositories.comunarepository import ComunaRepository
 from datosLsApp.repositories.regionrepository import RegionRepository
 from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
+from logicaVentasApp.services.contacto import Contacto
 from logicaVentasApp.services.cotizacion import Cotizacion
+from logicaVentasApp.services.direccion import Direccion
 from logicaVentasApp.services.producto import Producto
 from logicaVentasApp.services.socionegocio import SocioNegocio
 #librerias Python usadas
@@ -413,24 +415,44 @@ def mis_datos(request):
 def actualizarAgregarDirecion(request, socio):
     if request.method == "POST":
         try:
-            print("Estos son los datos:", request.POST)
-            # Delegamos la lógica de procesamiento al servicio
-            result = SocioNegocio.procesarDirecciones(request.POST, socio)
+
+            data = request.POST
+            rut = data.get('cliente')
+            carCode = SocioNegocio.generarCodigoSN(rut)
+
+            SocioNegocio.actualizaroCrearDireccionSL(carCode, request.POST)
+
+            conexionAPi = APIClient()
+            dataMSQL = conexionAPi.obtenerDataSn(carCode, "BPAddresses")
+
+            print(f"Data obtenida de la API: {dataMSQL}")
+
+            
+            result = Direccion().procesarDireccionDesdeAPI(dataMSQL, socio)
+
+            #result = SocioNegocio.procesarDirecciones(request.POST, socio)
             return JsonResponse(result['data'], status=result['status'])
 
         except Exception as e:
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
     return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
-
 
 def actualizarAgregarContacto(request, socio):
     if request.method == "POST":
         try:
-            print("Estos son los datos:", request.POST)
-            # Delegamos la lógica de procesamiento al servicio
-            result = SocioNegocio.procesarContactos(request.POST, socio)
-            
+            data = request.POST
+            rut = data.get('cliente')
+            carCode = SocioNegocio.generarCodigoSN(rut)
+
+            SocioNegocio.actualizaroCrearContactosSL(carCode, request.POST)
+
+            conexionAPi = APIClient()
+            dataMSQL = conexionAPi.obtenerDataSn(carCode, "ContactEmployees")
+
+            print(f"Data obtenida de la API: {dataMSQL}")
+
+            result = Contacto().procesarContactosDesdeAPI(dataMSQL, socio)
 
             return JsonResponse(result['data'], status=result['status'])
 
@@ -438,8 +460,6 @@ def actualizarAgregarContacto(request, socio):
             return JsonResponse({'success': False, 'message': str(e)}, status=500)
 
     return JsonResponse({'success': False, 'message': 'Método no permitido.'}, status=405)
-
-
 
 @login_required
 def agregarDireccion(request, socio):
@@ -577,43 +597,39 @@ def agregarContacto(request, cliente, **kwargs):
     return render(request, "cotizacion.html", {'clienteNoIncluido': clienteNoIncluido})
 
 
-"""
-Este metodo sirve para poder guardar los contactos de un cliente en la base de datos a traves de una peticion AJAX
-        creada en los modales, cuando se desea agregar un contacto o editar un contacto de un cliente ya existente.
-        Con este estaba probando pero no lo logre. (no empece con el de direcciones)
-"""
-
 @login_required
 def guardarContactosAJAX(request):
-    
     if request.method == "POST":
-        # Parsear los datos de contactos desde el request
-        contactos_json = request.POST.get('contactos')
-        contactos = json.loads(contactos_json)
-
-        cliente_id = request.POST.get('cliente')
-        cliente = SocioNegocioDB.objects.get(rut=cliente_id)
-
-        # Verificar que el cliente exista
-        if not cliente:
+        # Parsear los datos del cliente
+        cliente_id = request.POST.get('rutSN')  # Verificar que este campo corresponde al RUT
+        try:
+            cliente = SocioNegocioDB.objects.get(rut=cliente_id)
+        except SocioNegocioDB.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Cliente no encontrado'})
 
-        # Iterar sobre los contactos recibidos
-        for contacto in contactos:
-            nombre = contacto['nombre']
-            apellido = contacto['apellido']
-            telefono = contacto.get('telefono')
-            celular = contacto.get('celular')
-            email = contacto.get('email')
+        # Obtener las listas de contactos desde el QueryDict
+        nombres = request.POST.getlist('nombre[]')
+        apellidos = request.POST.getlist('apellido[]')
+        telefonos = request.POST.getlist('telefono[]')
+        celulares = request.POST.getlist('celular[]')
+        emails = request.POST.getlist('email[]')
 
-            # Verificar si los campos requeridos están completos
+        # Iterar sobre los contactos
+        for i in range(len(nombres)):
+            nombre = nombres[i]
+            apellido = apellidos[i]
+            telefono = telefonos[i] if i < len(telefonos) else None
+            celular = celulares[i] if i < len(celulares) else None
+            email = emails[i] if i < len(emails) else None
+
+            # Verificar que los campos requeridos estén completos
             if nombre and apellido:
-                nombreCompleto = f"{nombre} {apellido}"
+                nombre_completo = f"{nombre} {apellido}"
 
                 # Crear o actualizar el contacto
                 ContactoDB.objects.create(
-                    codigoInternoSap=1,  # Aquí deberías manejar la lógica del código interno si es variable
-                    nombreCompleto=nombreCompleto,
+                    codigoInternoSap=1,  # Ajustar esta lógica según sea necesario
+                    nombreCompleto=nombre_completo,
                     nombre=nombre,
                     apellido=apellido,
                     telefono=telefono,
@@ -621,7 +637,7 @@ def guardarContactosAJAX(request):
                     email=email,
                     SocioNegocio=cliente
                 )
-                print(f"Contacto {nombreCompleto} creado con éxito")
+                print(f"Contacto {nombre_completo} creado con éxito")
             else:
                 print(f"No se ha creado el contacto porque algunos campos están vacíos.")
 
@@ -848,3 +864,21 @@ def pryebas(request):
     odv = sl.getODV()
 
     return JsonResponse(odv, safe=False)
+
+def onbtenerImgProducto(request):
+    codigo = request.GET.get('codigo')
+
+    if not codigo:
+        return JsonResponse({'error': 'Falta el parámetro: idProducto es obligatorio'}, status=400)
+
+    try:
+        producto = ProductoDB.objects.get(codigo=codigo)
+
+        data = {
+            'imagen': producto.imagen
+        }
+
+        return JsonResponse(data, status=200)
+
+    except ProductoDB.DoesNotExist:
+        return JsonResponse({'error': 'No se encontró el producto solicitado'}, status=404)

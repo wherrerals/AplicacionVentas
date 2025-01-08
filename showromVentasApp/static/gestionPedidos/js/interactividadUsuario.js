@@ -4,7 +4,7 @@ function togglePassword() {
 
     // Verificar si los elementos existen antes de agregar el evento
     if (toggleButton && passwordInput) {
-        toggleButton.addEventListener("click", function() {
+        toggleButton.addEventListener("click", function () {
             if (passwordInput.type === "password") {
                 passwordInput.type = "text";
                 toggleButton.textContent = "Ocultar";
@@ -24,7 +24,7 @@ function toggleRepeatPassword() {
 
     // Verificar si los elementos existen antes de agregar el evento
     if (toggleButton && passwordInput) {
-        toggleButton.addEventListener("click", function() {
+        toggleButton.addEventListener("click", function () {
             if (passwordInput.type === "password") {
                 passwordInput.type = "text";
                 toggleButton.textContent = "Ocultar";
@@ -49,7 +49,7 @@ function cambiarLabel(razonSocialRadioName, nombreLabelId, apellidoInputId, apel
 
     if (razonSocialRadio[0].checked) {
         nombreLabel.textContent = 'Nombre';
-        apellidoInput.style.display = 'block'; // Mostrar input de apellido
+        apellidoInput.style.display = 'block'; //   Mostrar input de apellido
         apellidolabel.style.display = 'block'; // Mostrar label de apellido
     } else if (razonSocialRadio[1].checked) {
         nombreLabel.textContent = 'R. Social';
@@ -59,72 +59,57 @@ function cambiarLabel(razonSocialRadioName, nombreLabelId, apellidoInputId, apel
 }
 
 
-document.addEventListener('DOMContentLoaded', function () {
-    const duplicarOpcion = document.getElementById('duplicar');
+function limpiarInformacionCliente() {
+    $('#inputCliente').val(''); // Limpia el campo de entrada
+    $('#rutSN').val(''); // Limpia el campo de RUT
+    $('#rutSN').removeAttr('data-rut'); // Limpia el atributo data-rut
+    $('#inputCliente').removeAttr('data-rut').removeAttr('data-codigoSN'); // Elimina los atributos
+    $('#resultadosClientes').empty(); // Vacía el contenedor de resultados
+    $('#nombreSN').val('');
+    $('#apellidoSN').val('');
+    $('#rutSN').val('');
+    $('#codigoSN').val('');
+    $('#telefonoSN').val('');
+    $('#emailSN').val('');
+    $('#giroSN').val('');
 
-    if (duplicarOpcion) {
-        duplicarOpcion.addEventListener('click', function (event) {
-            event.preventDefault(); // Evitar acción predeterminada del enlace
+    // Restablece el select de contactos con la opción predeterminada
+    $('#clientes').html(`<option value="">Seleccione un contacto</option>`);
 
-            console.log('Evento click detectado en "Duplicar".');
+    // Restablece los selects de direcciones con opciones predeterminadas
+    $('#direcciones_despacho').html('<option value="">Seleccione una dirección de despacho</option>');
+    $('#direcciones_facturacion').html('<option value="">Seleccione una dirección de facturación</option>');
 
-            // Crear una nueva pestaña
-            const nuevaVentana = window.open('', '_blank');
-            if (nuevaVentana) {
-                const docOriginal = document.documentElement.cloneNode(true);
+    console.log("Información del cliente limpia.");
+}
 
-                // Crear una estructura HTML completa en la nueva pestaña
-                nuevaVentana.document.open();
-                nuevaVentana.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                        <head>
-                            ${document.head.innerHTML} <!-- Clonar el contenido del <head> -->
-                        </head>
-                        <body>
-                            ${document.body.innerHTML} <!-- Clonar el contenido del <body> -->
-                        </body>
-                    </html>
-                `);
-                nuevaVentana.document.close();
-                console.log('Nueva pestaña creada con el contenido duplicado.');
+const copiarODVButtton = document.getElementById("copiar-ODV");
 
-                // Ejecutar la función global definida en ajax__clientes.js
-                nuevaVentana.onload = function () {
-                    if (typeof nuevaVentana.limpiarInformacionCliente === 'function') {
-                        nuevaVentana.limpiarInformacionCliente();
-                        console.log('Función limpiarInformacionCliente ejecutada en la nueva pestaña.');
-                    } else {
-                        console.error('La función limpiarInformacionCliente no está definida en la nueva pestaña.');
-                    }
-                };
-            } else {
-                alert('No se pudo abrir una nueva pestaña. Verifica bloqueadores de pop-ups.');
-                return;
-            }
+if (copiarODVButtton) {
+    copiarODVButtton.addEventListener('click', (event) => {
+        console.log("Ejecutando...");
+        event.preventDefault(); // Evitar comportamiento predeterminado del botón/enlace
 
-            // Cerrar el menú desplegable
-            const dropdownMenu = duplicarOpcion.closest('.dropdown-menu');
-            if (dropdownMenu) {
-                dropdownMenu.classList.remove('show');
-            }
+        // Obtener el elemento que contiene el valor del número de cotización
+        const docEntryElement = document.getElementById('numero_cotizacion');
+        const docEntry = docEntryElement ? docEntryElement.textContent.trim() : null;
 
-            // Asegúrate de cerrar también el botón de toggle
-            const dropdownToggle = duplicarOpcion.closest('.dropdown').querySelector('.dropdown-toggle');
-            if (dropdownToggle) {
-                dropdownToggle.setAttribute('aria-expanded', 'false');
-            }
-        });
-    } else {
-        //console.error('No se encontró el enlace "Duplicar". Verifica el id.');
-    }
-});
+        if (docEntry) {
+            showLoadingOverlay(); // Mostrar un overlay de carga
+            window.location.href = `/ventas/ordenesVentas/?docentry=${docEntry}`; // Redirigir con el docEntry
+        } else {
+            hideLoadingOverlay(); // Ocultar el overlay si ocurre un error
+            alert("No se pudo obtener el DocEntry de la orden."); // Mostrar alerta de error
+        }
+    });
+}
+
 
 const cerrarButton = document.getElementById("cerrar");
 
 // Verificar si el elemento existe antes de agregar el evento
 if (cerrarButton) {
-    cerrarButton.addEventListener("click", function(event) {
+    cerrarButton.addEventListener("click", function (event) {
         event.preventDefault();
         handleAction("cerrar");
     });
@@ -134,15 +119,20 @@ if (cerrarButton) {
 
 const cancelarButton = document.getElementById("cancelar");
 if (cancelarButton) {
-    cancelarButton.addEventListener("click", function(event) {
+    cancelarButton.addEventListener("click", function (event) {
         event.preventDefault();
         handleAction("cancelar");
     });
-    } else {
-        //console.warn('El botón con ID "cerrar" no existe en el DOM.');
-    }
+} else {
+    //console.warn('El botón con ID "cerrar" no existe en el DOM.');
+}
 
-
+const duplicarbutton = document.getElementById("duplicar-1");
+if (duplicarbutton) {
+    duplicarbutton.addEventListener("click", function (event) {
+        limpiarInformacionCliente();
+    });
+}
 
 function handleAction(action) {
     const numeroCotizacion = document.getElementById("numero_cotizacion").innerText;
@@ -150,9 +140,12 @@ function handleAction(action) {
 
     // Crear objeto de datos a enviar
     const payload = {
-        DocEntry: numeroCotizacion,
+        DocNum: numeroCotizacion,
         Estado: estado
     };
+
+    // Limpiar mensajes previos antes de mostrar nuevos
+    limpiarMensajes();
 
     // Realizar POST con los datos
     fetch('/ventas/cambiar_estado_cotizacion/', {
@@ -162,20 +155,28 @@ function handleAction(action) {
         },
         body: JSON.stringify(payload)
     })
-    .then(response => {
-        if (response.ok) {
-            console.log("Acción realizada con éxito:", payload);
-        } else {
-            console.error("Error en la respuesta del servidor.");
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log("Respuesta del servidor:", data);
-    })
-    .catch(error => {
-        console.error("Error al realizar el POST:", error);
-    });
+        .then(response => {
+            if (response.ok) {
+                return response.json(); // Continuar para procesar la respuesta del servidor
+            } else {
+                // Mostrar mensaje de error con el estado de la respuesta
+                mostrarMensaje("Error en la solicitud. Estado: " + response.statusText, "error");
+                throw new Error("Respuesta no exitosa del servidor.");
+            }
+        })
+        .then(data => {
+            if (data.success) { // Suponiendo que el servidor retorna un campo 'success'
+                mostrarMensaje("Acción realizada con éxito.", "success");
+            } else {
+                mostrarMensaje(data.message || "Se produjo un error desconocido.", "error");
+            }
+        })
+        .catch(error => {
+            // Mostrar mensaje de error si falla el POST
+            console.error("Error al realizar el POST:", error);
+            mostrarMensaje("Error al procesar la solicitud: " + error.message, "error");
+        });
+
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -200,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const contactoNombreCompleto = contactoSelect.options[contactoSelect.selectedIndex].text.trim();
             const direcconSelect = document.getElementById('direcciones_despacho');
             const direccionCompleta = direcconSelect.options[direcconSelect.selectedIndex].text.trim();
-                    
+
 
 
             const telefonoSN = document.getElementById('telefonoSN')?.value || 'No disponible';
@@ -224,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else if (showroomCode === 'GR') {
                 showroomDireccion = 'Av. Pdte. Eduardo Frei Montalva #550, Av. Pdte. Eduardo Frei Montalva 520, 8640000 Renca, Región Metropolitana';
             } else if (showroomCode === 'PR') {
-                showroomDireccion = 'PR -- No especificado'; 
+                showroomDireccion = 'PR -- No especificado';
             } else {
                 showroomDireccion = 'Showroom no especificado';
             }
@@ -297,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function () {
             pdf.text(`${grupoSN}`, 10, yPosition + 12);
             //pdf.text(`${direccion}`, 10, yPosition + 18);
             pdf.text(`${direccionCompleta}`, 10, yPosition + 18);
-            pdf.text(`Contacto: ${contactoNombreCompleto}`, 10, yPosition + 24); 
+            pdf.text(`Contacto: ${contactoNombreCompleto}`, 10, yPosition + 24);
             //pdf.text(`Contacto: ${contactoNombre} ${contactoApellido}`, 10, yPosition + 24);    
             pdf.text(`Teléfono: ${telefonoSN}`, 10, yPosition + 30);
             pdf.text(`Email: ${emailSN}`, 10, yPosition + 36);
@@ -350,25 +351,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 pdf.text(`Página | ${pageNumber} de ${totalPages}`, columnWidth * 3 + 5, pageHeight - 8);
             };
 
-                    // Añadir tabla de totales
-                    const agregarTablaTotales = () => {
-                        const totalNeto = document.getElementById('total_neto')?.textContent || '$0';
-                        const iva = document.getElementById('iva')?.textContent || '$0';
-                        const totalBruto = document.getElementById('total_bruto')?.textContent || '$0';
-        
-                        const startY = yPosition + 50; // Espacio adicional debajo de los detalles
-        
-                        pdf.setFontSize(10);
-                        pdf.text('Subtotal Neto:', 10, startY);
-                        pdf.text(totalNeto, 80, startY);
-        
-                        pdf.text('IVA 19%:', 10, startY + 10);
-                        pdf.text(iva, 80, startY + 10);
-        
-                        pdf.text('Total a Pagar:', 10, startY + 20);
-                        pdf.text(totalBruto, 80, startY + 20);
-                    };
-                    agregarTablaTotales();
+            // Añadir tabla de totales
+            const agregarTablaTotales = () => {
+                const totalNeto = document.getElementById('total_neto')?.textContent || '$0';
+                const iva = document.getElementById('iva')?.textContent || '$0';
+                const totalBruto = document.getElementById('total_bruto')?.textContent || '$0';
+
+                const startY = yPosition + 50; // Espacio adicional debajo de los detalles
+
+                pdf.setFontSize(10);
+                pdf.text('Subtotal Neto:', 10, startY);
+                pdf.text(totalNeto, 80, startY);
+
+                pdf.text('IVA 19%:', 10, startY + 10);
+                pdf.text(iva, 80, startY + 10);
+
+                pdf.text('Total a Pagar:', 10, startY + 20);
+                pdf.text(totalBruto, 80, startY + 20);
+            };
+            agregarTablaTotales();
 
             // Configurar contenido del PDF
             const totalPages = 2; // Cambiar dinámicamente según el contenido

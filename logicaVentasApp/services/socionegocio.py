@@ -24,16 +24,33 @@ class SocioNegocio:
     
     def __init__(self, request):
         
+        try:
+            dataSN = json.loads(request.body)
+        except (json.JSONDecodeError, AttributeError):
+            dataSN = None
+
         self.logger = logging.getLogger(__name__)
-        self.request = request
-        self.gruposn = request.POST.get('grupoSN')
-        self.rut = request.POST.get('rutSN')
-        self.email = request.POST.get('emailSN')
-        self.nombre = request.POST.get('nombreSN')
-        self.apellido = request.POST.get('apellidoSN')
-        self.razon_social = request.POST.get('nombreSN')
-        self.giro = request.POST.get('giroSN')
-        self.telefono = request.POST.get('telefonoSN')
+        self.request = dataSN
+        
+        if dataSN:
+            self.gruposn = dataSN.get('tipoSN')
+            self.rut = dataSN.get('rutSN')
+            self.email = dataSN.get('emailSN')
+            self.nombre = dataSN.get('nombreSN')
+            self.apellido = dataSN.get('apellidoSN')
+            self.razon_social = dataSN.get('nombreSN')
+            self.giro = dataSN.get('giroSN')
+            self.telefono = dataSN.get('telefonoSN')
+        else:
+            # Atributos inicializados como None por defecto
+            self.gruposn = None
+            self.rut = None
+            self.email = None
+            self.nombre = None
+            self.apellido = None
+            self.razon_social = None
+            self.giro = None
+            self.telefono = None
         
         
     def validarDatosObligatorios(self):
@@ -48,13 +65,13 @@ class SocioNegocio:
         self.validarRut()
         self.validarEmail()
         self.validarNombre()
-        #self.validarApellido()
+        self.validarApellido()
         self.validarTelefono()
         self.tamañotelefono()        
 
     def procesarClienteExistente(self, codigosn, datosCliente, datosNuevos):
-        
-        logger.info(f"Procesando cliente existente con código SN: {codigosn}")
+
+        print("Procesando cliente existente...")
 
         try:
             verificacionSap = self.verificarSocioNegocioSap(codigosn)
@@ -80,22 +97,21 @@ class SocioNegocio:
 
     def actualizarSocioNegocio(self, cardcode, datos):
 
-        print(f"Actualizando socio de negocio con código: {cardcode}")
-
-        logger.info(f"Actualizando socio de negocio con código: {cardcode}")
+        print("Actualizando socio de negocio...")
         print(f"Datos recibidos: {datos}")
 
         repo = SocioNegocioRepository()
 
         try:
             # Verificar grupo de cliente
-            grupo_sn = datos.get('grupoSN')
+            grupo_sn = datos.get('tipoSN')
 
             if not grupo_sn:
                 raise ValueError("El atributo 'gruposn' no está definido o es inválido.")
 
+            print(f"Grupo de cliente: {grupo_sn}")
             # Determinar tipo de cliente
-            if grupo_sn == '100':
+            if grupo_sn == '105':
 
                 logger.info("Actualizando cliente persona...")
                 
@@ -260,7 +276,7 @@ class SocioNegocio:
             raise ValidationError("Faltan datos obligatorios")
         return gruposn, rut, email
 
-    
+    @staticmethod
     def generarCodigoSN(rut):
 
         """
@@ -389,7 +405,6 @@ class SocioNegocio:
                     'direcciones': direcciones_formateadas,
                     'contactos': contactos_formateados
                 })
-                print(f"Resultados formateados: {resultados_formateados}")
 
             return resultados_formateados
         
@@ -588,67 +603,7 @@ class SocioNegocio:
         except SocioNegocioDB.DoesNotExist:
             raise ValueError(f"No se encontró el cliente con RUT: {cardCode}")
 
-    def _prepararCabecera(self, jsonData, cardCodeSinGuion, nombreCompleto):
-        return {
-            'CardCode': cardCodeSinGuion,
-            'CardName': nombreCompleto,
-            'CardType': "C",
-            'GroupCode': jsonData['grupoSN'],
-            'Phone1': jsonData['telefonoSN'],
-            'Phone2': jsonData['telefonoSN'],
-            'Notes': "Persona",
-            'PayTermsGrpCode': -1,
-            'FederalTaxID': jsonData['rutSN'],
-            'SalesPersonCode': -1,  # Cambiar por el código de vendedor
-            'Cellular': jsonData['telefonoSN'],
-            'EmailAddress': jsonData['emailSN'],
-            'CardForeignName': nombreCompleto,
-            'ShipToDefault': jsonData['nombre_direccion[]'],
-            'BilltoDefault': jsonData['nombre_direccion[]'],
-            'DunningTerm': "ESTANDAR",
-            'CompanyPrivate': "cPrivate",
-            'AliasName': jsonData['nombreSN'],
-            'U_Tipo': "N",
-            'U_FE_Export': "N",
-        }
 
-    def _prepararDireciones(self, direcciones) -> list:
-        bp_addresses_json = []
-        for direccion in direcciones:
-            
-            
-            # Crear un diccionario por cada dirección
-            bp_addresses_json.append({
-                'AddressName': direccion.nombreDireccion,
-                'Street': direccion.calleNumero,
-                'City': direccion.codigoImpuesto,
-                'County': direccion.pais,
-                'Country': "CL", # Cambiar por el código de país
-                'State': direccion.region.numero,
-                'FederalTaxID': direccion.SocioNegocio.rut,
-                'TaxCode': "IVA", # Cambiar por el código de impuesto
-                'AddressType': 'bo_BillTo' if direccion.tipoDireccion == 'F' else 'bo_ShipTo',
-
-            })
-
-            return bp_addresses_json
-        
-    def _prepararContactos(self, contactos) -> list:
-        # Preparar contactos
-
-        return  [
-            {
-                'Name': contacto.nombreCompleto,
-                'Phone1': contacto.telefono,
-                'MobilePhone': contacto.celular,
-                'E_Mail': contacto.email,
-                'FirstName': contacto.nombre,
-                'LastName': contacto.apellido,
-            }
-            for contacto in contactos
-        ]
-
-    
     def creacionSocioSAP(self, data):
         """
         Método para crear un socio de negocio en SAP.
@@ -664,13 +619,7 @@ class SocioNegocio:
         client = APIClient()
         
         try:
-            print("Creando socio de negocio en SAP...")
-
-
-            # Enviar solicitud a SAP
-            print(f"Datos a enviar: {data}")
             response = client.crearCliente(data)
-            print(f"Respuesta de la API: {response}")
             
             if isinstance(response, dict):
                 # Verificar si la respuesta contiene un 'CardCode'
@@ -687,13 +636,7 @@ class SocioNegocio:
                     internal_codes = [employee.get('InternalCode') for employee in contact_employees if 'InternalCode' in employee]
 
 
-                    return {
-                        'success': 'Socio de negocio creado exitosamente',
-                        'CardCode': card_code,
-                        'RowNums': row_nums,  # Lista con los RowNum extraídos
-                        'InternalCodes': internal_codes  # Lista con los InternalCode extraídos
-
-                    }
+                    return response
                 
                 # Manejar el mensaje de error si lo hay
                 elif 'error' in response:
@@ -754,6 +697,7 @@ class SocioNegocio:
 
             # Calcular el dígito verificador según el módulo 11
             digito_calculado = 11 - residuo
+
             if digito_calculado == 11:
                 digito_calculado = '0'
             elif digito_calculado == 10:
@@ -768,117 +712,131 @@ class SocioNegocio:
             print(f"Error al verificar RUT: {str(e)}")
             return False
 
-    def procesarDirecciones(data, socio):
+        
+    
+    def actualizaroCrearDireccionSL(cardCode, data):
+        """
+        Método para actualizar o crear una dirección en SAP.
+
+        Args:
+            cardCode (str): Código del socio de negocio.
+            data (dict): Datos de la dirección.
+
+        Returns:
+            dict: Mensaje de éxito o error.
+        """
+        print("Actualizando o creando dirección en SAP...")
+
+        direcciones_json = data.getlist('direcciones')
+            
+        # Deserializar el JSON
+        direcciones = json.loads(direcciones_json[0])
+
+        print(f"Direcciones deserializadas: {direcciones}")
+
+        serializar = Serializador('json')
+        datosSerializados = serializar.mapearDirecciones(direcciones, cardCode)
+
+        client = APIClient()
 
         try:
-            # Obtener la lista de direcciones como JSON
-            direcciones_json = data.getlist('direcciones')
-            
-            if not direcciones_json:
-                return JsonResponse({'success': False, 'message': 'No se encontraron direcciones en el request.'}, status=400)
-            
-            # Deserializar el JSON
-            direcciones = json.loads(direcciones_json[0])
-            print(f"Direcciones deserializadas: {direcciones}")
-            
-            # Extraer campos relevantes
-            #autoincementar row num por cada direccion agg
-            rownum = 1
-            tipo = [direccion.get('tipoDireccion') for direccion in direcciones]
-            nombre_direccion = [direccion.get('nombreDireccion') for direccion in direcciones]
-            ciudad = [direccion.get('ciudad') for direccion in direcciones]
-            pais = [direccion.get('pais') for direccion in direcciones]
-            region = [direccion.get('region') for direccion in direcciones]
-            comuna = [direccion.get('comuna') for direccion in direcciones]
-            direccion = [direccion.get('direccion') for direccion in direcciones]
-            
-            # Verificar que las listas tienen la misma longitud
-            if not all(len(lst) == len(nombre_direccion) for lst in [ciudad, direccion, tipo, pais, region, comuna]):
-                return {'data': {'success': False, 'message': 'Las listas deben tener la misma longitud.'}, 'status': 400}
+            response = client.actualizarDireccionSL(cardCode, datosSerializados)
+            print(f"Respuesta de la API: {response}")
 
-            # Procesar cada dirección
-            for i in range(len(nombre_direccion)):
-                nombredire = nombre_direccion[i].strip()
-                
-                if nombredire:
-                    direccion_id = direcciones[i].get('direccionId')
-
-                    if direccion_id:
-                        # Obtener la dirección existente
-                        direccion_obj = DireccionRepository.obtenerDireccion(direccion_id)
-
-                        # Actualizar si existe, o crear si no
-                        if direccion_obj:
-                            DireccionRepository.actualizarDireccion(direccion_obj, nombredire, ciudad[i], direccion[i], comuna[i], region[i], tipo[i], pais[i])
-                    else:
-                        # Crear la dirección
-                        try:
-                            DireccionRepository.crearDireccion(socio,rownum, nombredire, ciudad[i], direccion[i], comuna[i], region[i], tipo[i], pais[i])
-                        except Exception as e:
-                            print(f"Ocurrió un error al crear la dirección: {str(e)}")
+            if isinstance(response, dict):
+                if 'error' in response:
+                    return {'success': False, 'message': response.get('error', 'Error desconocido')}
                 else:
-                    print(f"No se procesó la dirección {i+1} porque el nombre está vacío.")
+                    return {'success': True, 'message': 'Dirección actualizada exitosamente'}
+            else:
+                return {'success': False, 'message': 'Respuesta inesperada de la API'}
+        except ConnectionError as e:
+            return {'success': False, 'message': 'Error de conexión con SAP'}
+        except Exception as e:
+            return {'success': False, 'message': f'Error inesperado: {str(e)}'}
+        
+    def actualizaroCrearContactosSL(cardCode, data):
+        """
+        Método para actualizar o crear una dirección en SAP.
 
-            return {'data': {'success': True, 'message': 'Direcciones procesadas con éxito.'}, 'status': 200}
-        except KeyError as e:
-            return {'data': {'success': False, 'message': f'Falta el campo: {str(e)}'}, 'status': 400}
-        except json.JSONDecodeError as e:
-            return {'data': {'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, 'status': 400}
+        Args:
+            cardCode (str): Código del socio de negocio.
+            data (dict): Datos de la dirección.
+
+        Returns:
+            dict: Mensaje de éxito o error.
+        """
+        print("Actualizando o creando Conctactos en SAP...")
+
+        contactos_json = data.getlist('contactos')
+            
+        # Deserializar el JSON
+        contactos = json.loads(contactos_json[0])
+
+        print(f"Direcciones deserializadas: {contactos}")
+
+        serializar = Serializador('json')
+
+        datosSerializados = serializar.mapearContactos(contactos, cardCode)
+
+        client = APIClient()
+
+        try:
+            response = client.actualizarContactosSL(cardCode, datosSerializados)
+            print(f"Respuesta de la API: {response}")
+
+            if isinstance(response, dict):
+                if 'error' in response:
+                    return {'success': False, 'message': response.get('error', 'Error desconocido')}
+                else:
+                    return {'success': True, 'message': 'Contacto actualizado exitosamente'}
+            else:
+                return {'success': False, 'message': 'Respuesta inesperada de la API'}
+        except ConnectionError as e:
+            return {'success': False, 'message': 'Error de conexión con SAP'}
+        except Exception as e:
+            return {'success': False, 'message': f'Error inesperado: {str(e)}'}
+        
         
     def procesarContactos(data, socio):
+            try:
+                contactos_json = data.get('contactos')
 
-        print("Procesando contactos...")
-        try:
-            contactos_json = data.getlist('contactos')
-            print(f"Contactos JSON: {contactos_json}")
+                if not contactos_json:
+                    return JsonResponse({'success': False, 'message': 'No se encontraron contactos en el request.'}, status=400)
 
-            if not contactos_json:
-                return JsonResponse({'success': False, 'message': 'No se encontraron contactos en el request.'}, status=400)
+                contactos = json.loads(contactos_json[0])
+                
+                print(f"socio: {socio}")
 
-            contactos = json.loads(contactos_json[0])
+                ContactoRepository.eliminarContactosPorSocio(socio)
 
-            # Extraer los valores necesarios desde el JSON deserializado
-            nombres = [contacto.get('nombre', '').strip() for contacto in contactos]
-            apellidos = [contacto.get('apellido', '').strip() for contacto in contactos]
-            telefonos = [contacto.get('telefono', '').strip() for contacto in contactos]
-            celulares = [contacto.get('celular', '').strip() for contacto in contactos]
-            emails = [contacto.get('email', '').strip() for contacto in contactos]
-            codigosInternoSap = 1
-            
+                for contacto in contactos:
+                    nombre = contacto.get('nombre', '')
+                    apellido = contacto.get('apellido', '')
+                    telefono = contacto.get('telefono', '')
+                    celular = contacto.get('celular', '')
+                    email = contacto.get('email', '')
+                    codigo_interno_sap = int(contacto.get('contacto_id', ''))
 
-            # Verifica la longitud de todas las listas
-            if not all(len(lst) == len(nombres) for lst in [apellidos, telefonos, celulares, emails]):
-                print("Las listas deben tener la misma longitud.")
-                return JsonResponse({'success': False, 'message': 'Las listas deben tener la misma longitud.'}, status=400)
-
-            for i in range(len(nombres)):
-                nombre = nombres[i]
-
-                if nombre:
-                    contacto_id = contactos[i].get('contacto_id')
-
-                    if contacto_id:
-                        contacto_obj = ContactoRepository.obtenerContacto(contacto_id)
-
-                        if contacto_obj:
-                            print(f"Actualizando contacto {i+1}...")
-                            ContactoRepository.actualizarContacto(contacto_obj, nombre, apellidos[i], telefonos[i], celulares[i], emails[i])
-                    else:
+                    print(f"Datos del contacto: {nombre}, {apellido}, {telefono}, {celular}, {email}, {codigo_interno_sap}")
+                    if nombre:
                         try:
-                            ContactoRepository.crearContacto(socio, codigosInternoSap, nombre, apellidos[i], telefonos[i], emails[i], celulares[i])
+                            print(f"Creando nuevo contacto: {nombre} {apellido}")
+                            ContactoRepository.crearContacto(socio, codigo_interno_sap, nombre, apellido, telefono, email, celular)
                         except Exception as e:
                             print(f"Error al crear el contacto: {str(e)}")
                             return JsonResponse({'success': False, 'message': f'Error al crear el contacto: {str(e)}'}, status=500)
+                    else:
+                        print("Nombre vacío. No se procesó este contacto.")
 
-                else:
-                    print(f"No se procesó el contacto {i+1} porque el nombre o apellido está vacío.")
+                return {'data': {'success': True, 'message': 'Contactos procesados y reemplazados con éxito.'}, 'status': 200}
 
-            return {'data': {'success': True, 'message': 'Direcciones procesadas con éxito.'}, 'status': 200}
-        
-        except KeyError as e:
-            return {'data': {'success': False, 'message': f'Falta el campo: {str(e)}'}, 'status': 400}
-        except json.JSONDecodeError as e:
-            return {'data': {'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, 'status': 400}
+            except KeyError as e:
+                return {'data': {'success': False, 'message': f'Falta el campo: {str(e)}'}, 'status': 400}
+            
+            except json.JSONDecodeError as e:
+                return {'data': {'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, 'status': 400}
 
 
     def infoCliente(self, identificador, buscar_por_nombre=False):
@@ -976,9 +934,12 @@ class SocioNegocio:
 
         Returns:
             dict: Datos del socio de negocio procesados.
-
         """
-        name, lastname  = data.get('CardName').split(' ', 1)
+
+        print("Procesando datos del socio de negocio...")
+        print(f"Datos recibidos para crear en MYSQL: {data}")
+
+        name, lastname = data.get('CardName').split(' ', 1)
         razonsocial = data.get('CardName')
 
         # Datos principales del socio de negocio
@@ -997,10 +958,14 @@ class SocioNegocio:
             "tipoSN": "I",  # Valor fijo según lo especificado
             "tipoCliente": "N"  # Valor fijo según lo especificado
         }
-        
+
         # Direcciones del socio de negocio
         direcciones = []
         for direccion in data.get("BPAddresses", []):
+            address_type = direccion.get("AddressType", "")
+            # Asignar valores según AddressType
+            tipo_direccion = 13 if address_type == "bo_BillTo" else 12 if address_type == "bo_ShipTo" else None
+
             direcciones.append({
                 "rowNum": direccion.get("RowNum", ""),
                 "nombreDireccion": direccion.get("AddressName", ""),
@@ -1008,14 +973,12 @@ class SocioNegocio:
                 "ciudad": direccion.get("City", ""),
                 "codigoImpuesto": direccion.get("TaxCode", ""),
                 "SocioNegocio": direccion.get("BPCode", ""),
-                #"region": direccion.get("State", ""),
-                #"comuna": 16214,
+                "tipoDireccion": tipo_direccion,  # Nuevo campo
             })
 
         # Empleados de contacto del socio de negocio
         empleados_contacto = []
         for contacto in data.get("ContactEmployees", []):
-
             fullName = contacto.get("Name", "")
             nombre, apellido = (fullName.split(' ', 1) + [""])[:2]
 
@@ -1038,7 +1001,6 @@ class SocioNegocio:
         }
 
         return resultado
-    
 
 
     def guardarClienteCompleto(self, data):
@@ -1087,7 +1049,6 @@ class SocioNegocio:
             )
             
 
-
         # Crear las direcciones asociadas al cliente usando el método del repositorio
         for direccion in data.get("Direcciones", []):
             DireccionRepository.crearDireccion(
@@ -1098,7 +1059,7 @@ class SocioNegocio:
                 calle_numero=direccion["calleNumero"],
                 comuna_id=666,
                 region_id=13,  # Valor por defecto
-                tipo_direccion=12,
+                tipo_direccion=direccion["tipoDireccion"],
                 pais=direccion.get("pais", "Chile")  # Valor por defecto
             )
             print (f"Data Direccion: {direccion}")
@@ -1128,7 +1089,7 @@ class SocioNegocio:
         Returns:
             str: 'CardCode' generado.
         """
-
+        print("Generando CardCode...")
         return f"{rut}C"
 
     def responderInfoCliente(self, rut):
@@ -1153,7 +1114,9 @@ class SocioNegocio:
         try:
             client = APIClient()
             data = client.getInfoSN(carCode)
-
+            
+            print(f"Data: {data}")
+            
             data_creacion = self.procesarDatosSocionegocio(self.convertirJsonObjeto(data))
 
             print (f"Data Creacion: {data_creacion}")
@@ -1197,44 +1160,31 @@ class SocioNegocio:
         return filters
 
 
-    
-    """
-    filter=CardType eq 'cCustomer' and contains(CardCode, '10') 
-    and contains(CardName, 'Leonardo') and GroupCode eq 105 and contains(Phone1, '+569') and contains(EmailAddress, '@gmail')
-    """
-    
-    def plp(cls):
-        """
-        clear
-        """
-
-        ab = 1 + 2
-        pass
-
-
 #Creacion Socio Negocio
 
     def crearOActualizarCliente(self):
-        
-        print("Creando o actualizando cliente...")
+
+        dataSN = self.request
+        print("creando o actualizando cliente...")
+
         if not self.verificarRutValido(self.rut):
             return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)
         
         try:
             self.validarDatosObligatorios()
-            
-            rut = self.rut
-            
-            codigoSN = SocioNegocio.generarCodigoSN(rut)
 
+            rut = self.rut            
+            codigoSN = SocioNegocio.generarCodigoSN(rut)
             clienteExistente = SocioNegocioRepository.obtenerPorRut(self.rut)
 
-            logger.info(f"Cliente existente: {clienteExistente}")
+            print(f"Cliente existente: {clienteExistente}")
+
+            print(f"Grupo datos actualizar: {dataSN}")
                         
             if clienteExistente is not None:
-                return self.procesarClienteExistente(codigoSN, clienteExistente, datosNuevos=self.request.POST)
+                return self.procesarClienteExistente(codigoSN, clienteExistente, datosNuevos=dataSN)
             
-            self.procesarNuevoCliente()
+            self.procesarNuevoCliente(dataSN)
             
             return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
         except ValidationError as e:
@@ -1242,40 +1192,31 @@ class SocioNegocio:
         except Exception as e:
             return self.manejarErrorGeneral(e)
 
-    def procesarNuevoCliente(self):
-        """
-        Procesa la creación de un nuevo cliente y lo sincroniza con SAP.
-        """
+    def procesarNuevoCliente(self, dataSN):
         try:
             print("Procesando nuevo cliente...")
 
-            # Generar código único para el cliente
+            print (f"DataSN: {dataSN}")
+
             codigoSN = SocioNegocio.generarCodigoSN(self.rut)
+
             if not codigoSN:
                 raise ValueError("No se pudo generar el código del cliente.")
+            
+            print(f"Código de cliente generado: {codigoSN}")
 
-            # Obtener datos relacionados
-            gruposn = self.obtenerGrupoSN()
-            tipocliente = self.obtenerTipoCliente()
-            tiposn = self.obtenerTipoSN()
+            jsonData = self.serializarSN(dataSN)
+            
+            data = self.creacionSocioSAP(jsonData)
 
-            # Crear el cliente en la base de datos dentro de una transacción
-            with transaction.atomic():
-                cliente = self.crearNuevoCliente(codigoSN, tiposn, gruposn, tipocliente)
+            data_creacion = self.procesarDatosSocionegocio(self.convertirJsonObjeto(data))
 
-                # Preparar datos para SAP
-                print("Preparando datos para SAP...")
-                print(f"data: {self.request.POST}")
-                jsonData = self.prepararJsonCliente(self.request.POST)
-                if not jsonData:
-                    raise ValueError("Datos JSON inválidos para la sincronización con SAP.")
+            print (f"Data Creacion: {data_creacion}")
 
-                # Sincronizar con SAP
-                self.creacionSocioSAP(jsonData)
+            cliente = self.guardarClienteCompleto(data_creacion)
 
-            print("Cliente procesado con éxito.")
-            return cliente  # Retorna el cliente creado, si aplica
-
+            return cliente
+        
         except Exception as e: 
             return JsonResponse({'success': False, 'message': 'Error al procesar el cliente'}, status=500)
         
@@ -1300,37 +1241,160 @@ class SocioNegocio:
 
         return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
 
-    def prepararJsonCliente(self, jsonData: dict):
+    def serializarSN(self, data):
+        # Decodifica el JSON de entrada
+        print("Serializando datos del cliente...")
 
-        print("Preparando datos para el cliente...")
-        print(f"Datos JSON: {jsonData}")
+        rut = data.get("rutSN", "")
+        cardcode = self.generarCodigoSN(rut)
 
-        if jsonData.get('grupoSN') == '100':
-            camposRequeridos = ['rutSN', 'nombreSN', 'apellidoSN', 'grupoSN', 'telefonoSN', 'emailSN']
-            for campo in camposRequeridos:
-                if not jsonData.get(campo):
-                    raise ValueError(f"El campo '{campo}' es obligatorio.")
+        print(f"RUT: {rut}")
+        print(f"Código de cliente: {cardcode}")
+        
+        client_data = data
+        
+        # Serializa los datos principales del cliente
+        serialized_data = {
+            "CardCode": cardcode,
+            "CardName": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
+            "CardType": "cCustomer",
+            "GroupCode": int(client_data.get("tipoSN", "")),
+            "Phone1": client_data.get("telefonoSN", ""),
+            "Phone2": client_data.get("telefonoSN", ""),
+            "Notes": client_data.get("giroSN", ""),
+            "PayTermsGrpCode": -1,
+            "FederalTaxID": client_data.get("rutSN", ""),
+            "SalesPersonCode": -1,
+            "Cellular": client_data.get("telefonoSN", ""),
+            "EmailAddress": client_data.get("emailSN", ""),
+            "CardForeignName": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
+            #"ShipToDefault": "DESPACHO",
+            #"BilltoDefault": "FACTURACION",
+            "DunningTerm": "ESTANDAR",
+            "CompanyPrivate": "cPrivate",
+            "AliasName": client_data.get("nombreSN", ""),
+            "U_Tipo": "N",
+            "U_FE_Export": "N",
+            "BPAddresses": [],
+            "ContactEmployees": []
+        }
+        
+        # Serializa las direcciones
+        direcciones = client_data.get("direcciones", [])
+        tipos_direccion = {"13": None, "12": None}
+
+        for address in direcciones:
+            tipo_direccion = address.get("tipoDireccion", "")
+            serialized_address = {
+                "AddressName": address.get("nombreDireccion", ""),
+                "Street": address.get("direccion", ""),
+                "City": address.get("ciudad", ""),
+                "County": tipo_direccion,
+                "Country": "CL",  # Abreviación del país (e.g., Chile -> CL)
+                "State": int(address.get("region", "")),
+                "FederalTaxID": client_data.get("rutSN", "").split("-")[0],
+                "TaxCode": "IVA",
+                "AddressType": "bo_ShipTo" if tipo_direccion == "13" else "bo_BillTo"
+            }
+            serialized_data["BPAddresses"].append(serialized_address)
+            tipos_direccion[tipo_direccion] = serialized_address
+
+        # Genera la dirección faltante si solo hay una de las dos
+        if tipos_direccion["13"] and not tipos_direccion["12"]:
+            direccion_facturacion = tipos_direccion["13"].copy()
+            direccion_facturacion["County"] = "12"  # Cambia a tipo 12
+            direccion_facturacion["AddressType"] = "bo_BillTo"
+            serialized_data["BPAddresses"].append(direccion_facturacion)
+
+        if tipos_direccion["12"] and not tipos_direccion["13"]:
+            direccion_despacho = tipos_direccion["12"].copy()
+            direccion_despacho["County"] = "13"  # Cambia a tipo 13
+            direccion_despacho["AddressType"] = "bo_ShipTo"
+            serialized_data["BPAddresses"].append(direccion_despacho)
+        
+        # Serializa los contactos
+        contactos = client_data.get("contactos", [])
+        
+        if not contactos:  # Si no hay contactos, genera uno basado en el cliente principal
+            print("No se proporcionaron contactos. Generando un contacto basado en los datos del cliente principal...")
+            contacto_cliente_principal = {
+                "Name": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
+                "Phone1": client_data.get("telefonoSN", ""),
+                "MobilePhone": client_data.get("telefonoSN", ""),
+                "E_Mail": client_data.get("emailSN", ""),
+                "FirstName": client_data.get("nombreSN", ""),
+                "LastName": client_data.get("apellidoSN", "")
+            }
+            serialized_data["ContactEmployees"].append(contacto_cliente_principal)
         else:
-            camposRequeridos = ['rutSN', 'nombreSN', 'grupoSN', 'telefonoSN', 'emailSN']
-            for campo in camposRequeridos:
-                if not jsonData.get(campo):
-                    raise ValueError(f"El campo '{campo}' es obligatorio.")
+            for contact in contactos:
+                serialized_contact = {
+                    "Name": f"{contact.get('nombreContacto', '')} {contact.get('apellidoContacto', '')}".strip(),
+                    "Phone1": contact.get("telefonoContacto", ""),
+                    "MobilePhone": contact.get("telefonoContacto", ""),
+                    "E_Mail": contact.get("emailContacto", ""),
+                    "FirstName": contact.get("nombreContacto", ""),
+                    "LastName": contact.get("apellidoContacto", "")
+                }
+                serialized_data["ContactEmployees"].append(serialized_contact)
 
-        print("Datos obligatorios encontrados.")
+        print(f"Datos serializados: {serialized_data}")
+        return serialized_data
 
-        cardCode = jsonData['rutSN']
-        cardCodeSinGuion = SocioNegocio.generarCodigoSN(cardCode)
-        nombreCompleto = "{nombre} {apellido}".format(nombre=jsonData['nombreSN'], apellido=jsonData['apellidoSN'])
+    def procesarDirecciones(data, socio):
+        
+        print("Procesando direcciones desde API...")
 
-        print(f"CardCode: {cardCodeSinGuion}")
+        try:
+            direcciones_json = data.get("direcciones")
 
-        cliente, direcciones, contactos = self.obtenerDatosCliente(cardCode)
+            if not direcciones_json:
+                return JsonResponse({"success": False, "message": "No se encontraron direcciones en el request.", }, status=400)
 
-        print(f"Cliente encontrado: {cliente}")
+            direcciones = json.loads(direcciones_json[0])
+            
+            print(f"Direcciones deserializadas: {direcciones}")
+            print("eliminando direcciones")
+            
+            print(f"Eliminando direcciones para el socio: {socio}")
+            DireccionRepository.eliminarDireccionesPorSocio(socio)
+            
 
-        # Preparar JSON
-        cabezera = self._prepararCabecera(jsonData, cardCodeSinGuion, nombreCompleto)
-        bp_addresses_json = self._prepararDireciones(direcciones)
-        contact_employees_json = self._prepararContactos(contactos)
+            for direccion in direcciones:
 
-        return { **cabezera , 'BPAddresses': bp_addresses_json, 'ContactEmployees': contact_employees_json}
+                tipoDire = direccion.get("tipoDireccion")
+
+                if tipoDire == "bo_BillTo":
+                    
+                    tipoDireccion = "12"
+                else:
+                    tipoDireccion = "13"
+
+                rownum = direccion.get("row_id")
+                nombre_direccion = direccion.get("nombreDireccion")
+                ciudad = direccion.get("ciudad")
+                pais = direccion.get("pais")
+                region = direccion.get("region")
+                comuna = direccion.get("comuna")
+                direccion = direccion.get("direccion")
+                tipo = tipoDireccion
+
+                print(f"Datos de la dirección: {nombre_direccion}, {ciudad}, {pais}, {region}, {comuna}, {direccion}, {tipo}")
+                
+                if nombre_direccion:
+                    
+                    try:
+                        DireccionRepository.crearDireccion(socio, rownum, nombre_direccion, ciudad, direccion, comuna, region, tipo, pais)
+                    except Exception as e:
+                        print(f"Ocurrió un error al crear la dirección: {str(e)}")
+                else:
+                    print(f"No se procesó la dirección el nombre está vacío.")
+
+            return {"data": {"success": True, "message": "Direcciones procesadas con éxito.",}, "status": 200}
+        
+        except KeyError as e:
+            return {"data": {"success": False, "message": f"Falta el campo: {str(e)}",}, "status": 400}
+        
+        except json.JSONDecodeError as e:
+            return {"data": {"success": False, "message": f"Error al decodificar JSON: {str(e)}",}, "status": 400}
+        

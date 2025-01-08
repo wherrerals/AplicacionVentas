@@ -51,25 +51,28 @@ $(document).ready(function () {
         // Función para actualizar el valor de inputCliente al presionar el botón
         $('#grabar-btn').on('click', function () {
             // Obtener valores de los inputs
-            let rutSN = $('#rutSN').val().replace(/\./g, '').replace(/-/g, '') + 'C'; 
-            let nombreSN = $('#nombreSN').val(); // Nombre
-            let apellidoSN = $('#apellidoSN').val(); // Apellido
-    
-            // Construir el texto en el formato requerido
-            let nuevoTexto = `${rutSN} - ${nombreSN} ${apellidoSN}`;
-    
+            let rutSN = $('#rutSN').val().replace(/\./g, ''); // Eliminar puntos
+
+            // Eliminar todo lo que venga después del guion, incluido el guion
+            let nuevoTexto = rutSN.split('-')[0];
+
             // Actualizar el valor de inputCliente
             $('#inputCliente').val(nuevoTexto);
-    
+
             // Mostrar en consola para verificar
             console.log("Nuevo valor en inputCliente:", nuevoTexto);
         });
     });
-    
+
     // Función para realizar la búsqueda
     function ejecutarBusqueda(inputValue) {
         let buscarClientesUrl = '/ventas/buscar_clientes/';
         let parametros = {};
+
+        // Limpiar la "C" al final del valor si existe
+        if (inputValue.endsWith('C')) {
+            inputValue = inputValue.slice(0, -1); // Remueve la última letra "C"
+        }
 
         // Detectamos si el valor contiene solo números y puntos
         if (/^[0-9.]+$/.test(inputValue)) {
@@ -95,6 +98,7 @@ $(document).ready(function () {
                         clientesElemento.text(
                             `${resultado.codigoSN} - ${resultado.nombre} ${resultado.apellido}`
                         );
+                        
                         $('#resultadosClientes').append(clientesElemento);
                     });
                 } else {
@@ -106,6 +110,7 @@ $(document).ready(function () {
             }
         });
     }
+
 
     function limpiarInformacionCliente() {
         $('#inputCliente').val(''); // Limpia el campo de entrada

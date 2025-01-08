@@ -1,5 +1,7 @@
 import json
 
+from datosLsApp.repositories.regionrepository import RegionRepository
+
 class Serializador:
     def __init__(self, formato):
         self.formato = formato
@@ -39,6 +41,63 @@ class Serializador:
             'Cellular': datos['telefonoSN'],
             'EmailAddress': datos['emailSN'],
         }
+    
+    def mapearDirecciones(self, datos, cardCode):
+
+        repo = RegionRepository()
+        state = repo.obtenerRegionPorId(datos[0].get('region'))
+
+        tipo_direccion = datos[0].get('tipoDireccion')
+
+        if tipo_direccion == "13":
+            tipo_direccion = "bo_ShipTo"
+        else:
+            tipo_direccion = "bo_BillTo"
+        print("State: ", state)
+
+        # Formatear direcciones
+        direcciones_mapeadas = []
+        for direccion in datos:
+            direcciones_mapeadas.append({
+                'AddressName': direccion.get('nombreDireccion'),
+                'Street': direccion.get('direccion'),
+                'City': direccion.get('pais'),
+                'County': direccion.get('comuna'),
+                'Country': "CL", #direccion.get('pais')[:2].upper(),  # Obtener las dos primeras letras del país en mayúsculas
+                'State': direccion.get('region'),#state.nombre,      # Nombre de la región
+                'FederalTaxID': cardCode,  # Código asociado a la dirección
+                'TaxCode': 'IVA',          # Código de impuestos fijo
+                'AddressType': tipo_direccion # Tipo de dirección
+            })
+
+        return {
+            'BPAddresses': direcciones_mapeadas
+        }
+
+    
+    def mapearContactos(self, datos, cardCode):
+
+        
+        # Construir la lista de empleados de contacto
+        contactos_mapeados = []
+        for contacto in datos:
+            contactos_mapeados.append({
+                'InternalCode': contacto.get('codigoInternoSap'),
+                'Name': f"{contacto.get('nombre')} {contacto.get('apellido')}",
+                'Phone1': contacto.get('telefono'),
+                'MobilePhone': contacto.get('celular'),
+                'E_Mail': contacto.get('email'),
+                'CardCode': cardCode,
+                'FirstName': contacto.get('nombre'),
+                'LastName': contacto.get('apellido'),
+            })
+
+        print("Contactos mapeados: ", contactos_mapeados)
+        
+        return {
+            'ContactEmployees': contactos_mapeados
+        }
+
 
     def formatearDatos(self, json_data):
         # Lista para almacenar todos los productos procesados
@@ -165,6 +224,69 @@ class Serializador:
 
         return productos
     
+
+
+    def serializarSN(data):
+
+        print(data)
+        # Decodifica el JSON de entrada
+        client_data = json.loads(data)
+        
+        # Serializa los datos principales del cliente
+        serialized_data = {
+            "CardCode": client_data.get("rutSN", "").replace("-", ""),
+            "CardName": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
+            "CardType": "C",
+            "GroupCode": client_data.get("tipoSN", ""),
+            "Phone1": client_data.get("telefonoSN", ""),
+            "Phone2": client_data.get("telefonoSN", ""),
+            "Notes": client_data.get("giroSN", ""),
+            "PayTermsGrpCode": -1,
+            "FederalTaxID": client_data.get("rutSN", "").split("-")[0],
+            "SalesPersonCode": -1,
+            "Cellular": client_data.get("telefonoSN", ""),
+            "EmailAddress": client_data.get("emailSN", ""),
+            "CardForeignName": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
+            "ShipToDefault": "DESPACHO",
+            "BilltoDefault": "FACTURACION",
+            "DunningTerm": "ESTANDAR",
+            "CompanyPrivate": "cPrivate",
+            "AliasName": client_data.get("nombreSN", ""),
+            "U_Tipo": "N",
+            "U_FE_Export": "N",
+            "BPAddresses": [],
+            "ContactEmployees": []
+        }
+        
+        # Serializa las direcciones
+        for address in client_data.get("direcciones", []):
+            serialized_address = {
+                "AddressName": address.get("nombreDireccion", ""),
+                "Street": address.get("direccion", ""),
+                "City": address.get("ciudad", ""),
+                "County": address.get("tipoDireccion", ""),
+                "Country": address.get("pais", "")[:2].upper(),  # Abreviación del país (e.g., Chile -> CL)
+                "State": address.get("region", ""),
+                "FederalTaxID": client_data.get("rutSN", "").split("-")[0],
+                "TaxCode": "IVA",
+                "AddressType": "bo_ShipTo"
+            }
+            serialized_data["BPAddresses"].append(serialized_address)
+        
+        # Serializa los contactos
+        for contact in client_data.get("contactos", []):
+            serialized_contact = {
+                "Name": f"{contact.get('nombreContacto', '')} {contact.get('apellidoContacto', '')}".strip(),
+                "Phone1": contact.get("telefonoContacto", ""),
+                "MobilePhone": contact.get("telefonoContacto", ""),
+                "E_Mail": contact.get("emailContacto", ""),
+                "FirstName": contact.get("nombreContacto", ""),
+                "LastName": contact.get("apellidoContacto", "")
+            }
+            serialized_data["ContactEmployees"].append(serialized_contact)
+        
+        return serialized_data
+        
 
 
 

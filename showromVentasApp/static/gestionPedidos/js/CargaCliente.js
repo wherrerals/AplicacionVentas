@@ -34,12 +34,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
                   document.querySelector("#nombreApellidoSN p").textContent = `${data[0].apellido || ''}`;
                   document.querySelector("#rut-display p").textContent = `${data[0].codigoSN || ''}`;                  
-
+                
                   document.getElementById("rutSN").setAttribute("data-rut", data[0].rut || '');
                   document.getElementById("rutSN").readOnly = true;
 
                     // Lógica para seleccionar "Empresa" o "Persona"
-                    if (data[0].giro && data[0].giro.trim() !== "") {
+                    if (data[0].grupoSN && data[0].grupoSN.trim() !== "") {
                       // Si tiene razón social (giro), es "Empresa"
                       document.getElementById("formCheck-6").checked = true; // Empresa
                   } else {
@@ -236,6 +236,7 @@ function cargarDirecciones() {
                   const direcciones = cliente.direcciones || [];
 
                   direcciones.forEach((direccion, index) => {
+                      console.log("tipoDireccion", direccion.tipoDireccion);
                       let direccionElemento = `
 
                            <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 230px; margin-right: 10px;">

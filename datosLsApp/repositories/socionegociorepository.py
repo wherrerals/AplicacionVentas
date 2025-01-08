@@ -105,6 +105,7 @@ class SocioNegocioRepository:
             # Actualizar atributos comunes
             cliente.nombre = datosActualizados.get('nombreSN', cliente.nombre)
             cliente.apellido = datosActualizados.get('apellidoSN', cliente.apellido)
+            cliente.razonSocial = ""
             cliente.rut = datosActualizados.get('rutSN', cliente.rut)
             cliente.telefono = datosActualizados.get('telefono', cliente.telefono)
             cliente.giro = datosActualizados.get('giroSN', cliente.giro)

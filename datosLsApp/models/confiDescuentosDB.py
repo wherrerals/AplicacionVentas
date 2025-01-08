@@ -2,10 +2,10 @@ from django.db import models
 
 class ConfiDescuentosDB(models.Model):
     class Meta:
-        db_table = "Descuento"
+        db_table = "confiDescuento"
         
-        verbose_name = 'Descuento'
-        verbose_name_plural = 'Descuento'
+        verbose_name = 'confiDescuento'
+        verbose_name_plural = 'confiDescuento'
 
     codigo = models.CharField(primary_key= True,max_length=50,null = False)
     descripcion = models.CharField(max_length=50,null = False)

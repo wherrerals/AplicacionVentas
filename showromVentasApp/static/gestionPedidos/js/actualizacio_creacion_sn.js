@@ -1,13 +1,94 @@
-// Ensure CSRF token is available
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-document.getElementById('forCrearPedidos').addEventListener('submit', function (event) {
-    event.preventDefault();
-    showLoadingOverlay();
+const formularios = document.querySelectorAll('#forCrearPedidos, #forCrearCliente');
 
-    const formData = new FormData(this);
-    console.log('Datos del formulario:', formData);
-    const submitButton = this.querySelector('button[type="submit"]');
+formularios.forEach(formulario => {
+    formulario.addEventListener('submit', function (event) {
+        event.preventDefault();
+        showLoadingOverlay();
+
+    const nombre = document.getElementById('nombreSN').value;
+    const apellido = document.getElementById('apellidoSN').value;
+    const rut = document.getElementById('rutSN').value;
+    const tipo = document.querySelector('input[name="grupoSN"]:checked').value;
+    const email = document.getElementById('emailSN').value;
+    const telefono = document.getElementById('telefonoSN').value;
+    const giro = document.getElementById('giroSN').value;
+
+    /*     const formData = new FormData(this);
+        console.log('Datos del formulario:', formData); */
+
+
+    const lines = [];
+    const contactos = [];
+
+
+    // Selecciona todas las líneas de cada producto
+    const productRows = document.querySelectorAll('.direcciones');
+
+    productRows.forEach((row, index) => {
+        const tipoDireccion = row.querySelector("#direccionSN")?.value || "";
+        const nombreDireccion = row.querySelector("#nombreDireccionSN")?.value || "";
+        const pais = row.querySelector("#paisSN")?.value || "";
+        const region = row.querySelector("#regionSN")?.value || "";
+        const comuna = row.querySelector("#comunaSN")?.value || "";
+        const ciudad = row.querySelector("#ciudad")?.value || "";
+        const direccion = row.querySelector("#direccion")?.value || "";
+
+        // Crea un objeto con los datos de la línea
+        const line = {
+            direccionSN: index,
+            tipoDireccion: tipoDireccion,
+            nombreDireccion: nombreDireccion,
+            pais: pais,
+            region: region,
+            comuna: comuna,
+            ciudad: ciudad,
+            direccion: direccion
+        };
+
+        lines.push(line);
+    });
+
+    // Captura los contactos
+    const contactoRows = document.querySelectorAll('.contactos');
+    contactoRows.forEach((row, index) => {
+        const nombreContacto = row.querySelector("#nombreContacto")?.value || "";
+        const apellidoContacto = row.querySelector("#apellidoContacto")?.value || "";
+        const telefonoContacto = row.querySelector("#telefonoContacto")?.value || "";
+        const celularContacto = row.querySelector("#celularContacto")?.value || "";
+        const emailContacto = row.querySelector("#emailContacto")?.value || "";
+
+
+        const contactoData = {
+            contactoSN: index,
+            nombreContacto: nombreContacto,
+            apellidoContacto: apellidoContacto,
+            telefonoContacto: telefonoContacto,
+            puestoContacto: celularContacto,
+            emailContacto: emailContacto
+        };
+
+        contactos.push(contactoData);
+    });
+
+    data = {
+        nombreSN: nombre,
+        apellidoSN: apellido,
+        tipoSN: tipo,
+        rutSN: rut,
+        emailSN: email,
+        telefonoSN: telefono,
+        giroSN: giro,
+        direcciones: lines,
+        contactos: contactos
+    }
+
+    dataSN = JSON.stringify(data);
+
+    console.log('Datos del formulario:', dataSN);
+
+    const submitButton = document.querySelector('button[type="submit"]');
     submitButton.disabled = true;
 
     fetch('/ventas/agregar_editar_clientes/', {  // Verifica que esta ruta coincida con la vista del backend
@@ -15,7 +96,7 @@ document.getElementById('forCrearPedidos').addEventListener('submit', function (
         headers: {
             'X-CSRFToken': csrftoken
         },
-        body: formData
+        body: dataSN
     })
         .then(response => {
             submitButton.disabled = false;
@@ -35,6 +116,7 @@ document.getElementById('forCrearPedidos').addEventListener('submit', function (
             // Capturar el RUT directamente desde el campo #rutSN
             const rutSNInput = document.getElementById('rutSN');
             const rutCliente = rutSNInput.value;
+            console.log('RUT capturado:', rutCliente);
 
             if (rutCliente) {
                 // Actualizar el valor en el #inputCliente
@@ -72,6 +154,8 @@ document.getElementById('forCrearPedidos').addEventListener('submit', function (
             console.error('Error en la solicitud:', error);
             mostrarMensaje(error.message || 'Ocurrió un error desconocido', 'error');
         });
+});
+
 });
 
 function limpiarMensajes() {

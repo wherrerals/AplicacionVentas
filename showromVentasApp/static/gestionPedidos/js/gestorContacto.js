@@ -24,7 +24,7 @@ class ContactoManager {
 
     // Crear una nueva fila para el contacto
     let newRow = document.createElement('div');
-    newRow.className = "col-sm-5";
+    newRow.className = "col-sm-5 contactos";
     newRow.style = "font-size: 12px;background: #f0f2f5;width: 230px; margin-right: 10px;";
     newRow.innerHTML = `
         <div class="row">
@@ -51,23 +51,23 @@ class ContactoManager {
 
         <div class="row">
             <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Nombre</label></div>
-            <div class="col"><input class="form-control" type="text" name="nombre[]" style="border-color: rgb(159,168,175);font-size: 12px;"></div>
+            <div class="col"><input class="form-control" id="nombreContacto" type="text" name="nombre[]" style="border-color: rgb(159,168,175);font-size: 12px;"></div>
         </div>
         <div class="row">
             <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Apellido</label></div>
-            <div class="col"><input class="form-control" type="text" name="apellido[]" style="border-color: rgb(159,168,175);font-size: 12px;"></div>
+            <div class="col"><input class="form-control" id="apellidoContacto" type="text" name="apellido[]" style="border-color: rgb(159,168,175);font-size: 12px;"></div>
         </div>
         <div class="row">
             <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Teléfono</label></div>
-            <div class="col"><input class="form-control" type="tel" name="telefono[]" style="font-size: 12px;border-color: rgb(159,168,175);"></div>
+            <div class="col"><input class="form-control" id="telefonoContacto" type="tel" name="telefono[]" value="+56" style="font-size: 12px;border-color: rgb(159,168,175);"></div>
         </div>
         <div class="row">
             <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Celular</label></div>
-            <div class="col"><input class="form-control" name="celular[]" type="tel" style="font-size: 12px;border-color: rgb(159,168,175);"></div>
+            <div class="col"><input class="form-control" id="celularContacto" name="celular[]" value="+56" type="tel" style="font-size: 12px;border-color: rgb(159,168,175);"></div>
         </div>
         <div class="row">
             <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Email</label></div>
-            <div class="col"><input class="form-control" type="email" name="email[]" style="font-size: 12px;border-color: rgb(159,168,175);"></div>
+            <div class="col"><input class="form-control" id="emailContacto" type="email" name="email[]" style="font-size: 12px;border-color: rgb(159,168,175);"></div>
         </div>
     `;
 
@@ -135,7 +135,7 @@ $(document).ready(function() {
                               <div class="col-sm-12" style="height: 10px;background: transparent;"><span>&nbsp;</span></div>
                               </div>
 
-                              <input type="hidden" name="contacto_id[]" value="${contacto.id}" id="contacto_id_${index}">
+                              <input type="hidden" name="contacto_id[]" data-bpcode="${contacto.codigoInternoSap}" value="${contacto.id}" id="contacto_id_${index}">
 
 
                               <div class="row">
@@ -163,6 +163,13 @@ $(document).ready(function() {
 
                           $('#listaContactos').append(contactoElemento);
 
+                          $(`#nombre_${index}`).attr('name', 'nombre[]');
+                          $(`#apellido_${index}`).attr('name', 'apellido[]');
+                          $(`#telefono_${index}`).attr('name', 'telefono[]');
+                          $(`#celular_${index}`).attr('name', 'celular[]');
+                          $(`#email_${index}`).attr('name', 'email[]');
+                          $(`#contacto_id_${index}`).attr('name', 'contacto_id[]');
+                          
                           // Evento para habilitar la edición
                           $(`#editar_contacto_${index}`).on('click', function() {
                             // Hacer los campos editables
@@ -173,12 +180,7 @@ $(document).ready(function() {
                             $(`#email_${index}`).prop('disabled', false);
                         
                             // Cambiar el nombre para capturar solo si han sido modificados
-                            $(`#nombre_${index}`).attr('name', 'nombre[]');
-                            $(`#apellido_${index}`).attr('name', 'apellido[]');
-                            $(`#telefono_${index}`).attr('name', 'telefono[]');
-                            $(`#celular_${index}`).attr('name', 'celular[]');
-                            $(`#email_${index}`).attr('name', 'email[]');
-                            $(`#contacto_id_${index}`).attr('name', 'contacto_id[]');
+
                         });
 
                           // Evento para eliminar con confirmación

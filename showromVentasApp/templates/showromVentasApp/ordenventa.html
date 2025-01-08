@@ -147,13 +147,13 @@
                             <!-- Columna derecha: Radio buttons -->
                             <div class="col-sm-6">
                               <div class="form-check">
-                                <input class="form-check-input" type="radio" id="formCheck-5" name="grupoSN" value="100" style="border-color: rgb(159,168,175);" checked="" 
+                                <input class="form-check-input" type="radio" id="formCheck-5" name="grupoSN" value="105" style="border-color: rgb(159,168,175);" checked="" 
                                 onchange="cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow')">
                                 <label class="form-check-label" for="formCheck-5">Persona</label>
                               </div>
   
                               <div class="form-check">
-                                <input class="form-check-input" type="radio" id="formCheck-6" name="grupoSN" value="105" style="border-color: rgb(159,168,175);" 
+                                <input class="form-check-input" type="radio" id="formCheck-6" name="grupoSN" value="100" style="border-color: rgb(159,168,175);" 
                                 onchange="cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow')">
                                 <label class="form-check-label" for="formCheck-6">Empresa</label>
                               </div>
@@ -463,6 +463,9 @@
         </div>
       </div>
 
+      <div id="loadingOverlay" style="display: none;">
+        <div class="spinner"></div>
+      </div>
 
       <div class="row">
         <div class="col">
@@ -557,7 +560,7 @@
   <script src="{% static 'gestionPedidos/js/bloqueCampos.js' %}"></script>  
   <script src="{% static 'gestionPedidos/js/gestorDirecciones.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/gestorContacto.js' %}"></script>
-  <script src="{% static 'gestionPedidos/js/prueba.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/actualizacio_creacion_sn.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/ajax_solicitudes.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/ajax_clientes.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/interfazUsuario.js' %}"></script>

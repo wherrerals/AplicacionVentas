@@ -104,3 +104,13 @@ class DireccionRepository:
         except Exception as e:
             print(f"Error al crear la dirección: {e}")
 
+
+    def eliminarDireccionesPorSocio(socio):
+        print(f"Intentando eliminar direcciones para el socio: {socio}")
+        try:
+            print(f"Intentando eliminar contactos para el socio: {socio}")
+            DireccionDB.objects.filter(SocioNegocio__codigoSN=socio).delete()
+            print("Contactos eliminados con éxito.")
+        except Exception as e:
+            print(f"Error al eliminar contactos: {e}")
+            raise

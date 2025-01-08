@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function sumarTresDias() {
         let hoy = new Date();
-        let tresDiasDespues = new Date(hoy.getTime() + (3 * 24 * 60 * 60 * 1000));
+        let tresDiasDespues = new Date(hoy.getTime() + (10 * 24 * 60 * 60 * 1000));
 
         let dia = formatNumber(tresDiasDespues.getDate());
         let mes = formatNumber(tresDiasDespues.getMonth() + 1);
@@ -43,10 +43,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // Campos que se deben deshabilitar
     const camposADeshabilitar = [
         document.getElementById('inputCliente'),
-        document.getElementById('contactos_cliete'),
-        document.getElementById('direcciones_despacho'),
-        document.getElementById('tipoEntrega-1'),
-        document.getElementById('direcciones_facturacion')
+        //document.getElementById('contactos_cliete'),
+        //document.getElementById('direcciones_despacho'),
+        //document.getElementById('tipoEntrega-1'),
+        //document.getElementById('direcciones_facturacion')
     ].filter(campo => campo); // Filtra campos nulos o indefinidos
 
     function checkElementos() {
@@ -70,3 +70,21 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(elemento, { childList: true, subtree: true });
     });
 });
+
+
+function formatCurrency(value) {
+    // Convertir el valor a número y validar
+    const numericValue = parseFloat(String(value).replace(/[^0-9.-]/g, ''));
+    
+    if (isNaN(numericValue)) {
+        console.error("Valor inválido proporcionado:", value);
+        return '$ 0'; // Manejo de valores no numéricos
+    }
+    
+    // Formatear el número con separadores de miles y decimales
+    const formattedValue = numericValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    
+    console.log("Valor original:", value, "| Valor formateado:", formattedValue);
+    
+    return `$ ${formattedValue}`;
+}

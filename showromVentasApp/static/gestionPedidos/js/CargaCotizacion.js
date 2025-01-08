@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
             let cardCode = data.Cliente.Quotations.CardCode;
             const DocumentStatus = data.Cliente.Quotations.DocumentStatus;
             const docEntry = data.Cliente.Quotations.DocEntry;
+            const razonSocial = data.Cliente.Quotations.CardName;
 
             console.log("docEntry: ", docEntry);
             console.log("salesEmployeeName: ", salesEmployeeName);
@@ -144,9 +145,23 @@ document.addEventListener("DOMContentLoaded", function () {
       //console.log("Email recibido en la página de destino:", emailCliente);
       traerInformacionCliente(rutCliente); // Llama a la función con el RUT
 
-      if (grupoSN) {
-        document.querySelector(`input[name="grupoSN"][value="${grupoSN}"]`).checked = true;
+    // Selecciona el radio correspondiente basado en `grupoSN`.
+      const radioInput = document.querySelector(`input[name="grupoSN"][value="${grupoSN}"]`);
+     if (radioInput) {
+        radioInput.checked = true;
+        console.log("Grupo seleccionado:", grupoSN);
+        // Ejecuta la función cambiarLabel con la opción seleccionada.
+        cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow');
+    } else {
+        console.warn("No se encontró el input con el valor:", grupoSN);
     }
+
+    // Agregar evento onchange para que funcione dinámicamente al cambiar la selección.
+    document.getElementsByName('grupoSN').forEach(radio => {
+        radio.addEventListener('change', () => {
+            cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow');
+        });
+    });
     if (nombreSN) {
         document.getElementById("nombreSN").value = nombreCliente;
     }
