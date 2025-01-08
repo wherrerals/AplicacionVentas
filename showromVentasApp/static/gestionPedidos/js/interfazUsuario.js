@@ -70,3 +70,21 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(elemento, { childList: true, subtree: true });
     });
 });
+
+
+function formatCurrency(value) {
+    // Convertir el valor a número y validar
+    const numericValue = parseFloat(String(value).replace(/[^0-9.-]/g, ''));
+    
+    if (isNaN(numericValue)) {
+        console.error("Valor inválido proporcionado:", value);
+        return '$ 0'; // Manejo de valores no numéricos
+    }
+    
+    // Formatear el número con separadores de miles y decimales
+    const formattedValue = numericValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    
+    console.log("Valor original:", value, "| Valor formateado:", formattedValue);
+    
+    return `$ ${formattedValue}`;
+}

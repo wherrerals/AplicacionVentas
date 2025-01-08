@@ -101,10 +101,10 @@ class Producto {
                 </td>
                 <td style="background: transparent;border-style: none;padding-bottom: 0px;" rowspan="2">
                     <div style="font-size: 12px;">
-                        <small class="numeric-value" name="precio_venta" data-precio-unitario="100.00">${this.precioVenta}</small>
+                        <small class="numeric-value" name="precio_venta" data-precio-unitario="100.00">${formatCurrency(this.precioVenta)}</small>
                     </div>
                     <div style="font-size: 11px;">
-                        <small class="numeric-value" style="color: rgb(153,153,153);" name="precio_lista">${this.precioLista}</small>
+                        <small class="numeric-value" style="color: rgb(153,153,153);" name="precio_lista">${formatCurrency(this.precioLista)}</small>
                     </div>
 
                     <div class="row" style="font-size: 11px;">
@@ -114,7 +114,7 @@ class Producto {
                             </svg>
                         </div>
                         <div class="col-sm-7 col-md-8">
-                            <small  class="numeric-value" style="color: rgb(255,0,0);" id="descuento" name="descuento_max" hidden>Max: ${this.precioDescuento}</small>
+                            <small  class="numeric-value" style="color: rgb(255,0,0);" id="descuento" name="descuento_max" hidden>Max: ${formatCurrency(this.precioDescuento)}</small>
                         </div>
                     </div>
                 </td>
@@ -128,7 +128,7 @@ class Producto {
                     <input class="form-control format-number" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad}">
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
-                    <span id="precio_Venta">${this.totalProducto}</span>
+                    <span id="precio_Venta">${formatCurrency(this.totalProducto)}</span>
                 </td>
             </tr> 
             <tr style="font-size: 12px;background: transparent;">
@@ -147,21 +147,7 @@ class Producto {
                 <td colspan="7" style="padding-top: 0px;background: transparent;"><span>${this.nombre}</span></td>
             </tr>
             </tr>
-        `;
-        
-            function formatCurrency(value) {
-                // Convertimos el valor a número entero
-                const integerValue = Math.floor(value);
-                let formattedValue = integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-            
-                // Si el valor tiene 4 dígitos y no incluye un punto, lo añadimos manualmente
-                if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
-                    formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
-                }
-            
-                // Agregamos el símbolo de peso al principio
-                return `$ ${formattedValue}`;
-            }
+        `;    
             
     // Agregar evento mouseover para mostrar stock en otras tiendas
     const precioVentaElem = newRow.querySelector('#stock_total');
