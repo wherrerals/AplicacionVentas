@@ -48,11 +48,13 @@ urlpatterns = [
     path('obtener_comuna_id/', view.obtenerComunasId, name='obtener_comuna_id'),
     path('obtener_stock_bodegas/', view.obtenerStockBodegas, name='obtener_stock'),
     path('detalles_cotizacion/', cotizacionView.detallesCotizacion, name='detalles_cotizacion'),
+    path('duplicar_cotizacion/', cotizacionView.duplicarCotizacion, name='duplicar_cotizacion'),
     path('detalles_ODV/', OdvView.as_view(), name='detalles_ODV'),
     path('ordenesVentas/', view.odv, name='ordenesVentas'),
     path('imagen/', view.onbtenerImgProducto, name='imagen'),
     path('pruebas/', view.pryebas, name='pruebas'),
-    path('generarPDF/', view.report, name='generarPDF'),
+    path('cotizacion/<int:cotizacion_id>/pdf/', view.generar_cotizacion_pdf, name='cotizacion_pdf'),
+    path('get_vendedor_sucursal/', view.get_vendedor_sucursal, name='get_vendedor_sucursal'),
     #path('obtener_receta/', view.pryebas, name='obtener_receta'),
 ]
 

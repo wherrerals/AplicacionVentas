@@ -611,3 +611,47 @@ class Cotizacion(Documento):
         }
 
         return resultado
+
+    def formataearDatosSoloLineas(self, json_data):
+        document_lines = []
+        for line_info in json_data["DocumentLine"]["value"]:
+            line = line_info.get("Quotations/DocumentLines", {})
+            warehouse_info = line_info.get("Items/ItemWarehouseInfoCollection", {})
+            
+            # Construye la línea
+            document_line = {
+                "DocEntry": line.get("DocEntry"),
+                "LineNum": line.get("LineNum"),
+                "ItemCode": line.get("ItemCode"),
+                "ItemDescription": line.get("ItemDescription"),
+                "WarehouseCode": line.get("WarehouseCode"),
+                "Quantity": line.get("Quantity"),
+                "UnitPrice": line.get("UnitPrice"),
+                "GrossPrice": line.get("GrossPrice"),
+                "DiscountPercent": line.get("DiscountPercent"),
+                "Price": line.get("Price"),
+                "PriceAfterVAT": line.get("PriceAfterVAT"),
+                "LineTotal": line.get("LineTotal"),
+                "GrossTotal": line.get("GrossTotal"),
+                "ShipDate": line.get("ShipDate"),
+                "Address": line.get("Address"),
+                "ShippingMethod": line.get("ShippingMethod"),
+                "FreeText": line.get("FreeText"),
+                "BaseType": line.get("BaseType"),
+                "GrossBuyPrice": line.get("GrossBuyPrice"),
+                "BaseEntry": line.get("BaseEntry"),
+                "BaseLine": line.get("BaseLine"),
+                "LineStatus": line.get("LineStatus"),
+                "WarehouseInfo": {
+                    "WarehouseCode": warehouse_info.get("WarehouseCode"),
+                    "InStock": warehouse_info.get("InStock"),
+                    "Committed": warehouse_info.get("Committed"),
+                    "SalesStock": warehouse_info.get("SalesStock"),
+                }
+            }
+            
+            # Agrega la línea solo si el Price es mayor a 0
+            if document_line["Price"] and document_line["Price"] > 0:
+                document_lines.append(document_line)
+
+        return document_lines

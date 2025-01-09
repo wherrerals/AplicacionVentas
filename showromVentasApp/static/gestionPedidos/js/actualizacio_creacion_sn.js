@@ -123,7 +123,7 @@ formularios.forEach(formulario => {
 
             // Actualizar el campo de entrada con el RUT del cliente
             if (rutCliente) {
-                const inputCliente = document.getElementById('inputCliente');
+                const inputCliente = document.getElementById('rutSN') || document.getElementById('inputCliente');
                 if (inputCliente) {
                     inputCliente.value = rutCliente;
                 }

@@ -64,6 +64,7 @@ class CotizacionView(View):
             '/ventas/listado_Cotizaciones': self.listarCotizaciones, # Listado de cotizaciones, no es necesaria se deja para ver si es usada en otra parte del codigo. 
             '/ventas/obtener_detalles_cotizacion': self.obtenerDetallesCotizacion,
             '/ventas/detalles_cotizacion': self.detallesCotizacion,
+            '/ventas/duplicar_cotizacion': self.duplicarCotizacion,
         }
 
     def post_route_map(self):
@@ -243,6 +244,38 @@ class CotizacionView(View):
             cotiza = Cotizacion()
             lines_data = cotiza.formatearDatos(data)
             return JsonResponse(lines_data, safe=False)
+        
+        
+    def duplicarCotizacion(self, request):
+        
+        docentry = request.GET.get('docentry')
+        
+        print("DocEntry:", docentry)
+        
+        print("Duplicando cotización")
+        
+        client = APIClient()
+        
+        # Llamar al método para obtener los detalles de la cotización
+        
+        lineasDocumento = client.detalleCotizacionLineas(docentry)
+        
+                
+        data = {
+            "DocumentLine": lineasDocumento
+        }
+        
+        
+        print("Data:", data)
+        # Verificar si el socio de negocio ya existe en la base de datos
+        
+        cotiza = Cotizacion()
+        lines_data = cotiza.formataearDatosSoloLineas(data)
+        
+        print("Lines data:", lines_data)  # Verificar los datos de las líneas de documento
+        
+        return JsonResponse(lines_data, safe=False)
+        
 
 
 

@@ -1,12 +1,7 @@
-from io import BytesIO
-from turtle import width
+from django.shortcuts import render
 from django.http import HttpResponse
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from reportlab.platypus import Table, TableStyle, Paragraph
-from reportlab.lib import colors
-from reportlab.lib.units import cm
-from reportlab.lib.styles import getSampleStyleSheet, TA_CENTER
+from weasyprint import HTML
+from django.template.loader import render_to_string
 
 from django.shortcuts import get_object_or_404, render, redirect  
 from django.contrib.auth.decorators import login_required
@@ -216,6 +211,32 @@ def quotations(request):
 
         # Renderiza el template con el contexto
         return render(request, 'cotizacion.html', context)
+    
+
+
+@login_required
+def get_vendedor_sucursal(request):
+
+        usuario = UsuarioDB.objects.get(usuarios=request.user)
+        sucurs = str(usuario.sucursal)
+        nombreUser = usuario.nombre
+        codVen = usuario.vendedor.codigo
+        
+        print(f"Usuario: {nombreUser}, Código de vendedor: {codVen}", f"Sucursal: {sucurs}")
+        
+
+                
+        data = {
+            'nombreUser': nombreUser,
+            'codigoVendedor': codVen,
+            'sucursal': sucurs  # Ahora es un diccionario serializable
+        }
+        
+        #data = json.dumps(data)
+        print(data)
+        
+        return JsonResponse(data, status=200)
+
 
 @login_required
 def lista_ovs(request):
@@ -899,76 +920,97 @@ def onbtenerImgProducto(request):
         return JsonResponse({'error': 'No se encontró el producto solicitado'}, status=404)
     
 
-def report(request):
-    #create the HttpResponse header with PDF
-    
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="report.pdf"'
-    
-    #create the PDF object, using the response object as its "file"
-    buffer = BytesIO()
-    c = canvas.Canvas(buffer, pagesize=A4)
-    
-    #header
-    c.setLineWidth(.3)
-    c.setFont('Helvetica', 22)
-    c.drawString(30,750,'Reporte de Ventas')
-    c.setFont('Helvetica', 12)
-    c.drawString(30,735,'Showroom')
-    
-    c.setFont('Helvetica-Bold', 12)
-    c.drawString(480,750,"2024")
-    
-    c.line(460,747,560,747)
-    
-    #table header
-    styles = getSampleStyleSheet()
-    styleBH = styles["Normal"]  
-    styleBH.alignment = TA_CENTER
-    styleBH.fontSize = 10
-    
-    numero = Paragraph('''#''', styleBH)
-    nombre = Paragraph('''Nombre''', styleBH)
-    precio = Paragraph('''Precio''', styleBH)
-    stock = Paragraph('''Stock''', styleBH)
-    precioAnterior = Paragraph('''Precio Anterior''', styleBH)
-    maxDescuento = Paragraph('''Descuento Máximo''', styleBH)
-    total = Paragraph('''Total''', styleBH)
-    data = []
-    
-    #table
-    
-    data.append([numero, nombre, precio, stock, precioAnterior, maxDescuento, total])
-    
-    styles = getSampleStyleSheet()
-    styleN = styles["BodyText"]
-    styleN.alignment = TA_CENTER
-    styleN.fontSize = 7
-    
-    width, height = A4
-    
-    high = 650
-    for producto in ProductoDB.objects.all():
-        this_prod = [producto.codigo, producto.nombre, producto.precioVenta, producto.stockTotal, producto.precioLista, producto.dsctoMaxTienda, producto.stockTotal * producto.precioVenta]
-        data.append(this_prod)
-        high = high - 18
+""" def generar_cotizacion_pdf(request, cotizacion_id):
+    # Datos dinámicos (deberías obtenerlos de tu base de datos)
+    cotizacion = {
+        'numero': '299263',
+        'fecha': '2025-01-09 10:48:09',
+        'valido_hasta': '2025-01-19',
+        'vendedor': 'William Herrera',
+        'cliente': {
+            'rut': '10808683-4',
+            'nombre': 'Leonardo Silva Piña',
+            'tipo': 'Persona',
+            'direccion': 'Avenida Kennedy 7031',
+            'contacto': 'Leonardo',
+            'telefono': '+56993097276',
+            'email': 'lsilvapina@gmail.com',
+        },
+        'productos': [
+            {
+                'sku': 'C2220034K',
+                'descripcion': 'KIT RIEL MONOFÁSICO LED STUDIO\n1 METRO - 3 FOCOS RIEL FADHIE CON AMPOLLETAS',
+                'cantidad': 5,
+                'precio_neto': 32689,
+                'porcentaje_descuento': 14,
+                'valor_descuento': 4576,
+                'subtotal_neto': 28113,
+            }
+        ],
+        'totales': {
+            'total_sin_descuento': 32689,
+            'total_descuento': 4576,
+            'total_neto': 28113,
+            'iva': 5341,
+            'total_pagar': 33454,
+        },
+    }
+
+    # Renderizar plantilla HTML
+    html_string = render_to_string('cotizacion_template.html', {'cotizacion': cotizacion})
+
+    # Generar PDF
+    pdf_file = HTML(string=html_string).write_pdf()
+
+    # Devolver PDF como respuesta
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="cotizacion_{cotizacion["numero"]}.pdf"'
+    return response """
+
+#ignorar crf token
+
+@csrf_exempt
+def generar_cotizacion_pdf(request, cotizacion_id):
+    if request.method == 'POST':
+        # Parsear datos JSON recibidos
         
-    #table size
-    table = Table(data, colWidths=[1.9*cm, 3 * cm, 3 * cm, 3 * cm, 3 * cm, 3 * cm, 3 * cm])
-    table.setStyle(TableStyle([
-        ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
-    ]))
-    
-    #pdf size
-    table.wrapOn(c, width, height)
-    table.drawOn(c, 30, high)
-    c.showPage()
-    
-    c.save()
-    pdf = buffer.getvalue()
-    buffer.close()
-    response.write(pdf)
-    return response
-    
-    
+        print("Estamos en la vista")
+        try:
+            data = json.loads(request.body)
+
+            # Datos generales
+            cotizacion = {
+                'numero': data.get('numero'),
+                'fecha': data.get('fecha'),
+                'valido_hasta': data.get('valido_hasta'),
+                'vendedor': data.get('vendedor'),
+                'cliente': {
+                    'rut': data.get('rut'),
+                    # Agregar datos adicionales del cliente según sea necesario
+                },
+                'productos': data.get('DocumentLines', []),
+                # Puedes calcular los totales aquí según los datos enviados
+                'totales': {
+                    'total_sin_descuento': sum(item['subtotal_neto'] + item['descuento'] for item in data['DocumentLines']),
+                    'total_descuento': sum(item['descuento'] for item in data['DocumentLines']),
+                    'total_neto': sum(item['subtotal_neto'] for item in data['DocumentLines']),
+                    'iva': sum(item['subtotal_neto'] for item in data['DocumentLines']) * 0.19,  # Ajusta el IVA
+                    'total_pagar': sum(item['subtotal_neto'] for item in data['DocumentLines']) * 1.19,  # Neto + IVA
+                },
+            }
+
+            # Renderizar plantilla HTML
+            html_string = render_to_string('cotizacion_template.html', {'cotizacion': cotizacion})
+
+            # Generar PDF
+            pdf_file = HTML(string=html_string).write_pdf()
+
+            # Devolver PDF como respuesta
+            response = HttpResponse(pdf_file, content_type='application/pdf')
+            response['Content-Disposition'] = f'inline; filename="cotizacion_{cotizacion["numero"]}.pdf"'
+            return response
+
+        except (KeyError, ValueError, json.JSONDecodeError) as e:
+            return HttpResponse(f'Error al procesar datos: {str(e)}', status=400)
+    else:
+        return HttpResponse('Método no permitido', status=405)
