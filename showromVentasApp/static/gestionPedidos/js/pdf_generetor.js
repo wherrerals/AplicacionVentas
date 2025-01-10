@@ -35,15 +35,15 @@ document.addEventListener("DOMContentLoaded", function () {
             const name = row.querySelector("[name='nombre_producto']").innerText.trim();
             const quantity = row.querySelector("[name='cantidad']").value.trim();
             const porcentaje_descuento = row.querySelector("#agg_descuento").value.trim();
-            const discount = row.querySelector("#Precio_Descuento").value.trim();
-            const total = row.querySelector("[name='total']").innerText.trim();
+            const discount = row.querySelector("#Precio_Descuento").value;
+            //const total = row.querySelector("[name='total']").value;
 
             console.log(`Producto ${index + 1} - SKU:`, itemCode);
             console.log(`Producto ${index + 1} - Nombre:`, name);
             console.log(`Producto ${index + 1} - Cantidad:`, quantity);
             console.log(`Producto ${index + 1} - Descuento %:`, porcentaje_descuento);
             console.log(`Producto ${index + 1} - Descuento $:`, discount);
-            console.log(`Producto ${index + 1} - Subtotal Neto:`, total);
+            //console.log(`Producto ${index + 1} - Subtotal Neto:`, total);
 
             const line = {
                 "LineNum": index,
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "cantidad": parseFloat(quantity),
                 "porcentaje_descuento": parseFloat(porcentaje_descuento),
                 "descuento": parseFloat(discount),
-                "subtotal_neto": parseFloat(total),
+                // "subtotal_neto": parseFloat(total),
             };
             lines.push(line);
         });
@@ -110,4 +110,11 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("URL de la solicitud:", `/ventas/cotizacion/${id}/pdf/`);
 
     }
+
+    // Función para obtener el token CSRF (si usas Django)
+    function getCSRFToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
 });
+
+

@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from weasyprint import HTML
 from django.template.loader import render_to_string
 
 from django.shortcuts import get_object_or_404, render, redirect  
@@ -11,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
 from django.db import transaction
 from django.http import JsonResponse, HttpResponse
+from weasyprint import HTML
 #Modulos Diseñados
 from datosLsApp.models.usuariodb import User 
 from datosLsApp.models import (ProductoDB, SocioNegocioDB, UsuarioDB, RegionDB, GrupoSNDB, TipoSNDB, TipoClienteDB, DireccionDB, ComunaDB, ContactoDB)
@@ -973,7 +973,6 @@ def onbtenerImgProducto(request):
 def generar_cotizacion_pdf(request, cotizacion_id):
     if request.method == 'POST':
         # Parsear datos JSON recibidos
-        
         print("Estamos en la vista")
         try:
             data = json.loads(request.body)
@@ -986,16 +985,14 @@ def generar_cotizacion_pdf(request, cotizacion_id):
                 'vendedor': data.get('vendedor'),
                 'cliente': {
                     'rut': data.get('rut'),
-                    # Agregar datos adicionales del cliente según sea necesario
                 },
                 'productos': data.get('DocumentLines', []),
-                # Puedes calcular los totales aquí según los datos enviados
                 'totales': {
-                    'total_sin_descuento': sum(item['subtotal_neto'] + item['descuento'] for item in data['DocumentLines']),
-                    'total_descuento': sum(item['descuento'] for item in data['DocumentLines']),
-                    'total_neto': sum(item['subtotal_neto'] for item in data['DocumentLines']),
-                    'iva': sum(item['subtotal_neto'] for item in data['DocumentLines']) * 0.19,  # Ajusta el IVA
-                    'total_pagar': sum(item['subtotal_neto'] for item in data['DocumentLines']) * 1.19,  # Neto + IVA
+                    'total_sin_descuento': 10,#sum(item['subtotal_neto'] + item['descuento'] for item in data['DocumentLines']),
+                    'total_descuento': 10,#sum(item['descuento'] for item in data['DocumentLines']),
+                    'total_neto':10, #sum(item['subtotal_neto'] for item in data['DocumentLines']),
+                    'iva': 10,#sum(item['subtotal_neto'] for item in data['DocumentLines']) * 0.19,
+                    'subtotal_neto': 10,#sum(item['subtotal_neto'] for item in data['DocumentLines']) * 1.19,
                 },
             }
 
@@ -1007,7 +1004,7 @@ def generar_cotizacion_pdf(request, cotizacion_id):
 
             # Devolver PDF como respuesta
             response = HttpResponse(pdf_file, content_type='application/pdf')
-            response['Content-Disposition'] = f'inline; filename="cotizacion_{cotizacion["numero"]}.pdf"'
+            response['Content-Disposition'] = f'attachment; filename="cotizacion_{cotizacion["numero"]}.pdf"'
             return response
 
         except (KeyError, ValueError, json.JSONDecodeError) as e:
