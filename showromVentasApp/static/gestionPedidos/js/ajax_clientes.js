@@ -58,7 +58,7 @@ $(document).ready(function () {
 
             // Actualizar el valor de inputCliente
             $('#inputCliente').val(nuevoTexto);
-
+            
             // Mostrar en consola para verificar
             console.log("Nuevo valor en inputCliente:", nuevoTexto);
         });

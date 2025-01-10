@@ -11,3 +11,4 @@ urllib3==2.2.2
 celery==5.2.3
 redi
 pika
+weasyprint

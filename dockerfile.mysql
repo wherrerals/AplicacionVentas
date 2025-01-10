@@ -5,20 +5,17 @@ FROM mysql:9.0.1
 RUN mkdir -p /run/mysqld && \
     chown -R mysql:mysql /run/mysqld
 
-# Establecer la configuración de la base de datos
-# COPY ./my.cnf /etc/mysql/my.cnf  
-# Si tienes un archivo de configuración personalizado
-
-# Puedes definir variables de entorno para la configuración de la base de datos
+# Variables de entorno para configurar la base de datos
 ENV MYSQL_ROOT_PASSWORD=Ea7hava5*
 ENV MYSQL_DATABASE=led_studio
 ENV MYSQL_USER=root
 ENV MYSQL_PASSWORD=Ea7hava5*
 
-
-# El comando predeterminado para iniciar MySQL
-CMD ["mysqld"]
+# Copiar un archivo de inicialización para configuraciones personalizadas
+COPY init.sql /docker-entrypoint-initdb.d/
 
 # Exponer el puerto 3306
 EXPOSE 3306
-#docker build -t devrrior/proyectoledstudio_mysql -f Dockerfile.mysql .
+
+# Comando predeterminado para iniciar MySQL
+CMD ["mysqld"]

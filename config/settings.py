@@ -86,6 +86,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None  # Permite un número ilimitado (no recomendado)
 
+# Configuración de la base de datos local
 
 DATABASES = {
     'default': {
@@ -98,13 +99,19 @@ DATABASES = {
         #'HOST':'localhost',
         'PORT':'3306',
     }
-}
+} 
 
 # Configuración de Celery con RabbitMQ como broker
-CELERY_BROKER_URL = 'amqp://guest:guest@localhost//'
+#localHost
+#CELERY_BROKER_URL = 'amqp://guest:guest@localhost//'
+#Docker
+CELERY_BROKER_URL = 'amqp://guest:guest@rabbitmq:5672//'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'rpc://'
+
+# Configuración de Celery con Redis como broker
+
 # Configuración de rutas de tareas a colas específicas
 CELERY_TASK_ROUTES = {
     'taskApp.tasks.sync_products': {'queue': 'sync_queue'},  # Asigna la tarea a una cola específica
@@ -122,8 +129,7 @@ CELERY_TASK_CREATE_MISSING_QUEUES = True
         'HOST': 'db',                 # Nombre del servicio en docker-compose
         'PORT': '3306',               # Puerto por defecto de MySQL
     }
-}
- """
+} """
 
 # Base service Layer
 API_BASE_URL = 'https://182.160.29.24:50003/b1s/v1/'

@@ -4,10 +4,17 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Instalar dependencias necesarias, incluyendo las herramientas de compilación
-RUN apk update \
-    && apk add --no-cache mysql-dev \
-    && apk add --no-cache python3-dev \
+# Instalar dependencias necesarias, incluyendo las herramientas de compilación y las librerías requeridas por weasyprint
+RUN apk update && apk add --no-cache \
+    mysql-dev \
+    python3-dev \
+    libc-dev \
+    libffi-dev \
+    cairo \
+    pango \
+    gdk-pixbuf \
+    harfbuzz \
+    fribidi \
     && apk add --no-cache --virtual .build-deps build-base \
     && pip install --upgrade pip
 
@@ -23,9 +30,12 @@ RUN apk del .build-deps
 # Copiar el código de la aplicación
 COPY ./ ./ 
 
-# Comando por defecto para ejecutar el servidor
+# Exponer el puerto 8000 para la aplicación
 EXPOSE 8000
+
+# Comando por defecto para ejecutar el servidor
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
 
 #ejecutar el comando docker build -t myapp .
 #docker build -t devrrior/proyectoledstudio_aplicacionventas .

@@ -34,6 +34,13 @@ $(document).ready(function(){
 // Función para traer la información completa del cliente
 function traerInformacionCliente(clienteId) {
 
+    // si el numero tiene un - se elimina y lo que este al lado derecho se elimina
+    if(clienteId.includes("-")){
+        clienteId = clienteId.split("-")[0];
+    }
+
+    // URL para buscar clientes
+
     let buscarClientesUrl = `/ventas/buscar_clientes/?numero=${clienteId}`;
 
     $.ajax({
