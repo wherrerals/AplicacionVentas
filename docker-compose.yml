@@ -21,6 +21,8 @@ services:
       sh -c "
       python manage.py makemigrations datosLsApp &&
       python manage.py migrate datosLsApp &&
+      python manage.py makemigrations taskApp &&
+      python manage.py migrate taskApp &&
       python manage.py makemigrations &&
       python manage.py migrate &&
       python manage.py runserver 0.0.0.0:8000
@@ -28,7 +30,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - "8000:8001"
+      - "8000:8000"
     depends_on:
       - db
       - rabbitmq

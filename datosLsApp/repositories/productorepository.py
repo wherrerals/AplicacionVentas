@@ -58,8 +58,9 @@ class ProductoRepository:
             # Sincronizar o crear la bodega
             bodega, _ = BodegaDB.objects.update_or_create(
                 nombre=bodega_data["nombre"],
+                codigo = bodega_data["nombre"],
                 defaults={
-                    "descripcion": bodega_data.get("descripcion", ""),
+                    "descripcion": bodega_data.get("nombre", ""),
                 },
             )
 
