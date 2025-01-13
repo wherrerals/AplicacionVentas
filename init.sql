@@ -5,3 +5,4 @@ FLUSH PRIVILEGES;
 
 -- Opcional: Crear tablas o datos iniciales
 -- CREATE TABLE led_studio_table (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255));
+

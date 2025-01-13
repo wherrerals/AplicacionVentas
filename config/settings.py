@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None  # Permite un número ilimitado (no recomendado)
 
 # Configuración de la base de datos local
-
+""" 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -99,7 +99,7 @@ DATABASES = {
         #'HOST':'localhost',
         'PORT':'3306',
     }
-} 
+}  """
 
 # Configuración de Celery con RabbitMQ como broker
 #localHost
@@ -120,7 +120,7 @@ CELERY_TASK_ROUTES = {
 CELERY_TASK_CREATE_MISSING_QUEUES = True
 
 #Configuracion para docker
-""" DATABASES = {
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',         # Nombre de la base de datos
@@ -129,7 +129,7 @@ CELERY_TASK_CREATE_MISSING_QUEUES = True
         'HOST': 'db',                 # Nombre del servicio en docker-compose
         'PORT': '3306',               # Puerto por defecto de MySQL
     }
-} """
+} 
 
 # Base service Layer
 API_BASE_URL = 'https://182.160.29.24:50003/b1s/v1/'

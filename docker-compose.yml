@@ -17,7 +17,14 @@ services:
     build:
       context: .
       dockerfile: dockerfile.app
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "
+      python manage.py makemigrations datosLsApp &&
+      python manage.py migrate datosLsApp &&
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000
+      "
     volumes:
       - .:/app
     ports:
@@ -40,7 +47,7 @@ services:
     build:
       context: .
       dockerfile: dockerfile.app
-    command: celery -A config beat --loglevel=info  # Ejecutar el beat
+    command: celery -A config beat --loglevel=info
     depends_on:
       - rabbitmq
       - db
@@ -51,7 +58,7 @@ services:
     build:
       context: .
       dockerfile: dockerfile.app
-    command: celery -A config worker --pool=solo -Q sync_queue --loglevel=info  # Ejecutar el worker en la cola sync_queue
+    command: celery -A config worker --pool=solo -Q sync_queue --loglevel=info
     depends_on:
       - rabbitmq
       - db
