@@ -2,8 +2,9 @@
 function cargarInformacionClienteEnModal(cliente) {
     // Agregar logs para verificar si los datos están llegando correctamente
     console.log("Cargando información del cliente en el modal:", cliente);
+    console.log("grupoSN:", cliente.grupoSN);
 
-    if (cliente.nombre){
+    if (cliente.nombre && cliente.razonSocial === '') {
         $('#nombreSN').val(cliente.nombre);
         $('#apellidoSN').val(cliente.apellido);
 

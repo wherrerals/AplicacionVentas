@@ -58,14 +58,21 @@ function traerInformacionCliente(clienteId) {
                 const apellido = cliente.apellido;
                 const codigoSN = cliente.codigoSN;
 
+                console.log('Información del cliente XXX:', cliente);
+
                 // Asignar el rut como atributo data-rut del input
                 $('#inputCliente').attr('data-rut', clienteId);
 
                 // Asignar el codigoSN como atributo data-codigoSN del input
-                $('#inputCliente').attr('data-codigoSN', codigoSN);        
-
-                // Rellenar el campo de entrada con el nombre y apellido del cliente seleccionado
-                $('#inputCliente').val(codigoSN + " - " + nombre + ' ' + apellido);
+                $('#inputCliente').attr('data-codigoSN', codigoSN);
+                
+                if (cliente.nombre && cliente.razonSocial === '') {
+                    // Rellenar el campo de entrada con el nombre y apellido del cliente seleccionado
+                    $('#inputCliente').val(codigoSN + " - " + nombre + ' ' + apellido);
+                } else {
+                    // Rellenar el campo de entrada con la razón social del cliente seleccionado
+                    $('#inputCliente').val(codigoSN + " - " + cliente.razonSocial);
+                }
                 
                 // Actualizar los contactos y direcciones del cliente seleccionado
                 actualizarContactos(cliente.contactos);

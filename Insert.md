@@ -32,7 +32,7 @@ VALUES
 
 # Insert regiones
 
-INSERT INTO regiones (numero, nombre) VALUES
+INSERT INTO Region (numero, nombre) VALUES
 (15, 'Región de Arica y Parinacota'),
 (1, 'Región de Tarapacá'),
 (2, 'Región de Antofagasta'),
@@ -124,7 +124,7 @@ VALUES
 
 USE led_studio;
 
-INSERT INTO comuna (codigo, nombre, region_id) VALUES
+INSERT INTO Comuna (codigo, nombre, region_id) VALUES
 -- Región de Tarapacá (1)
 ('01101', 'Iquique', 1),
 ('01107', 'Alto Hospicio', 1),
