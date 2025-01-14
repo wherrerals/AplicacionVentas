@@ -12,6 +12,7 @@ def sync_products(self):
         task_name=self.name,
         status=states.PENDING
     )
+    
     try:
         print("Sincronizando productos...")
         service = Producto()
@@ -21,6 +22,7 @@ def sync_products(self):
         task.status = states.SUCCESS
         task.result = result_message  # Guarda el mensaje retornado
         return result_message
+    
     except Exception as e:
         # Manejo de errores
         task.status = states.FAILURE

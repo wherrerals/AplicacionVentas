@@ -10,25 +10,33 @@ import pika
 class Producto:
 
     def sync(self):
-        # Get or create sync state, defaulting to 0
+
+        # Obtener el valor de `skip` desde la base de datos
         state, created = SyncState.objects.get_or_create(
             key='product_sync_skip', 
             defaults={'value': 0}
         )
+        
+        # Inicializar el valor de `skip` si es la primera vez
         skip = state.value
         total_synced = 0
 
+        # Obtener productos desde la API de SalesLayer
         cliente = APIClient()
         productos = cliente.obtenerProductosSL(skip=skip)
 
-        if productos:  # Check if there are products to sync
-            # Serialize and save products
+        # Si hay productos, sincronizarlos
+        if productos:  
+
+            # Serializar los productos
             serialcer = Serializador('json')
             jsonserializado = serialcer.formatearDatos(productos)
             
+            # Sincronizar los productos y su stock
             repo = ProductoRepository()
             creacion = repo.sync_products_and_stock(jsonserializado)
 
+            # Incrementar el valor de `skip` si la sincronización fue exitosa
             if creacion:
                 synced_count = len(jsonserializado)
                 total_synced += synced_count
@@ -36,7 +44,9 @@ class Producto:
                 # Update skip state for next call
                 state.value += synced_count
                 state.save()
-
+                
+                
+        # Retorna el mensaje con la cantidad de productos sincronizados
         return f"{total_synced} productos sincronizados exitosamente"
     
     def obtenerReceta(self, codigo):
