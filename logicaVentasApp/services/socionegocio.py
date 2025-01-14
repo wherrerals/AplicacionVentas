@@ -493,10 +493,12 @@ class SocioNegocio:
         Raises:
             ValidationError: Si el apellido no se encuentra.
         """
-
-        if not self.apellido:
-            raise ValidationError("Apellido no encontrado")
-    
+        if self.gruposn == '105':
+            if not self.apellido :
+                raise ValidationError("Apellido no encontrado") 
+        else:
+            self.apellido = None
+        
     def validarTelefono(self):
         """
         Método para validar el teléfono del cliente.

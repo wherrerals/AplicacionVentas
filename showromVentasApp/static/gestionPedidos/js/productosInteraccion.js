@@ -13,13 +13,14 @@ class valorTributario {
   // Metodo para calcular IVA, bruto y neto
   calcularValores() {
       var precioFinal = parseFloat(this.precioFinal) || 0;
-      var iva = precioFinal * 0.19;
       var bruto = precioFinal;
-      var neto = precioFinal - iva;
+      var neto = precioFinal / 1.19;
+      var iva = bruto - neto;
       return {
-          iva: iva.toFixed(0),
           bruto: bruto.toFixed(0),
-          neto: neto.toFixed(0)
+          neto: neto.toFixed(0),
+          iva: iva.toFixed(0)
+          
       };
   }
 }
@@ -106,9 +107,9 @@ function agregarInteractividad(newRow, codigoProducto) {
     
         productos.forEach(producto => {
             const valores = producto.calcularValores();
-            totalIva += parseFloat(valores.iva);
-            totalBruto += parseFloat(valores.bruto);
-            totalNeto += parseFloat(valores.neto);
+            totalIva += Math.round(valores.iva);
+            totalBruto += Math.round(valores.bruto);
+            totalNeto += Math.round(valores.neto);
         });
     
         console.log('Total IVA:', totalIva, 'Total Bruto:', totalBruto, 'Total Neto:', totalNeto);
