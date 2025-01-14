@@ -99,6 +99,10 @@ document.addEventListener("DOMContentLoaded", function () {
               const stockTotal = 0;
               const precioLista = line.GrossPrice;
               const precioDescuento = line.DiscountPercent;
+              const sucursal = line.WarehouseCode;
+              const comentario = line.FreeText;
+
+              console.log("comentario: ", comentario);
   
               console.log("Agregando producto con datos:", {
                 productoCodigo,
@@ -107,10 +111,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 precioVenta,
                 stockTotal,
                 precioLista,
-                precioDescuento
+                precioDescuento,
+                sucursal,
+                comentario
               });
   
-              agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal);
+              agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario);
             });
           }
         })

@@ -1,5 +1,5 @@
 class Producto {
-    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal) {
+    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario) {
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
         this.imagen = imagen;
@@ -11,6 +11,7 @@ class Producto {
         this.totalProducto = precioVenta * cantidad;
         this.cantidad = cantidad;
         this.sucursal = sucursal;
+        this.comentario = comentario;
     }
 
     async obtenerStock(codigoProducto) {
@@ -133,7 +134,7 @@ class Producto {
             </tr> 
             <tr style="font-size: 12px;background: transparent;">
                 <td style="font-size: 11px;background: transparent;padding-top: 0px;border-style: none;padding-bottom: 0px;"colspan="3">
-                    <input class="form-control" type="text" placeholder="Comentario" id="comentarios-1" style="font-size: 12px;">
+                    <input class="form-control" type="text" placeholder="Comentario" id="comentarios-1" style="font-size: 12px;" value="${this.comentario}"></input>
                 </td>
                 <td style="background: transparent;padding-top: 8px;padding-left: 50px;border-style: none;padding-bottom: 0px;">
                     <a class="navbar-brand d-flex align-items-center" href="#" style="width: 18px;">
@@ -225,14 +226,14 @@ class Producto {
 }
 
 // Función global para manejar la adición de productos
-function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal) {
+function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario) {
     // Contador de productos
     console.log("cantidad: ", cantidad);
     console.log("sucursal: ", sucursal);
 
     let contprod = document.querySelectorAll('#productos tbody').length + 1;
 
-    let producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal);
+    let producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario);
 
     let newRow = producto.crearFila(contprod);
 
