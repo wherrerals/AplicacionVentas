@@ -252,6 +252,9 @@ class SocioNegocio:
 
 
 
+        
+
+
     @staticmethod
     def validardatosObligatorios(self):
         """
@@ -1173,11 +1176,18 @@ class SocioNegocio:
             return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)
         
         try:
+            
+            
+            
             self.validarDatosObligatorios()
 
             rut = self.rut            
             codigoSN = SocioNegocio.generarCodigoSN(rut)
             clienteExistente = SocioNegocioRepository.obtenerPorRut(self.rut)
+            
+            
+            if not dataSN.get('direcciones'):
+                raise ValidationError("No se proporcionaron direcciones")
 
             print(f"Cliente existente: {clienteExistente}")
 

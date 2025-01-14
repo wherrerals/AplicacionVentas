@@ -967,7 +967,10 @@ def onbtenerImgProducto(request):
 def generar_cotizacion_pdf(request, cotizacion_id):
     if request.method == 'POST':
         # Parsear datos JSON recibidos
+        
         print("Estamos en la vista")
+        print(request.body)
+        
         try:
             data = json.loads(request.body)
 
