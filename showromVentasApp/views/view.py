@@ -476,19 +476,13 @@ def actualizarAgregarContacto(request, socio):
             carCode = SocioNegocio.generarCodigoSN(rut)
 
             SocioNegocio.actualizaroCrearContactosSL(carCode, request.POST)
-            print("Estos son los datos:", request.POST)
 
             conexionAPi = APIClient()
-
             dataMSQL = conexionAPi.obtenerDataSn(carCode, "ContactEmployees")
 
-            print("Data obtenida de la API:", dataMSQL)
+            print(f"Data obtenida de la API: {dataMSQL}")
 
             result = Contacto().procesarContactosDesdeAPI(dataMSQL, socio)
-            
-            # Delegamos la lógica de procesamiento al servicio
-            #result = SocioNegocio.procesarContactos(contactoSerializado, socio)
-            
 
             return JsonResponse(result['data'], status=result['status'])
 

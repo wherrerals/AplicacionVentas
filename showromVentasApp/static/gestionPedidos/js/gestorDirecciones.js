@@ -367,37 +367,37 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
             cargarComunas(direccion.region_numero, comunaSelect, direccion.comuna_codigo);
 
 
-            
-            
-              // Añadir los atributos name a los campos editados
-              $(`#tipoDireccion_${index}`).attr('name', 'tipodireccion[]');
-              $(`#direccion_${index}`).attr('name', 'nombre_direccion[]');
-              $(`#pais_${index}`).attr('name', 'pais[]');
-              $(`#region_${index}`).attr('name', 'region[]');
-              $(`#ciudad_${index}`).attr('name', 'ciudad[]');
-              $(`#comuna_${index}`).attr('name', 'comuna[]').attr('data-comuna', direccion.comuna);
-              $(`#nombreDireccion_${index}`).attr('name', 'direccion[]');
-              $(`#contacto_id_${index}`).attr('name', 'direccionid[]');
-              
 
-              $(document).on('click', `[id^="editar_dir_"]`, function () {
-                // Extraer el índice del ID dinámico
-                const index = $(this).attr('id').split('_')[2];
-                console.log("Habilitando edición para la dirección con index:", index);
-            
-                // Hacer los campos editables
-                $(`#tipoDireccion_${index}`).prop('disabled', false);
-                $(`#direccion_${index}`).prop('disabled', false);
-                $(`#pais_${index}`).prop('disabled', false);
-                $(`#region_${index}`).prop('disabled', false);
-                $(`#ciudad_${index}`).prop('disabled', false);
-                $(`#comuna_${index}`).prop('disabled', false);
-                $(`#nombreDireccion_${index}`).prop('disabled', false);
-            
-                let tipoDireccion = $(`#tipoDireccion_${index}`).val();
-                console.log('Valor capturado de tipoDireccion:', tipoDireccion);
-            
-                console.log("Edición habilitada para la dirección con index:", index);
+
+            // Añadir los atributos name a los campos editados
+            $(`#tipoDireccion_${index}`).attr('name', 'tipodireccion[]');
+            $(`#direccion_${index}`).attr('name', 'nombre_direccion[]');
+            $(`#pais_${index}`).attr('name', 'pais[]');
+            $(`#region_${index}`).attr('name', 'region[]');
+            $(`#ciudad_${index}`).attr('name', 'ciudad[]');
+            $(`#comuna_${index}`).attr('name', 'comuna[]').attr('data-comuna', direccion.comuna);
+            $(`#nombreDireccion_${index}`).attr('name', 'direccion[]');
+            $(`#contacto_id_${index}`).attr('name', 'direccionid[]');
+
+
+            $(document).on('click', `[id^="editar_dir_"]`, function () {
+              // Extraer el índice del ID dinámico
+              const index = $(this).attr('id').split('_')[2];
+              console.log("Habilitando edición para la dirección con index:", index);
+
+              // Hacer los campos editables
+              $(`#tipoDireccion_${index}`).prop('disabled', false);
+              $(`#direccion_${index}`).prop('disabled', false);
+              $(`#pais_${index}`).prop('disabled', false);
+              $(`#region_${index}`).prop('disabled', false);
+              $(`#ciudad_${index}`).prop('disabled', false);
+              $(`#comuna_${index}`).prop('disabled', false);
+              $(`#nombreDireccion_${index}`).prop('disabled', false);
+
+              let tipoDireccion = $(`#tipoDireccion_${index}`).val();
+              console.log('Valor capturado de tipoDireccion:', tipoDireccion);
+
+              console.log("Edición habilitada para la dirección con index:", index);
             });
 
 
