@@ -369,8 +369,46 @@ class Cotizacion(Documento):
         Returns:
             dict: Datos de la cotización preparados para ser enviados a SAP.
         """
-            
-        # Determinar el tipo de venta basado en el vendedor
+
+        codigo_vendedor = jsonData.get('SalesPersonCode')
+        tipo_venta = self.tipoVentaTipoVendedor(codigo_vendedor)
+
+        if tipo_venta == 'NA':
+            lineas = jsonData.get('DocumentLines', [])
+            tipo_venta = self.tipoVentaTipoLineas(lineas)
+
+        #CAPTURAR ADDRES Y ADDRESS2 Y CONSULTAR LA BASE DE DATOS PARA CONCATENAR DIRECCION, COMUNA.nombre /R CIUDAD /R REGION.nombre
+        
+        adrres = jsonData.get('Address')
+        adrres2 = jsonData.get('Address2')
+        
+        #consultar en base de datos con el id capturado
+        
+        
+        direccion1 = DireccionRepository.obtenerDireccion(adrres)
+        direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)
+        
+        addresmodif = f"{direccion1.calleNumero} {direccion1.comuna.nombre}\n{direccion1.ciudad}\n{direccion1.region.nombre}"
+        addresmodif2 = f"{direccionRepo2.calleNumero} {direccionRepo2.comuna.nombre}\n{direccionRepo2.ciudad}\n{direccionRepo2.region.nombre}"
+        
+      
+        cabecera = {
+            'DocDate': jsonData.get('DocDate'),
+            'DocDueDate': jsonData.get('DocDueDate'),
+            'TaxDate': jsonData.get('TaxDate'),
+            'Address': addresmodif,
+            'Address2': addresmodif2,
+            'CardCode': jsonData.get('CardCode'),
+            'NumAtCard': jsonData.get('NumAtCard'),
+            'Comments': jsonData.get('Comments'),
+            'PaymentGroupCode': jsonData.get('PaymentGroupCode'),
+            'SalesPersonCode': jsonData.get('SalesPersonCode'),
+            'TransportationCode': jsonData.get('TransportationCode'),
+            #'U_LED_NROPSH': jsonData.get('U_LED_NROPSH'),
+            'U_LED_TIPVTA': tipo_venta,  # Tipo de venta calculado
+            'U_LED_TIPDOC': jsonData.get('U_LED_TIPDOC'), # Tipo de documento boleta o factura
+            'U_LED_FORENV': jsonData.get('TransportationCode'), # Forma de envio de la cotización
+        }
 
         # Datos de las líneas
         lineas = jsonData.get('DocumentLines', [])
@@ -380,6 +418,7 @@ class Cotizacion(Documento):
                 'ItemCode': linea.get('ItemCode'),
                 'Quantity': linea.get('Quantity'),
                 'ShipDate': linea.get('ShipDate'),
+                'FreeText': linea.get('FreeText'),
                 'DiscountPercent': linea.get('DiscountPercent'),
                 'WarehouseCode': linea.get('WarehouseCode'),
                 'CostingCode': linea.get('CostingCode'),
@@ -393,6 +432,7 @@ class Cotizacion(Documento):
 
         # Combina cabecera y líneas en un solo diccionario
         return {
+            **cabecera,
             'DocumentLines': lineas_json,
         }
 
