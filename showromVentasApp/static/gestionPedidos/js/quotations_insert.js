@@ -22,6 +22,8 @@ function submitForm() {
     const spcInt  = document.getElementById("vendedor_data").getAttribute("data-codeVen"); //listo
     const spc  = parseInt(spcInt, 10); //listo Convertir a entero con base 10
     const trnasp = document.getElementById("tipoEntrega-1").value; //listo
+    const direccion2 = document.getElementById("direcciones_despacho").value;
+    const direccion = document.getElementById("direcciones_despacho").value;
     const ulfen = 1; //document.getElementById("uledforenv").value;
     const referencia = document.getElementById("referencia").value; //listo
     const observaciones = document.getElementById("Observaciones-1").value; //selecionando observaciones por fila de producto por medio de id
@@ -36,7 +38,7 @@ function submitForm() {
 
     console.log('Fecha del documento:', docDate);
     console.log('Fecha de vencimiento del documento:', docDueDate);
-
+    console.log('tipo de entrega:', trnasp);
     // Captura las líneas del documento
     const lines = [];
 
@@ -59,6 +61,7 @@ function submitForm() {
         const cogsCostingCode2 = "AV"; 
 
         console.log('warehouseCode:', warehouseCode);
+
         
         
 
@@ -89,6 +92,8 @@ function submitForm() {
         "DocDueDate": docDueDate,
         "Comments": observaciones,
         "TaxDate": taxDate,
+        "Address": direccion,
+        "Address2": direccion2,
         "CardCode": cardCode,
         "PaymentGroupCode": pgc,  
         "SalesPersonCode": spc,

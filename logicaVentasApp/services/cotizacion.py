@@ -2,6 +2,7 @@ import json
 from django.http import JsonResponse
 from requests import request
 from adapters.sl_client import APIClient
+from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from logicaVentasApp.services.documento import Documento
 import logging
@@ -299,11 +300,27 @@ class Cotizacion(Documento):
             lineas = jsonData.get('DocumentLines', [])
             tipo_venta = self.tipoVentaTipoLineas(lineas)
         
+        #CAPTURAR ADDRES Y ADDRESS2 Y CONSULTAR LA BASE DE DATOS PARA CONCATENAR DIRECCION, COMUNA.nombre /R CIUDAD /R REGION.nombre
+        
+        adrres = jsonData.get('Address')
+        adrres2 = jsonData.get('Address2')
+        
+        #consultar en base de datos con el id capturado
+        
+        
+        direccion1 = DireccionRepository.obtenerDireccion(adrres)
+        direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)
+        
+        addresmodif = f"{direccion1.calleNumero} {direccion1.comuna.nombre} /n {direccion1.ciudad} /r {direccion1.region.nombre}"
+        addresmodif2 = f"{direccionRepo2.calleNumero} {direccionRepo2.comuna.nombre} /r {direccionRepo2.ciudad} /r {direccionRepo2.region.nombre}"
+        
         # Datos de la cabecera
         cabecera = {
             'DocDate': jsonData.get('DocDate'),
             'DocDueDate': jsonData.get('DocDueDate'),
             'TaxDate': jsonData.get('TaxDate'),
+            'Address': addresmodif,
+            'Address2': addresmodif2,
             'CardCode': jsonData.get('CardCode'),
             'NumAtCard': jsonData.get('NumAtCard'),
             'Comments': jsonData.get('Comments'),
