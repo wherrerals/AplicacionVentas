@@ -8,7 +8,6 @@ const formularios = document.querySelectorAll('#forCrearPedidos, #forCrearClient
 formularios.forEach(formulario => {
     formulario.addEventListener('submit', function (event) {
         event.preventDefault();
-        showLoadingOverlay();
 
         // Obtener los datos del formulario
         const nombre = document.getElementById('nombreSN').value;
@@ -91,6 +90,8 @@ formularios.forEach(formulario => {
         const submitButton = document.querySelector('button[type="submit"]');
         submitButton.disabled = true;
 
+        showLoadingOverlay();
+
         // Enviar los datos del formulario
         fetch('/ventas/agregar_editar_clientes/', {  
             method: 'POST',
@@ -103,19 +104,20 @@ formularios.forEach(formulario => {
         // Procesar la respuesta
         .then(response => {
             submitButton.disabled = false;
-            hideLoadingOverlay();
 
             if (!response.ok) {
                 if (response.status === 400) {
+                    hideLoadingOverlay();
                     return response.json().then(data => {
                         throw new Error(data.message || 'Error en los datos enviados');
                     });
+                    
                 } else if (response.status === 500) {
                     throw new Error('Error interno del servidor');
                 } else {
                     throw new Error('Error desconocido');
                 }
-            }
+            }hideLoadingOverlay();
 
             // Obtener el RUT del cliente para buscar la información 
             const rutInput = document.getElementById('rutSN') || document.getElementById('inputCliente'); // Ajusta el ID según el HTML
