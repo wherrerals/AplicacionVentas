@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Instalar dependencias necesarias, incluyendo las herramientas de compilación y las librerías requeridas por weasyprint
+# Instalar dependencias necesarias, incluyendo herramientas para fonts y WeasyPrint
 RUN apk update && apk add --no-cache \
     mysql-dev \
     python3-dev \
@@ -15,6 +15,8 @@ RUN apk update && apk add --no-cache \
     gdk-pixbuf \
     harfbuzz \
     fribidi \
+    fontconfig \
+    ttf-freefont \
     && apk add --no-cache --virtual .build-deps build-base \
     && pip install --upgrade pip
 
@@ -35,6 +37,7 @@ EXPOSE 8000
 
 # Comando por defecto para ejecutar el servidor
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
 
 
 #ejecutar el comando docker build -t myapp .
