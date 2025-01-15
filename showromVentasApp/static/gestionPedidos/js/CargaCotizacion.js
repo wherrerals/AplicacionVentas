@@ -42,10 +42,12 @@ document.addEventListener("DOMContentLoaded", function () {
           const razonSocial = data.Cliente.Quotations.CardName;
           const tipoentrega = data.Cliente.Quotations.TransportationCode;
           const tipoFactura = data.Cliente.Quotations.U_LED_TIPDOC;
+          const referencia = data.Cliente.Quotations.NumAtCard;
           const comentarios = data.Cliente.Quotations.Comments;
 
+          console.log("Tipo de comentarios: ", referencia);
           console.log("Tipo de comentarios: ", comentarios);
-
+          
 
           if (cardCode.endsWith("C")) {
             cardCode = cardCode.slice(0, -1);
@@ -61,6 +63,28 @@ document.addEventListener("DOMContentLoaded", function () {
           const showroomElement = document.getElementById("sucursal");
           if (showroomElement) {
             showroomElement.innerText = sucursal;
+          }
+
+          //capturando referencia
+
+          if (referencia) {
+            const referenciaInput = document.getElementById("referencia");
+            if (referenciaInput) {
+              referenciaInput.value = referencia; // Asigna el valor capturado al input
+            } else {
+              console.warn("No se encontró el elemento con id 'referencia'.");
+            }
+          }
+
+          // Capturando comentarios
+
+          if (comentarios) {
+            const comentariotxt = document.getElementById("Observaciones-1");
+            if (comentariotxt) {
+              comentariotxt.value = comentarios; // Asigna el valor capturado al input
+            } else {
+              console.warn("No se encontró el elemento con id 'comentariotxt'.");
+            }
           }
 
           // Capturar el elemento del select

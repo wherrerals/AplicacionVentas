@@ -586,6 +586,9 @@ class Cotizacion(Documento):
         salesperson = client_info.get("SalesPersons", {})
         contact_employee = client_info.get("BusinessPartners/ContactEmployees", {})
 
+        #print comments 
+        print("COMENTARIOS", quotations.get("Comments"))
+
         # Formatear los datos de cliente
         cliente = {
             "Quotations": {

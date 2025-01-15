@@ -383,7 +383,7 @@ class APIClient:
         """
 
         crossjoin = "Quotations,SalesPersons,BusinessPartners/ContactEmployees"
-        expand = "Quotations($select=DocEntry,DocNum, FederalTaxID, CardCode,CardName,TransportationCode,Address,Address2,DocDate,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
+        expand = "Quotations($select=DocEntry,DocNum, FederalTaxID, CardCode,CardName,TransportationCode,Address,Address2,DocDate,Comments,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
         filter = f"Quotations/DocEntry eq {docEntry} and Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Quotations/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode"    
         url = f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
 
