@@ -597,6 +597,8 @@ class Cotizacion(Documento):
                 "Address": quotations.get("Address"),
                 "Address2": quotations.get("Address2"),
                 "DocDate": quotations.get("DocDate"),
+                # si los comentarios son none se asigna un string vacio
+                "Comments": quotations.get("Comments") if quotations.get("Comments") else "",
                 "DocumentStatus": quotations.get("DocumentStatus"),
                 "Cancelled": quotations.get("Cancelled"),
                 "U_LED_TIPVTA": quotations.get("U_LED_TIPVTA"),

@@ -18,6 +18,9 @@ document.addEventListener("DOMContentLoaded", function () {
       estadoElement.innerText = "Cargando...";
     }
 
+    showLoadingOverlay();
+
+
     fetch(`/ventas/detalles_cotizacion/?docentry=${docEntry}`)
       .then(response => {
         if (!response.ok) throw new Error('Error al obtener la información de la cotización');
@@ -39,8 +42,9 @@ document.addEventListener("DOMContentLoaded", function () {
           const razonSocial = data.Cliente.Quotations.CardName;
           const tipoentrega = data.Cliente.Quotations.TransportationCode;
           const tipoFactura = data.Cliente.Quotations.U_LED_TIPDOC;
+          const comentarios = data.Cliente.Quotations.Comments;
 
-          console.log("Tipo de factura: ", tipoFactura);
+          console.log("Tipo de comentarios: ", comentarios);
 
 
           if (cardCode.endsWith("C")) {
@@ -68,6 +72,14 @@ document.addEventListener("DOMContentLoaded", function () {
             tipoEntregaSelect.value = tipoentrega;
           }
 
+          const tipoDocRadios = document.getElementsByName("tipoDocTributario");
+
+          // Iterar sobre los radios para seleccionar el correspondiente
+          tipoDocRadios.forEach(radio => {
+            if (radio.value === tipoFactura) {
+              radio.checked = true; // Seleccionar el radio cuyo valor coincide con tipoFactura
+            }
+          });
 
           const docEntryElement = document.getElementById("numero_cotizacion");
           if (docEntryElement) {
@@ -130,15 +142,20 @@ document.addEventListener("DOMContentLoaded", function () {
             agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario);
           });
         }
+        hideLoadingOverlay();
+
       })
+      
       .catch(error => {
         console.error('Error en la solicitud AJAX:', error);
         if (vendedorDataElement) {
           vendedorDataElement.innerText = "Error al cargar datos";
         }
+        hideLoadingOverlay();
       });
   } else {
     console.log("No se ha proporcionado un DocEntry en la URL.");
+    hideLoadingOverlay();
   }
 
   // Manejo de rutSN
