@@ -102,13 +102,12 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
     aplicarFiltroDesdeBusqueda();
 });
 
-showLoadingOverlay();
+
 
     const displayQuotations = (quotations) => {
         const tbody = document.querySelector('#listadoCotizaciones');
         tbody.innerHTML = '';
     
-        showLoadingOverlay();
         quotations.forEach(entry => {
             const quotation = entry.Quotations || {};
             const salesPerson = entry.SalesPersons || {};
@@ -174,9 +173,6 @@ showLoadingOverlay();
             }
         });
     });
-
-    hideLoadingOverlay();
-
 
         // Agrega el evento click a todos los enlaces de clientes después de añadir las filas
         document.querySelectorAll('.cliente-link').forEach(link => {
