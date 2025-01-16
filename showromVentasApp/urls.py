@@ -20,6 +20,7 @@ urlpatterns = [
     path('filtrar_socios_negocio/', SocioNegocioView.as_view(), name='filtrar_socios_negocio'),
     path('listado_productos/', Productos.as_view(), name='listado_productos'),
     path('crear_cotizacion/', CotizacionView.as_view(), name='crear_cotizacion'),
+    path('copiar_a_odv/', CotizacionView.as_view(), name='copiar_a_odv'),
     path('listado_odv/', OdvView.as_view(), name='listado_odv'),
     path('crear_odv/', OdvView.as_view(), name='crear_odv'),
     #path('crear_cliente/', SocioNegocioView.as_view(), name='crear_cliente'),

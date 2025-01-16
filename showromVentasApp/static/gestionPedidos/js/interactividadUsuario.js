@@ -123,12 +123,12 @@ if (copiarODVButtton) {
         event.preventDefault(); // Evitar comportamiento predeterminado del botón/enlace
 
         // Obtener el elemento que contiene el valor del número de cotización
-        const docEntryElement = document.getElementById('numero_cotizacion');
-        const docEntry = docEntryElement ? docEntryElement.textContent.trim() : null;
+        const docEntryElement = document.getElementById('numero_cotizacion').getAttribute("data-docentry");
 
-        if (docEntry) {
+
+        if (docEntryElement) {
             showLoadingOverlay(); // Mostrar un overlay de carga
-            window.location.href = `/ventas/ordenesVentas/?docentry=${docEntry}`; // Redirigir con el docEntry
+            window.location.href = `/ventas/ordenesVentas/?documento_copiado=${docEntryElement}`; // Redirigir con el docEntry
         } else {
             hideLoadingOverlay(); // Ocultar el overlay si ocurre un error
             alert("No se pudo obtener el DocEntry de la orden."); // Mostrar alerta de error

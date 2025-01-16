@@ -10,6 +10,7 @@
   <script src="{% static 'gestionPedidos/js/sucursales_select.js.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="{% static 'gestionPedidos/css/moreStyles.css' %}">
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles.min.css' %}">
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles2.css' %}">
 </head>
@@ -551,6 +552,10 @@
     </form>
   </div>
 
+  <div id="loadingOverlay" style="display: none;">
+    <div class="spinner"></div>
+  </div>
+
     <!-- Agrega este script antes de usar cualquier función de jQuery -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
@@ -570,6 +575,7 @@
   <script src="{% static 'gestionPedidos/js/obtenerInfoCliente.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/cargarInfoClientes.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/cargarODV.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/copiarODV.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/interaccionModalContactos.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/interaccionModalDirecciones.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/odv_insert.js' %}"></script>
