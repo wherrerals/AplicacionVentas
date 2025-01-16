@@ -732,9 +732,10 @@ class SocioNegocio:
         """
         print("Actualizando o creando dirección en SAP...")
 
+        # Obtener la lista de direcciones del request
         direcciones_json = data.getlist('direcciones')
             
-        # Deserializar el JSON
+        # Deserializar el JSON de direcciones
         direcciones = json.loads(direcciones_json[0])
 
         print(f"Direcciones deserializadas: {direcciones}")

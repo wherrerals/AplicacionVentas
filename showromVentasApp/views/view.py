@@ -689,6 +689,8 @@ def busquedaProductos(request):
                                    'stockTotal': producto.stockTotal,
                                    'precioAnterior': producto.precioLista,
                                    'maxDescuento': producto.dsctoMaxTienda} for producto in resultados]
+        
+        print("mostrar stock total", resultados_formateados)
         return JsonResponse({'resultados': resultados_formateados})
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})

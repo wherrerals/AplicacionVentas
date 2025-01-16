@@ -1,4 +1,6 @@
 from datosLsApp.models import ProductoDB, StockBodegasDB, BodegaDB
+from django.db.models import Sum
+
 
 class ProductoRepository:
     def sync_products_and_stock(self, products):
@@ -39,6 +41,9 @@ class ProductoRepository:
             if "Bodegas" in product_data:
                 self.sync_stock(producto, product_data["Bodegas"])
 
+                # Calcular y actualizar el stock total del producto
+                self.update_stock_total(producto)
+
         return True
 
     def sync_stock(self, producto, bodegas):
@@ -58,7 +63,7 @@ class ProductoRepository:
             # Sincronizar o crear la bodega
             bodega, _ = BodegaDB.objects.update_or_create(
                 nombre=bodega_data["nombre"],
-                codigo = bodega_data["nombre"],
+                codigo=bodega_data["nombre"],
                 defaults={
                     "descripcion": bodega_data.get("nombre", ""),
                 },
@@ -73,3 +78,18 @@ class ProductoRepository:
                     "stockDisponibleReal": bodega_data.get("stock_comprometido", -1),
                 },
             )
+
+    def update_stock_total(self, producto):
+        """
+        Calcula y actualiza el stock total del producto sumando el stock disponible en las bodegas.
+
+        Args:
+            producto (ProductoDB): Instancia del producto.
+        """
+        stock_total = StockBodegasDB.objects.filter(idProducto=producto).aggregate(
+            total_stock=Sum('stock')
+        )['total_stock'] or 0
+
+        # Actualizar el campo stockTotal en el producto
+        producto.stockTotal = stock_total
+        producto.save()
