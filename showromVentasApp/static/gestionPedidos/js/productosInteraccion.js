@@ -107,9 +107,9 @@ function agregarInteractividad(newRow, codigoProducto) {
     
         productos.forEach(producto => {
             const valores = producto.calcularValores();
-            totalIva += Math.round(valores.iva);
-            totalBruto += Math.round(valores.bruto);
-            totalNeto += Math.round(valores.neto);
+            totalIva += parseFloat(valores.iva);
+            totalBruto += parseFloat(valores.bruto);
+            totalNeto += parseFloat(valores.neto);
         });
     
         console.log('Total IVA:', totalIva, 'Total Bruto:', totalBruto, 'Total Neto:', totalNeto);
