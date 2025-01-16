@@ -17,7 +17,21 @@ formularios.forEach(formulario => {
         const email = document.getElementById('emailSN').value;
         const telefono = document.getElementById('telefonoSN').value;
         const giro = document.getElementById('giroSN').value;
-        const docentry = document.getElementById("numero_cotizacion").textContent;
+        // docentry es el número de la cotización o numero_orden
+        let docentry = null;
+
+        // Intenta capturar el contenido de "numero_cotizacion"
+        const cotizacionElement = document.getElementById("numero_cotizacion");
+        
+        // Si no encuentra "numero_cotizacion", busca "numero_orden"
+        if (cotizacionElement) {
+            docentry = cotizacionElement.textContent;
+        } else {
+            const ordenElement = document.getElementById("numero_orden");
+            if (ordenElement) {
+                docentry = ordenElement.textContent;
+            }
+        }
 
 
         // Obtener las direcciones y contactos

@@ -117,12 +117,14 @@ document.addEventListener("DOMContentLoaded", function () {
         applyGeneralSearch();
     });
     
+showLoadingOverlay();
 
     const displayOrders = (orders) => {
         console.log("Displaying orders:", orders);
         const tbody = document.querySelector('tbody');
         tbody.innerHTML = '';
     
+        showLoadingOverlay();
         orders.forEach(entry => {
             const order = entry.Orders || {};
             const salesPerson = entry.SalesPersons || {};
@@ -178,6 +180,9 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     
+    hideLoadingOverlay();
+
+
         // Agrega eventos a los enlaces de clientes
         document.querySelectorAll('.cliente-link').forEach(link => {
             link.addEventListener('click', (event) => {

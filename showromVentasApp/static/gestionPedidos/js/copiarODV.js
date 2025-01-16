@@ -106,11 +106,9 @@ document.addEventListener("DOMContentLoaded", function () {
           if (vendedorDataElement) {
             vendedorDataElement.innerText = "Error al cargar datos";
           }
-          hideLoadingOverlay();
         });
     } else {
       console.log("No se ha proporcionado un DocEntry en la URL.");
-      hideLoadingOverlay();
     }
   
     // Manejo de rutSN

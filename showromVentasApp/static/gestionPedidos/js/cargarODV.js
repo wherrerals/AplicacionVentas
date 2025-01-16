@@ -20,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       showLoadingOverlay();
 
-  
       fetch(`/ventas/detalles_ODV/?docentry=${docEntry}`)
         .then(response => {
           if (!response.ok) throw new Error('Error al obtener la información de la cotización');
