@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ].filter(elemento => elemento); // Filtra elementos nulos o indefinidos
 
     const botonAcciones = document.querySelector('.btn.btn-primary.dropdown-toggle');
+    const btn = document.querySelector('#botonacciones');
 
     // Campos que se deben deshabilitar
     const camposADeshabilitar = [
@@ -67,6 +68,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Ocultar o mostrar el botón de acciones
         botonAcciones.style.display = tieneTexto ? 'inline-block' : 'none';
+
+        // Ocultar o mostrar el botón de acciones en la vista de impresión
+        btn.style.display = tieneTexto ? 'inline-block' : 'none';
 
         // Deshabilitar o habilitar campos
         camposADeshabilitar.forEach(campo => {

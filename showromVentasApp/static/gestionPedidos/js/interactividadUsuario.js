@@ -115,16 +115,15 @@ function limpiarInformacionCliente() {
 }
 
 
-const copiarODVButtton = document.getElementById("copiar-ODV");
+const copiarODVButtons = document.querySelectorAll("#copiar-ODV, #copiar-ODV-1");
 
-if (copiarODVButtton) {
-    copiarODVButtton.addEventListener('click', (event) => {
+copiarODVButtons.forEach(button => {
+    button.addEventListener('click', (event) => {
         console.log("Ejecutando...");
         event.preventDefault(); // Evitar comportamiento predeterminado del botón/enlace
 
         // Obtener el elemento que contiene el valor del número de cotización
         const docEntryElement = document.getElementById('numero_cotizacion').getAttribute("data-docentry");
-
 
         if (docEntryElement) {
             showLoadingOverlay(); // Mostrar un overlay de carga
@@ -134,7 +133,8 @@ if (copiarODVButtton) {
             alert("No se pudo obtener el DocEntry de la orden."); // Mostrar alerta de error
         }
     });
-}
+});
+
 
 
 const cerrarButton = document.getElementById("cerrar");

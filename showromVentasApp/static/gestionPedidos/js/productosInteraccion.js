@@ -1,28 +1,27 @@
 // Dependencias: valorTributario.js
 class valorTributario {
-  constructor(codigoProducto, precioFinal) {
-      this.codigoProducto = codigoProducto;
-      this.precioFinal = precioFinal;
-  }
+    constructor(codigoProducto, precioFinal) {
+        this.codigoProducto = codigoProducto;
+        this.precioFinal = precioFinal;
+    }
 
-  // Metodo para modificar el precio final
-  modificarPrecioFinal(precioFinal) {
-      this.precioFinal = precioFinal;
-  }
+    // Metodo para modificar el precio final
+    modificarPrecioFinal(precioFinal) {
+        this.precioFinal = precioFinal;
+    }
 
-  // Metodo para calcular IVA, bruto y neto
-  calcularValores() {
-      var precioFinal = parseFloat(this.precioFinal) || 0;
-      var bruto = precioFinal;
-      var neto = precioFinal / 1.19;
-      var iva = bruto - neto;
-      return {
-          bruto: bruto.toFixed(0),
-          neto: neto.toFixed(0),
-          iva: iva.toFixed(0)
-          
-      };
-  }
+    // Metodo para calcular IVA, bruto y neto
+    calcularValores() {
+        var precioFinal = parseFloat(this.precioFinal) || 0;
+        var bruto = precioFinal;
+        var neto = precioFinal / 1.19;
+        var iva = bruto - neto;
+        return {
+            bruto: bruto,
+            neto: neto,
+            iva: iva
+        };
+    }
 }
 
 // Array global para almacenar las instancias de valorTributario
@@ -81,7 +80,7 @@ function agregarInteractividad(newRow, codigoProducto) {
         calcularPrecioTotal();
     }
 
-    document.addEventListener('productoEliminado', function(event) {
+    document.addEventListener('productoEliminado', function (event) {
         const codigoProducto = event.detail.codigoProducto;
 
         // Buscar el índice del producto a eliminar
@@ -104,19 +103,24 @@ function agregarInteractividad(newRow, codigoProducto) {
         let totalIva = 0;
         let totalBruto = 0;
         let totalNeto = 0;
-    
+
         productos.forEach(producto => {
             const valores = producto.calcularValores();
-            totalIva += parseFloat(valores.iva);
-            totalBruto += parseFloat(valores.bruto);
-            totalNeto += parseFloat(valores.neto);
+            totalIva += valores.iva;
+            totalBruto += valores.bruto;
+            totalNeto += valores.neto;
         });
-    
+
+        // Redondear los totales al final
+        totalIva = Math.round(totalIva);
+        totalBruto = Math.round(totalBruto);
+        totalNeto = Math.round(totalNeto);
+
         console.log('Total IVA:', totalIva, 'Total Bruto:', totalBruto, 'Total Neto:', totalNeto);
-    
+
         document.querySelector('#iva').textContent = `$${totalIva.toFixed(0)}`;
         document.querySelector('#total_bruto').textContent = `$${totalBruto.toFixed(0)}`;
         document.querySelector('#total_neto').textContent = `$${totalNeto.toFixed(0)}`;
     }
-    
+
 }
