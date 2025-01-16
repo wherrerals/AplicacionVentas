@@ -2,7 +2,7 @@ $(document).ready(function () {
     // Asignar evento para el modal de despacho
     $('#btn-grabar-direcciones-despacho').on('click', function (e) {
         e.preventDefault(); // Evitar comportamiento por defecto del botón
-
+        
         // Capturar todas las direcciones de despacho en un array
         let direcciones = [];
 
@@ -171,6 +171,7 @@ $(document).ready(function () {
 
         // Enviar las direcciones al backend mediante AJAX
         let urlguardarDir = `/ventas/guardar_direcciones/${rutCliemte}/`;
+        showLoadingOverlay();
         $.ajax({
             url: urlguardarDir,
             type: 'POST',
@@ -184,15 +185,18 @@ $(document).ready(function () {
             success: function (response) {
                 console.log('Respuesta del servidor:', response);
                 if (response.success) {
+                    hideLoadingOverlay();
                     alert('Direcciones guardadas correctamente');
                     $('.modal').modal('hide');  // Ocultar cualquier modal que esté abierto
                     //location.reload();
                 } else {
+                    hideLoadingOverlay();
                     alert('Error al guardar direcciones: ' + response.message);
                 }
             },
             error: function (xhr, status, error) {
                 console.error('Error al guardar direcciones:', error);
+                hideLoadingOverlay();
                 alert('Ha ocurrido un error al guardar las direcciones.');
             }
         });
