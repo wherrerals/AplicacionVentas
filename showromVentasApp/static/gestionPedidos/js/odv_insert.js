@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("saveButton").addEventListener("click", submitForm);
     
     function submitForm() {
+        showLoadingOverlay();
+
         // Capturar los datos del documento
         const fechaSolo = new Date().toISOString().split('T')[0]; // Salida en formato YYYY-MM-DD
     
@@ -137,9 +139,16 @@ document.addEventListener("DOMContentLoaded", function() {
     
             .catch(error => {
                 console.error('Hubo un error al crear el documento:', error);
+                
+            })
+
+            .finally(() => {
+                // Ocultar el overlay en cualquier caso
+                hideLoadingOverlay();
             });
-        }
+    }        
     
+        
         // Función para obtener el token CSRF (si usas Django)
         function getCSRFToken() {
             return document.querySelector('[name=csrfmiddlewaretoken]').value;

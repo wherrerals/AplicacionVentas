@@ -717,3 +717,22 @@ class Cotizacion(Documento):
                 document_lines.append(document_line)
 
         return document_lines
+    
+
+    def reemplazarQuotationsPorOrders(self, formatear_datos_result):
+        def replace_keys(data):
+            if isinstance(data, dict):
+                # Crear un nuevo diccionario con las claves modificadas
+                return {
+                    (key.replace("Quotations", "Orders") if "Quotations" in key else key): replace_keys(value)
+                    for key, value in data.items()
+                }
+            elif isinstance(data, list):
+                # Aplicar la función a cada elemento de la lista
+                return [replace_keys(item) for item in data]
+            else:
+                # Devolver los valores que no sean dict ni list sin cambios
+                return data
+
+        # Reemplazar las claves en la estructura recibida
+        return replace_keys(formatear_datos_result)

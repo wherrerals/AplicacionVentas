@@ -5,9 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
       return urlParams.get(param);
     }
   
-    // Manejo de docEntry
-    const docEntry = getQueryParam('docentry');
-    if (docEntry) {
+    const documentoCopiado = getQueryParam('documento_copiado');
+    if (documentoCopiado) {
       const vendedorDataElement = document.getElementById("vendedor_data");
       const showroomElement = document.getElementById("sucursal");
       const estadoElement = document.getElementById('estado');
@@ -18,9 +17,10 @@ document.addEventListener("DOMContentLoaded", function () {
         estadoElement.innerText = "Cargando...";
       }
 
-      showLoadingOverlay();
+    showLoadingOverlay();
 
-      fetch(`/ventas/detalles_ODV/?docentry=${docEntry}`)
+  
+      fetch(`/ventas/copiar_a_odv/?documento_copiado=${documentoCopiado}`)
         .then(response => {
           if (!response.ok) throw new Error('Error al obtener la información de la cotización');
           return response.json();
@@ -32,26 +32,11 @@ document.addEventListener("DOMContentLoaded", function () {
             // Extracción de datos principales
             const salesEmployeeName = data.Cliente.SalesPersons.SalesEmployeeName;
             const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
-            const numCotizacion = data.Cliente.Orders.DocNum;
             const docDate = data.Cliente.Orders.DocDate;
             const canceled = data.Cliente.Orders.Cancelled;
             let cardCode = data.Cliente.Orders.CardCode;
             const DocumentStatus = data.Cliente.Orders.DocumentStatus;
-            const docEntry = data.Cliente.Orders.DocEntry;
 
-           //console log de todo
-
-            console.log("docEntry: ", docEntry);
-            console.log("salesEmployeeName: ", salesEmployeeName);
-            console.log("sucursal: ", sucursal);
-            console.log("numCotizacion: ", numCotizacion);
-            console.log("docDate: ", docDate);
-            console.log("canceled: ", canceled);
-            console.log("cardCode: ", cardCode);
-            console.log("DocumentStatus: ", DocumentStatus);
-            console.log("docEntry: ", docEntry);
-
-  
             if (cardCode.endsWith("C")) {
               cardCode = cardCode.slice(0, -1);
             }
@@ -66,16 +51,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const showroomElement = document.getElementById("sucursal");
             if (showroomElement) {
               showroomElement.innerText = sucursal;
-            }
-
-            const docEntryElement = document.getElementById("numero_orden");
-            if (docEntryElement) {
-              docEntryElement.setAttribute("data-docEntry", docEntry);
-            }
-  
-            const numeroCotizacionElement = document.getElementById("numero_orden");            
-            if (numeroCotizacionElement) {
-              numeroCotizacionElement.textContent = `${numCotizacion}`;
             }
   
             const dueDateElement = document.getElementById("docDueDate");
@@ -124,19 +99,16 @@ document.addEventListener("DOMContentLoaded", function () {
             });
           }
 
-          hideLoadingOverlay();
+        hideLoadingOverlay();
         })
         .catch(error => {
           console.error('Error en la solicitud AJAX:', error);
           if (vendedorDataElement) {
             vendedorDataElement.innerText = "Error al cargar datos";
           }
-          hideLoadingOverlay();
-
         });
     } else {
       console.log("No se ha proporcionado un DocEntry en la URL.");
-      hideLoadingOverlay();
     }
   
     // Manejo de rutSN

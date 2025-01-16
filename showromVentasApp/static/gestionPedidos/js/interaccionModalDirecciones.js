@@ -14,6 +14,9 @@ $(document).ready(function () {
             let comuna = $(this).find('select[name="comuna[]"]').val();
             let direccion = $(this).find('input[name="direccion[]"]').val();
             let direccionId = $(this).find('input[name="direccionid[]"]').val();
+            let rowNum = $(this).find('input[name="direccionid[]"]').data('rowNum');
+
+            console.log('rowNum:', rowNum); 
 
             // Capturamos el tipo de dirección
             let tipoDireccion = null;
@@ -60,7 +63,8 @@ $(document).ready(function () {
                 ciudad,
                 comuna,
                 direccion,
-                direccionId
+                direccionId,
+                rowNum
             );
 
             direcciones.push({

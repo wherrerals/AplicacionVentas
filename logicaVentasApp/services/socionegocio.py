@@ -1171,6 +1171,7 @@ class SocioNegocio:
 
         dataSN = self.request
         print("creando o actualizando cliente...")
+        print(f"DataSN: {dataSN}")
 
         if not self.verificarRutValido(self.rut):
             return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)
@@ -1186,7 +1187,7 @@ class SocioNegocio:
             clienteExistente = SocioNegocioRepository.obtenerPorRut(self.rut)
             
             
-            if not dataSN.get('direcciones'):
+            if not dataSN.get('direcciones') and dataSN.get('docentry') is None:
                 raise ValidationError("No se proporcionaron direcciones")
 
             print(f"Cliente existente: {clienteExistente}")

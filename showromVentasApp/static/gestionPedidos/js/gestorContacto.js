@@ -163,6 +163,7 @@ $(document).ready(function() {
 
                           $('#listaContactos').append(contactoElemento);
 
+                          // Cambiar los nombres de los campos para capturar solo si han sido modificados
                           $(`#nombre_${index}`).attr('name', 'nombre[]');
                           $(`#apellido_${index}`).attr('name', 'apellido[]');
                           $(`#telefono_${index}`).attr('name', 'telefono[]');

@@ -164,6 +164,7 @@ function submitForm() {
         .catch(error => {
             console.error('Hubo un error durante la operación:', error);
         })
+        
         .finally(() => {
             // Ocultar el overlay en cualquier caso
             hideLoadingOverlay();

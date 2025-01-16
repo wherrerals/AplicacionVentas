@@ -166,8 +166,8 @@ document.addEventListener("DOMContentLoaded", function () {
             agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario);
           });
         }
-        hideLoadingOverlay();
 
+        hideLoadingOverlay();
       })
       
       .catch(error => {
@@ -176,6 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
           vendedorDataElement.innerText = "Error al cargar datos";
         }
         hideLoadingOverlay();
+
       });
   } else {
     console.log("No se ha proporcionado un DocEntry en la URL.");

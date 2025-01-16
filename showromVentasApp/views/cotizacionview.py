@@ -65,6 +65,7 @@ class CotizacionView(View):
             '/ventas/obtener_detalles_cotizacion': self.obtenerDetallesCotizacion,
             '/ventas/detalles_cotizacion': self.detallesCotizacion,
             '/ventas/duplicar_cotizacion': self.duplicarCotizacion,
+            '/ventas/copiar_a_odv': self.copiarAODV,
         }
 
     def post_route_map(self):
@@ -244,6 +245,29 @@ class CotizacionView(View):
             cotiza = Cotizacion()
             lines_data = cotiza.formatearDatos(data)
             return JsonResponse(lines_data, safe=False)
+        
+    def copiarAODV(self, request):
+        # Obtener el parámetro 'docentry' de la solicitud
+        docentry = request.GET.get('documento_copiado')
+        client = APIClient()
+
+        # Llamar al método para obtener los detalles del cliente
+        documentClient = client.detalleCotizacionCliente(docentry)
+        documentLine = client.detalleCotizacionLineas(docentry)
+        
+        # Preparar la estructura de datos para enviar como respuesta
+        data = {
+            "Client": documentClient,
+            "DocumentLine": documentLine
+        }
+
+        cotiza = Cotizacion()
+        datosQuotations = cotiza.formatearDatos(data)
+
+        lines_data = cotiza.reemplazarQuotationsPorOrders(datosQuotations)
+
+        return JsonResponse(lines_data, safe=False)
+
         
         
     def duplicarCotizacion(self, request):
