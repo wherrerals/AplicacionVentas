@@ -17,6 +17,8 @@ formularios.forEach(formulario => {
         const email = document.getElementById('emailSN').value;
         const telefono = document.getElementById('telefonoSN').value;
         const giro = document.getElementById('giroSN').value;
+        const docentry = document.getElementById("numero_cotizacion").textContent;
+
 
         // Obtener las direcciones y contactos
         const lines = [];
@@ -72,6 +74,7 @@ formularios.forEach(formulario => {
 
         // Crear un objeto con los datos del formulario
         data = {
+            docentry: docentry,
             nombreSN: nombre,
             apellidoSN: apellido,
             tipoSN: tipo,

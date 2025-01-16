@@ -3,12 +3,12 @@ class Producto {
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
         this.imagen = imagen;
-        this.precioVenta = precioVenta;
+        this.precioVenta = Math.round(precioVenta);
         this.stockTotal = stockTotal;
-        this.precioLista = precioLista;
-        this.precioDescuento = precioDescuento;
+        this.precioLista = Math.round(precioLista);
+        this.precioDescuento = Math.round(precioDescuento);
         this.precioSinDescuento = 0;
-        this.totalProducto = precioVenta * cantidad;
+        this.totalProducto = Math.round(precioVenta * cantidad);
         this.cantidad = cantidad;
         this.sucursal = sucursal;
         this.comentario = comentario;
@@ -124,12 +124,12 @@ class Producto {
                         <input class="form-control format-number" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="0">
                     </div>
                 </td>
-                <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${this.precioSinDescuento}</td>
+                <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${formatCurrency(this.precioSinDescuento)}</td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <input class="form-control format-number" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad}">
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
-                    <span id="precio_Venta">${this.totalProducto}</span>
+                    <span id="precio_Venta">${formatCurrency(this.totalProducto)}</span>
                 </td>
             </tr> 
             <tr style="font-size: 12px;background: transparent;">
@@ -154,12 +154,12 @@ class Producto {
             // Convertimos el valor a número entero
             const integerValue = Math.floor(value);
             let formattedValue = integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-
+        
             // Si el valor tiene 4 dígitos y no incluye un punto, lo añadimos manualmente
             if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
                 formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
             }
-
+        
             // Agregamos el símbolo de peso al principio
             return `$ ${formattedValue}`;
         }

@@ -60,6 +60,7 @@ class Serializador:
 
             # Añadir la dirección mapeada
             direcciones_mapeadas.append({
+                'RowNum': direccion.get('rowNum') if direccion.get('rowNum') else '',
                 'AddressName': direccion.get('nombreDireccion'),
                 'Street': direccion.get('direccion'),
                 'City': direccion.get('ciudad'),
