@@ -9,6 +9,7 @@ class Direccion:
         pass
 
     def procesarDireccionDesdeAPI(self, data, socio):
+        print("PASO 5")
         print(f"Datos recibidos: {data}")
 
         try:

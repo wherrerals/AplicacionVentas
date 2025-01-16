@@ -719,7 +719,7 @@ class SocioNegocio:
 
         
     
-    def actualizaroCrearDireccionSL(cardCode, data):
+    def actualizaroCrearDireccionSL(rut, cardCode, data):
         """
         Método para actualizar o crear una dirección en SAP.
 
@@ -730,7 +730,8 @@ class SocioNegocio:
         Returns:
             dict: Mensaje de éxito o error.
         """
-        print("Actualizando o creando dirección en SAP...")
+
+        print("PASO 2")
 
         # Obtener la lista de direcciones del request
         direcciones_json = data.getlist('direcciones')
@@ -741,7 +742,7 @@ class SocioNegocio:
         print(f"Direcciones deserializadas: {direcciones}")
 
         serializar = Serializador('json')
-        datosSerializados = serializar.mapearDirecciones(direcciones, cardCode)
+        datosSerializados = serializar.mapearDirecciones(direcciones, cardCode, rut)
 
         client = APIClient()
 

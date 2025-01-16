@@ -110,7 +110,53 @@ class DireccionRepository:
         try:
             print(f"Intentando eliminar contactos para el socio: {socio}")
             DireccionDB.objects.filter(SocioNegocio__codigoSN=socio).delete()
-            print("Contactos eliminados con éxito.")
+            print("DIRECCIONES eliminados con éxito.")
         except Exception as e:
             print(f"Error al eliminar contactos: {e}")
             raise
+
+    def obtenerDireccionPorSocioYTipo(self, socio, tipos):
+        """
+        Obtiene una lista de direcciones por socio y tipo de dirección
+
+        Args:
+            socio (str): Código del socio
+            tipos (list): Lista de tipos de dirección
+
+        Returns:
+            list: Lista de diccionarios con la información de las direcciones encontradas
+
+        Raises:
+            ValueError: Si el socio está vacío o tipos no es una lista válida
+        """
+        if not socio or not tipos:
+            raise ValueError("El código de socio y tipos de dirección son requeridos")
+        
+        direcciones = DireccionDB.objects.filter(
+            SocioNegocio__codigoSN=socio, 
+            tipoDireccion__in=tipos
+        )
+        
+        direcciones_diccionario = []
+        
+        for direccion in direcciones:
+            try:
+                direccion_dict = {
+                    'tipoDireccion': getattr(direccion, 'tipoDireccion', ''),
+                    'rowNum': getattr(direccion, 'rowNum', ''),
+                    'nombreDireccion': getattr(direccion, 'nombreDireccion', ''),
+                    'direccion': getattr(direccion, 'calleNumero', ''),
+                    'ciudad': getattr(direccion, 'ciudad', ''),
+                    'comuna': getattr(direccion.comuna, 'codigo', '') if hasattr(direccion, 'comuna') and direccion.comuna else '',
+                    'region': getattr(direccion.region, 'numero', '') if hasattr(direccion, 'region') and direccion.region else ''
+                }
+                direcciones_diccionario.append(direccion_dict)
+            except Exception as e:
+                print(f"Error al procesar dirección: {e}")
+                print(f"Datos de la dirección: {vars(direccion)}")
+                continue
+            
+            print(f"Direcciones XXXXX: {direcciones_diccionario}")
+        
+        return direcciones_diccionario
+

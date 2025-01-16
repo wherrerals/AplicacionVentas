@@ -443,14 +443,16 @@ def mis_datos(request):
 
 
 def actualizarAgregarDirecion(request, socio):
+    print("PASO 1")
     if request.method == "POST":
         try:
 
             data = request.POST
+            print(f"Data recibida para esta prueba: {data}")
             rut = data.get('cliente')
             carCode = SocioNegocio.generarCodigoSN(rut)
 
-            SocioNegocio.actualizaroCrearDireccionSL(carCode, request.POST)
+            SocioNegocio.actualizaroCrearDireccionSL(rut, carCode, request.POST)
 
             conexionAPi = APIClient()
             dataMSQL = conexionAPi.obtenerDataSn(carCode, "BPAddresses")
