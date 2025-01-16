@@ -23,9 +23,11 @@ formularios.forEach(formulario => {
         // Intenta capturar el contenido de "numero_cotizacion"
         const cotizacionElement = document.getElementById("numero_cotizacion");
         
+        
         // Si no encuentra "numero_cotizacion", busca "numero_orden"
         if (cotizacionElement) {
             docentry = cotizacionElement.textContent;
+            console.log(docentry);
         } else {
             const ordenElement = document.getElementById("numero_orden");
             if (ordenElement) {

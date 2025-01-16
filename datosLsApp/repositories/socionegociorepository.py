@@ -140,3 +140,24 @@ class SocioNegocioRepository:
             return {'success': False, 'message': f'Cliente con código {codigoSN} no encontrado'}
         except Exception as e:
             return {'success': False, 'message': f'Error al actualizar cliente: {str(e)}'}
+
+
+    #obtener rut de cliente por codigoSN
+    
+    def obtenerRutCliente(self, codigoSN):
+        """
+        Obtiene el rut de un cliente por su código
+        
+        params:
+            codigoSN: str
+
+            - Código del cliente a buscar
+        
+        return:
+            str | None
+        """
+        try:
+            cliente = SocioNegocioDB.objects.get(codigoSN=codigoSN)
+            return cliente.rut
+        except SocioNegocioDB.DoesNotExist:
+            return None

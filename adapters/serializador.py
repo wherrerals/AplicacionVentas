@@ -1,6 +1,8 @@
 import json
 
+from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.regionrepository import RegionRepository
+from datosLsApp.repositories.socionegociorepository import SocioNegocioRepository
 
 class Serializador:
     def __init__(self, formato):
@@ -42,35 +44,73 @@ class Serializador:
             'EmailAddress': datos['emailSN'],
         }
     
-    def mapearDirecciones(self, datos, cardCode):
-        repo = RegionRepository()
+    def mapearDirecciones(self, datos, cardCode, rut):
 
-        # Formatear direcciones
+        dirRepo = DireccionRepository()        
+
+        if not isinstance(datos, list):
+            raise ValueError("Se esperaba una lista de direcciones en 'datos'.")
+
+        tipo_direcciones = list({direccion.get('tipoDireccion') for direccion in datos if 'tipoDireccion' in direccion})
+        print("TIPOS DE DIRECCIONES DETECTADOS:", tipo_direcciones)
+
+        tipo_direcciones_complementarios = ["13" if t == "12" else "12" for t in tipo_direcciones]
+        print("TIPOS DE DIRECCIONES COMPLEMENTARIOS:", tipo_direcciones_complementarios)
+        
+        datos2 = dirRepo.obtenerDireccionPorSocioYTipo(cardCode, tipo_direcciones_complementarios)
+        print("DATOS DESDE LA BASE DE DATOS:", datos2) 
+
         direcciones_mapeadas = []
 
-        for direccion in datos:
-            # Obtener tipo de dirección del elemento actual
-            tipo_direccion = direccion.get('tipoDireccion')
+        direcciones_enviadas = {direccion.get('tipoDireccion'): direccion for direccion in datos}
+        
+        
+        # obtener las direcciones de la base de datos y mapearlas ejemplo  dato2 = [<DireccionDB: PRUEBA 53>]
+        
+        direcciones_base = {
+            direccion['tipoDireccion']: {
+                'rowNum': direccion['rowNum'],
+                'nombreDireccion': direccion['nombreDireccion'],
+                'direccion': direccion['direccion'],
+                'ciudad': direccion['ciudad'],
+                'comuna': direccion['comuna'],
+                'region': direccion['region'],
+            }
+            for direccion in datos2
+        }
 
-            # Mapear el tipo de dirección
-            if tipo_direccion == "12":
-                tipo_direccion = "bo_ShipTo"
-            else:
-                tipo_direccion = "bo_BillTo"
+        for tipo_direccion, direccion_enviada in direcciones_enviadas.items():
+            tipo_complementario = "13" if tipo_direccion == "12" else "12"
+            direccion_complementaria = direcciones_base.get(tipo_complementario, {})
 
-            # Añadir la dirección mapeada
             direcciones_mapeadas.append({
-                'RowNum': direccion.get('rowNum') if direccion.get('rowNum') else '',
-                'AddressName': direccion.get('nombreDireccion'),
-                'Street': direccion.get('direccion'),
-                'City': direccion.get('ciudad'),
-                'County': direccion.get('comuna'),
-                'Country': "CL",  # Código de país fijo
-                'State': direccion.get('region'),  # Nombre de la región
-                'FederalTaxID': cardCode,  # Código asociado a la dirección
-                'TaxCode': 'IVA',  # Código de impuestos fijo
-                'AddressType': tipo_direccion  # Tipo de dirección
+                'RowNum': direccion_enviada.get('rowNum', ''),
+                'AddressName': direccion_enviada.get('nombreDireccion'),
+                'Street': direccion_enviada.get('direccion'),
+                'City': direccion_enviada.get('ciudad'),
+                'County': direccion_enviada.get('comuna'),
+                'Country': "CL",
+                'State': direccion_enviada.get('region'),
+                'FederalTaxID': cardCode,
+                'TaxCode': 'IVA',
+                'AddressType': "bo_ShipTo" if tipo_direccion == "12" else "bo_BillTo"
             })
+
+            if direccion_complementaria:
+                direcciones_mapeadas.append({
+                    'RowNum': direccion_complementaria.get('rowNum', ''),
+                    'AddressName': direccion_complementaria.get('nombreDireccion'),
+                    'Street': direccion_complementaria.get('direccion'),
+                    'City': direccion_complementaria.get('ciudad'),
+                    'County': direccion_complementaria.get('comuna'),
+                    'Country': "CL",
+                    'State': direccion_complementaria.get('region'),
+                    'FederalTaxID': cardCode,
+                    'TaxCode': 'IVA',
+                    'AddressType': "bo_BillTo" if tipo_complementario == "13" else "bo_ShipTo"
+                })
+
+        print("DIRECCIONES MAPEADAS:", direcciones_mapeadas)
 
         return {
             'BPAddresses': direcciones_mapeadas
