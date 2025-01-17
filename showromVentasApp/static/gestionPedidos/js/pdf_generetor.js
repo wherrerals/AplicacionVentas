@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const fechaSolo = new Date().toISOString().split('T')[0];
         console.log("Fecha actual (ISO):", fechaSolo);
 
-        const rut = document.getElementById("inputCliente").getAttribute("data-rut");
+        const rut = document.getElementById("inputCliente").getAttribute("data-codigosn");
         console.log("RUT del cliente:", rut);
 
         const docNum = document.getElementById("numero_cotizacion").textContent.trim();
@@ -25,6 +25,17 @@ document.addEventListener("DOMContentLoaded", function () {
         const codigoVendedor = document.getElementById("vendedor_data").getAttribute("data-codeVen");
         console.log("Código del vendedor:", codigoVendedor);
 
+        const totalNeto = document.querySelector("#total_neto").textContent;
+
+
+        const ivaGeneral = document.querySelector("#iva").textContent;
+
+
+        const totalbruto = document.querySelector("#total_bruto").textContent;
+
+
+        
+
         // Construir líneas del documento
         const lines = [];
         const productRows = document.querySelectorAll('.product-row');
@@ -35,25 +46,23 @@ document.addEventListener("DOMContentLoaded", function () {
             const name = row.querySelector("[name='nombre_producto']").innerText.trim();
             const quantity = row.querySelector("[name='cantidad']").value.trim();
             const porcentaje_descuento = row.querySelector("#agg_descuento").value.trim();
-            const discount = row.querySelector("#Precio_Descuento").value;
-            //const total = row.querySelector("[name='total']").value;
+            const discountspan = row.querySelector("#Precio_Descuento").textContent;
+            const totalspan = row.querySelector("#precio_Venta").textContent;
 
-            console.log(`Producto ${index + 1} - SKU:`, itemCode);
-            console.log(`Producto ${index + 1} - Nombre:`, name);
-            console.log(`Producto ${index + 1} - Cantidad:`, quantity);
-            console.log(`Producto ${index + 1} - Descuento %:`, porcentaje_descuento);
-            console.log(`Producto ${index + 1} - Descuento $:`, discount);
-            //console.log(`Producto ${index + 1} - Subtotal Neto:`, total);
+            const total = parseFloat(totalspan);
+            const discount = parseFloat(discountspan);
 
             const line = {
                 "LineNum": index,
                 "sku": itemCode,
                 "descripcion": name,
-                "cantidad": parseFloat(quantity),
-                "porcentaje_descuento": parseFloat(porcentaje_descuento),
-                "descuento": parseFloat(discount),
-                // "subtotal_neto": parseFloat(total),
+                "cantidad": quantity,
+                "porcentaje_descuento": porcentaje_descuento,
+                "descuento": discount,
+                "subtotal_neto": total,
             };
+
+            console.log("Línea de producto:", line);
             lines.push(line);
         });
 
@@ -63,7 +72,10 @@ document.addEventListener("DOMContentLoaded", function () {
             "valido_hasta": docDueDate,
             "rut": rut,
             "vendedor": codigoVendedor,
-            "DocumentLines": lines
+            "DocumentLines": lines,
+            "totalbruto": totalbruto,
+            "iva": ivaGeneral,
+            "totalNeto": totalNeto
         };
 
         console.log("Datos del documento:", documentData);
