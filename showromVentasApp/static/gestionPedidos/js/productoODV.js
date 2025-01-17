@@ -1,5 +1,5 @@
 class Producto {
-    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, tipoEntrega, fechaEntrega = new Date().toISOString().split('T')[0]) {
+    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, tipoEntrega, fechaEntrega = new Date().toISOString().split('T')[0]) {
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
         this.imagen = imagen;
@@ -11,6 +11,7 @@ class Producto {
         this.totalProducto = precioVenta * cantidad;
         this.cantidad = cantidad;
         this.sucursal = sucursal;
+        this.comentario = comentario;
         this.tipoEntrega = tipoEntrega;
         this.fechaEntrega = fechaEntrega;
     }
@@ -134,7 +135,7 @@ class Producto {
             </tr>
             <tr  style="font-size: 12px;background: transparent;">
                 <td  style="font-size: 11px;background: transparent;padding-top: 0px;border-style: none;padding-bottom: 0px;" colspan="3">
-                    <input class="form-control" type="text" placeholder="Comentario" style="font-size: 12px;">
+                    <input class="form-control" type="text" placeholder="Comentario" id="comentarios-1" style="font-size: 12px;"  value="${this.comentario ?? ''}">
                 </td>
                     <td style="background: transparent;padding-top: 8px;padding-left: 50px;border-style: none;padding-bottom: 0px;">
                         <a class="navbar-brand d-flex align-items-center bi bi-trash" href="#" style="width: 18px;"  id="eliminarp">
@@ -271,13 +272,13 @@ class Producto {
 }
 
 
-function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, tipoEntrega, fechaEntrega) {
+function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, tipoEntrega, fechaEntrega) {
     let contprod = document.querySelectorAll('#productos tbody').length + 1; // Contador de productos
 
     const tipoEntregaSeleccionado = document.getElementById('tipoEntrega-1')?.value || '1'; // Obtener el valor del tipo de entrega seleccionado
 
     // Crear instancia del producto
-    const producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, tipoEntregaSeleccionado, fechaEntrega);
+    const producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, tipoEntregaSeleccionado, fechaEntrega);
     const newRow = producto.crearFila(contprod, tipoEntregaSeleccionado); // Crear la fila del producto
 
     document.getElementById('productos').appendChild(newRow); // Agregar la fila al tbody
