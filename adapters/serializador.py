@@ -45,70 +45,59 @@ class Serializador:
         }
     
     def mapearDirecciones(self, datos, cardCode, rut):
-
-        dirRepo = DireccionRepository()        
+        dirRepo = DireccionRepository()
 
         if not isinstance(datos, list):
             raise ValueError("Se esperaba una lista de direcciones en 'datos'.")
 
         tipo_direcciones = list({direccion.get('tipoDireccion') for direccion in datos if 'tipoDireccion' in direccion})
-        print("TIPOS DE DIRECCIONES DETECTADOS:", tipo_direcciones)
 
         tipo_direcciones_complementarios = ["13" if t == "12" else "12" for t in tipo_direcciones]
         print("TIPOS DE DIRECCIONES COMPLEMENTARIOS:", tipo_direcciones_complementarios)
-        
+
         datos2 = dirRepo.obtenerDireccionPorSocioYTipo(cardCode, tipo_direcciones_complementarios)
-        print("DATOS DESDE LA BASE DE DATOS:", datos2) 
+        print("DATOS DESDE LA BASE DE DATOS:", datos2)
 
         direcciones_mapeadas = []
 
-        direcciones_enviadas = {direccion.get('tipoDireccion'): direccion for direccion in datos}
-        
-        
-        # obtener las direcciones de la base de datos y mapearlas ejemplo  dato2 = [<DireccionDB: PRUEBA 53>]
-        
-        direcciones_base = {
-            direccion['tipoDireccion']: {
-                'rowNum': direccion['rowNum'],
-                'nombreDireccion': direccion['nombreDireccion'],
-                'direccion': direccion['direccion'],
-                'ciudad': direccion['ciudad'],
-                'comuna': direccion['comuna'],
-                'region': direccion['region'],
-            }
-            for direccion in datos2
-        }
+        # Procesar las direcciones recibidas
+        for direccion in datos:
+            tipo_direccion = direccion.get('tipoDireccion')
+            if not tipo_direccion:
+                continue
 
-        for tipo_direccion, direccion_enviada in direcciones_enviadas.items():
-            tipo_complementario = "13" if tipo_direccion == "12" else "12"
-            direccion_complementaria = direcciones_base.get(tipo_complementario, {})
-
+            # Añadir la dirección principal
             direcciones_mapeadas.append({
-                'RowNum': direccion_enviada.get('rowNum', ''),
-                'AddressName': direccion_enviada.get('nombreDireccion'),
-                'Street': direccion_enviada.get('direccion'),
-                'City': direccion_enviada.get('ciudad'),
-                'County': direccion_enviada.get('comuna'),
-                'Country': "CL",
-                'State': direccion_enviada.get('region'),
+                'RowNum': direccion.get('rowNum', ''),
+                'AddressName': direccion.get('nombreDireccion'),
+                'Street': direccion.get('direccion'),
+                'City': direccion.get('ciudad'),
+                'County': direccion.get('comuna'),
+                'Country': 'CL',
+                'State': int(direccion.get('region')),
                 'FederalTaxID': cardCode,
                 'TaxCode': 'IVA',
                 'AddressType': "bo_ShipTo" if tipo_direccion == "12" else "bo_BillTo"
             })
 
-            if direccion_complementaria:
+            # Buscar complementaria en datos2
+            tipo_complementario = "13" if tipo_direccion == "12" else "12"    
+            complementaria = next((d for d in datos2 if d['tipoDireccion'] == tipo_complementario), None)
+            # Evitar duplicados antes de agregar
+            if complementaria and not any(d['AddressName'] == complementaria.get('nombreDireccion', '') for d in direcciones_mapeadas):
                 direcciones_mapeadas.append({
-                    'RowNum': direccion_complementaria.get('rowNum', ''),
-                    'AddressName': direccion_complementaria.get('nombreDireccion'),
-                    'Street': direccion_complementaria.get('direccion'),
-                    'City': direccion_complementaria.get('ciudad'),
-                    'County': direccion_complementaria.get('comuna'),
+                    'RowNum': complementaria.get('rowNum', ''),
+                    'AddressName': complementaria.get('nombreDireccion'),
+                    'Street': complementaria.get('direccion'),
+                    'City': complementaria.get('ciudad'),
+                    'County': complementaria.get('comuna'),
                     'Country': "CL",
-                    'State': direccion_complementaria.get('region'),
+                    'State': complementaria.get('region'),
                     'FederalTaxID': cardCode,
                     'TaxCode': 'IVA',
                     'AddressType': "bo_BillTo" if tipo_complementario == "13" else "bo_ShipTo"
                 })
+
 
         print("DIRECCIONES MAPEADAS:", direcciones_mapeadas)
 

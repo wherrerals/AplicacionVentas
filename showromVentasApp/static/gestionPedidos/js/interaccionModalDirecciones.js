@@ -2,7 +2,7 @@ $(document).ready(function () {
     // Asignar evento para el modal de despacho
     $('#btn-grabar-direcciones-despacho').on('click', function (e) {
         e.preventDefault(); // Evitar comportamiento por defecto del botón
-        
+
         // Capturar todas las direcciones de despacho en un array
         let direcciones = [];
 
@@ -16,7 +16,7 @@ $(document).ready(function () {
             let direccionId = $(this).find('input[name="direccionid[]"]').val();
             let rowNum = $(this).find('input[name="direccionid[]"]').data('rowNum');
 
-            console.log('rowNum:', rowNum); 
+            console.log('rowNum:', rowNum);
 
             // Capturamos el tipo de dirección
             let tipoDireccion = null;
@@ -162,16 +162,21 @@ $(document).ready(function () {
         enviarDirecciones(direcciones);
     });
 
-    // Función común para enviar las direcciones al backend
     function enviarDirecciones(direcciones) {
         let clienteRut = $('#inputCliente').data('rut');
         console.log('Cliente RUT capturado:', clienteRut);
 
         const rutCliemte = document.getElementById("inputCliente").getAttribute("data-codigoSN");
 
-        // Enviar las direcciones al backend mediante AJAX
+        // URL para guardar direcciones
         let urlguardarDir = `/ventas/guardar_direcciones/${rutCliemte}/`;
+
+        // Mostrar el overlay de carga
         showLoadingOverlay();
+
+        // Limpiar mensajes previos
+        limpiarMensajes();
+
         $.ajax({
             url: urlguardarDir,
             type: 'POST',
@@ -183,22 +188,60 @@ $(document).ready(function () {
                 "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val()
             },
             success: function (response) {
-                console.log('Respuesta del servidor:', response);
+                // Ocultar el overlay de carga
+                hideLoadingOverlay();
+
+                // Manejar la respuesta del servidor
                 if (response.success) {
-                    hideLoadingOverlay();
-                    alert('Direcciones guardadas correctamente');
-                    $('.modal').modal('hide');  // Ocultar cualquier modal que esté abierto
-                    //location.reload();
+                    mostrarMensaje('Direcciones guardadas correctamente.', 'success');
+
+                    // Cerrar el modal si existe
+                    const modalDespElement = document.getElementById('dirDespModal');
+                    const modalFactElement = document.getElementById('dirFactModal');
+
+                    // Obtener instancias de los modales
+                    const modalDespInstance = bootstrap.Modal.getInstance(modalDespElement);
+                    const modalFactInstance = bootstrap.Modal.getInstance(modalFactElement);
+
+                    // Cerrar modal de despacho si existe
+                    if (modalDespInstance) {
+                        modalDespInstance.hide();
+                    }
+
+                    // Cerrar modal de facturación si existe
+                    if (modalFactInstance) {
+                        modalFactInstance.hide();
+                    }
+
+                    // Obtener el RUT del cliente para buscar la información 
+                    const rutInput = document.getElementById('rutSN') || document.getElementById('inputCliente'); // Ajusta el ID según el HTML
+                    const rutCliente = rutInput ? rutInput.value : '';
+
+                    // Actualizar el campo de entrada con el RUT del cliente
+                    if (rutCliente) {
+                        const inputCliente = document.getElementById('rutSN') || document.getElementById('inputCliente');
+                        if (inputCliente) {
+                            inputCliente.value = rutCliente;
+                        }
+
+                        $('#resultadosClientes').empty(); // Limpiar los resultados de la búsqueda 
+                        traerInformacionCliente(rutCliente); // Traer la información del cliente
+                    }
+
+                    // Opcional: refrescar la página
+                    // location.reload();
                 } else {
-                    hideLoadingOverlay();
-                    alert('Error al guardar direcciones: ' + response.message);
+                    mostrarMensaje(response.message || 'Error al guardar las direcciones.', 'error');
                 }
             },
             error: function (xhr, status, error) {
                 console.error('Error al guardar direcciones:', error);
+
+                // Ocultar el overlay de carga y mostrar mensaje de error
                 hideLoadingOverlay();
-                alert('Ha ocurrido un error al guardar las direcciones.');
+                mostrarMensaje('Ha ocurrido un error al guardar las direcciones.', 'error');
             }
         });
     }
+
 });

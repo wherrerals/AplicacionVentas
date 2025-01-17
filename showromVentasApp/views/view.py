@@ -1,3 +1,4 @@
+import datetime
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -17,6 +18,7 @@ from datosLsApp.models import (ProductoDB, SocioNegocioDB, UsuarioDB, RegionDB, 
 from adapters.sl_client import APIClient
 from datosLsApp.repositories.comunarepository import ComunaRepository
 from datosLsApp.repositories.regionrepository import RegionRepository
+from datosLsApp.repositories.socionegociorepository import SocioNegocioRepository
 from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
 from logicaVentasApp.services.contacto import Contacto
 from logicaVentasApp.services.cotizacion import Cotizacion
@@ -448,7 +450,6 @@ def actualizarAgregarDirecion(request, socio):
         try:
 
             data = request.POST
-            print(f"Data recibida para esta prueba: {data}")
             rut = data.get('cliente')
             carCode = SocioNegocio.generarCodigoSN(rut)
 
@@ -972,17 +973,51 @@ def generar_cotizacion_pdf(request, cotizacion_id):
     if request.method == 'POST':
         # Parsear datos JSON recibidos
         print("Estamos en la vista")
+
         try:
             data = json.loads(request.body)
+            print(f"Data recibida para PDF: {data}")
+            
+            codigoSn = data.get('rut')
+            
+            snrepo = SocioNegocioRepository()
+
+            datossocio = snrepo.obtenerPorCodigoSN(codigoSn)
+
+            usuarios = UsuarioDB.objects.get(vendedor__codigo=data.get('vendedor'))
+
+            fecha = data.get('valido_hasta'),
+
+            print(f"fECHA: {fecha}")
+
+            #formatear fecha para que pase de 2025-01-19 a 19-01-2025
+            fecha = fecha[0].split("-")
+            fecha = fecha[2] + "-" + fecha[1] + "-" + fecha[0]
+
+
+            # Datos generales
+            
 
             # Datos generales
             cotizacion = {
                 'numero': data.get('numero'),
-                'fecha': data.get('fecha'),
-                'valido_hasta': data.get('valido_hasta'),
-                'vendedor': data.get('vendedor'),
+                'fecha': fecha,
+                'validez': fecha,
+                'totalNeto': data.get('totalNeto'),
+                'iva': data.get('iva'),
+                'totalbruto': data.get('totalbruto'),
+                'vendedor': {
+                    'nombre': usuarios.nombre,
+                    'email': usuarios.email,
+                    'telefono': usuarios.telefono,
+                },
                 'cliente': {
-                    'rut': data.get('rut'),
+                    'rut': datossocio.rut,
+                    'nombre': datossocio.nombre + " " + datossocio.apellido,
+                    'telefono': datossocio.telefono,
+                    'tipo': datossocio.grupoSN.nombre,
+                    'email': datossocio.email,
+                    
                 },
                 'productos': data.get('DocumentLines', []),
                 'totales': {

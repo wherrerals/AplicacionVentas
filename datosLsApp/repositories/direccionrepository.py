@@ -136,13 +136,15 @@ class DireccionRepository:
             SocioNegocio__codigoSN=socio, 
             tipoDireccion__in=tipos
         )
+
         
         direcciones_diccionario = []
         
-        for direccion in direcciones:
+        for index, direccion in enumerate(direcciones):
             try:
+                
                 direccion_dict = {
-                    'tipoDireccion': getattr(direccion, 'tipoDireccion', ''),
+                    'tipoDireccion': str(getattr(direccion, 'tipoDireccion', '')),  # Convertimos a string
                     'rowNum': getattr(direccion, 'rowNum', ''),
                     'nombreDireccion': getattr(direccion, 'nombreDireccion', ''),
                     'direccion': getattr(direccion, 'calleNumero', ''),
@@ -151,12 +153,11 @@ class DireccionRepository:
                     'region': getattr(direccion.region, 'numero', '') if hasattr(direccion, 'region') and direccion.region else ''
                 }
                 direcciones_diccionario.append(direccion_dict)
+
             except Exception as e:
-                print(f"Error al procesar dirección: {e}")
+                print(f"Error al procesar dirección {index + 1}: {str(e)}")
                 print(f"Datos de la dirección: {vars(direccion)}")
                 continue
-            
-            print(f"Direcciones XXXXX: {direcciones_diccionario}")
         
         return direcciones_diccionario
 

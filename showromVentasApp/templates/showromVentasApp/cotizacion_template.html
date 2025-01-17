@@ -182,7 +182,7 @@
             <p>Vendedor: {{ cotizacion.vendedor.nombre }}</p>
             <p>Email: {{ cotizacion.vendedor.email }}</p>
             <p>Teléfono: {{ cotizacion.vendedor.telefono }}</p>
-            <p>Showroom: Av. Padre Hurtado Norte 1199, Vitacura, Santiago</p>
+            <p>Showroom: LED STUDIO TIENDA DE ILUMINACION</p>
         </div>
     </div>
     
@@ -195,7 +195,7 @@
                     <th>SKU</th>
                     <th>Descripción</th>
                     <th>Cantidad</th>
-                    <th>Precio Neto</th>
+                    <th>Valor DEscuento</th>
                     <th>% Descuento</th>
                     <th>Subtotal Neto</th>
                 </tr>
@@ -210,7 +210,7 @@
                         <span style="font-size: 10px; color: gray;">Entrega: {{ producto.entrega }}</span>
                     </td>
                     <td>{{ producto.cantidad }}</td>
-                    <td>${{ producto.precio_neto }}</td>
+                    <td>${{ producto.descuento }}</td>
                     <td>{{ producto.porcentaje_descuento }}%</td>
                     <td>${{ producto.subtotal_neto }}</td>
                 </tr>
@@ -222,9 +222,9 @@
     <!-- Totales -->
     <div class="totals">
         <h3>Totales</h3>
-        <p>Total Neto: ${{ cotizacion.totales.total_neto }}</p>
-        <p>IVA (19%): ${{ cotizacion.totales.iva }}</p>
-        <p><strong>Total a Pagar: ${{ cotizacion.totales.total_pagar }}</strong></p>
+        <p>Total Neto: {{ cotizacion.totalNeto }}</p>
+        <p>IVA (19%): {{ cotizacion.iva }}</p>
+        <p><strong>Total a Pagar: {{ cotizacion.totalbruto }}</strong></p>
     </div>
 </body>
 

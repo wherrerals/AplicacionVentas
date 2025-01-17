@@ -204,3 +204,8 @@ AplicacionVentas/__pycache__/wsgi.cpython-311.pyc
 # Ignorar el archivo celerybeat-schedule
 celerybeat-schedule
 celerybeat-schedule.*
+
+# Ignorar archivos de Celery Beat
+celerybeat-schedule.dat
+celerybeat-schedule.dir
+celerybeat-schedule.bak
