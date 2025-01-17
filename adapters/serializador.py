@@ -50,10 +50,7 @@ class Serializador:
         if not isinstance(datos, list):
             raise ValueError("Se esperaba una lista de direcciones en 'datos'.")
 
-        print("DATOS RECIBIDOS DIRECCIONES:", datos)
-
         tipo_direcciones = list({direccion.get('tipoDireccion') for direccion in datos if 'tipoDireccion' in direccion})
-        print("TIPOS DE DIRECCIONES DETECTADOS:", tipo_direcciones)
 
         tipo_direcciones_complementarios = ["13" if t == "12" else "12" for t in tipo_direcciones]
         print("TIPOS DE DIRECCIONES COMPLEMENTARIOS:", tipo_direcciones_complementarios)
@@ -84,10 +81,10 @@ class Serializador:
             })
 
             # Buscar complementaria en datos2
-            tipo_complementario = "13" if tipo_direccion == "12" else "12" # Obtener el tipo de dirección complementario    
+            tipo_complementario = "13" if tipo_direccion == "12" else "12"    
             complementaria = next((d for d in datos2 if d['tipoDireccion'] == tipo_complementario), None)
             # Evitar duplicados antes de agregar
-            if complementaria and not any(d['RowNum'] == complementaria.get('rowNum', '') for d in direcciones_mapeadas):
+            if complementaria and not any(d['AddressName'] == complementaria.get('nombreDireccion', '') for d in direcciones_mapeadas):
                 direcciones_mapeadas.append({
                     'RowNum': complementaria.get('rowNum', ''),
                     'AddressName': complementaria.get('nombreDireccion'),

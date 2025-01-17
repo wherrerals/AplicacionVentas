@@ -731,8 +731,6 @@ class SocioNegocio:
             dict: Mensaje de éxito o error.
         """
 
-        print("PASO 2")
-
         # Obtener la lista de direcciones del request
         direcciones_json = data.getlist('direcciones')
             

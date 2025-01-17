@@ -448,7 +448,6 @@ def actualizarAgregarDirecion(request, socio):
         try:
 
             data = request.POST
-            print(f"Data recibida para esta prueba: {data}")
             rut = data.get('cliente')
             carCode = SocioNegocio.generarCodigoSN(rut)
 

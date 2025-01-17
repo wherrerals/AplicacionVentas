@@ -71,7 +71,7 @@ class DireccionManager {
               <select class="form-select" id="direccionSN" name="tipodireccion[]" style="font-size: 12px;border-color: rgb(159,168,175);">
                 <optgroup label="Tipo">
                   <option value="12" ${tipoDireccion === 'Despacho' ? 'selected' : ''}>Despacho</option>
-                  <option value="13" ${tipoDireccion === 'Facturación' ? 'seleced' : ''}>Facturación</option>
+                  <option value="13" ${tipoDireccion === 'Facturación' ? 'selected' : ''}>Facturación</option>
                 </optgroup>
               </select>
             </div>

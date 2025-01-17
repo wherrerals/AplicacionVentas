@@ -74,6 +74,9 @@ function limpiarInformacionCliente() {
     $('#telefonoSN').val('');
     $('#emailSN').val('');
     $('#giroSN').val('');
+    // referencia
+    $('#referencia').val('');
+    $('#Observaciones-1').val('');
 
     // Limpiar los datos de vendedor y sucursal
     $('#vendedor_data').text('');
