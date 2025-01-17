@@ -189,7 +189,6 @@ function limpiarMensajes() {
     mensajes.forEach(mensaje => mensaje.remove());
 }
 
-// Función para mostrar el overlay de carga
 function mostrarMensaje(mensaje, tipo) {
     const contenedorMensajes = document.getElementById('contenedor-mensajes') || document.body;
     const div = document.createElement('div');

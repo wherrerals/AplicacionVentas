@@ -155,8 +155,6 @@ class DireccionRepository:
                 print(f"Error al procesar dirección: {e}")
                 print(f"Datos de la dirección: {vars(direccion)}")
                 continue
-            
-            print(f"Direcciones XXXXX: {direcciones_diccionario}")
-        
+                    
         return direcciones_diccionario
 

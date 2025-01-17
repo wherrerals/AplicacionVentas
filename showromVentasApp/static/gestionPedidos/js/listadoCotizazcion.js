@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const getSkip = (page) => (page - 1) * recordsPerPage;
 
     const applyFiltersAndFetchData = (filters, page = 1) => {
-        showLoader();
+        showLoadingOverlay();
         const skip = getSkip(page); // Calcular el número de registros a omitir
         const filterData = {
             top: recordsPerPage,
