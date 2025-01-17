@@ -301,6 +301,11 @@ class Cotizacion(Documento):
             tipo_venta = self.tipoVentaTipoLineas(lineas)
         
         #CAPTURAR ADDRES Y ADDRESS2 Y CONSULTAR LA BASE DE DATOS PARA CONCATENAR DIRECCION, COMUNA.nombre /R CIUDAD /R REGION.nombre
+
+        transportationCode = jsonData.get('TransportationCode')
+
+        if tipo_venta == 'NA' and transportationCode != '1':
+            tipo_venta = 'RESE'
         
         adrres = jsonData.get('Address')
         adrres2 = jsonData.get('Address2')
@@ -369,13 +374,22 @@ class Cotizacion(Documento):
         Returns:
             dict: Datos de la cotización preparados para ser enviados a SAP.
         """
-
+        print("PREPARANDO JSON COTIZACION AC")
+        print(f"JSON DATA: {jsonData}")
         codigo_vendedor = jsonData.get('SalesPersonCode')
         tipo_venta = self.tipoVentaTipoVendedor(codigo_vendedor)
+
 
         if tipo_venta == 'NA':
             lineas = jsonData.get('DocumentLines', [])
             tipo_venta = self.tipoVentaTipoLineas(lineas)
+
+        transportationCode = jsonData.get('TransportationCode')
+
+        print("TRANSPORTATION CODE", transportationCode)
+
+        if tipo_venta == 'NA' and transportationCode != "1":
+            tipo_venta = 'RESE'
 
         #CAPTURAR ADDRES Y ADDRESS2 Y CONSULTAR LA BASE DE DATOS PARA CONCATENAR DIRECCION, COMUNA.nombre /R CIUDAD /R REGION.nombre
         
