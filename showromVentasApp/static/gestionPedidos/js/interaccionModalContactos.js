@@ -88,7 +88,8 @@ $(document).ready(function () {
                         if (inputCliente) {
                             inputCliente.value = rutCliente;
                         }
-
+                        
+                        console.log('RUT del cliente XXXXXX:', rutCliente);
                         $('#resultadosClientes').empty(); // Limpiar los resultados de la búsqueda 
                         traerInformacionCliente(rutCliente); // Traer la información del cliente
                     }
@@ -144,3 +145,5 @@ $(document).ready(function () {
         });
     });
 });
+
+

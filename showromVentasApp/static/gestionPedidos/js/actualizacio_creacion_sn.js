@@ -149,6 +149,7 @@ formularios.forEach(formulario => {
                     inputCliente.value = rutCliente;
                 }
 
+                console.log('RUT del cliente XXXX:', rutCliente);
                 $('#resultadosClientes').empty(); // Limpiar los resultados de la búsqueda 
                 traerInformacionCliente(rutCliente); // Traer la información del cliente
             }
