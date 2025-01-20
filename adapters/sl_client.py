@@ -521,7 +521,7 @@ class APIClient:
 
         response = self.session.get(url, verify=False)
         response.raise_for_status()
-        print(url)
+        print("URL DE PRODUCTOS PARA SINCRONIZACION", url)
         return response.json()
     
     def elementosReceta(self, itemCode):

@@ -28,12 +28,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Obtener el elemento <select>
         const selectElement = document.getElementById("direcciones_despacho");
-        const direccion = selectElement.value;
+        const direccion2 = selectElement.value;
 
         console.log("Valor seleccionado:", direccion);
 
         const selectElement2 = document.getElementById("direcciones_facturacion");
-        const direccion2 = selectElement2.value;
+        const direccion = selectElement2.value;
         console.log("Valor seleccionado:", direccion2);
 
 
@@ -103,8 +103,8 @@ document.addEventListener("DOMContentLoaded", function () {
             "DocDueDate": docDueDate,
             "Comments": observaciones,
             "TaxDate": taxDate,
-            "Address": direccion,
-            "Address2": direccion2,
+            "Address": direccion, // direccion de facturacion
+            "Address2": direccion2, // direccion de  despacho
             "CardCode": cardCode,
             "PaymentGroupCode": pgc,
             "SalesPersonCode": spc,
