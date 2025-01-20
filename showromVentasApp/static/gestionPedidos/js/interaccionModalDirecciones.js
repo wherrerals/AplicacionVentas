@@ -6,6 +6,7 @@ $(document).ready(function () {
         // Capturar todas las direcciones de despacho en un array
         let direcciones = [];
 
+        // Recorrer cada div que contiene las direcciones de despacho
         $('#listaDireccionDespacho .col-sm-5').each(function () {
             let nombreDireccion = $(this).find('input[name="nombre_direccion[]"]').val();
             let pais = $(this).find('select[name="pais[]"]').val();
@@ -15,38 +16,7 @@ $(document).ready(function () {
             let direccion = $(this).find('input[name="direccion[]"]').val();
             let direccionId = $(this).find('input[name="direccionid[]"]').val();
             let rowNum = $(this).find('input[name="direccionid[]"]').data('rowNum');
-
-            console.log('rowNum:', rowNum);
-
-            // Capturamos el tipo de dirección
-            let tipoDireccion = null;
-
-            // Verificamos si es un select o un input y obtenemos el valor
-            let selectTipoDireccion = $(this).find('select[name="tipodireccion[]"]');
-            let inputTipoDireccionStatic = $(this).find('input[name="tipoDireccion_static[]"]');
-
-            if (selectTipoDireccion.length) {
-                // Si es un select, tomamos el valor seleccionado
-                tipoDireccion = selectTipoDireccion.find('option:selected').val();
-
-                // Agregamos el evento change para actualizar las direcciones dinámicamente
-                selectTipoDireccion.on('change', function () {
-                    const nuevoTipoDireccion = $(this).val();
-                    console.log('Tipo de dirección actualizado:', nuevoTipoDireccion);
-
-                    // Ejecutar la actualización de direcciones
-                    actualizarDirecciones(cliente.direcciones, '#direcciones_despacho', "12");
-                    actualizarDirecciones(cliente.direcciones, '#direcciones_facturacion', "13");
-                });
-            } else if (inputTipoDireccionStatic.length) {
-                // Si es un input, tomamos su valor directamente
-                let staticValue = inputTipoDireccionStatic.val();
-                if (staticValue === 'Despacho') {
-                    tipoDireccion = 12;
-                } else if (staticValue === 'Facturación') {
-                    tipoDireccion = 13;
-                }
-            }
+            let tipoDireccion = $(this).find('select[name="tipodireccion[]"]').val();
 
             // Validar tipo de dirección y otros campos
             if (tipoDireccion === null || !nombreDireccion || !pais || !region || !ciudad || !comuna || !direccion) {
