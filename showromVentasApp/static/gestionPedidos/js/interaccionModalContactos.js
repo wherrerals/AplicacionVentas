@@ -76,7 +76,7 @@ $(document).ready(function () {
 
                 console.log('Respuesta del servidor:', response);
                 if (response.success) {
-                    mostrarMensaje('Direcciones guardadas correctamente.', 'success');
+                    mostrarMensaje('Contactos guardados correctamente.', 'success');
                     $('#contactoModal').modal('hide');
 
                     const rutInput = document.getElementById('rutSN') || document.getElementById('inputCliente'); // Ajusta el ID según el HTML

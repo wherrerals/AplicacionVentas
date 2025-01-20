@@ -1044,3 +1044,5 @@ def generar_cotizacion_pdf(request, cotizacion_id):
             return HttpResponse(f'Error al procesar datos: {str(e)}', status=400)
     else:
         return HttpResponse('Método no permitido', status=405)
+
+
