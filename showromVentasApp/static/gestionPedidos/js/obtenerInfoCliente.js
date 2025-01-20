@@ -103,8 +103,16 @@ function actualizarContactos(contactos) {
     if (contactos && contactos.length > 0) {
         contactos.forEach(function(contacto) {
             let option = $('<option></option>');
+            
             option.val(contacto.id);
+            // asignar el codigo interno sap como valor del option
+            option.attr('data-codigoInterno', contacto.codigoInternoSap);
             option.text(contacto.nombre + ' ' + contacto.apellido);
+
+            option.addClass('contacto-option');
+
+            
+
             selectContactos.append(option);
         });
     } else {

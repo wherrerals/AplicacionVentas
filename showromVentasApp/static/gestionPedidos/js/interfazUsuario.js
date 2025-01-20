@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Campos que se deben deshabilitar
     const camposADeshabilitar = [
         document.getElementById('inputCliente'),
+        document.getElementById('contactos_cliete'),
         //document.getElementById('contactos_cliete'),
         //document.getElementById('direcciones_despacho'),
         //document.getElementById('tipoEntrega-1'),

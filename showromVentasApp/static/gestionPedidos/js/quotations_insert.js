@@ -30,13 +30,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const selectElement = document.getElementById("direcciones_despacho");
         const direccion2 = selectElement.value;
 
-        console.log("Valor seleccionado:", direccion);
+        console.log("Valor seleccionado:", direccion2);
 
         const selectElement2 = document.getElementById("direcciones_facturacion");
         const direccion = selectElement2.value;
-        console.log("Valor seleccionado:", direccion2);
+        console.log("Valor seleccionado:", direccion);
 
+        const contactoCliente = document.getElementById("contactos_cliete");
+        const contacto = contactoCliente.value;
 
+        console.log('contacto seleccionado:', contacto);
 
 
 
@@ -103,6 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "DocDueDate": docDueDate,
             "Comments": observaciones,
             "TaxDate": taxDate,
+            "ContactPersonCode": contacto,
             "Address": direccion, // direccion de facturacion
             "Address2": direccion2, // direccion de  despacho
             "CardCode": cardCode,

@@ -1,12 +1,12 @@
-$(document).ready(function() {
-    $('#btn-grabar-cont').on('click', function(e) {
+$(document).ready(function () {
+    $('#btn-grabar-cont').on('click', function (e) {
         e.preventDefault(); // Evitar comportamiento por defecto del botón
 
         // Capturar todos los contactos en un array
         let contactos = [];
 
         // Recorrer cada div que contiene los contactos
-        $('#listaContactos .col-sm-5').each(function() {
+        $('#listaContactos .col-sm-5').each(function () {
             // Obtener los valores de los inputs
             let nombre = $(this).find('input[name="nombre[]"]').val();
             let apellido = $(this).find('input[name="apellido[]"]').val();
@@ -16,7 +16,7 @@ $(document).ready(function() {
             let contactoid = $(this).find('input[name="contacto_id[]"]').val();
             let codigoInternoSap = $(this).find('input[name="contacto_id[]"]').data('bpcode');
             console.log('Codigo interno SAP:', codigoInternoSap);
-            
+
             if (nombre && apellido && telefono && celular && email) {
                 contactos.push({
                     'nombre': nombre,
@@ -31,7 +31,7 @@ $(document).ready(function() {
                 console.log('Contacto ignorado porque no tiene todos los campos completos.');
             }
         });
-        
+
 
         // Mostrar en consola el array completo de contactos
         console.log('Contactos capturados:', contactos);
@@ -50,7 +50,13 @@ $(document).ready(function() {
 
 
         // Enviar los contactos al backend mediante AJAX
-        
+
+        // Mostrar el overlay de carga
+        showLoadingOverlay();
+
+        // Limpiar mensajes previos
+        limpiarMensajes();
+
 
         let urlguardarCont = `/ventas/guardar_contactos/${rutCliemte}/`;
         $.ajax({
@@ -60,22 +66,43 @@ $(document).ready(function() {
                 'contactos': JSON.stringify(contactos),
                 'cliente': clienteRut  // Asumiendo que el cliente está en un atributo `data-rut`
             },
-            headers: { 
+            headers: {
                 "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val()  // Incluir el token CSRF en los headers
             },
-            success: function(response) {
+            success: function (response) {
+
+                hideLoadingOverlay();
+
+
                 console.log('Respuesta del servidor:', response);
                 if (response.success) {
-                    alert('Contactos guardados correctamente');
+                    mostrarMensaje('Direcciones guardadas correctamente.', 'success');
                     $('#contactoModal').modal('hide');
+
+                    const rutInput = document.getElementById('rutSN') || document.getElementById('inputCliente'); // Ajusta el ID según el HTML
+                    const rutCliente = rutInput ? rutInput.value : '';
+
+                    // Actualizar el campo de entrada con el RUT del cliente
+                    if (rutCliente) {
+                        const inputCliente = document.getElementById('rutSN') || document.getElementById('inputCliente');
+                        if (inputCliente) {
+                            inputCliente.value = rutCliente;
+                        }
+
+                        $('#resultadosClientes').empty(); // Limpiar los resultados de la búsqueda 
+                        traerInformacionCliente(rutCliente); // Traer la información del cliente
+                    }
                     //location.reload();
                 } else {
                     alert('Error al guardar contactos: ' + response.message);
                 }
             },
-            error: function(xhr, status, error) {
-                console.error('Error al guardar contactos:', error);
-                alert('Ha ocurrido un error al guardar los contactos.');
+            error: function (xhr, status, error) {
+                console.error('Error al guardar los contactos:', error);
+
+
+                hideLoadingOverlay();
+                mostrarMensaje('Ha ocurrido un error al guardar los conctactos.', 'error');
             }
         });
     });
@@ -107,7 +134,7 @@ $(document).ready(function () {
                 } else if (contactoid) {
                     // Si no existe, agregarla y seleccionarla
                     $(`#contactos_cliete`).append(
-                        `<option value="${contactoid}">${nuevoTexto}</option>`
+                        `<option value="${contactoid} ">${nuevoTexto}</option>`
                     );
                     console.log(`Nueva opción agregada: ${nuevoTexto}`);
                 }

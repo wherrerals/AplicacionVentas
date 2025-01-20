@@ -45,6 +45,9 @@ document.addEventListener("DOMContentLoaded", function () {
           const referencia = data.Cliente.Quotations.NumAtCard;
           const comentarios = data.Cliente.Quotations.Comments;
 
+          const contactos = data.Cliente.ContactEmployee.Contactos;
+
+
           console.log("Tipo de comentarios: ", referencia);
           console.log("Tipo de comentarios: ", comentarios);
           

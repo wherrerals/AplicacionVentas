@@ -2,6 +2,7 @@ import json
 from django.http import JsonResponse
 from requests import request
 from adapters.sl_client import APIClient
+from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from logicaVentasApp.services.documento import Documento
@@ -310,8 +311,11 @@ class Cotizacion(Documento):
         adrres = jsonData.get('Address')
         adrres2 = jsonData.get('Address2')
         
+        idContacto = jsonData.get('ContactPersonCode')
         #consultar en base de datos con el id capturado
         
+        contacto = ContactoRepository.obtenerContacto(idContacto)
+        numerocontactoSAp = contacto.codigoInternoSap
         
         direccion1 = DireccionRepository.obtenerDireccion(adrres)
         direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)
@@ -324,6 +328,7 @@ class Cotizacion(Documento):
             'DocDate': jsonData.get('DocDate'),
             'DocDueDate': jsonData.get('DocDueDate'),
             'TaxDate': jsonData.get('TaxDate'),
+            'ContactPersonCode': numerocontactoSAp,
             'Address': addresmodif,
             'Address2': addresmodif2,
             'CardCode': jsonData.get('CardCode'),
@@ -378,26 +383,27 @@ class Cotizacion(Documento):
         print(f"JSON DATA: {jsonData}")
         codigo_vendedor = jsonData.get('SalesPersonCode')
         tipo_venta = self.tipoVentaTipoVendedor(codigo_vendedor)
-
-
+        
+        # Si el tipo de venta por vendedor no es válido ('NA'), determinar por líneas
         if tipo_venta == 'NA':
             lineas = jsonData.get('DocumentLines', [])
             tipo_venta = self.tipoVentaTipoLineas(lineas)
+        
+        #CAPTURAR ADDRES Y ADDRESS2 Y CONSULTAR LA BASE DE DATOS PARA CONCATENAR DIRECCION, COMUNA.nombre /R CIUDAD /R REGION.nombre
 
         transportationCode = jsonData.get('TransportationCode')
 
-        print("TRANSPORTATION CODE", transportationCode)
-
-        if tipo_venta == 'NA' and transportationCode != "1":
+        if tipo_venta == 'NA' and transportationCode != '1':
             tipo_venta = 'RESE'
-
-        #CAPTURAR ADDRES Y ADDRESS2 Y CONSULTAR LA BASE DE DATOS PARA CONCATENAR DIRECCION, COMUNA.nombre /R CIUDAD /R REGION.nombre
         
         adrres = jsonData.get('Address')
         adrres2 = jsonData.get('Address2')
         
+        idContacto = jsonData.get('ContactPersonCode')
         #consultar en base de datos con el id capturado
         
+        contacto = ContactoRepository.obtenerContacto(idContacto)
+        numerocontactoSAp = contacto.codigoInternoSap
         
         direccion1 = DireccionRepository.obtenerDireccion(adrres)
         direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)
