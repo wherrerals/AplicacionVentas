@@ -301,12 +301,19 @@ class Cotizacion(Documento):
             lineas = jsonData.get('DocumentLines', [])
             tipo_venta = self.tipoVentaTipoLineas(lineas)
         
+        print("TIPO DE VENTA 1", tipo_venta)
         #CAPTURAR ADDRES Y ADDRESS2 Y CONSULTAR LA BASE DE DATOS PARA CONCATENAR DIRECCION, COMUNA.nombre /R CIUDAD /R REGION.nombre
 
         transportationCode = jsonData.get('TransportationCode')
 
         if tipo_venta == 'NA' and transportationCode != '1':
             tipo_venta = 'RESE'
+        elif tipo_venta == 'PROY':
+            tipo_venta = 'PROY'
+        elif tipo_venta == 'ECCO':
+            tipo_venta = 'ECCO'
+            
+        print("TIPO DE VENTA 2", tipo_venta)
         
         adrres = jsonData.get('Address')
         adrres2 = jsonData.get('Address2')
@@ -339,8 +346,8 @@ class Cotizacion(Documento):
             'TransportationCode': jsonData.get('TransportationCode'),
             #'U_LED_NROPSH': jsonData.get('U_LED_NROPSH'),
             'U_LED_TIPVTA': tipo_venta,  # Tipo de venta calculado
-            'U_LED_TIPDOC': jsonData.get('U_LED_TIPDOC'), # Tipo de documento boleta o factura
-            'U_LED_FORENV': jsonData.get('TransportationCode'), # Forma de envio de la cotización
+            'U_LED_TIPDOC': jsonData.get('U_LED_TIPDOC'),
+            'U_LED_FORENV': jsonData.get('TransportationCode'),
         }
 
         # Datos de las líneas
@@ -363,7 +370,6 @@ class Cotizacion(Documento):
             for linea in lineas
         ]
 
-        # Combina cabecera y líneas en un solo diccionario
         return {
             **cabecera,
             'DocumentLines': lineas_json,
@@ -391,10 +397,18 @@ class Cotizacion(Documento):
         
         #CAPTURAR ADDRES Y ADDRESS2 Y CONSULTAR LA BASE DE DATOS PARA CONCATENAR DIRECCION, COMUNA.nombre /R CIUDAD /R REGION.nombre
 
+        print("TIPO DE VENTA 1", tipo_venta)
+        
         transportationCode = jsonData.get('TransportationCode')
 
         if tipo_venta == 'NA' and transportationCode != '1':
             tipo_venta = 'RESE'
+        elif tipo_venta == 'PROY':
+            tipo_venta = 'PROY'
+        elif tipo_venta == 'ECCO':
+            tipo_venta = 'ECCO'
+            
+        print("TIPO DE VENTA 2", tipo_venta)
         
         adrres = jsonData.get('Address')
         adrres2 = jsonData.get('Address2')

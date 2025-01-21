@@ -420,9 +420,11 @@ class APIClient:
         &$filter=Quotations/DocEntry eq 165332 and Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Quotations/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode
         """
         crossjoin = "Orders,SalesPersons,BusinessPartners/ContactEmployees"
-        expand = "Orders($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address,Address2,DocDate,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
+        expand = "Orders($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address,Address2,DocDate,DocDueDate,Comments,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
         filter = f"Orders/DocEntry eq {docEntry} and Orders/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Orders/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode"
         url = f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
+        
+        print("URL DE CARGA CLIENTE ODV", url)
 
         response = self.session.get(url, verify=False)
         response.raise_for_status()

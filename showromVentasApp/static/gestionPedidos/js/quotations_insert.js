@@ -145,6 +145,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const numeroCotizacion = document.getElementById('numero_cotizacion');
                     const esActualizacion = numeroCotizacion && numeroCotizacion.getAttribute('data-docentry');
 
+
                     // Determinar si es creación o actualización
                     const titulo = esActualizacion ? 'Cotización actualizada' : 'Cotización creada';
                     const mensaje = esActualizacion
@@ -163,6 +164,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         numeroCotizacion.textContent = `${data.docNum}`;
                         numeroCotizacion.setAttribute('data-docEntry', `${data.docEntry}`);
                     }
+
+                    console.log("Numero de cotizacion:", data.docNum);
+                    console.log("Numero de docEntry:", data.docEntry);
 
                     bloquearCampos();
 

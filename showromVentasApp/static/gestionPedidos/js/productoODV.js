@@ -162,7 +162,7 @@ class Producto {
                     </select>
                 </td>
                 <td td colspan="2" style="background: transparent;">
-                    <input class="form-control" type="date" name="fechaEntrega" style="width: 90%;font-size: 13px;" value="${this.fechaEntrega}">
+                    <input class="form-control" type="date" name="fechaEntrega" id="fecha_entrega_lineas" style="width: 90%;font-size: 13px;" value="${this.fechaEntrega}">
                 </td>
             </tr>
         `;

@@ -157,9 +157,9 @@ class OdvView(View):
             odv = OrdenVenta()  # Instancia del modelo o clase de negocio
 
             if docEntry:
-                print("Actualizando cotización con DocEntry:", docEntry)
+                print("Actualizando ODV con DocEntry:", docEntry)
                 # Si `DocEntry` está presente, se realiza una actualización
-                print("Actualizando cotización con DocEntry:", docEntry)
+                print("Actualizando ODV con DocEntry:", docEntry)
                 actualizacion = odv.actualizarDocumento(docnum, docEntry, data)
                 return JsonResponse(actualizacion, status=200)
             else:

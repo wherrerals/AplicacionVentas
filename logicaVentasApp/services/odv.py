@@ -2,6 +2,8 @@ import json
 from django.http import JsonResponse
 from requests import request
 from adapters.sl_client import APIClient
+from datosLsApp.repositories.contactorepository import ContactoRepository
+from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from logicaVentasApp.services.documento import Documento
 import logging
@@ -95,6 +97,8 @@ class OrdenVenta(Documento):
                 "Address": quotations.get("Address"),
                 "Address2": quotations.get("Address2"),
                 "DocDate": quotations.get("DocDate"),
+                "DocDueDate": quotations.get("DocDueDate"),
+                "Comments": quotations.get("Comments"),
                 "DocumentStatus": quotations.get("DocumentStatus"),
                 "Cancelled": quotations.get("Cancelled"),
                 "U_LED_TIPVTA": quotations.get("U_LED_TIPVTA"),
@@ -168,7 +172,7 @@ class OrdenVenta(Documento):
 
         try:
             docentry = int(docentry)
-            jsonData = self.prepararJsonODVAC(data)
+            jsonData = self.prepararJsonODV(data)
             
             client = APIClient()
 
@@ -176,8 +180,9 @@ class OrdenVenta(Documento):
 
             if 'success' in response:
                 return {
-                    'success': 'Cotización creada exitosamente',
-                    'docNum': docnum
+                    'success': 'Orden Venta creada exitosamente',
+                    'docNum': docnum,
+                    'docEntry': docentry
                 }
 
         
@@ -186,42 +191,6 @@ class OrdenVenta(Documento):
             
             return {'error': str(e)}
 
-    def prepararJsonODVAC(self, jsonData):
-        """
-        Prepara los datos JSON específicos de la cotización.
-
-        Args:
-            jsonData (dict): Datos de la cotización.
-        
-        Returns:
-            dict: Datos de la cotización preparados para ser enviados a SAP.
-        """
-            
-        # Determinar el tipo de venta basado en el vendedor
-
-        # Datos de las líneas
-        lineas = jsonData.get('DocumentLines', [])
-        lineas_json = [
-            {
-                'lineNum': linea.get('LineNum'),
-                'ItemCode': linea.get('ItemCode'),
-                'Quantity': linea.get('Quantity'),
-                'ShipDate': linea.get('ShipDate'),
-                'DiscountPercent': linea.get('DiscountPercent'),
-                'WarehouseCode': linea.get('WarehouseCode'),
-                'CostingCode': linea.get('CostingCode'),
-                'ShippingMethod': linea.get('ShippingMethod'),
-                'COGSCostingCode': linea.get('COGSCostingCode'),
-                'CostingCode2': linea.get('CostingCode2'),
-                'COGSCostingCode2': linea.get('COGSCostingCode2'),
-            }
-            for linea in lineas
-        ]
-
-        # Combina cabecera y líneas en un solo diccionario
-        return {
-            'DocumentLines': lineas_json,
-        }
 
     def crearDocumento(self, data):
         """
@@ -254,9 +223,11 @@ class OrdenVenta(Documento):
                 # Si contiene DocEntry, es un éxito
                 if 'DocEntry' in response:
                     doc_num = response.get('DocNum')
+                    doc_entry = response.get('DocEntry')
                     return {
-                        'success': 'Cotización creada exitosamente',
-                        'docNum': doc_num
+                        'success': 'Orden Venta creada exitosamente',
+                        'docNum': doc_num,
+                        'docEntry': doc_entry
                     }
                 
                 # Si contiene un mensaje de error, manejarlo
@@ -310,39 +281,49 @@ class OrdenVenta(Documento):
         return ' '.join(errores)
     
     def prepararJsonODV(self, jsonData):
-        """
-        Prepara los datos JSON específicos de la cotización.
 
-        Args:
-            jsonData (dict): Datos de la cotización.
-        
-        Returns:
-            dict: Datos de la cotización preparados para ser enviados a SAP.
-        """
-            
-        # Determinar el tipo de venta basado en el vendedor
-        print("Preparando JSON")
         codigo_vendedor = jsonData.get('SalesPersonCode')
         tipo_venta = self.tipoVentaTipoVendedor(codigo_vendedor)
         
-        # Si el tipo de venta por vendedor no es válido ('NA'), determinar por líneas
         if tipo_venta == 'NA':
             lineas = jsonData.get('DocumentLines', [])
             tipo_venta = self.tipoVentaTipoLineas(lineas)
+            
+            
+        adrres = jsonData.get('Address')
+        adrres2 = jsonData.get('Address2')
+        
+        idContacto = jsonData.get('ContactPersonCode')
+        
+        contacto = ContactoRepository.obtenerContacto(idContacto)
+        numerocontactoSAp = contacto.codigoInternoSap
+        
+        direccion1 = DireccionRepository.obtenerDireccion(adrres)
+        direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)
+        
+        addresmodif = f"{direccion1.calleNumero} {direccion1.comuna.nombre}\n{direccion1.ciudad}\n{direccion1.region.nombre}"
+        addresmodif2 = f"{direccionRepo2.calleNumero} {direccionRepo2.comuna.nombre}\n{direccionRepo2.ciudad}\n{direccionRepo2.region.nombre}"
+
+
         
         # Datos de la cabecera
         cabecera = {
             'DocDate': jsonData.get('DocDate'),
             'DocDueDate': jsonData.get('DocDueDate'),
             'TaxDate': jsonData.get('TaxDate'),
+            'ContactPersonCode': numerocontactoSAp,
+            'Address': addresmodif,
+            'Address2': addresmodif2,
             'CardCode': jsonData.get('CardCode'),
+            'NumAtCard': jsonData.get('NumAtCard'),
+            'Comments': jsonData.get('Comments'),
             'PaymentGroupCode': jsonData.get('PaymentGroupCode'),
             'SalesPersonCode': jsonData.get('SalesPersonCode'),
             'TransportationCode': jsonData.get('TransportationCode'),
             #'U_LED_NROPSH': jsonData.get('U_LED_NROPSH'),
-            'U_LED_TIPVTA': tipo_venta,  # Tipo de venta calculado
-            'U_LED_TIPDOC': jsonData.get('U_LED_TIPDOC'), # Tipo de documento boleta o factura
-            'U_LED_FORENV': jsonData.get('TransportationCode'), # Forma de envio de la cotización
+            'U_LED_TIPVTA': tipo_venta,
+            'U_LED_TIPDOC': jsonData.get('U_LED_TIPDOC'),
+            'U_LED_FORENV': jsonData.get('TransportationCode'),
         }
 
         # Datos de las líneas
@@ -353,6 +334,7 @@ class OrdenVenta(Documento):
                 'ItemCode': linea.get('ItemCode'),
                 'Quantity': linea.get('Quantity'),
                 'ShipDate': linea.get('ShipDate'),
+                'FreeText': linea.get('FreeText'),
                 'DiscountPercent': linea.get('DiscountPercent'),
                 'WarehouseCode': linea.get('WarehouseCode'),
                 'CostingCode': linea.get('CostingCode'),
@@ -364,7 +346,6 @@ class OrdenVenta(Documento):
             for linea in lineas
         ]
 
-        # Combina cabecera y líneas en un solo diccionario
         return {
             **cabecera,
             'DocumentLines': lineas_json,
@@ -378,6 +359,7 @@ class OrdenVenta(Documento):
         Args:
             tipo_venta (str): Tipo de venta.
         """
+        
         repo = VendedorRepository()
         tipo_vendedor = repo.obtenerTipoVendedor(codigo_vendedor)
 

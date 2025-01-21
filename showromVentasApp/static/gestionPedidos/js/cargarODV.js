@@ -27,30 +27,57 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(data => {
           if (data.Cliente && data.Cliente.SalesPersons) {
-            console.log("Datos de la cotización:", data);
+            console.log("Datos de la orden:", data);
   
             // Extracción de datos principales
             const salesEmployeeName = data.Cliente.SalesPersons.SalesEmployeeName;
             const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
             const numCotizacion = data.Cliente.Orders.DocNum;
-            const docDate = data.Cliente.Orders.DocDate;
+            const docDate = data.Cliente.Orders.DocDueDate;
             const canceled = data.Cliente.Orders.Cancelled;
             let cardCode = data.Cliente.Orders.CardCode;
             const DocumentStatus = data.Cliente.Orders.DocumentStatus;
             const docEntry = data.Cliente.Orders.DocEntry;
+            const tipoFactura = data.Cliente.Orders.U_LED_TIPDOC;
+            const referencia = data.Cliente.Orders.NumAtCard;
+            const comentarios = data.Cliente.Orders.Comments;
+            const tipoentrega = data.Cliente.Orders.TransportationCode;
 
-           //console log de todo
+            const tipoDocRadios = document.getElementsByName("tipoDocTributario");
 
-            console.log("docEntry: ", docEntry);
-            console.log("salesEmployeeName: ", salesEmployeeName);
-            console.log("sucursal: ", sucursal);
-            console.log("numCotizacion: ", numCotizacion);
-            console.log("docDate: ", docDate);
-            console.log("canceled: ", canceled);
-            console.log("cardCode: ", cardCode);
-            console.log("DocumentStatus: ", DocumentStatus);
-            console.log("docEntry: ", docEntry);
+          // Iterar sobre los radios para seleccionar el correspondiente
+          tipoDocRadios.forEach(radio => {
+            if (radio.value === tipoFactura) {
+              radio.checked = true; // Seleccionar el radio cuyo valor coincide con tipoFactura
+            }
+          });
 
+          if (referencia) {
+            const referenciaInput = document.getElementById("referencia");
+            if (referenciaInput) {
+              referenciaInput.value = referencia; // Asigna el valor capturado al input
+            } else {
+              console.warn("No se encontró el elemento con id 'referencia'.");
+            }
+          }
+
+          if (comentarios) {
+            const comentariotxt = document.getElementById("Observaciones-1");
+            if (comentariotxt) {
+              comentariotxt.value = comentarios; // Asigna el valor capturado al input
+            } else {
+              console.warn("No se encontró el elemento con id 'comentariotxt'.");
+            }
+          }
+
+          // Capturar el elemento del select
+          const tipoEntregaSelect = document.getElementById("tipoEntrega-1");
+
+          // Verificar si el elemento existe
+          if (tipoEntregaSelect) {
+            // Ajustar el valor del select al tipo de entrega obtenido
+            tipoEntregaSelect.value = tipoentrega;
+          }
   
             if (cardCode.endsWith("C")) {
               cardCode = cardCode.slice(0, -1);
@@ -78,9 +105,9 @@ document.addEventListener("DOMContentLoaded", function () {
               numeroCotizacionElement.textContent = `${numCotizacion}`;
             }
   
-            const dueDateElement = document.getElementById("docDueDate");
+            const dueDateElement = document.getElementById("fecha_entrega");
             if (dueDateElement) {
-              dueDateElement.textContent = `${docDate}`;
+              dueDateElement.value = `${docDate}`;
             }
   
             const estadoElement = document.querySelector('p strong[data-estado="bost_Open"]');
@@ -109,6 +136,11 @@ document.addEventListener("DOMContentLoaded", function () {
               const stockTotal = 0;
               const precioLista = line.GrossPrice;
               const precioDescuento = line.DiscountPercent;
+              const sucursal = line.WarehouseCode;
+              const comentario = line.FreeText;
+              const fechaEntrega = line.ShipDate;
+              const tipoentrega = line.ShippingMethod;
+
   
               console.log("Agregando producto con datos:", {
                 productoCodigo,
@@ -117,10 +149,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 precioVenta,
                 stockTotal,
                 precioLista,
-                precioDescuento
+                precioDescuento,
+                fechaEntrega
               });
   
-              agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal);
+              agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, tipoentrega, fechaEntrega);
             });
           }
 
@@ -147,7 +180,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const giroCliente = getQueryParam("giroSN");
     const telefonoCliente = getQueryParam("telefonoSN");
     const emailCliente = getQueryParam("emailSN");
-
 
 
     if (rutCliente) {
