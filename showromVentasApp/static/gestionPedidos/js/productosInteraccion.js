@@ -82,6 +82,7 @@ function agregarInteractividad(newRow, codigoProducto) {
 
     document.addEventListener('productoEliminado', function (event) {
         const codigoProducto = event.detail.codigoProducto;
+        console.log('Producto eliminado:', codigoProducto);
 
         // Buscar el índice del producto a eliminar
         const index = productos.findIndex(producto => producto.codigoProducto === codigoProducto);

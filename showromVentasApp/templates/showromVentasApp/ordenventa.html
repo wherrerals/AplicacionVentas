@@ -153,13 +153,13 @@
                             <!-- Columna derecha: Radio buttons -->
                             <div class="col-sm-6">
                               <div class="form-check">
-                                <input class="form-check-input" type="radio" id="formCheck-5" name="grupoSN" value="105" style="border-color: rgb(159,168,175);" checked="" 
+                                <input class="form-check-input" type="radio" id="formCheck-5" name="grupoSN" value="100" style="border-color: rgb(159,168,175);" checked="" 
                                 onchange="cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow')">
                                 <label class="form-check-label" for="formCheck-5">Persona</label>
                               </div>
   
                               <div class="form-check">
-                                <input class="form-check-input" type="radio" id="formCheck-6" name="grupoSN" value="100" style="border-color: rgb(159,168,175);" 
+                                <input class="form-check-input" type="radio" id="formCheck-6" name="grupoSN" value="105" style="border-color: rgb(159,168,175);" 
                                 onchange="cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow')">
                                 <label class="form-check-label" for="formCheck-6">Empresa</label>
                               </div>
@@ -359,10 +359,10 @@
           <label class="col-form-label" style="font-size: 13px;">Horario Entrega</label>
         </div>
         <div class="col" style="width: 20%;">
-          <select id="horario_entrega" class="form-select" style="font-size: 12px;border-color: rgb(159,168,175);">
+          <select id="horario_entrega" class="form-select" style="font-size: 12px;border-color: rgb(159,168,175);" disabled>
             <optgroup label="Horario">
-              <option value="12" selected="">AM</option>
-              <option value="13">PM</option>
+              <option value="12">AM</option>
+              <option value="13" selected="">PM</option>
             </optgroup>
           </select></div>
       </div>

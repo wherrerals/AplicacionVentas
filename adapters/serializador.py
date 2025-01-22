@@ -40,7 +40,8 @@ class Serializador:
             'CardName': nombre_completo,
             'Notes': "Persona",
             'FederalTaxID': datos['rutSN'],
-            'Cellular': datos['telefonoSN'],
+            'Phone2': datos['telefonoSN'],
+            'GroupCode': datos['tipoSN'],
             'EmailAddress': datos['emailSN'],
         }
     

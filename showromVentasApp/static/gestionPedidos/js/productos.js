@@ -76,7 +76,9 @@ class Producto {
                 <td style="font-size: 12px; background: transparent; border-style: none; padding-bottom: 0px;" rowspan="2">
                     <div class="row">
                         <div class="col-md-11 col-xxl-6" style="font-size: 14px; font-weight: bold;">
-                        <small id="indixe_producto">${contprod})</small><small>&nbsp;&nbsp;</small><small style="font-weight-bold" name="sku_producto">${this.productoCodigo}</small>
+                        <small id="indixe_producto">${contprod})</small>
+                        <small>&nbsp;&nbsp;</small>
+                        <small style="font-weight-bold" name="sku_producto">${this.productoCodigo}</small>
                         </div>
                         <div class="col-md-11 col-xxl-7" style="text-align: center;">
                             <img src="${this.imagen}" width="50" height="50" style="width: 50px;height: 50px;" name="img_producto">

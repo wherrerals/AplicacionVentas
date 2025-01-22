@@ -77,7 +77,10 @@ class Producto {
             <tr>
                 <td style="font-size: 12px;background: transparent;border-style: none;padding-bottom: 0px;"rowspan="2">
                     <div class="row">
-                        <div class="col-md-11 col-xxl-6" style="font-size: 14px;font-weight: bold;"><small style="font-weight: bold;"><small>${contprod})</small><small>&nbsp;&nbsp;</small><small name="sku_producto">${this.productoCodigo}</small></div>
+                        <div class="col-md-11 col-xxl-6" style="font-size: 14px;font-weight: bold;"><small style="font-weight: bold;">
+                        <small id="indixe_producto">${contprod})</small>
+                        <small>&nbsp;&nbsp;</small>
+                        <small name="sku_producto">${this.productoCodigo}</small></div>
                         <div class="col-md-11 col-xxl-7" style="text-align: center;"><img src="${this.imagen}" width="50" height="50" style="width: 50px;height: 50px;"></div>
                     </div>
                 </td>
@@ -238,11 +241,11 @@ class Producto {
         const docEntry = numeroOrdenElem?.getAttribute('data-docentry');
 
         // Verificar si hay un valor en data-docentry
-        if (docEntry) {
+/*         if (docEntry) {
             console.log("No se ejecuta limitarCantidad porque data-docentry tiene un valor:", numeroOrdenElem);
             return;
         }
-
+ */
         let cantidadInput = row.querySelector('#calcular_cantidad');
         let stockBodegaElem = row.querySelector('[name="stock_bodega"]'); // Referencia al elemento de stock
 
@@ -290,10 +293,32 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     });
 
     newRow.querySelector('#eliminarp').addEventListener('click', function () {
+        // Eliminar la fila del DOM
         newRow.remove();
-        const event = new CustomEvent('productoEliminado', { detail: { codigoProducto: productoCodigo } });
+    
+        // Emitir un evento personalizado pasando el código del producto
+        const event = new CustomEvent('productoEliminado', {
+            detail: { codigoProducto: productoCodigo }
+        });
+        console.log('Evento emitido:', event);
         document.dispatchEvent(event);
+    
+        // Actualizar los índices de los productos visibles
+        actualizarIndicesProductos();
     });
+    
+    function actualizarIndicesProductos() {
+        // Seleccionar todas las filas de los productos
+        const filasProductos = document.querySelectorAll('.product-row'); // Asegúrate de que las filas tengan esta clase
+        filasProductos.forEach((fila, index) => {
+            // Buscar el elemento que muestra el índice y actualizarlo
+            const indiceElemento = fila.querySelector('#indixe_producto'); // Ajusta el selector si es necesario
+            if (indiceElemento) {
+                indiceElemento.textContent = `${index + 1})`; // Actualiza el índice visible
+            }
+        });
+    }    
+
 
 
     // Validar que la cantidad no supere el stock
