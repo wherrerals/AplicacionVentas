@@ -1,5 +1,5 @@
 class Producto {
-    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, tipoEntrega, fechaEntrega = new Date().toISOString().split('T')[0]) {
+    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, tipoentrega2, fechaEntrega = new Date().toISOString().split('T')[0]) {
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
         this.imagen = imagen;
@@ -12,7 +12,7 @@ class Producto {
         this.cantidad = cantidad;
         this.sucursal = sucursal;
         this.comentario = comentario;
-        this.tipoEntrega = tipoEntrega;
+        this.tipoEntrega2 = tipoentrega2;
         this.fechaEntrega = fechaEntrega;
     }
 
@@ -70,7 +70,7 @@ class Producto {
 
 
 
-    crearFila(contprod, valorTipoEntrega) {
+    crearFila(contprod) {
         let newRow = document.createElement('tbody');
         newRow.className = 'product-row';
         newRow.innerHTML = `
@@ -155,9 +155,9 @@ class Producto {
                 <td style="font-size: 12px;background: transparent;" colspan="2">
                     <select class="form-select" id="tipoEntrega" style="font-size: 12px;">
                         <optgroup label="Entrega">
-                            <option value="1" ${valorTipoEntrega === '1' ? 'selected' : ''}>Directa</option>
-                            <option value="5" ${valorTipoEntrega === '5' ? 'selected' : ''}>Despacho</option>
-                            <option value="2" ${['2', '3', '4'].includes(valorTipoEntrega) ? 'selected' : ''}>Retiro</option>
+                            <option value="1" ${this.tipoEntrega2 == 1 ? 'selected' : ''}>Directa</option>
+                            <option value="5" ${this.tipoEntrega2 == 5 ? 'selected' : ''}>Despacho</option>
+                            <option value="2" ${this.tipoEntrega2 == 2 ? 'selected' : ''}>Retiro</option>
                         </optgroup>
                     </select>
                 </td>
@@ -272,14 +272,15 @@ class Producto {
 }
 
 
-function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, tipoEntrega, fechaEntrega) {
+function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, tipoEntrega2, fechaEntrega) {
+    
+    console.log("TIPO DE ENTREGA RECIBIDA: ", tipoEntrega2);
+
     let contprod = document.querySelectorAll('#productos tbody').length + 1; // Contador de productos
 
-    const tipoEntregaSeleccionado = document.getElementById('tipoEntrega-1')?.value || '1'; // Obtener el valor del tipo de entrega seleccionado
-
     // Crear instancia del producto
-    const producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, tipoEntregaSeleccionado, fechaEntrega);
-    const newRow = producto.crearFila(contprod, tipoEntregaSeleccionado); // Crear la fila del producto
+    const producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, tipoEntrega2, fechaEntrega);
+    const newRow = producto.crearFila(contprod); // Crear la fila del producto
 
     document.getElementById('productos').appendChild(newRow); // Agregar la fila al tbody
 

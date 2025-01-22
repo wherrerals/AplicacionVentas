@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(data => {
           if (data.Cliente && data.Cliente.SalesPersons) {
-            console.log("Datos de la orden:", data);
   
             // Extracción de datos principales
             const salesEmployeeName = data.Cliente.SalesPersons.SalesEmployeeName;
@@ -128,7 +127,6 @@ document.addEventListener("DOMContentLoaded", function () {
             // Iteración sobre `DocumentLines` para añadir cada producto
             const documentLines = data.DocumentLines;
             documentLines.forEach((line) => {
-              console.log("Producto: ", line)
               const productoCodigo = line.ItemCode;
               const nombre = line.ItemDescription;
               const imagen = 'ruta_a_la_imagen.jpg';
@@ -139,21 +137,10 @@ document.addEventListener("DOMContentLoaded", function () {
               const sucursal = line.WarehouseCode;
               const comentario = line.FreeText;
               const fechaEntrega = line.ShipDate;
-              const tipoentrega = line.ShippingMethod;
+              const tipoentrega2 = (line.ShippingMethod !== 1 && line.ShippingMethod !== 5) ? 2 : line.ShippingMethod;
 
   
-              console.log("Agregando producto con datos:", {
-                productoCodigo,
-                nombre,
-                imagen,
-                precioVenta,
-                stockTotal,
-                precioLista,
-                precioDescuento,
-                fechaEntrega
-              });
-  
-              agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, tipoentrega, fechaEntrega);
+              agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, tipoentrega2, fechaEntrega);
             });
           }
 

@@ -6,10 +6,8 @@ document.addEventListener("DOMContentLoaded", function () {
     function submitForm() {
         showLoadingOverlay();
 
-        // Capturar los datos del documento
+        // Capturar los datos de la cebezera del documento
         const fechaSolo = new Date().toISOString().split('T')[0]; // Salida en formato YYYY-MM-DD
-
-
         const docNum = document.getElementById("numero_orden").textContent;
         const docEntry = document.getElementById("numero_orden").getAttribute("data-docEntry")
         const docDate = fechaSolo; 
@@ -26,12 +24,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const direccion2 = selectElement.value;
         const selectElement2 = document.getElementById("direcciones_facturacion");
         const direccion = selectElement2.value;
-        console.log("Valor seleccionado:", direccion);
         const contactoCliente = document.getElementById("contactos_cliete");
         const contacto = contactoCliente.value;
         const trnasp = document.getElementById("tipoEntrega-1").value; 
         const ulfen = 1;
         const tipoDocElement = document.querySelector("[name='tipoDocTributario']:checked");
+
+
+        const horarioEntrega = document.getElementById("horario_entrega").value;
+        console.log(horarioEntrega);
+
         if (!tipoDocElement) {
             console.error("No se seleccionó un tipo de documento tributario.");
             return;
@@ -50,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const bodegaSelect = row.querySelector(".bodega-select");
             const warehouseCode = bodegaSelect ? bodegaSelect.value : null;
             const comentarios = row.querySelector("#comentarios-1").value;
+            const tipoEntregaLineas = row.querySelector("#tipoEntrega").value;
             const costingCode = warehouseCode;
             const cogsCostingCode = warehouseCode;
             const costingCode2 = "AV";
@@ -64,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "DiscountPercent": parseFloat(discount),
                 "WarehouseCode": warehouseCode,
                 "CostingCode": costingCode,
-                "ShippingMethod": trnasp,
+                "ShippingMethod": tipoEntregaLineas,
                 "COGSCostingCode": cogsCostingCode,
                 "CostingCode2": costingCode2,
                 "COGSCostingCode2": cogsCostingCode2,
@@ -72,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
             lines.push(line);
         });
 
-        // Crea el objeto final que será enviado en formato JSON
+        // Crea el objeto dcoumento final que será enviado en formato JSON
         const documentData = {
             "DocNum": docNum,
             "DocEntry": docEntry,

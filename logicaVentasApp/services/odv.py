@@ -140,7 +140,7 @@ class OrdenVenta(Documento):
                 "PriceAfterVAT": line.get("PriceAfterVAT"),
                 "LineTotal": line.get("LineTotal"),
                 "GrossTotal": line.get("GrossTotal"),
-                "ShipDate": line.get("ShipDate"),
+                "ShipDate": str(line.get("ShipDate")),
                 "Address": line.get("Address"),
                 "ShippingMethod": line.get("ShippingMethod"),
                 "FreeText": line.get("FreeText"),
@@ -328,6 +328,8 @@ class OrdenVenta(Documento):
 
         # Datos de las líneas
         lineas = jsonData.get('DocumentLines', [])
+        
+        lineas = self.ajustarShippingMethod(lineas)
         lineas_json = [
             {
                 'lineNum': linea.get('LineNum'),
@@ -382,6 +384,31 @@ class OrdenVenta(Documento):
         Args:
             lineas (list): Líneas de la cotización.
         """
-
+        
+        shipping_methods = set(linea.get('ShippingMethod') for linea in lineas)
         warehouses = set(linea.get('WarehouseCode') for linea in lineas)
-        return 'TIEN' if len(warehouses) == 1 else 'RESE'
+        
+        if len(shipping_methods) and len(warehouses) == 1:
+            return 'TIEN'
+        else:
+            return 'RESE'
+
+    @staticmethod
+    def ajustarShippingMethod(lineas):
+        """
+        Ajusta el valor de ShippingMethod para cada línea según las reglas dadas.
+        """
+        for linea in lineas:
+            shipping_method = linea.get('ShippingMethod')
+            warehouse_code = linea.get('WarehouseCode')
+
+            # Regla para ShippingMethod
+            if shipping_method == "2":
+                if warehouse_code == "LC":
+                    linea['ShippingMethod'] = "3"
+                elif warehouse_code == "ME":
+                    linea['ShippingMethod'] = "2"
+                elif warehouse_code == "PH":
+                    linea['ShippingMethod'] = "4"
+
+        return lineas
