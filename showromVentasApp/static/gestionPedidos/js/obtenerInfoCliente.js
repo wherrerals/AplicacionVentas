@@ -99,6 +99,8 @@ function actualizarContactos(contactos) {
     // Limpiar el select antes de agregar nuevos contactos
     selectContactos.empty();
 
+    console.log('Contactos:', contactos);
+
     // Verificar si hay contactos disponibles
     if (contactos && contactos.length > 0) {
         contactos.forEach(function(contacto) {
@@ -128,6 +130,8 @@ function actualizarContactos(contactos) {
 function actualizarDirecciones(direcciones, selectId, tipoDireccion) {
     let select = $(selectId); 
     select.empty();
+
+    console.log('Direcciones:', direcciones);
 
     // Filtrar las direcciones según el tipoDireccion
     const direccionesFiltradas = direcciones.filter(function(direccion) {
