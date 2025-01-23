@@ -245,3 +245,20 @@ $(document).ready(function () {
     }
 
 });
+
+document.addEventListener('direccionEliminada', function (event) {
+    const direccionId = event.detail.direccionId;
+    console.log('Producto eliminado:', direccionId);
+
+    // Buscar el índice del producto a eliminar
+    const index = direccion.findIndex(producto => producto.direccionId === direccionId);
+    console.log('Índice encontrado:', index);
+
+    if (index > -1) {
+        direccion.splice(index, 1);
+    }
+
+    // Imprimir el estado actual del array productos después de la eliminación
+    console.log('Estado actual del array productos:', direccion);
+
+});

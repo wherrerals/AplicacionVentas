@@ -53,6 +53,8 @@ class Serializador:
 
         tipo_direcciones = list({direccion.get('tipoDireccion') for direccion in datos if 'tipoDireccion' in direccion})
 
+        # Si no hay direcciones, retornar un diccionario vacío
+        # val
         tipo_direcciones_complementarios = ["13" if t == "12" else "12" for t in tipo_direcciones]
         print("TIPOS DE DIRECCIONES COMPLEMENTARIOS:", tipo_direcciones_complementarios)
 
@@ -82,6 +84,7 @@ class Serializador:
             })
 
             # Buscar complementaria en datos2
+            # Si la dirección es de tipo 12, buscar la complementaria de tipo 13 y viceversa
             tipo_complementario = "13" if tipo_direccion == "12" else "12"    
             complementaria = next((d for d in datos2 if d['tipoDireccion'] == tipo_complementario), None)
             # Evitar duplicados antes de agregar

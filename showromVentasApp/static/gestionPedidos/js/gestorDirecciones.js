@@ -36,16 +36,16 @@ class DireccionManager {
           <div class="row">
             <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
             <div class="col" style="text-align: center;">
-              <span style="font-weight: bold;">Dirección Nº ${this.contdir}</span></div>
+              <span style="font-weight: bold;" id="direcciones_indice">Dirección Nº ${this.contdir}</span></div>
             <div class="col-sm-12" style="height: 5px;background: transparent;"><span>&nbsp;</span></div>
           </div>
 
           <div class="row">
             <div class="col-sm-9"><span></span>
-              <div class="form-check">
+              <!--<div class="form-check" disabled>
                 <input class="form-check-input" type="radio" id="formCheck-1" name="dirDespacho" value="1" style="border-color: rgb(159,168,175);" checked="">
-                <label class="form-check-label" for="formCheck-3">Principal</label>
-              </div>
+                <label class="form-check-label" for="formCheck-3" >Principal</label>
+              </div>-->
             </div>
           </div>
   
@@ -238,7 +238,7 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                 <div class="row">
                                     <div class="col-sm-12" style="height: 15px; background: transparent;"><span>&nbsp;</span></div>
                                     <div class="col" style="text-align: center;">
-                                        <span style="font-weight: bold;">Dirección Nº${index + 1}</span>
+                                        <span style="font-weight: bold;" id="direcciones_indice">Dirección Nº${index + 1}</span>
                                     </div>
                                     <div class="col-sm-12" style="height: 5px; background: transparent;"><span>&nbsp;</span></div>
                                 </div>
@@ -403,9 +403,17 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
 
             $(`#eliminar_dir_${index}`).on('click', function () {
               if (confirm('¿Estás seguro que deseas eliminar esta direccion?')) {
+                // Remove the current address row
                 $(this).closest('.col-sm-5').remove();
+                
+                // Reindex all remaining address rows
+                $('.col-sm-5').each(function(newIndex) {
+                  // Update the direction number in the span
+                  $(this).find('#direcciones_indice').text(`Dirección Nº${newIndex - 1}`);
+                });
               }
             });
+
 
           });
         } else {

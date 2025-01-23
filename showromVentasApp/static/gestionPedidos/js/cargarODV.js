@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
               const sucursal = line.WarehouseCode;
               const comentario = line.FreeText;
               const fechaEntrega = line.ShipDate;
-              const tipoentrega2 = (line.ShippingMethod !== 1 && line.ShippingMethod !== 5) ? 2 : line.ShippingMethod;
+              const tipoentrega2 = line.ShippingMethod;
 
   
               agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, tipoentrega2, fechaEntrega);
@@ -154,6 +154,7 @@ document.addEventListener("DOMContentLoaded", function () {
           hideLoadingOverlay();
 
         });
+        
     } else {
       console.log("No se ha proporcionado un DocEntry en la URL.");
       hideLoadingOverlay();
