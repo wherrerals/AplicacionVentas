@@ -327,8 +327,8 @@ class Cotizacion(Documento):
         direccion1 = DireccionRepository.obtenerDireccion(adrres)
         direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)
         
-        addresmodif = f"{direccion1.calleNumero} {direccion1.comuna.nombre}\n{direccion1.ciudad}\n{direccion1.region.nombre}"
-        addresmodif2 = f"{direccionRepo2.calleNumero} {direccionRepo2.comuna.nombre}\n{direccionRepo2.ciudad}\n{direccionRepo2.region.nombre}"
+        addresmodif = f"{direccion1.calleNumero}, {direccion1.comuna.nombre}\n{direccion1.ciudad}\n{direccion1.region.nombre}"
+        addresmodif2 = f"{direccionRepo2.calleNumero}, {direccionRepo2.comuna.nombre}\n{direccionRepo2.ciudad}\n{direccionRepo2.region.nombre}"
         
         # Datos de la cabecera
         cabecera = {
@@ -422,8 +422,8 @@ class Cotizacion(Documento):
         direccion1 = DireccionRepository.obtenerDireccion(adrres)
         direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)
         
-        addresmodif = f"{direccion1.calleNumero} {direccion1.comuna.nombre}\n{direccion1.ciudad}\n{direccion1.region.nombre}"
-        addresmodif2 = f"{direccionRepo2.calleNumero} {direccionRepo2.comuna.nombre}\n{direccionRepo2.ciudad}\n{direccionRepo2.region.nombre}"
+        addresmodif = f"{direccion1.calleNumero}, {direccion1.comuna.nombre}\n{direccion1.ciudad}\n{direccion1.region.nombre}"
+        addresmodif2 = f"{direccionRepo2.calleNumero}, {direccionRepo2.comuna.nombre}\n{direccionRepo2.ciudad}\n{direccionRepo2.region.nombre}"
         
       
         cabecera = {

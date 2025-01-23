@@ -110,7 +110,7 @@ class SocioNegocio:
 
             print(f"Grupo de cliente: {grupo_sn}")
             # Determinar tipo de cliente
-            if grupo_sn == '100':
+            if grupo_sn == '105':
 
                 logger.info("Actualizando cliente persona...")
                 
@@ -497,7 +497,7 @@ class SocioNegocio:
         Raises:
             ValidationError: Si el apellido no se encuentra.
         """
-        if self.gruposn == '100':
+        if self.gruposn == '105':
             if not self.apellido :
                 raise ValidationError("Apellido no encontrado") 
         else:

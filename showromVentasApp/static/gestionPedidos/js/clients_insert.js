@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Capturando el valor del radio button seleccionado
         const grupoSNSeleccionado = document.querySelector('input[name="grupoSN"]:checked').value;
-        let tipoDoc = grupoSNSeleccionado === "100" ? "100" : "105"; // Asignar "Persona" o "Empresa"
+        let tipoDoc = grupoSNSeleccionado === "105" ? "105" : "100"; // Asignar "Persona" o "Empresa"
 
         const giro = document.getElementById("giroSN").value;
         const email = document.getElementById("emailSN").value;

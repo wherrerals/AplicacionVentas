@@ -2,8 +2,8 @@
 use led_studio;
 INSERT INTO GrupoSN (codigo, nombre)
 VALUES
-    ('105', 'Empresas'),
-    ('100', 'Persona Natural');
+    ('100', 'Empresas'),
+    ('105', 'Persona Natural');
 
 -- Insert para Tipo Cliente:
 use led_studio;

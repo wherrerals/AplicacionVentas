@@ -36,7 +36,7 @@ class DireccionManager {
           <div class="row">
             <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
             <div class="col" style="text-align: center;">
-              <span style="font-weight: bold;" id="direcciones_indice">Dirección Nº ${this.contdir}</span></div>
+              <span style="font-weight: bold;" id="direcciones_indice">Nueva Direccion</span></div>
             <div class="col-sm-12" style="height: 5px;background: transparent;"><span>&nbsp;</span></div>
           </div>
 
