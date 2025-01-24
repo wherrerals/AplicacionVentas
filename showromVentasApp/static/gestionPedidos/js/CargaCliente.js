@@ -38,8 +38,10 @@ document.addEventListener("DOMContentLoaded", function () {
                   document.getElementById("rutSN").setAttribute("data-rut", data[0].rut || '');
                   document.getElementById("rutSN").readOnly = true;
 
+                  console.log("Valor de data[0].grupoSN:", data[0].grupoSN);
+
                     // Lógica para seleccionar "Empresa" o "Persona"
-                    if (data[0].grupoSN && data[0].grupoSN.trim() !== "") {
+                    if (data[0].grupoSN == 100) {
                       // Si tiene razón social (giro), es "Empresa"
                       document.getElementById("formCheck-6").checked = true; // Empresa
                   } else {

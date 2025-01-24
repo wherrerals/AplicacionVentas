@@ -895,7 +895,8 @@ class SocioNegocio:
                         'clienteExportacion': socio.clienteExportacion or False,
                         'vendedor': socio.vendedor or '',
                         'direcciones': direcciones_formateadas,
-                        'contactos': contactos_formateados
+                        'contactos': contactos_formateados,
+                        'grupoSN': socio.grupoSN.codigo
                     }
                     
                     resultados_formateados.append(socio_formateado)
