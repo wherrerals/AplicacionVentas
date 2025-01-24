@@ -98,3 +98,11 @@ class ProductoRepository:
 
     def descuentoMax():
         pass
+    
+    def obtenerImagenProducto(codigo):
+        """
+        metodo para obtener la imagen por medio del codigo del producto
+        """
+        
+        producto = ProductoDB.objects.get(codigo=codigo)
+        return producto.imagen

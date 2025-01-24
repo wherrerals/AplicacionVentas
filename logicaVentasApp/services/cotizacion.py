@@ -2,8 +2,10 @@ import json
 from django.http import JsonResponse
 from requests import request
 from adapters.sl_client import APIClient
+from datosLsApp.models.productodb import ProductoDB
 from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
+from datosLsApp.repositories.productorepository import ProductoRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from logicaVentasApp.services.documento import Documento
 import logging
@@ -622,7 +624,8 @@ class Cotizacion(Documento):
 
         #print comments 
         print("COMENTARIOS", quotations.get("Comments"))
-
+        
+        
         # Formatear los datos de cliente
         cliente = {
             "Quotations": {
@@ -663,10 +666,17 @@ class Cotizacion(Documento):
             line = line_info.get("Quotations/DocumentLines", {})
             warehouse_info = line_info.get("Items/ItemWarehouseInfoCollection", {})
             
+            # obtener imagen por medio del codigo en la tabla de productos
+            
+            sku = line.get("ItemCode")
+            
+            imagen = ProductoRepository.obtenerImagenProducto(sku)
+            
             # Construye la línea
             document_line = {
                 "DocEntry": line.get("DocEntry"),
                 "LineNum": line.get("LineNum"),
+                "imagen": imagen,
                 "ItemCode": line.get("ItemCode"),
                 "ItemDescription": line.get("ItemDescription"),
                 "WarehouseCode": line.get("WarehouseCode"),

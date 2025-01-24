@@ -204,7 +204,9 @@
                 {% for producto in cotizacion.productos %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td>{{ producto.sku }}</td>
+                    <td>{{ producto.sku }}
+                        <img src="{{ producto.imagen }}" alt="{{ producto.descripcion }}" class="image">
+                    </td>
                     <td>
                         {{ producto.descripcion }}<br>
                         <span style="font-size: 10px; color: gray;">Entrega: {{ producto.entrega }}</span>

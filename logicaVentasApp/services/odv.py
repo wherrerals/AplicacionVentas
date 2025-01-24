@@ -4,6 +4,7 @@ from requests import request
 from adapters.sl_client import APIClient
 from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
+from datosLsApp.repositories.productorepository import ProductoRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from logicaVentasApp.services.documento import Documento
 import logging
@@ -126,9 +127,14 @@ class OrdenVenta(Documento):
             line = line_info.get("Orders/DocumentLines", {})
             warehouse_info = line_info.get("Items/ItemWarehouseInfoCollection", {})
             
+            sku = line.get("ItemCode")
+            
+            imagen = ProductoRepository.obtenerImagenProducto(sku)
+            
             document_line = {
                 "DocEntry": line.get("DocEntry"),
                 "LineNum": line.get("LineNum"),
+                "imagen": imagen,
                 "ItemCode": line.get("ItemCode"),
                 "ItemDescription": line.get("ItemDescription"),
                 "WarehouseCode": line.get("WarehouseCode"),

@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log("Producto: ", line)
             const productoCodigo = line.ItemCode;
             const nombre = line.ItemDescription;
-            const imagen = 'ruta_a_la_imagen.jpg';
+            const imagen = line.imagen;
             const precioVenta = line.PriceAfterVAT;
             const stockTotal = 0;
             const precioLista = line.GrossPrice;

@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
             documentLines.forEach((line) => {
               const productoCodigo = line.ItemCode;
               const nombre = line.ItemDescription;
-              const imagen = 'ruta_a_la_imagen.jpg';
+              const imagen = line.imagen;
               const precioVenta = line.PriceAfterVAT;
               const stockTotal = 0;
               const precioLista = line.GrossPrice;
