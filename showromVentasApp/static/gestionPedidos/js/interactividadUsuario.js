@@ -62,8 +62,13 @@ function cambiarLabel(razonSocialRadioName, nombreLabelId, apellidoInputId, apel
 function limpiarInformacionCliente() {
     // Limpia todos los campos relacionados con el cliente
     $('#inputCliente').val(''); 
+    
+
+    // limpia en cotizaciones y ordenes
     $('#numero_cotizacion').text('');
     $('#numero_cotizacion').removeAttr('data-docentry');
+    $('#numero_orden').text('');
+    $('#numero_orden').removeAttr('data-docentry');
     $('#rutSN').val('').removeAttr('data-rut');
     $('#inputCliente').removeAttr('data-rut').removeAttr('data-codigoSN');
     $('#resultadosClientes').empty();

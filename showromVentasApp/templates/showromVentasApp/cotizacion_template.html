@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -20,9 +21,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #f0f0f0;
+            background-color: black;
             padding: 20px;
-            border-bottom: 3px solid #004085;
+            border-bottom: 3px solid #947b3a;
         }
 
         .header .logo {
@@ -30,7 +31,7 @@
         }
 
         .header .cotizacion {
-            background-color: #004085;
+            background-color: #947b3a;
             color: #fff;
             padding: 10px 20px;
             font-size: 18px;
@@ -76,7 +77,7 @@
         }
 
         .table th {
-            background-color: #004085;
+            background-color: black;
             color: white;
             padding: 10px;
             text-align: left;
@@ -132,7 +133,7 @@
         }
 
         .bank-info h3 {
-            color: #004085;
+            color: black;
             font-size: 14px;
             margin-bottom: 5px;
         }
@@ -161,10 +162,10 @@
 <body>
     <!-- Encabezado -->
     <div class="header">
-        <img src="logo.png" alt="LED Studio Logo" class="logo">
+        {% load static %}
+        <img src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/a156f0f3-157a-40f7-b3b9-848ec960ed5a___19c4cc248f9416bc9d534b43493bd501.png" alt="LED Studio Logo" class="logo">
         <div class="cotizacion">COTIZACIÓN N°{{ cotizacion.numero }}</div>
     </div>
-    
     <!-- Información del cliente y detalles de la cotización -->
     <div class="info-section">
         <div class="info-box">
