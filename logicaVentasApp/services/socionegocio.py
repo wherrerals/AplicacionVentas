@@ -245,7 +245,7 @@ class SocioNegocio:
             JsonResponse: Mensaje de éxito o error según el resultado.
         """
         return SocioNegocioRepository.crearClienteEmpresa(
-            codigoSN=codigosn, nombre=self.nombre, razonSocial=self.razon_social, rut=self.rut, giro=self.giro,
+            codigoSN=codigosn, nombre=self.razon_social, razonSocial=self.razon_social, rut=self.rut, giro=self.giro,
             telefono=self.telefono, email=self.email, grupoSN=grupoSN, tipoSN=tiposn,
             tipoCliente=tipoCliente
         )
@@ -1043,7 +1043,7 @@ class SocioNegocio:
             print("Creando cliente empresa...")
             cliente = SocioNegocioRepository.crearClienteEmpresa(
                 codigoSN=socio_negocio["codigoSN"],
-                nombre=socio_negocio["nombre"],
+                nombre=socio_negocio["razonSocial"],
                 razonSocial=socio_negocio["razonSocial"],
                 email=socio_negocio["email"],
                 telefono=socio_negocio["telefono"],
