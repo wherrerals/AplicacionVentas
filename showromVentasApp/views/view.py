@@ -1045,4 +1045,13 @@ def generar_cotizacion_pdf(request, cotizacion_id):
     else:
         return HttpResponse('Método no permitido', status=405)
 
-
+def prueba(request):
+    conteo = APIClient().contarProductos()
+    
+    coteodata = conteo['value']
+    
+    for cont in coteodata:
+        print(cont.get('ItemsCount'))
+    
+    return JsonResponse(coteodata, safe=False)
+    

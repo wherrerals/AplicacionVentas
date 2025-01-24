@@ -10,7 +10,6 @@ import pika
 class Producto:
 
     def sync(self):
-
         # Obtener el valor de `skip` desde la base de datos
         state, created = SyncState.objects.get_or_create(
             key='product_sync_skip', 
@@ -21,13 +20,35 @@ class Producto:
         skip = state.value
         total_synced = 0
 
-        # Obtener productos desde la API de SalesLayer
+        # Crear instancia de APIClient
         cliente = APIClient()
+
+        # Obtener el valor total de productos desde la API
+        conteo = cliente.contarProductos()
+
+        # Validar si `conteo` tiene la estructura correcta
+        if isinstance(conteo, dict) and 'value' in conteo and len(conteo['value']) > 0:
+            first_item = conteo['value'][0]
+            if 'ItemsCount' in first_item:
+                total_items = first_item['ItemsCount']
+            else:
+                return "Error: No se encontró la clave 'ItemsCount' en el resultado."
+        else:
+            return "Error: El método contarProductos no retornó datos válidos."
+        
+        print(f"Total de productos: {total_items}")
+
+        # Verificar si `skip` ha alcanzado el total y reiniciar si es necesario
+        if skip >= total_items:
+            skip = 0
+            state.value = 0
+            state.save()
+
+        # Obtener productos desde la API de SalesLayer usando `skip`
         productos = cliente.obtenerProductosSL(skip=skip)
 
         # Si hay productos, sincronizarlos
-        if productos:  
-
+        if productos:
             # Serializar los productos
             serialcer = Serializador('json')
             jsonserializado = serialcer.formatearDatos(productos)
@@ -41,13 +62,13 @@ class Producto:
                 synced_count = len(jsonserializado)
                 total_synced += synced_count
                 
-                # Update skip state for next call
+                # Actualizar el valor de `skip` para la próxima llamada
                 state.value += synced_count
                 state.save()
-                
-                
-        # Retorna el mensaje con la cantidad de productos sincronizados
+
+        # Retornar el mensaje con la cantidad de productos sincronizados
         return f"{total_synced} productos sincronizados exitosamente"
+
     
     def obtenerReceta(self, codigo):
         cliente = APIClient()

@@ -160,7 +160,8 @@ class Serializador:
                 "Producto": {
                     "nombre": product_data.get("ItemName"),
                     "codigo": product_data.get("ItemCode"),
-                    "imagen": "imagen.jpg",  # Este dato debería ser dinámico si existe en el JSON
+                    "marca": product_data.get("U_LED_MARCA"),
+                    "costo": product_data.get("AvgStdPrice"),
                 }
             }
 

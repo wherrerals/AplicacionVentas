@@ -702,4 +702,12 @@ class APIClient:
         print(url)
 
         return response.json()
-    
+
+    def contarProductos(self):
+        self.__login()
+        url = f"{self.base_url}Items?$apply=aggregate($count as ItemsCount)&$filter=SalesItem eq 'tYES'"
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print("url del conteo", url)
+        print(response.json())
+        return response.json()

@@ -22,7 +22,8 @@ class ProductoRepository:
                 codigo=producto_info["codigo"],
                 defaults={
                     "nombre": producto_info.get("nombre", "Nombre no disponible"),
-                    "imagen": producto_info.get("imagen", ""),
+                    "marca": producto_info.get("marca", "Sin Marca"),
+                    "costo": producto_info.get("costo", 0.0),
                     "precioLista": next(
                         (precio["precio"] for precio in product_data.get("Precios", []) if precio["priceList"] == 1),
                         0.0,
@@ -93,3 +94,7 @@ class ProductoRepository:
         # Actualizar el campo stockTotal en el producto
         producto.stockTotal = stock_total
         producto.save()
+
+
+    def descuentoMax():
+        pass

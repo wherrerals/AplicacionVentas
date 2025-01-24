@@ -56,6 +56,7 @@ urlpatterns = [
     path('pruebas/', view.pryebas, name='pruebas'),
     path('cotizacion/<int:cotizacion_id>/pdf/', view.generar_cotizacion_pdf, name='cotizacion_pdf'),
     path('get_vendedor_sucursal/', view.get_vendedor_sucursal, name='get_vendedor_sucursal'),
+    path('prueba/', view.prueba, name='prueba'),
     #path('obtener_receta/', view.pryebas, name='obtener_receta'),
 ]
 
