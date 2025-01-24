@@ -39,25 +39,6 @@ function toggleRepeatPassword() {
 toggleRepeatPassword();
 
 
-document.getElementById("tipoEntrega-1").addEventListener("change", function() {
-    const newValue = ["2","3","4"].includes(this.value) ? "2" : this.value;
-    document.querySelectorAll("#tipoEntrega").forEach(select => select.value = newValue);
-});
-
-// Agregamos un event listener al elemento fecha_entrega
-document.getElementById('fecha_entrega').addEventListener('change', function() {
-    // Obtenemos el valor seleccionado
-    const fechaSeleccionada = this.value;
-    
-    // Obtenemos todos los elementos con id fecha_entrega_lineas
-    const elementosFechaLineas = document.querySelectorAll('#fecha_entrega_lineas');
-    
-    // Actualizamos el valor de cada elemento
-    elementosFechaLineas.forEach(function(elemento) {
-        elemento.value = fechaSeleccionada;
-    });
-});
-
 // archivo formularioReactivo.js
 
 function cambiarLabel(razonSocialRadioName, nombreLabelId, apellidoInputId, apellidolabelId) {
@@ -233,3 +214,21 @@ function handleAction(action) {
 
 }
 
+document.getElementById("tipoEntrega-1").addEventListener("change", function() {
+    const newValue = ["2","3","4"].includes(this.value) ? "2" : this.value;
+    document.querySelectorAll("#tipoEntrega").forEach(select => select.value = newValue);
+});
+
+// Agregamos un event listener al elemento fecha_entrega
+document.getElementById('fecha_entrega').addEventListener('change', function() {
+    // Obtenemos el valor seleccionado
+    const fechaSeleccionada = this.value;
+    
+    // Obtenemos todos los elementos con id fecha_entrega_lineas
+    const elementosFechaLineas = document.querySelectorAll('#fecha_entrega_lineas');
+    
+    // Actualizamos el valor de cada elemento
+    elementosFechaLineas.forEach(function(elemento) {
+        elemento.value = fechaSeleccionada;
+    });
+});

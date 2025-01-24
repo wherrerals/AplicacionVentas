@@ -213,6 +213,7 @@ function initDireccionManager() {
 
 // Función para cargar direcciones del cliente seleccionado
 function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
+  console.log("Cargando direcciones del cliente:", clienteRut, "Tipo:", tipoDireccion);
   let buscarClientesUrl = '/ventas/buscar_clientes/';
 
   $.ajax({

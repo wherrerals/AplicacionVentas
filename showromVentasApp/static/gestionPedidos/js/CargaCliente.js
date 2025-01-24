@@ -220,6 +220,7 @@ function cargarContactos() {
 
 // Función para cargar direcciones
 function cargarDirecciones() {
+  console.log("Encargado de ejecutar direcciones...");
   const clienteRut = $('#rutSN').attr('data-rut');
   console.log("Valor de clienteRut para direcciones:", clienteRut);
 

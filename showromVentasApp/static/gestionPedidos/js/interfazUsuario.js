@@ -38,11 +38,6 @@ function formatCurrency(value) {
     return `$ ${formattedValue}`;
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    const today = new Date();
-    const formattedDate = today.toISOString().split('T')[0]; // Formato YYYY-MM-DD
-    document.getElementById('fecha_entrega').value = formattedDate;
-});
 
 // Oculta el botón de acciones si no hay número de cotización y deshabilita campos relacionados
 document.addEventListener('DOMContentLoaded', function () {
@@ -53,6 +48,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const botonAcciones = document.querySelector('.btn.btn-primary.dropdown-toggle');
     const btn = document.querySelector('#botonacciones');
+    const btn2 = document.querySelector('#botonmodalcontacto');
+    const botonGuardado = document.querySelector('#saveButton');
+    const botonGuardado2 = document.querySelector('#saveButton2');
+
+    const estadoElemento = document.querySelector('#estado'); // Elemento para verificar estado
+
 
     // Campos que se deben deshabilitar
     const camposADeshabilitar = [
@@ -66,6 +67,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function checkElementos() {
         const tieneTexto = elementosMonitoreados.some(elemento => elemento.textContent.trim() !== '');
+        const noTieneTexto = elementosMonitoreados.every(elemento => elemento.textContent.trim() === '');
+        const estado = estadoElemento ? estadoElemento.textContent.trim() : '';
+        const esEstadoInvalido = estado === "Cancelado" || estado === "Cerrado";
+
 
         // Ocultar o mostrar el botón de acciones
         botonAcciones.style.display = tieneTexto ? 'inline-block' : 'none';
@@ -73,10 +78,22 @@ document.addEventListener('DOMContentLoaded', function () {
         // Ocultar o mostrar el botón de acciones en la vista de impresión
         btn.style.display = tieneTexto ? 'inline-block' : 'none';
 
+        // Ocultar o mostrar el botón de acciones en la vista de impresión
+        botonGuardado.style.display = tieneTexto && !esEstadoInvalido ? 'inline-block' : 'none';
+        botonGuardado2.style.display = tieneTexto && !esEstadoInvalido ? 'inline-block' : 'none';
+
+        // Ocultar o mostrar el botón de acciones en la vista de impresión
+        btn2.style.display = noTieneTexto ? 'inline-block' : 'none';
+
         // Deshabilitar o habilitar campos
         camposADeshabilitar.forEach(campo => {
             campo.disabled = tieneTexto;
         });
+
+        if (estado === "Abierta") {
+            botonGuardado.style.display = 'inline-block';
+            botonGuardado2.style.display = 'inline-block';
+        }
     }
 
     // Verificar el estado inicial
@@ -89,3 +106,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+    document.getElementById('fecha_entrega').value = formattedDate;
+});

@@ -34,6 +34,7 @@ $(document).ready(function(){
 // Función para traer la información completa del cliente
 function traerInformacionCliente(clienteId) {
 
+    console.log("Cliente seleccionado, trayendo información del cliente...");
     // si el numero tiene un - se elimina y lo que este al lado derecho se elimina
     if(clienteId.includes("-")){
         clienteId = clienteId.split("-")[0];
@@ -75,8 +76,11 @@ function traerInformacionCliente(clienteId) {
                 }
                 
                 // Actualizar los contactos y direcciones del cliente seleccionado
+                console.log('actualizarContactos:', cliente.contactos);
                 actualizarContactos(cliente.contactos);
+                console.log('actualizarDirecciones:', cliente.direcciones);
                 actualizarDirecciones(cliente.direcciones, '#direcciones_despacho', "12");
+                console.log('actualizarDirecciones:', cliente.direcciones);
                 actualizarDirecciones(cliente.direcciones, '#direcciones_facturacion', "13");
 
                 // Llamar a la función para cargar la información del cliente en el modal

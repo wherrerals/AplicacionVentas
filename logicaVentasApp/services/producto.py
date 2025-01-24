@@ -155,6 +155,72 @@ class Producto:
         return list(receta_unificada.values())
 
 
+    def reporteProductos(data):
+
+        """
+        Construye los filtros para la consulta de cotizaciones basados en los datos proporcionados.
+
+        Args:
+            data (dict): Datos de la consulta.
+
+        Returns:
+            dict: Filtros para la consulta de cotizaciones.
+        """
+
+        filters = {}
+
+        if data.get('fecha_doc'):
+            filters['Quotations/DocDate ge'] = str(f"'{data.get('fecha_doc')}'")
+            filters['Quotations/DocDate le'] = str(f"'{data.get('fecha_doc')}'")
+        if data.get('fecha_inicio'):
+            filters['Quotations/DocDate ge'] = str(f"'{data.get('fecha_inicio')}'")
+        if data.get('fecha_fin'):
+            filters['Quotations/DocDate le'] = str(f"'{data.get('fecha_fin')}'")
+        if data.get('docNum'):
+            docum = int(data.get('docNum'))
+            filters['contains(Quotations/DocNum,'] = f"{docum})"
+
+        if data.get('carData'):
+            car_data = data.get('carData')
+            
+            if car_data.isdigit():  # Si es un número
+                filters['contains(Quotations/CardCode,'] = f"'{car_data}')"
+            else:  # Si contiene letras (nombre)
+                filters['contains(Quotations/CardName,'] = f"'{car_data}')"
+
+        if data.get('salesEmployeeName'):
+            numecode = int(data.get('salesEmployeeName'))
+            filters['contains(SalesPersons/SalesEmployeeCode,'] = f"{numecode})" 
+        
+        #if data.get('DocumentStatus'):
+        #   filters['Quotations/DocumentStatus eq'] = f"'{data.get('DocumentStatus')}'"
+
+        #if data.get('cancelled'):
+        #    filters['Quotations/Cancelled eq'] = f"'{data.get('cancelled')}'"
+
+        if data.get('DocumentStatus'):
+            document_status = data.get('DocumentStatus')
+
+            if document_status == 'O':
+                filters['Quotations/DocumentStatus eq'] = "'O'"
+            elif document_status == 'C':
+                filters['Quotations/DocumentStatus eq'] = "'C'"
+                filters['Quotations/Cancelled eq'] = "'N'"
+                
+            else:
+                filters['Quotations/Cancelled eq'] = "'Y'"
+
+        if data.get('docTotal'):
+            docTotal = float(data.get('docTotal'))
+            filters['Quotations/DocTotal eq'] = f"{docTotal}"
+
+
+        # Limpiar filtros vacíos o inválidos
+        filters = {k: v for k, v in filters.items() if v and v != "''"}
+
+        return filters
+
+
         
 """
 
