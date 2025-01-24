@@ -176,6 +176,12 @@ class ComunaDBper(admin.ModelAdmin):
 
 class stockBodegasDBper(admin.ModelAdmin):
     list_display = ('idProducto', 'idBodega', 'stock', 'stockDisponibleReal')
+    
+class ConfiDescuentosDBper(admin.ModelAdmin):
+    list_display = ('codigo', 'descripcion', 'tipoVenta', 'limiteDescuentoMaximo', 'tipoDeMarca')
+
+class ConfiEmpresaDBper(admin.ModelAdmin):
+    list_display = ('id','razonsocial', 'rut', 'direccion', 'rentabilidadBrutaMin', 'rentabilidadBrutaConAut')
 
 # Register your models here.
 admin.site.register(TipoDocTributarioDB, TipoDocTributarioDBper)
@@ -199,5 +205,5 @@ admin.site.register(TipoClienteDB, TipoClienteDBper)
 admin.site.register(ComunaDB, ComunaDBper)
 admin.site.register(RegionDB, RegionDBper)
 admin.site.register(StockBodegasDB, stockBodegasDBper)
-admin.site.register(ConfiDescuentosDB)
-admin.site.register(ConfiEmpresaDB)
+admin.site.register(ConfiDescuentosDB, ConfiDescuentosDBper)
+admin.site.register(ConfiEmpresaDB, ConfiEmpresaDBper)

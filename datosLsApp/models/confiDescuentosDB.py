@@ -15,5 +15,4 @@ class ConfiDescuentosDB(models.Model):
 
 
     def __str__(self):
-        return f"{self.descripcion}"
-    
+        return f"{self.codigo} - {self.descripcion} - {self.tipoVenta} - {self.limiteDescuentoMaximo} - {self.tipoDeMarca}"    
