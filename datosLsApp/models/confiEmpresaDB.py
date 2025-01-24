@@ -16,4 +16,4 @@ class ConfiEmpresaDB(models.Model):
     rentabilidadBrutaConAut = models.IntegerField(null = False)
 
     def __str__(self):
-        return f"{self.razonsocial} - {self.rut} - {self.direccion} - {self.rentabilidadBrutaMin} - {self.rentabilidadBrutaConAut}"
+        return f"{ self.id} - {self.razonsocial} - {self.rut} - {self.direccion} - {self.rentabilidadBrutaMin} - {self.rentabilidadBrutaConAut}"
