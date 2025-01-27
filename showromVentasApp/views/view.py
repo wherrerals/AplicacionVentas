@@ -691,7 +691,7 @@ def busquedaProductos(request):
                                    'precio': producto.precioVenta,
                                    'stockTotal': producto.stockTotal,
                                    'precioAnterior': producto.precioLista,
-                                   'maxDescuento': producto.dsctoMaxTienda} for producto in resultados]
+                                   'maxDescuento': producto.dsctoMaxTienda * 100} for producto in resultados]
         
         print("mostrar stock total", resultados_formateados)
         return JsonResponse({'resultados': resultados_formateados})

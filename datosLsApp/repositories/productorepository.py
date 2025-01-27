@@ -3,6 +3,28 @@ from django.db.models import Sum
 
 
 class ProductoRepository:
+    def calculate_margen_descuentos(self, precio_venta, costo, rentabilidad_minima):
+        """
+        Calcula el margen bruto y el descuento máximo.
+        
+        Args:
+            precio_venta (float): Precio de venta del producto.
+            costo (float): Costo del producto.
+            rentabilidad_minima (float): Rentabilidad mínima en porcentaje.
+
+        Returns:
+            tuple: Margen bruto y descuento máximo.
+        """
+        if precio_venta <= 0:
+            print("Advertencia: El precio de venta debe ser mayor a 0.")
+            return 0, 0
+        
+        precio_sin_iva = precio_venta / 1.19  # Calcular el precio sin IVA
+        margen_bruto = (precio_sin_iva - costo) / precio_sin_iva
+        descuento_maximo = margen_bruto - (rentabilidad_minima / 100)
+        
+        return margen_bruto, max(descuento_maximo, 0)  # Asegurar que no sea negativo
+
     def sync_products_and_stock(self, products):
         """
         Sincroniza los productos y su stock en bodegas.
@@ -10,13 +32,8 @@ class ProductoRepository:
         Args:
             products (list): Lista de diccionarios con datos de productos y su stock.
         """
+        rentabilidad_minima = 50
 
-        rentabilidadMinima = 50
-        # formula para obtener el margen bruto
-        # (Precio Venta / 1,19) - Costo / (Precio Venta / 1,19)
-        # obtener ambos descuentos maximos tienda y proyectos son el mismo 
-        # Margen Bruto - (Rentabilidad Mínima / 100)
-        
         for product_data in products:
             # Acceder al producto correctamente
             producto_info = product_data.get("Producto", {}).get("Producto")
@@ -24,23 +41,31 @@ class ProductoRepository:
                 print(f"Advertencia: Producto inválido o sin código. Datos: {product_data}")
                 continue  # Saltar este producto
 
+            # Calcular margen bruto y descuentos máximos
+            precio_venta = next(
+                (precio["precio"] for precio in product_data.get("Precios", []) if precio["priceList"] == 2),
+                0.0,
+            )
+            costo = producto_info.get("costo", 0.0)
+            
+            margen_bruto, descuento_maximo = self.calculate_margen_descuentos(
+                precio_venta, costo, rentabilidad_minima
+            )
+
             # Sincronizar ProductoDB
             producto, _ = ProductoDB.objects.update_or_create(
                 codigo=producto_info["codigo"],
                 defaults={
                     "nombre": producto_info.get("nombre", "Nombre no disponible"),
                     "marca": producto_info.get("marca", "Sin Marca"),
-                    "costo": producto_info.get("costo", 0.0),
+                    "costo": costo,
                     "precioLista": next(
                         (precio["precio"] for precio in product_data.get("Precios", []) if precio["priceList"] == 1),
                         0.0,
                     ),
-                    "precioVenta": next(
-                        (precio["precio"] for precio in product_data.get("Precios", []) if precio["priceList"] == 2),
-                        0.0,
-                    ),
-                    "dsctoMaxTienda": product_data.get("dsctoMaxTienda", 0.0),
-                    "dctoMaxProyectos": product_data.get("dctoMaxProyectos", 0.0),
+                    "precioVenta": precio_venta,
+                    "dsctoMaxTienda": descuento_maximo,
+                    "dctoMaxProyectos": descuento_maximo,
                     "linkProducto": product_data.get("linkProducto", ""),
                 },
             )
@@ -53,6 +78,7 @@ class ProductoRepository:
                 self.update_stock_total(producto)
 
         return True
+
 
     def sync_stock(self, producto, bodegas):
         """
