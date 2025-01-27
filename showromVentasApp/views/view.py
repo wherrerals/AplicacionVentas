@@ -685,18 +685,36 @@ def busquedaProductos(request):
         # Realiza la consulta a la base de datos para obtener los resultados
         resultados = ProductoDB.objects.filter(codigo__icontains=numero)
         # Convierte los resultados en una lista de diccionarios
-        resultados_formateados = [{'codigo': producto.codigo,
-                                   'nombre': producto.nombre,
-                                   'imagen': producto.imagen,
-                                   'precio': producto.precioVenta,
-                                   'stockTotal': producto.stockTotal,
-                                   'precioAnterior': producto.precioLista,
-                                   'maxDescuento': producto.dsctoMaxTienda * 100} for producto in resultados]
+        resultados_formateados = [
+            {
+                'codigo': producto.codigo,
+                'nombre': producto.nombre,
+                'imagen': producto.imagen,
+                'precio': producto.precioVenta,
+                'stockTotal': producto.stockTotal,
+                'precioAnterior': producto.precioLista,
+                'maxDescuento': limitar_descuento(producto),  # Aplica el nuevo método aquí
+            }
+            for producto in resultados
+        ]
         
         print("mostrar stock total", resultados_formateados)
         return JsonResponse({'resultados': resultados_formateados})
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
+    
+def limitar_descuento(producto):
+    """
+    Limita el descuento máximo según el tipo de producto.
+    Si el producto es LST y el descuento es mayor que 15%, lo ajusta a 15%.
+    Para otros productos, si el descuento es mayor que 10%, lo ajusta a 10%.
+    """
+    if producto.marca == 'LST':
+        return min(producto.dsctoMaxTienda * 100, 15)
+    else:
+        return min(producto.dsctoMaxTienda * 100, 10)
+
+
 
 
 
