@@ -10,6 +10,13 @@ class ProductoRepository:
         Args:
             products (list): Lista de diccionarios con datos de productos y su stock.
         """
+
+        rentabilidadMinima = 50
+        # formula para obtener el margen bruto
+        # (Precio Venta / 1,19) - Costo / (Precio Venta / 1,19)
+        # obtener ambos descuentos maximos tienda y proyectos son el mismo 
+        # Margen Bruto - (Rentabilidad Mínima / 100)
+        
         for product_data in products:
             # Acceder al producto correctamente
             producto_info = product_data.get("Producto", {}).get("Producto")

@@ -14,9 +14,9 @@ class ProductoDB(models.Model):
     precioVenta = models.FloatField(null = False)
     dsctoMaxTienda = models.FloatField()
     dctoMaxProyectos = models.FloatField()
-    linkProducto = models.CharField(max_length=255,null = False)
+    linkProducto = models.CharField(max_length=255, null=False)
     marca = models.CharField(max_length=20, default="Sin Marca", null=True) 
-    costo = models.FloatField(default=0.0)
+    costo = models.FloatField(default=0,null=False)
 
     def __str__(self):
         return self.codigo
