@@ -6,6 +6,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const getSkip = (page) => (page - 1) * recordsPerPage;
 
+    // Capturar el valor dinámico seleccionado por defecto en el filtro del vendedor
+    const vendedorSelect = document.querySelector('#filtro_vendedor');
+    const defaultVendedorValue = vendedorSelect.value; // Obtener el valor seleccionado por defecto
+
+    activeFilters['salesEmployeeName'] = defaultVendedorValue;
+
+
     const applyFiltersAndFetchData = (filters, page = 1) => {
         showLoadingOverlay();
         const skip = getSkip(page); // Calcular el número de registros a omitir
@@ -223,7 +230,7 @@ showLoadingOverlay();
             fecha_doc: document.querySelector('[name="fecha_documento"]').value,
             docNum: document.querySelector('[name="docNum"]').value,
             carData: document.querySelector('[name="cardName"]').value,
-            salesEmployeeName: document.querySelector('[name="salesEmployeeName"]').value,
+            salesEmployeeName: document.querySelector('#filtro_vendedor').value,
             DocumentStatus: document.querySelector('[name="DocumentStatus"]').value,
             docTotal: document.querySelector('[name="docTotal"]').value
         };

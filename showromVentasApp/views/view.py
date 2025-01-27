@@ -138,7 +138,25 @@ def list_quotations(request):
         HttpResponse: renderiza el template 'lista_cotizaciones.html' 
     """
     
-    return render(request, "lista_cotizaciones.html")
+    if request.user.is_authenticated:
+        username = request.user.username
+
+        try:
+            usuario = UsuarioDB.objects.get(usuarios=request.user)
+            nombreUser = usuario.nombre
+
+
+        except UsuarioDB.DoesNotExist:
+            return JsonResponse({'error': 'No se encontró el usuario relacionado con el usuario autenticado'}, status=404)
+        
+
+        
+        context = {
+            'username': username,
+            'nombreuser': nombreUser,
+        }
+    
+    return render(request, "lista_cotizaciones.html", context)
 
 def enlazarComunas(request):
     """

@@ -131,10 +131,12 @@
                       <select class="form-select" id="filtro_vendedor" name="salesEmployeeName" placeholder="Nombre del Vendedor" style="width: 90px;font-size: 12px;">
                         <optgroup label="--">
                           {% if 'Vendedor' in grupos_usuario  or 'Administrador' in grupos_usuario%}
-                          <option value="20">Míos</option>
+                            {% if username %}
+                              <option value="{{codigo_vendedor}}" selected="">Míos</option>
+                            {% endif %}
                           {% endif %}
                           {% if 'Administrador' in grupos_usuario %}
-                          <option value="" selected="">Todos</option>
+                          <option value="">Todos</option>
                           {% endif %}
                         </optgroup>
                       </select>
@@ -155,7 +157,8 @@
                     <div>
                       <select class="form-select" id="filtro_estado" name="DocumentStatus" placeholder="Estado del Documento" style="width: 100px;font-size: 12px;">
                         <optgroup label="Estado">
-                          <option value="O" selected="">Abierto</option>
+                          <option value="" selected="">Todos</option>
+                          <option value="O" >Abierto</option>
                           <option value="C">Cerrado</option>
                           <option value="Y">Cancelado</option>
                         </optgroup>
