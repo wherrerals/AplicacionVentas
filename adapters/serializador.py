@@ -1,5 +1,6 @@
 import json
 
+from datosLsApp.repositories.comunarepository import ComunaRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.regionrepository import RegionRepository
 from datosLsApp.repositories.socionegociorepository import SocioNegocioRepository
@@ -66,12 +67,17 @@ class Serializador:
             if not tipo_direccion:
                 continue
 
+            id_comuna = direccion.get('comuna')
+            comunas = ComunaRepository().obtenerComunaPorId(id_comuna)
+            
+            print("COMUNA:", comunas)
+
             direcciones_mapeadas.append({
                 'RowNum': direccion.get('rowNum', ''),
                 'AddressName': direccion.get('nombreDireccion'),
                 'Street': direccion.get('direccion'),
                 'City': direccion.get('ciudad'),
-                'County': direccion.get('comuna'),
+                'County': f"{comunas.codigo} - {comunas.nombre}",
                 'Country': 'CL',
                 'State': int(direccion.get('region')),
                 'FederalTaxID': cardCode,
@@ -84,12 +90,20 @@ class Serializador:
 
             for complementaria in complementarias:
                 if not any(d['AddressName'] == complementaria.get('nombreDireccion', '') for d in direcciones_mapeadas):
+                    
+                    id_comuna = direccion.get('comuna')        
+                    # Buscar la comuna por id 
+                    comunas = ComunaRepository().obtenerComunaPorId(id_comuna)
+                    
+                    print("COMUNA XX1:", comunas)
+
+                    
                     direcciones_mapeadas.append({
                         'RowNum': complementaria.get('rowNum', ''),
                         'AddressName': complementaria.get('nombreDireccion'),
                         'Street': complementaria.get('direccion'),
                         'City': complementaria.get('ciudad'),
-                        'County': complementaria.get('comuna'),
+                        'County': f"{comunas.codigo} - {comunas.nombre}",
                         'Country': "CL",
                         'State': complementaria.get('region'),
                         'FederalTaxID': cardCode,
@@ -99,12 +113,19 @@ class Serializador:
 
         for direccion_db in datos2:
             if not any(d['AddressName'] == direccion_db.get('nombreDireccion', '') for d in direcciones_mapeadas):
+                
+                id_comuna = direccion.get('comuna')        
+                # Buscar la comuna por id 
+                comunas = ComunaRepository().obtenerComunaPorId(id_comuna)
+                
+                print("COMUNA XX2:", comunas)
+                
                 direcciones_mapeadas.append({
                     'RowNum': direccion_db.get('rowNum', ''),
                     'AddressName': direccion_db.get('nombreDireccion'),
                     'Street': direccion_db.get('direccion'),
                     'City': direccion_db.get('ciudad'),
-                    'County': direccion_db.get('comuna'),
+                    'County': f"{comunas.codigo} - {comunas.nombre}",
                     'Country': "CL",
                     'State': direccion_db.get('region'),
                     'FederalTaxID': cardCode,

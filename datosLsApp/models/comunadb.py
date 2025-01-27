@@ -15,4 +15,4 @@ class ComunaDB(models.Model):
     #El parametro to_field='atributo_En_otro_modelo' es solo necesario si la relacion es con algo que no sea la llave primaria
 
     def __str__(self):
-        return f'{self.nombre}'
+        return f'{self.codigo, self.nombre}'

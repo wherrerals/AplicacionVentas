@@ -10,6 +10,7 @@ from datosLsApp.models.gruposndb import GrupoSNDB
 from datosLsApp.models.socionegociodb import SocioNegocioDB
 from datosLsApp.models.tipoclientedb import TipoClienteDB
 from datosLsApp.models.tiposndb import TipoSNDB
+from datosLsApp.repositories.comunarepository import ComunaRepository
 from datosLsApp.repositories.socionegociorepository import SocioNegocioRepository
 from datosLsApp.repositories.gruposnrepository import GrupoSNRepository
 from datosLsApp.repositories.tipoclienterepository import TipoClienteRepository
@@ -966,6 +967,7 @@ class SocioNegocio:
             "tipoCliente": "N"  # Valor fijo según lo especificado
         }
 
+        print("Datos del socio de negocio procesados:")
         # Direcciones del socio de negocio
         direcciones = []
         for direccion in data.get("BPAddresses", []):
@@ -980,6 +982,8 @@ class SocioNegocio:
                 "ciudad": direccion.get("City", ""),
                 "codigoImpuesto": direccion.get("TaxCode", ""),
                 "SocioNegocio": direccion.get("BPCode", ""),
+                "region": direccion.get("State", ""),
+                "comuna": direccion.get("County", ""),
                 "tipoDireccion": tipo_direccion,  # Nuevo campo
             })
 
@@ -1014,7 +1018,7 @@ class SocioNegocio:
         socio_negocio = data["SocioNegocio"]
         print(f"Nombre: " + socio_negocio["nombre"])
         print(f"Apellido: " + socio_negocio["apellido"])
-
+    
         # Obtener la instancia de GrupoSNDB
         try:
             grupo = GrupoSNDB.objects.get(codigo=socio_negocio["grupoSN"]) # Cambiado de id a codigo
@@ -1058,18 +1062,37 @@ class SocioNegocio:
 
         # Crear las direcciones asociadas al cliente usando el método del repositorio
         for direccion in data.get("Direcciones", []):
+            datoComuna = direccion.get('comuna')
+            # Quitar el guion y limpiar el string
+            id_comuna = datoComuna.strip().split("-")[0].strip()
+            
+            print(f"ID Comuna1: {id_comuna}")
+            
+            # Obtener la comuna del repositorio
+            comuna = ComunaRepository().obtenerComunaPorId(id_comuna)
+            
+            print(f"Comuna: {comuna}")
+            
+            # Verificar si se obtuvo una comuna válida
+            comuna_id = comuna.codigo if comuna != 0 else direccion["region"]
+            
+            print(f"Comuna ID: {comuna_id}")
+            
+            
+            # Crear la dirección asociada
             DireccionRepository.crearDireccion(
                 socio=socio_negocio["codigoSN"],
                 rownum=direccion["rowNum"],
                 nombre_direccion=direccion["nombreDireccion"],
                 ciudad=direccion["ciudad"],
                 calle_numero=direccion["calleNumero"],
-                comuna_id=666,
-                region_id=13,  # Valor por defecto
+                ## obtener el id de la comuna de que retona la funcion obtenerComunaPorId Comuna: ('13126', 'Quinta Normal')
+                comuna_id= comuna_id,
+                region_id=direccion["region"],
                 tipo_direccion=direccion["tipoDireccion"],
                 pais=direccion.get("pais", "Chile")  # Valor por defecto
             )
-            print (f"Data Direccion: {direccion}")
+            print(f"Data Dirección: {direccion}")
 
         # Crear los contactos asociados al cliente usando el método del repositorio
         for contacto in data.get("Contactos", []):
@@ -1304,12 +1327,16 @@ class SocioNegocio:
         tipos_direccion = {"13": None, "12": None}
 
         for address in direcciones:
+            id_comuna = address.get('comuna')
+            comunas = ComunaRepository().obtenerComunaPorId(id_comuna) 
+            print(f"ID ComunaXX: {comunas}")
+   
             tipo_direccion = address.get("tipoDireccion", "")
             serialized_address = {
                 "AddressName": address.get("nombreDireccion", ""),
                 "Street": address.get("direccion", ""),
                 "City": address.get("ciudad", ""),
-                "County": tipo_direccion,
+                "County": f"{comunas.codigo} - {comunas.nombre}",
                 "Country": "CL",  # Abreviación del país (e.g., Chile -> CL)
                 "State": int(address.get("region", "")),
                 "FederalTaxID": client_data.get("rutSN", "").split("-")[0],
@@ -1387,12 +1414,21 @@ class SocioNegocio:
                 else:
                     tipoDireccion = "12"
 
+
+                datoComuna = direccion.get('comuna')
+                # quitar el guion y limpiar el string
+                id_comuna = datoComuna.strip().split("-")[0].strip()
+                print(f"ID ComunaRRR: {id_comuna}")
+                comunas = ComunaRepository().obtenerComunaPorId(id_comuna)
+                print("COMUNAS:", comunas)
+
+
                 rownum = direccion.get("row_id")
                 nombre_direccion = direccion.get("nombreDireccion")
                 ciudad = direccion.get("ciudad")
                 pais = direccion.get("pais")
                 region = direccion.get("region")
-                comuna = direccion.get("comuna")
+                comuna = comunas.codigo
                 direccion = direccion.get("direccion")
                 tipo = tipoDireccion
 

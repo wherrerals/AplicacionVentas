@@ -24,16 +24,27 @@ class ComunaRepository:
         return ComunaDB.objects.filter(region=region)
     
 
-    def obtenerComunaPorId(self, codigo_comuna):
+    def obtenerComunaPorId(self, codigo_comuna): 
         """
         Obtiene una comuna por su id
 
         params:
-            id_comuna: int
+            codigo_comuna: int
 
             - Id de la comuna
 
         return:
-            ComunaDB
+            ComunaDB o 0 si no se encuentra
         """
-        return ComunaDB.objects.get(codigo=codigo_comuna)
+        
+        print("estamos en el repositorio")
+        
+        codigo_comuna = str(codigo_comuna)  # Convertir el código a cadena
+        
+        dato = ComunaDB.objects.filter(codigo=codigo_comuna)
+        
+        if dato.exists():
+            return dato[0]
+        else:
+            return 0
+
