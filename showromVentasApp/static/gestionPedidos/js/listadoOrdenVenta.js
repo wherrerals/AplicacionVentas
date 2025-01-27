@@ -6,9 +6,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const getSkip = (page) => (page - 1) * recordsPerPage;
 
+    const vendedorSelect = document.querySelector('#filtro_vendedor');
+    const defaultVendedorValue = vendedorSelect.value; // Obtener el valor seleccionado por defecto
+
+    activeFilters['salesEmployeeName'] = defaultVendedorValue;
+
+
     const applyFiltersAndFetchData = (filters, page = 1) => {
         //console.log("Applying filters:", filters, "Page:", page);
-        showLoader();
+        showLoadingOverlay();
         const skip = getSkip(page); // Calcular el número de registros a omitir
         const filterData = {
             top: recordsPerPage,

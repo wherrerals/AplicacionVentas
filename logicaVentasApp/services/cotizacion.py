@@ -321,10 +321,14 @@ class Cotizacion(Documento):
         adrres2 = jsonData.get('Address2')
         
         idContacto = jsonData.get('ContactPersonCode')
-        #consultar en base de datos con el id capturado
         
-        contacto = ContactoRepository.obtenerContacto(idContacto)
-        numerocontactoSAp = contacto.codigoInternoSap
+        if idContacto == "No hay contactos disponibles":
+            numerocontactoSAp = "null"
+        else:
+            contacto = ContactoRepository.obtenerContacto(idContacto)
+            numerocontactoSAp = contacto.codigoInternoSap        #consultar en base de datos con el id capturado
+        
+
         
         direccion1 = DireccionRepository.obtenerDireccion(adrres)
         direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)
@@ -617,6 +621,10 @@ class Cotizacion(Documento):
         
     def formatearDatos(self, json_data):
         # Extraer y limpiar la información del cliente
+        
+        print("DETALLES DE COTIZACION FORMATEO DE DATOS")
+        print("JSON DATA", json_data)
+
         client_info = json_data["Client"]["value"][0]
         quotations = client_info.get("Quotations", {})
         salesperson = client_info.get("SalesPersons", {})
@@ -655,8 +663,8 @@ class Cotizacion(Documento):
                 "U_LED_SUCURS": salesperson.get("U_LED_SUCURS"),
             },
             "ContactEmployee": {
-                "InternalCode": contact_employee.get("InternalCode"),
-                "FirstName": contact_employee.get("FirstName"),
+                "InternalCode": contact_employee.get("InternalCode") if contact_employee.get("InternalCode") else "No hay contactos disponibles",
+                "FirstName": contact_employee.get("FirstName") if contact_employee.get("FirstName") else "No hay contactos disponibles",
             }
         }
 
@@ -715,7 +723,8 @@ class Cotizacion(Documento):
             "Cliente": cliente,
             "DocumentLines": document_lines
         }
-
+        
+        print("RESULTADO", resultado)
         return resultado
 
     def formataearDatosSoloLineas(self, json_data):

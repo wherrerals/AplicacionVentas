@@ -42,7 +42,7 @@ class CondicionPagoper(admin.ModelAdmin):
     list_display = ('codigo', 'nombre')
 
 class VendedorDBper(admin.ModelAdmin):
-    list_display = ('codigo', 'nombre')
+    list_display = ('codigo', 'nombre', 'tipoVendedor')
 
 class DocumentoDBper(admin.ModelAdmin):
     list_display = ('docEntry', 'folio', 'totalAntesDelDescuento', 'totalDocumento', 'vendedor')

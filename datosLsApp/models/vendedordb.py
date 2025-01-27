@@ -13,4 +13,4 @@ class VendedorDB(models.Model):
     #sucursal = models.ForeignKey(SucursalDB, on_delete=models.CASCADE, default=1)
     
     def __str__(self):
-        return f'{self.nombre}'
+        return f'{self.nombre} - {self.codigo} - {self.tipoVendedor}'
