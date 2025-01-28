@@ -12,7 +12,7 @@ class SocioNegocioDB(models.Model):
 
     codigoSN = models.CharField(primary_key=True, max_length=255) #Es un identiicador unico que lo diferencia de todas las otras entradas
     nombre = models.CharField(max_length=150,)
-    apellido = models.CharField(max_length=150)
+    apellido = models.CharField(max_length=150, null=True)
     razonSocial = models.CharField(max_length=255)
     rut = models.CharField(max_length=255,null = False)
     email = models.EmailField()

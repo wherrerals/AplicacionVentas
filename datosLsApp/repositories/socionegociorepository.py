@@ -92,8 +92,11 @@ class SocioNegocioRepository:
         return:
             SocioNegocioDB | None
         """
+        print("Esto es el repositorio de SocioNegocio")
+        print("codigoSN", codigoSN)
+        
         try:
-            return SocioNegocioDB.objects.get(codigoSN__icontains=codigoSN)
+            return SocioNegocioDB.objects.get(codigoSN=codigoSN)
         except SocioNegocioDB.DoesNotExist:
             return None
 

@@ -210,6 +210,8 @@ class SocioNegocioView(FormView):
         return:
             JsonResponse con la información del cliente, o un mensaje de error
         """
+        
+        print("BUSCANDO DATA DEL CLIENTE")
 
         if request.method != 'GET':
             return JsonResponse({'error': 'Método no permitido'}, status=405)
@@ -229,6 +231,9 @@ class SocioNegocioView(FormView):
             print("CardCode:", cardCode)
 
             if socio_negocio_service.verificarSocioDB(cardCode):
+                print("Existe en la base de datos")
+                print("Responder info cliente")
+                print("RUT:", rut)
                 return socio_negocio_service.responderInfoCliente(rut)
             else:
                 return socio_negocio_service.crearYresponderCliente(cardCode, rut)

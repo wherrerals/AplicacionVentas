@@ -947,7 +947,8 @@ class SocioNegocio:
         print("Procesando datos del socio de negocio...")
         print(f"Datos recibidos para crear en MYSQL: {data}")
 
-        name, lastname = data.get('CardName').split(' ', 1)
+        # SI NO HAY SPACIO ASIGNAR SIN APPELLIDO
+        name, lastname = data.get('CardName').split(' ', 1) if ' ' in data.get('CardName') else (data.get('CardName'), None)
         razonsocial = data.get('CardName')
 
         # Datos principales del socio de negocio
