@@ -16,8 +16,8 @@
       <div class="col-md-8 col-xl-6 text-center mx-auto">
         <h2>Ventas Showroom</h2>
         <a href="{% url 'salir' %}">Cerrar Sesion</a>
-        {% if nombreuser %}
-        <p>Bienvenido, {{ nombreuser }}.</p>
+        {% if nameUser %}
+        <p>Bienvenido, {{ nameUser }}.</p>
         {% else %}
         <p>No has iniciado sesión.</p>
         {% endif %}

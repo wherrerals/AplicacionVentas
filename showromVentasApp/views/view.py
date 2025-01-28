@@ -59,17 +59,17 @@ def home(request):
 
         try:
             usuario = UsuarioDB.objects.get(usuarios=request.user)
-            nombreUser = usuario.nombre
+            nameUser = usuario.nombre
 
 
         except UsuarioDB.DoesNotExist:
-            return JsonResponse({'error': 'No se encontró el usuario relacionado con el usuario autenticado'}, status=404)
+            return JsonResponse({'error': 'User related to authenticated user not found'}, status=404)
         
 
         
         context = {
             'username': username,
-            'nombreuser': nombreUser,
+            'nameUser': nameUser,
         }
 
         return render(request, 'home.html', context)
