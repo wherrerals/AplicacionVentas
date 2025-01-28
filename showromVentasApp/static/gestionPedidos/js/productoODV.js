@@ -3,12 +3,12 @@ class Producto {
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
         this.imagen = imagen;
-        this.precioVenta = precioVenta;
+        this.precioVenta = Math.round(precioVenta);
         this.stockTotal = stockTotal;
-        this.precioLista = precioLista;
-        this.precioDescuento = precioDescuento;
+        this.precioLista = Math.round(precioLista);
+        this.precioDescuento = Math.round(precioDescuento);
         this.precioSinDescuento = 0;
-        this.totalProducto = precioVenta * cantidad;
+        this.totalProducto = Math.round(precioVenta * cantidad);
         this.cantidad = cantidad;
         this.sucursal = sucursal;
         this.comentario = comentario;
