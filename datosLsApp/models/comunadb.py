@@ -11,7 +11,7 @@ class ComunaDB(models.Model):
     codigo = models.CharField(primary_key= True,max_length=50,null = False)
     nombre = models.CharField(max_length=50,null = False)
     region = models.ForeignKey(RegionDB, on_delete=models.CASCADE, default=1)
-    codgio_postal = models.CharField(max_length=50, default='0')
+    codgio_postal = models.CharField(max_length=50, default='0', null=True)
 
     #El parametro to_field='atributo_En_otro_modelo' es solo necesario si la relacion es con algo que no sea la llave primaria
 
