@@ -33,7 +33,7 @@ RUN apk del .build-deps
 COPY ./ ./ 
 
 # Exponer el puerto 8000 para la aplicación
-EXPOSE 7000
+EXPOSE 8000
 
 # Comando por defecto para ejecutar el servidor
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

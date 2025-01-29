@@ -11,7 +11,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
-      - "4350:4350"
+      - "3307:3306"
 
   web:
     build:
@@ -30,7 +30,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - "7000 :7000"
+      - "8000:8000"
     depends_on:
       - db
       - rabbitmq
