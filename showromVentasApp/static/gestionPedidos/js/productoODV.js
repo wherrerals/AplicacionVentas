@@ -160,7 +160,7 @@ class Producto {
                         <optgroup label="Entrega">
                             <option value="1" ${this.tipoEntrega2 == 1 ? 'selected' : ''}>Directa</option>
                             <option value="5" ${this.tipoEntrega2 == 5 ? 'selected' : ''}>Despacho</option>
-                            <option value="2" ${this.tipoEntrega2 == 2 ? 'selected' : ''}>Retiro GR</option>
+                            <option value="2" ${this.tipoEntrega2 == 2 ? 'selected' : ''}>Retiro Panal</option>
                             <option value="3" ${this.tipoEntrega2 == 3 ? 'selected' : ''}>Retiro LC</option>
                             <option value="4" ${this.tipoEntrega2 == 4 ? 'selected' : ''}>Retiro PH</option>
                         </optgroup>
