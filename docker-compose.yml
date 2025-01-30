@@ -5,35 +5,30 @@ services:
   db:
     image: mysql:9.0.1
     environment:
-      MYSQL_ROOT_PASSWORD: Ea7hava5*
-      MYSQL_DATABASE: led_studio
-      MYSQL_PASSWORD: Ea7hava5*
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}*
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
-      - "4350:4350"
+      - "4350:3306"
 
   web:
     build:
-      context: .
+      image: lsApp:latest
+      restart: always
+      env_file: .env
       dockerfile: dockerfile.app
-    command: >
-      sh -c "
-      python manage.py makemigrations datosLsApp &&
-      python manage.py migrate datosLsApp &&
-      python manage.py makemigrations taskApp &&
-      python manage.py migrate taskApp &&
-      python manage.py makemigrations &&
-      python manage.py migrate &&
-      python manage.py runserver 0.0.0.0:8000
-      "
-    volumes:
-      - .:/app
+      environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
     ports:
       - "7000:7000"
     depends_on:
       - db
       - rabbitmq
+    command: ["/app/entrypoint.sh"]
+
 
   rabbitmq:
     image: rabbitmq:3-management

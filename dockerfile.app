@@ -1,4 +1,4 @@
-FROM python:3.10.4-alpine3.15
+FROM python:3.10-alpine
 
 ENV PYTHONUNBUFFERED=1
 
@@ -17,7 +17,7 @@ RUN apk update && apk add --no-cache \
     fribidi \
     fontconfig \
     ttf-freefont \
-    && apk add --no-cache --virtual .build-deps build-base \
+    build-base \
     && pip install --upgrade pip
 
 # Copiar el archivo de requerimientos antes de la instalación
@@ -27,26 +27,16 @@ COPY ./requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Eliminar las herramientas de compilación para reducir el tamaño de la imagen
-RUN apk del .build-deps
+RUN apk del build-base
 
 # Copiar el código de la aplicación
-COPY ./ ./ 
+COPY ./ ./ ./
 
-# Exponer el puerto 8000 para la aplicación
+RUN ls -la /app
+
+
+# Exponer el puerto 7000 para la aplicación
 EXPOSE 7000
 
 # Comando por defecto para ejecutar el servidor
 CMD ["sh", "entrypoint.sh"]
-
-
-
-#ejecutar el comando docker build -t myapp .
-#docker build -t devrrior/proyectoledstudio_aplicacionventas .
-#docker run -p 8000:8000 devrrior/proyectoledstudio_aplicacionventas
-
-#docker build -t devrrior/proyectoledstudio_django -f dockerfile.django .
-#docker run -p 8000:8000 devrrior/proyectoledstudio_django
-#docker run -p 8000:8000 -v /ruta1/ruta2/ruta3/ProyectoLedStudio/AplicacionVentas:/app devrrior/proyectoledstudio_django
-
-#Crear un volumen para que los cambios en el código se reflejen en el contenedor
-#docker run -p 8000:8000 -v /ruta1/ruta2/ruta3/ProyectoLedStudio/AplicacionVentas:/app devrrior/proyectoledstudio_aplicacionventas

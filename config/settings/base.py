@@ -19,9 +19,9 @@ BASE_APPS = [
 ]
 
 LOCAL_APPS = [
+    'datosLsApp',
     'apps.core',
     'config',
-    'datosLsApp',
     'logicaVentasApp',
     'showromVentasApp',
     'taskApp',

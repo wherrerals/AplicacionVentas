@@ -8,4 +8,4 @@ python manage.py waitForDb --settings=config.settings.production
 python manage.py migrate --settings=config.settings.production
 
 
-gunicorn --env DJANGO_SETTINGS_MODULE=config.settings.production config.wsgi:aplication --bind 127.0.0.01:8000
+gunicorn --env DJANGO_SETTINGS_MODULE=config.settings.production config.wsgi:application --bind 0.0.0.0:7000
