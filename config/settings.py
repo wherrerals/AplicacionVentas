@@ -19,7 +19,6 @@ DEBUG = True
 
 #En este se debe colocar la ip de la maquina en la que se esta trabajando o la ip de la maquina en la que se va a desplegar la aplicacion
 ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '192.168.3.41', '192.168.3.42', '127.0.0.1']
-#ALLOWED_HOSTS = []
 #python manage.py runserver 192.168.3.41:8000
 
 
