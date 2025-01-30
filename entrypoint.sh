@@ -1,7 +1,7 @@
 #!/bin/sh
 
-echo 'Running Collectstatic...'
-python manage.py collectstatic --no-input --settings=config.settings.production 
+#echo 'Running Collectstatic...'
+#python manage.py collectstatic --no-input --settings=config.settings.production 
 
 echo 'Apply Migrations...'
 python manage.py waitForDb --settings=config.settings.production

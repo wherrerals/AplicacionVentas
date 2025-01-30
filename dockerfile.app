@@ -30,10 +30,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN apk del build-base
 
 # Copiar el código de la aplicación
-COPY ./ ./ ./
+COPY ./ ./
 
 RUN ls -la /app
-
 
 # Exponer el puerto 7000 para la aplicación
 EXPOSE 7000
