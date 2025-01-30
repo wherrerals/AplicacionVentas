@@ -6,10 +6,10 @@ RUN mkdir -p /run/mysqld && \
     chown -R mysql:mysql /run/mysqld
 
 # Variables de entorno para configurar la base de datos
-ENV MYSQL_ROOT_PASSWORD=Ea7hava5*
-ENV MYSQL_DATABASE=led_studio
-ENV MYSQL_USER=root
-ENV MYSQL_PASSWORD=Ea7hava5*
+#ENV MYSQL_ROOT_PASSWORD=Ea7hava5*
+#ENV MYSQL_DATABASE=led_studio
+#ENV MYSQL_USER=root
+#ENV MYSQL_PASSWORD=Ea7hava5*
 
 # Copiar un archivo de inicialización para configuraciones personalizadas
 COPY init.sql /docker-entrypoint-initdb.d/

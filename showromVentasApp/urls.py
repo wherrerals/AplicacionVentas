@@ -23,9 +23,7 @@ urlpatterns = [
     path('copiar_a_odv/', CotizacionView.as_view(), name='copiar_a_odv'),
     path('listado_odv/', OdvView.as_view(), name='listado_odv'),
     path('crear_odv/', OdvView.as_view(), name='crear_odv'),
-    #path('crear_cliente/', SocioNegocioView.as_view(), name='crear_cliente'),
     path('cambiar_estado_cotizacion/', CotizacionView.as_view(), name='cambiar_estado_cotizacion'),
-    # Rutas adicionales
     path('lista_cotizaciones/', view.list_quotations, name="lista_cotizaciones"),
     path('generar_cotizacion/', view.quotations, name="generar_cotizacion"),
     path('lista_ovs/', view.lista_ovs, name='lista_ovs'),
@@ -57,9 +55,4 @@ urlpatterns = [
     path('cotizacion/<int:cotizacion_id>/pdf/', view.generar_cotizacion_pdf, name='cotizacion_pdf'),
     path('get_vendedor_sucursal/', view.get_vendedor_sucursal, name='get_vendedor_sucursal'),
     path('prueba/', view.prueba, name='prueba'),
-    #path('obtener_receta/', view.pryebas, name='obtener_receta'),
 ]
-
-""" Este es el path que estaba probando
-    path('guardar_contactos/', view.guardarContactosAJAX, name='guardar_contactos_ajx'), 
-"""

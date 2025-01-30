@@ -36,7 +36,7 @@ COPY ./ ./
 EXPOSE 7000
 
 # Comando por defecto para ejecutar el servidor
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["sh", "entrypoint.sh"]
 
 
 
