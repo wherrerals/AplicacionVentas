@@ -1,6 +1,4 @@
 #version: '3.8'  #agregar esto solo se necesita especificar la versión
-
-
 services:
   db:
     image: mysql:9.0.1

@@ -1,4 +1,5 @@
-from .base import *
+from config.settings.base import *
+from config.logging import *
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-fexe1oq@sx@j&x3m#tw(#x(r!g32fylgea=whky=#ge^vn5f*h'
@@ -7,9 +8,9 @@ SECRET_KEY = 'django-insecure-fexe1oq@sx@j&x3m#tw(#x(r!g32fylgea=whky=#ge^vn5f*h
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '192.168.3.41', '192.168.3.42', '127.0.0.1', '192.168.3.13']
+ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '127.0.0.1']
 
-#Configuracion para DB docker
+""" #Configuracion para DB docker
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -21,9 +22,8 @@ DATABASES = {
     }
 }
 
-#Configuracion para DB local
+#Configuracion para DB local """
 
-""" 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -35,5 +35,4 @@ DATABASES = {
         #'HOST':'localhost',
         'PORT':'3306',
     }
-}  """
-
+} 
