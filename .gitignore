@@ -210,4 +210,7 @@ celerybeat-schedule.dat
 celerybeat-schedule.dir
 celerybeat-schedule.bak
 
+#ignorar la carpeta staticfiles
 staticfiles/
+
+* staticfiles/

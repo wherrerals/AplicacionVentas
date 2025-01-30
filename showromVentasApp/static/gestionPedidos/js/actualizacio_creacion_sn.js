@@ -35,7 +35,6 @@ formularios.forEach(formulario => {
             }
         }
 
-
         // Obtener las direcciones y contactos
         const lines = [];
         const contactos = [];
