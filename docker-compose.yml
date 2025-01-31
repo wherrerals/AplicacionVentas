@@ -56,6 +56,9 @@ services:
       - db
     volumes:
       - .:/app
+    environment:
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+
 
   celery-worker:
     build:
@@ -67,6 +70,8 @@ services:
       - db
     volumes:
       - .:/app
+    environment:
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
 
 volumes:
   mysql_data:
