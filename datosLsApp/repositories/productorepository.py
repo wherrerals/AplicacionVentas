@@ -60,7 +60,7 @@ class ProductoRepository:
                     "marca": producto_info.get("marca", "Sin Marca"),
                     "costo": costo,
                     "precioLista": next(
-                        (precio["precio"] for precio in product_data.get("Precios", []) if precio["priceList"] == 1),
+                        (precio["precio"] for precio in product_data.get("Precios", []) if precio["priceList"] == 3),
                         0.0,
                     ),
                     "precioVenta": precio_venta,
