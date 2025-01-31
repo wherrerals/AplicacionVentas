@@ -5,7 +5,7 @@ from celery import Celery
 from celery.schedules import crontab
 
 # Configuración del entorno de Django para Celery
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')  # Asegúrate de que el nombre del proyecto sea correcto
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.production')
 
 # Crear la aplicación Celery
 app = Celery('taskApp')
@@ -23,7 +23,7 @@ def debug_task(self):
 
 app.conf.update(
     task_create_missing_queues=True,
-    worker_pool='solo',  # Intenta usar 'solo' para evitar problemas de concurrencia
+    #worker_pool='solo',  # Intenta usar 'solo' para evitar problemas de concurrencia
 )
 
 
@@ -32,6 +32,6 @@ app.conf.beat_schedule = {
     "data-product": {
         "task": "taskApp.tasks.sync_products",  # Ruta correcta a la tarea
         #"schedule": crontab(minute="*/1"),  # Ejecutar cada minuto
-        "schedule": timedelta(seconds=1),  # Ejecutar cada 10 segundos
+        "schedule": timedelta(seconds=10),  # Ejecutar cada 10 segundos
     },
 }
