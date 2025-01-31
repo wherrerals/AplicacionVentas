@@ -38,4 +38,4 @@ RUN ls -la /app
 EXPOSE 8000
 
 # Comando por defecto para ejecutar el servidor
-CMD ["sh", "entrypoint2.sh"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

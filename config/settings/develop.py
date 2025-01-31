@@ -10,7 +10,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '127.0.0.1']
 
-""" #Configuracion para DB docker
+#Configuracion para DB docker
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -22,9 +22,9 @@ DATABASES = {
     }
 }
 
-#Configuracion para DB local """
+#Configuracion para DB local
 
-DATABASES = {
+""" DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'led_studio',
@@ -35,4 +35,4 @@ DATABASES = {
         #'HOST':'localhost',
         'PORT':'3306',
     }
-} 
+}  """
