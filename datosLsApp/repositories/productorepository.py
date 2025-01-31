@@ -69,6 +69,8 @@ class ProductoRepository:
                     "linkProducto": product_data.get("linkProducto", ""),
                 },
             )
+            
+            print(f"Producto sincronizado: {producto.codigo} - {producto.nombre} - {producto.marca} - {producto.precioVenta} - {producto.precioLista} - {producto.dsctoMaxTienda} - {producto.dctoMaxProyectos}") 
 
             # Sincronizar bodegas y stock
             if "Bodegas" in product_data:
@@ -129,8 +131,21 @@ class ProductoRepository:
         producto.save()
 
 
-    def descuentoMax():
-        pass
+    def descuentoMax(sku):
+        """
+        metodo para obtener el descuento maximo del producto
+        """
+        producto = ProductoDB.objects.get(codigo=sku)
+        
+        print(f"Descuento max {producto.dsctoMaxTienda}")
+        return producto.dsctoMaxTienda
+    
+    def obtenerPrecioLista(sku):
+        """
+        metodo para obtener el precio de lista del producto
+        """
+        producto = ProductoDB.objects.get(codigo=sku)
+        return producto.precioLista
     
     def obtenerImagenProducto(codigo):
         """
@@ -139,3 +154,11 @@ class ProductoRepository:
         
         producto = ProductoDB.objects.get(codigo=codigo)
         return producto.imagen
+    
+    def obtenerMarcaProducto(codigo):
+        """
+        metodo para obtener la marca por medio del codigo del producto
+        """
+        
+        producto = ProductoDB.objects.get(codigo=codigo)
+        return producto.marca

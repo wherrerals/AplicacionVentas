@@ -679,6 +679,14 @@ class Cotizacion(Documento):
             sku = line.get("ItemCode")
             
             imagen = ProductoRepository.obtenerImagenProducto(sku)
+            marca = ProductoRepository.obtenerMarcaProducto(sku)
+            descuentoMax = ProductoRepository.descuentoMax(sku)
+            priceList = ProductoRepository.obtenerPrecioLista(sku)
+            
+            if marca == "LST":
+                descuentoMax = min(descuentoMax * 100, 15)
+            else:
+                descuentoMax = min(descuentoMax * 100, 10)
             
             # Construye la línea
             document_line = {
@@ -705,6 +713,8 @@ class Cotizacion(Documento):
                 "BaseEntry": line.get("BaseEntry"),
                 "BaseLine": line.get("BaseLine"),
                 "LineStatus": line.get("LineStatus"),
+                "DescuentoMax": descuentoMax,
+                "PriceList": priceList,
                 "WarehouseInfo": {
                     "WarehouseCode": warehouse_info.get("WarehouseCode"),
                     "InStock": warehouse_info.get("InStock"),

@@ -145,10 +145,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const productoCodigo = line.ItemCode;
             const nombre = line.ItemDescription;
             const imagen = line.imagen;
-            const precioVenta = line.PriceAfterVAT;
+            const precioVenta = line.GrossPrice;
             const stockTotal = 0;
-            const precioLista = line.GrossPrice;
-            const precioDescuento = line.DiscountPercent;
+            const precioLista = line.PriceList;
+            const precioDescuento = line.DescuentoMax;
+            const descuentoAplcado = line.DiscountPercent;
             const sucursal = line.WarehouseCode;
             const comentario = line.FreeText;
 
@@ -166,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
               comentario
             });
 
-            agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario);
+            agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado);
           });
         }
 

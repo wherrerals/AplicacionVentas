@@ -1,5 +1,5 @@
 class Producto {
-    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario) {
+    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado) {
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
         this.imagen = imagen;
@@ -12,6 +12,7 @@ class Producto {
         this.cantidad = cantidad;
         this.sucursal = sucursal;
         this.comentario = comentario;
+        this.descuentoAplcado = descuentoAplcado;
     }
 
     async obtenerStock(codigoProducto) {
@@ -121,7 +122,7 @@ class Producto {
                 </td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <div>
-                        <input class="form-control format-number" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="0">
+                        <input class="form-control format-number" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="${this.descuentoAplcado ?? 0}">
                     </div>
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${formatCurrency(this.precioSinDescuento)}</td>
@@ -200,40 +201,41 @@ class Producto {
         // Obtener el valor del descuento máximo
         let descuentoMaxElem = row.querySelector('#descuento');
         let descuentoMax = parseFloat(descuentoMaxElem.textContent.replace('Max: ', ''));
-
+    
         // Configurar el input para limitar el valor máximo
         let inputDescuento = row.querySelector('#agg_descuento');
         inputDescuento.max = descuentoMax;
-
-        // Establecer valor inicial de 0 en el input
-        inputDescuento.value = 0;
-
+    
+        // Establecer el valor inicial del descuento aplicado en el input
+        inputDescuento.value = this.descuentoAplcado;  // Cambié de 0 a this.descuentoAplcado
+    
         // Validar el valor actual del input
         inputDescuento.addEventListener('input', function () {
             let valor = parseFloat(inputDescuento.value);
-
+    
             // Si el valor es mayor que el descuento máximo, ajustarlo
             if (valor > descuentoMax) {
                 inputDescuento.value = descuentoMax;
             }
-
+    
             // Si el valor es menor que 0, ajustarlo a 0
             if (valor < 0) {
                 inputDescuento.value = 0;
             }
         });
     }
+    
 }
 
 // Función global para manejar la adición de productos
-function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario) {
+function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, descuentoAplcado = 1 - 1) {
     // Contador de productos
     console.log("cantidad: ", cantidad);
     console.log("sucursal: ", sucursal);
 
     let contprod = document.querySelectorAll('#productos tbody').length + 1;
 
-    let producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario);
+    let producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado);
 
     let newRow = producto.crearFila(contprod);
 

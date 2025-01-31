@@ -195,12 +195,12 @@ class Serializador:
             for item_price in product_data.get("ItemPrices", []):
                 price_list = item_price.get("PriceList")
                 price = item_price.get("Price")
-                if price_list == 1:
+                if price_list == 2:
                     price_1 = price
-                elif price_list == 2:
+                elif price_list == 3:
                     price_2 = price
 
-                if price_list in [1, 2]:  # Filtrar por PriceList
+                if price_list in [2, 3]:  # Filtrar por PriceList
                     item_prices.append({
                         "priceList": price_list,
                         "precio": price,
@@ -217,9 +217,9 @@ class Serializador:
 
             # Actualizar precios en la lista
             for item_price in item_prices:
-                if item_price["priceList"] == 1:
+                if item_price["priceList"] == 2:
                     item_price["precio"] = price_1
-                elif item_price["priceList"] == 2:
+                elif item_price["priceList"] == 3:
                     item_price["precio"] = price_2
 
             # Filtrar y formatear la información de bodegas (WarehouseCode = "PH", "LC", "ME")
