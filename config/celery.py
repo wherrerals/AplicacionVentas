@@ -34,4 +34,10 @@ app.conf.beat_schedule = {
         #"schedule": crontab(minute="*/1"),  # Ejecutar cada minuto
         "schedule": timedelta(seconds=10),  # Ejecutar cada 10 segundos
     },
+    
+    "data-user": {
+        "task": "taskApp.tasks.syncUser",  # Ruta correcta a la tarea
+        #"schedule": crontab(minute="*/1"),  # Ejecutar cada minuto
+        "schedule": timedelta(seconds=10),  # Ejecutar cada 10 segundos
+    },
 }

@@ -19,6 +19,7 @@ from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.models import DireccionDB, ContactoDB
 from adapters.sl_client import APIClient
+from taskApp.models import SyncState
 
 
 class SocioNegocio:
@@ -1451,4 +1452,75 @@ class SocioNegocio:
         
         except json.JSONDecodeError as e:
             return {"data": {"success": False, "message": f"Error al decodificar JSON: {str(e)}",}, "status": 400}
+
+
+
+    def syncBusinessPartners(self):
+        # Obtener el valor de skip desde la base de datos
+        state, created = SyncState.objects.get_or_create(
+            name="syncPartnersBusiness",
+            defaults={"skip": 0}
+        )
         
+        skip = state.skip
+        totalSynced = 0
+
+        # Instancia del cliente API
+        apiClientSL = APIClient()
+
+        try:
+            # Obtener la cantidad total de socios de negocio
+            count = apiClientSL.getQuantityBusinessPartners()
+
+            if not isinstance(count, dict) or 'value' not in count or not count['value']:
+                return {"success": False, "message": "No se encontraron socios de negocio en SAP."}
+
+            firstBP = count['value'][0]
+            totalBP = firstBP.get('BusinessPartners')
+
+            if totalBP is None:
+                return {"success": False, "message": "No se encontraron socios de negocio en SAP."}
+
+            logging.info(f"Total de socios de negocio en SAP: {totalBP}")
+
+            # Si el skip es mayor o igual al total, reiniciar el contador
+            if skip >= totalBP:
+                skip = 0
+                state.skip = 0
+                state.save()
+
+            # Obtener los socios de negocio desde SAP
+            bp = apiClientSL.getBusinessPartners(skip=skip)
+
+            if not bp:
+                return {"success": False, "message": "No se encontraron socios de negocio en SAP."}
+
+            syncedCount = 0
+
+            for partner in bp:
+                try:
+                    # Convertir JSON a objeto y procesarlo
+                    dataCreation = self.procesarDatosSocionegocio(self.convertirJsonObjeto(partner))
+                    client = self.guardarClienteCompleto(dataCreation)
+
+                    if client:
+                        syncedCount += 1
+
+                except Exception as e:
+                    logging.error(f"Error al sincronizar socio de negocio: {str(e)}")
+                    continue
+
+            # Actualizar el skip solo si hubo sincronización
+            if syncedCount > 0:
+                state.skip = skip + syncedCount
+                state.save()
+                logging.info(f"{syncedCount} socios de negocio sincronizados con éxito.")
+
+            return {"success": True, "message": f"{syncedCount} socios de negocio sincronizados con éxito."}
+
+        except Exception as e:
+            logging.error(f"Error general en la sincronización: {str(e)}")
+            return {"success": False, "message": "Ocurrió un error en la sincronización."}
+        
+
+

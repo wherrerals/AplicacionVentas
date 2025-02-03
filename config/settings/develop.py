@@ -8,7 +8,7 @@ SECRET_KEY = 'django-insecure-fexe1oq@sx@j&x3m#tw(#x(r!g32fylgea=whky=#ge^vn5f*h
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '127.0.0.1',  '192.168.3.42']
 
 #Configuracion para DB docker
 DATABASES = {

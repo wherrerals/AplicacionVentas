@@ -711,3 +711,24 @@ class APIClient:
         print("url del conteo", url)
         print(response.json())
         return response.json()
+    
+    def getQuantityBusinessPartners(self):
+        self.__login()
+        url = f"{self.base_url}BusinessPartners?$apply=aggregate($count as BusinessPartners)&$filter=CardType eq 'cCustomer'"
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print("url del conteo", url)
+        print(response.json())
+        return response.json()
+    
+    def getBusinessPartners(self, skip=0):
+        self.__login()
+        select = 'CardCode,CardName,CardType,Phone1,EmailAddress,Notes,GroupCode,FederalTaxID,BPAddresses,ContactEmployees'
+        filters = "CardType eq 'cCustomer'"
+        url = f"{self.base_url}BusinessPartners?$select={select}&$filter={filters}$&$skip={skip}"
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print("url del conteo", url)
+        print(response.json())
+        return response.json()
+    

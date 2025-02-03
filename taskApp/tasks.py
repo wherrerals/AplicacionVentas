@@ -1,6 +1,7 @@
 # taskApp/tasks.py
 from celery import shared_task, states
 from celery.result import AsyncResult
+from logicaVentasApp.services.socionegocio import SocioNegocio
 from taskApp.models import CeleryTask
 from logicaVentasApp.services.producto import Producto
 
@@ -32,3 +33,29 @@ def sync_products(self):
         task.save()
 
 
+def syncUser(bind=True):
+    # Registrar la tarea en la base de datos al iniciar
+    task2 = CeleryTask.objects.create(
+        task_id=bind.request.id,
+        task_name=bind.name,
+        status=states.PENDING
+    )
+    
+    try:
+        # Llamada al servicio de sincronización
+        service = SocioNegocio()
+        result_message = service.syncPartnersBusiness()  # Captura el retorno de sync()
+
+        # Actualizar el estado y guardar el resultado
+        task2.status = states.SUCCESS
+        task2.result = "Usuarios sincronizados"  # Guarda el mensaje retornado
+        return result_message
+    
+    except Exception as e:
+        # Manejo de errores y actualización de la tarea
+        task2.status = states.FAILURE
+        task2.result = str(e)
+        raise
+    finally:
+        task2.save()
+        
