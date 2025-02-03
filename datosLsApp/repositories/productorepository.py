@@ -70,7 +70,7 @@ class ProductoRepository:
                 },
             )
             
-            print(f"Producto sincronizado: {producto.codigo} - {producto.nombre} - {producto.marca} - {producto.precioVenta} - {producto.precioLista} - {producto.dsctoMaxTienda} - {producto.dctoMaxProyectos}") 
+            #print(f"Producto sincronizado: {producto.codigo} - {producto.nombre} - {producto.marca} - {producto.precioVenta} - {producto.precioLista} - {producto.dsctoMaxTienda} - {producto.dctoMaxProyectos}") 
 
             # Sincronizar bodegas y stock
             if "Bodegas" in product_data:

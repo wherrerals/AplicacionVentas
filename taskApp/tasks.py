@@ -32,19 +32,20 @@ def sync_products(self):
     finally:
         task.save()
 
-
-def syncUser(bind=True):
+@shared_task(bind=True)
+def syncUser(self):
     # Registrar la tarea en la base de datos al iniciar
     task2 = CeleryTask.objects.create(
-        task_id=bind.request.id,
-        task_name=bind.name,
+        task_id=self.request.id,
+        task_name=self.name,
         status=states.PENDING
     )
     
     try:
+        print("Sincronizando usuarios...")
         # Llamada al servicio de sincronización
-        service = SocioNegocio()
-        result_message = service.syncPartnersBusiness()  # Captura el retorno de sync()
+        service = SocioNegocio(request=None)
+        result_message = service.syncBusinessPartners()  # Captura el retorno de sync()
 
         # Actualizar el estado y guardar el resultado
         task2.status = states.SUCCESS

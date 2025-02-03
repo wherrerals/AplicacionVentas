@@ -31,7 +31,7 @@ import json
 
 from logicaVentasApp.services.comuna import Comuna
 from datosLsApp.models.stockbodegasdb import StockBodegasDB
-from taskApp.tasks import sync_products
+from taskApp.tasks import sync_products, syncUser
 from celery.exceptions import TimeoutError
 
 #Inicio vistas Renderizadoras
@@ -936,6 +936,7 @@ def  obtenerComunasId(request):
 def trigger_sync(request):
     try:
         sync_products.delay()  # Dispara la tarea encolada
+        syncUser.delay()
         return JsonResponse({'status': 'Sincronización en cola'})
     except TimeoutError:
         return JsonResponse({'status': 'Error: RabbitMQ no está disponible'}, status=500)

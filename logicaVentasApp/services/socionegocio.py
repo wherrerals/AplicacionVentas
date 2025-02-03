@@ -925,7 +925,6 @@ class SocioNegocio:
             dict: Objeto Python convertido.
         """
         print("Convirtiendo JSON a objeto Python...")
-        print(f"Datos JSON: {json_data}")
 
         # Verificar si `json_data` es una cadena JSON y convertirla si es necesario
         if isinstance(json_data, str):
@@ -944,21 +943,27 @@ class SocioNegocio:
         Returns:
             dict: Datos del socio de negocio procesados.
         """
-
         print("Procesando datos del socio de negocio...")
-        print(f"Datos recibidos para crear en MYSQL: {data}")
+        print(f"Datos recibidos Integracion: {data}")
 
-        # SI NO HAY SPACIO ASIGNAR SIN APPELLIDO
-        name, lastname = data.get('CardName').split(' ', 1) if ' ' in data.get('CardName') else (data.get('CardName'), None)
-        razonsocial = data.get('CardName')
+        # Obtener 'CardName' con un valor predeterminado
+        card_name = data.get('CardName', '')
+
+        # Validar si 'card_name' tiene un espacio
+        if card_name and isinstance(card_name, str): 
+            name, lastname = card_name.split(' ', 1) if ' ' in card_name else (card_name, None)
+        else:
+            name, lastname = "Null", "None"
+
+        razonsocial = card_name or "Null"
 
         # Datos principales del socio de negocio
         socio_negocio = {
             "codigoSN": data.get("CardCode", ""),
-            "nombreCompleto": data.get("CardName", ""),
-            "razonSocial": razonsocial or "Null",
-            "nombre": name or "Null",  # Asumiendo que 'CardName' contiene nombre completo
-            "apellido": lastname or "None",  # Si solo hay un campo de nombre, apellido se mantiene igual
+            "nombreCompleto": card_name,
+            "razonSocial": razonsocial,
+            "nombre": name,
+            "apellido": lastname,
             "email": data.get("EmailAddress", "") or "Null",
             "telefono": data.get("Phone1", "") or "Null",
             "celular": data.get("Phone1", "") or "Null",
@@ -969,10 +974,9 @@ class SocioNegocio:
             "tipoCliente": "N"  # Valor fijo según lo especificado
         }
 
-        print("Datos del socio de negocio procesados:")
         # Direcciones del socio de negocio
         direcciones = []
-        for direccion in data.get("BPAddresses", []):
+        for direccion in data.get("BPAddresses", []) or []:  # Asegurar que sea iterable
             address_type = direccion.get("AddressType", "")
             # Asignar valores según AddressType
             tipo_direccion = 13 if address_type == "bo_BillTo" else 12 if address_type == "bo_ShipTo" else None
@@ -991,15 +995,18 @@ class SocioNegocio:
 
         # Empleados de contacto del socio de negocio
         empleados_contacto = []
-        for contacto in data.get("ContactEmployees", []):
+        for contacto in data.get("ContactEmployees", []) or []:  # Asegurar que sea iterable
             fullName = contacto.get("Name", "")
-            nombre, apellido = (fullName.split(' ', 1) + [""])[:2]
+            if fullName and isinstance(fullName, str): 
+                nombre, apellido = (fullName.split(' ', 1) + [""])[:2]
+            else:
+                nombre, apellido = "Null", "None"
 
             empleados_contacto.append({
                 "codigoInternoSap": contacto.get("InternalCode", ""),
-                "nombreCompleto": contacto.get("Name", ""),
-                "nombre": nombre,  # Asumiendo que 'Name' contiene nombre completo
-                "apellido": apellido or "None",  # Si no hay apellido, se mantiene vacío
+                "nombreCompleto": fullName,
+                "nombre": nombre,
+                "apellido": apellido,
                 "telefono": contacto.get("Phone1", ""),
                 "celular": contacto.get("Phone1", ""),
                 "email": contacto.get("E_Mail", ""),
@@ -1013,13 +1020,20 @@ class SocioNegocio:
             "Contactos": empleados_contacto
         }
 
+        print(f"Datos del socio de negocio procesados: {resultado}")
+        
         return resultado
 
 
+
     def guardarClienteCompleto(self, data):
+        
+        print(F"datos para guardar cliente completo: {data}")
+        print("Guardando cliente completo...")
         socio_negocio = data["SocioNegocio"]
         print(f"Nombre: " + socio_negocio["nombre"])
         print(f"Apellido: " + socio_negocio["apellido"])
+        print(data["Direcciones"])
     
         # Obtener la instancia de GrupoSNDB
         try:
@@ -1456,71 +1470,66 @@ class SocioNegocio:
 
 
     def syncBusinessPartners(self):
-        # Obtener el valor de skip desde la base de datos
         state, created = SyncState.objects.get_or_create(
-            name="syncPartnersBusiness",
-            defaults={"skip": 0}
+            key="syncPartnersBusiness",
+            defaults={"value": 0}
         )
-        
-        skip = state.skip
+
+        skip = state.value
         totalSynced = 0
 
-        # Instancia del cliente API
         apiClientSL = APIClient()
+        
+        count = apiClientSL.getQuantityBusinessPartners()
+
+        if not isinstance(count, dict) or 'value' not in count or not count['value']:
+            return {"success": False, "message": "No se encontraron socios de negocio en SAP."}
+
+        totalBP = count['value'][0].get('BusinessPartners', 0)
+        
+        if skip >= totalBP:
+            skip = 0
+            state.value = 0
+            state.save()
+
+        logging.info(f"Total de socios de negocio en SAP: {totalBP}")
 
         try:
-            # Obtener la cantidad total de socios de negocio
-            count = apiClientSL.getQuantityBusinessPartners()
-
-            if not isinstance(count, dict) or 'value' not in count or not count['value']:
-                return {"success": False, "message": "No se encontraron socios de negocio en SAP."}
-
-            firstBP = count['value'][0]
-            totalBP = firstBP.get('BusinessPartners')
-
-            if totalBP is None:
-                return {"success": False, "message": "No se encontraron socios de negocio en SAP."}
-
-            logging.info(f"Total de socios de negocio en SAP: {totalBP}")
-
-            # Si el skip es mayor o igual al total, reiniciar el contador
-            if skip >= totalBP:
-                skip = 0
-                state.skip = 0
-                state.save()
-
             # Obtener los socios de negocio desde SAP
             bp = apiClientSL.getBusinessPartners(skip=skip)
-
-            if not bp:
+            
+            if not bp or 'value' not in bp:
                 return {"success": False, "message": "No se encontraron socios de negocio en SAP."}
+            
+            # Ajuste para procesar cada elemento dentro de 'value'
+            for partner_data in bp['value']:
+                # Convertir cada objeto JSON de la lista en un objeto manejable
+                partner_object = self.convertirJsonObjeto(partner_data)
 
-            syncedCount = 0
+                # Procesar y guardar cada socio de negocio
+                processed_data = self.procesarDatosSocionegocio(partner_object)
 
-            for partner in bp:
                 try:
-                    # Convertir JSON a objeto y procesarlo
-                    dataCreation = self.procesarDatosSocionegocio(self.convertirJsonObjeto(partner))
-                    client = self.guardarClienteCompleto(dataCreation)
-
+                    client = self.guardarClienteCompleto(processed_data)
+                    print(f"Cliente creado: {client}")
                     if client:
-                        syncedCount += 1
-
+                        totalSynced += 1
                 except Exception as e:
-                    logging.error(f"Error al sincronizar socio de negocio: {str(e)}")
-                    continue
+                    logging.error(f"Error al sincronizar socio {partner_object.get('CardCode')}: {str(e)}")
+                    continue  # Evita que un error detenga la sincronización
 
-            # Actualizar el skip solo si hubo sincronización
-            if syncedCount > 0:
-                state.skip = skip + syncedCount
+            if totalSynced > 0:
+                state.value = skip + totalSynced
                 state.save()
-                logging.info(f"{syncedCount} socios de negocio sincronizados con éxito.")
+                logging.info(f"{totalSynced} socios de negocio sincronizados con éxito.")
 
-            return {"success": True, "message": f"{syncedCount} socios de negocio sincronizados con éxito."}
+            return {"success": True, "message": f"{totalSynced} socios de negocio sincronizados con éxito."}
 
         except Exception as e:
             logging.error(f"Error general en la sincronización: {str(e)}")
             return {"success": False, "message": "Ocurrió un error en la sincronización."}
+
+
         
 
 
