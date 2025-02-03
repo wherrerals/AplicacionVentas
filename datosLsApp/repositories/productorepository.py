@@ -105,13 +105,23 @@ class ProductoRepository:
                 },
             )
 
+            print(f"Bodegas dispo: {bodega_data.get('stock_disponible', -1)}")
+            print(f"Bodega Cmpro: {bodega_data.get('stock_comprometido', -1)}")
+            stockVentaDAto = bodega_data.get("stock_disponible", -1) - bodega_data.get("stock_comprometido", -1),
+            
+            stockVenta = stockVentaDAto[0]
+            
+            print(f"Stock venta: {stockVenta}")
+            
+            
+
             # Sincronizar el stock de la bodega para este producto
             StockBodegasDB.objects.update_or_create(
                 idProducto=producto,
                 idBodega=bodega,
                 defaults={
-                    "stock": bodega_data.get("stock_disponible", -1),
-                    "stockDisponibleReal": bodega_data.get("stock_comprometido", -1),
+                    "stock": stockVenta,
+                    "stockDisponibleReal": bodega_data.get("stock_disponible", -1),
                 },
             )
 
