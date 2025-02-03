@@ -924,7 +924,6 @@ class SocioNegocio:
         Returns:
             dict: Objeto Python convertido.
         """
-        print("Convirtiendo JSON a objeto Python...")
 
         # Verificar si `json_data` es una cadena JSON y convertirla si es necesario
         if isinstance(json_data, str):
@@ -943,8 +942,6 @@ class SocioNegocio:
         Returns:
             dict: Datos del socio de negocio procesados.
         """
-        print("Procesando datos del socio de negocio...")
-        print(f"Datos recibidos Integracion: {data}")
 
         # Obtener 'CardName' con un valor predeterminado
         card_name = data.get('CardName', '')
@@ -1019,21 +1016,14 @@ class SocioNegocio:
             "Direcciones": direcciones,
             "Contactos": empleados_contacto
         }
-
-        print(f"Datos del socio de negocio procesados: {resultado}")
-        
         return resultado
 
 
 
     def guardarClienteCompleto(self, data):
         
-        print(F"datos para guardar cliente completo: {data}")
-        print("Guardando cliente completo...")
+
         socio_negocio = data["SocioNegocio"]
-        print(f"Nombre: " + socio_negocio["nombre"])
-        print(f"Apellido: " + socio_negocio["apellido"])
-        print(data["Direcciones"])
     
         # Obtener la instancia de GrupoSNDB
         try:
@@ -1046,7 +1036,6 @@ class SocioNegocio:
             # Maneja el error según sea necesario, como lanzar una excepción o crear un nuevo grupo
         
         if socio_negocio["grupoSN"] == 105:
-            print("Creando cliente persona...")
             cliente = SocioNegocioRepository.crearCliente(
                 codigoSN=socio_negocio["codigoSN"],
                 nombre=socio_negocio["nombre"],
@@ -1061,7 +1050,6 @@ class SocioNegocio:
             )
 
         else:
-            print("Creando cliente empresa...")
             cliente = SocioNegocioRepository.crearClienteEmpresa(
                 codigoSN=socio_negocio["codigoSN"],
                 nombre=socio_negocio["razonSocial"],
@@ -1081,19 +1069,12 @@ class SocioNegocio:
             datoComuna = direccion.get('comuna')
             # Quitar el guion y limpiar el string
             id_comuna = datoComuna.strip().split("-")[0].strip()
-            
-            print(f"ID Comuna1: {id_comuna}")
-            
+                        
             # Obtener la comuna del repositorio
             comuna = ComunaRepository().obtenerComunaPorId(id_comuna)
-            
-            print(f"Comuna: {comuna}")
-            
+                        
             # Verificar si se obtuvo una comuna válida
-            comuna_id = comuna.codigo if comuna != 0 else direccion["region"]
-            
-            print(f"Comuna ID: {comuna_id}")
-            
+            comuna_id = comuna.codigo if comuna != 0 else direccion["region"]            
             
             # Crear la dirección asociada
             DireccionRepository.crearDireccion(
@@ -1295,8 +1276,6 @@ class SocioNegocio:
             else:
                 raise ValidationError(f"Grupo de cliente no válido: {self.gruposn}")
             SocioNegocio.agregarDireccionYContacto(self.request, cliente)
-            print("Cliente creado exitosamente.")
-            print(f"Cliente creado: {cliente}")
 
         return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
 
@@ -1492,8 +1471,6 @@ class SocioNegocio:
             state.value = 0
             state.save()
 
-        logging.info(f"Total de socios de negocio en SAP: {totalBP}")
-
         try:
             # Obtener los socios de negocio desde SAP
             bp = apiClientSL.getBusinessPartners(skip=skip)
@@ -1511,7 +1488,6 @@ class SocioNegocio:
 
                 try:
                     client = self.guardarClienteCompleto(processed_data)
-                    print(f"Cliente creado: {client}")
                     if client:
                         totalSynced += 1
                 except Exception as e:

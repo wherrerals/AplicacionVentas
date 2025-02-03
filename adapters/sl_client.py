@@ -729,3 +729,35 @@ class APIClient:
         print("url del conteo", url)
         return response.json()
     
+    def productTreesComponents(self, itemCode):
+        url = f"{self.base_url}ProductTrees('{itemCode}')"
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print(url)
+        return response.json()
+
+    def urlPrueba(self, skip=0):
+
+        self.__login()
+        adicionales = "Items('N10800053K2')?$select=ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection&$filter=SalesItem eq 'tYES'&$orderby=ItemCode asc"
+
+        url = f"{self.base_url}{adicionales}"
+
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print("URL DE PRODUCTOS PARA SINCRONIZACION", url)
+        return response.json()
+    
+    def prueba(self, skip=0):
+
+        self.__login()
+        select = "ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection"
+        filter = "SalesItem eq 'tYES' and TreeType eq 'iSalesTree'"
+        order_by = "ItemCode asc"
+
+        url = f"{self.base_url}Items?$select={select}&$filter={filter}&$orderby={order_by}&$skip={skip}"
+
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        print("URL DE PRODUCTOS PARA SINCRONIZACION", url)
+        return response.json()

@@ -33,26 +33,23 @@ class ProductoRepository:
             products (list): Lista de diccionarios con datos de productos y su stock.
         """
         rentabilidad_minima = 50
-
+        
         for product_data in products:
-            # Acceder al producto correctamente
             producto_info = product_data.get("Producto", {}).get("Producto")
             if not producto_info or "codigo" not in producto_info:
                 print(f"Advertencia: Producto inválido o sin código. Datos: {product_data}")
-                continue  # Saltar este producto
+                continue
 
-            # Calcular margen bruto y descuentos máximos
             precio_venta = next(
                 (precio["precio"] for precio in product_data.get("Precios", []) if precio["priceList"] == 2),
                 0.0,
             )
             costo = producto_info.get("costo", 0.0)
-            
+
             margen_bruto, descuento_maximo = self.calculate_margen_descuentos(
                 precio_venta, costo, rentabilidad_minima
             )
 
-            # Sincronizar ProductoDB
             producto, _ = ProductoDB.objects.update_or_create(
                 codigo=producto_info["codigo"],
                 defaults={
@@ -69,17 +66,60 @@ class ProductoRepository:
                     "linkProducto": product_data.get("linkProducto", ""),
                 },
             )
+            print("******" * 100)
             
-            #print(f"Producto sincronizado: {producto.codigo} - {producto.nombre} - {producto.marca} - {producto.precioVenta} - {producto.precioLista} - {producto.dsctoMaxTienda} - {producto.dctoMaxProyectos}") 
-
-            # Sincronizar bodegas y stock
-            if "Bodegas" in product_data:
-                self.sync_stock(producto, product_data["Bodegas"])
-
-                # Calcular y actualizar el stock total del producto
-                self.update_stock_total(producto)
+            print(f'TreeType: {producto_info.get("TreeType")},')
+            print(f'producto:  {producto_info.get("nombre")},')
+            
+            # Si el producto es una receta, calcular stock y costo de receta
+            if producto_info.get("TreeType") == "iSalesTree":
+                print("Es una receta")
+                stock_receta, costo_receta = self.calcular_stock_y_costo_receta(producto_info["codigo"])
+                producto.stock_total = stock_receta
+                producto.costo = costo_receta
+                producto.save()
+            else:
+                if "Bodegas" in product_data:
+                    self.sync_stock(producto, product_data["Bodegas"])
+                    self.update_stock_total(producto)
 
         return True
+
+    def calcular_stock_y_costo_receta(self, item_code):
+        """Calcula el stock y costo total de una receta."""
+        print(f"Calculando stock y costo de receta para {item_code}")
+        componentes = self.productTreesComponents(item_code).get("ProductTreeLines", [])
+        bodegas = ["ME", "TR_ME", "PH", "TR_PH", "LC", "TR_LC"]
+        
+        stock_por_bodega = {bodega: float("inf") for bodega in bodegas}
+        costo_total = 0.0
+        
+        for componente in componentes:
+            item_code_componente = componente["ItemCode"]
+            print(f"Item code componente: {item_code_componente}")
+            cantidad_necesaria = componente["Quantity"]
+            stock_componente = self.obtener_stock_componente(item_code_componente)
+            costo_componente = self.obtener_costo_componente(item_code_componente)
+            
+            for bodega in bodegas:
+                stock_bodega = stock_componente.get(bodega, 0) // cantidad_necesaria
+                stock_por_bodega[bodega] = min(stock_por_bodega[bodega], stock_bodega)
+            
+            costo_total += costo_componente * cantidad_necesaria
+        
+        stock_total_receta = min(stock_por_bodega.values())
+        return stock_total_receta, costo_total
+
+    def obtener_stock_componente(self, item_code):
+        """Obtiene el stock de un componente desde la API."""
+        stock_data = self.get_stock(item_code)
+        return {bodega["WarehouseCode"]: bodega["InStock"] for bodega in stock_data.get("Stock", [])}
+
+    def obtener_costo_componente(self, item_code):
+        """Obtiene el costo promedio del componente desde la API."""
+        item_data = self.get_item(item_code)
+        return item_data.get("AvgStdPrice", 0.0)
+
 
 
     def sync_stock(self, producto, bodegas):
@@ -104,15 +144,10 @@ class ProductoRepository:
                     "descripcion": bodega_data.get("nombre", ""),
                 },
             )
-
-            print(f"Bodegas dispo: {bodega_data.get('stock_disponible', -1)}")
-            print(f"Bodega Cmpro: {bodega_data.get('stock_comprometido', -1)}")
+            
             stockVentaDAto = bodega_data.get("stock_disponible", -1) - bodega_data.get("stock_comprometido", -1),
             
-            stockVenta = stockVentaDAto[0]
-            
-            print(f"Stock venta: {stockVenta}")
-            
+            stockVenta = stockVentaDAto[0]            
             
 
             # Sincronizar el stock de la bodega para este producto
@@ -172,3 +207,5 @@ class ProductoRepository:
         
         producto = ProductoDB.objects.get(codigo=codigo)
         return producto.marca
+
+    

@@ -45,8 +45,9 @@ class Producto:
             state.save()
 
         # Obtener productos desde la API de SalesLayer usando `skip`
-        productos = cliente.obtenerProductosSL(skip=skip)
 
+        #productos = cliente.obtenerProductosSL(skip=skip)
+        productos = cliente.prueba(skip=20)
         # Si hay productos, sincronizarlos
         if productos:
             # Serializar los productos

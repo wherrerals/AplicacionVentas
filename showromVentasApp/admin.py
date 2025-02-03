@@ -176,6 +176,7 @@ class ComunaDBper(admin.ModelAdmin):
 
 class stockBodegasDBper(admin.ModelAdmin):
     list_display = ('idProducto', 'idBodega', 'stock', 'stockDisponibleReal')
+    search_fields = ['idProducto', 'idBodega']
     
 class ConfiDescuentosDBper(admin.ModelAdmin):
     list_display = ('codigo', 'descripcion', 'tipoVenta', 'limiteDescuentoMaximo', 'tipoDeMarca')
