@@ -183,6 +183,7 @@ class Serializador:
                     "codigo": product_data.get("ItemCode"),
                     "marca": product_data.get("U_LED_MARCA"),
                     "costo": product_data.get("AvgStdPrice"),
+                    "TreeType": product_data.get("TreeType"),
                 }
             }
 

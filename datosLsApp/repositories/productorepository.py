@@ -1,3 +1,4 @@
+from adapters.sl_client import APIClient
 from datosLsApp.models import ProductoDB, StockBodegasDB, BodegaDB
 from django.db.models import Sum
 
@@ -76,7 +77,9 @@ class ProductoRepository:
                 print("Es una receta")
                 stock_receta, costo_receta = self.calcular_stock_y_costo_receta(producto_info["codigo"])
                 producto.stock_total = stock_receta
+                print(f"Stock total receta xxx: {stock_receta}")
                 producto.costo = costo_receta
+                print(f"Costo total receta xxx: {costo_receta}")
                 producto.save()
             else:
                 if "Bodegas" in product_data:
@@ -88,7 +91,9 @@ class ProductoRepository:
     def calcular_stock_y_costo_receta(self, item_code):
         """Calcula el stock y costo total de una receta."""
         print(f"Calculando stock y costo de receta para {item_code}")
-        componentes = self.productTreesComponents(item_code).get("ProductTreeLines", [])
+
+        ApiClientSL = APIClient()
+        componentes = ApiClientSL.productTreesComponents(item_code).get("ProductTreeLines", [])
         bodegas = ["ME", "TR_ME", "PH", "TR_PH", "LC", "TR_LC"]
         
         stock_por_bodega = {bodega: float("inf") for bodega in bodegas}
@@ -96,7 +101,6 @@ class ProductoRepository:
         
         for componente in componentes:
             item_code_componente = componente["ItemCode"]
-            print(f"Item code componente: {item_code_componente}")
             cantidad_necesaria = componente["Quantity"]
             stock_componente = self.obtener_stock_componente(item_code_componente)
             costo_componente = self.obtener_costo_componente(item_code_componente)
@@ -108,16 +112,26 @@ class ProductoRepository:
             costo_total += costo_componente * cantidad_necesaria
         
         stock_total_receta = min(stock_por_bodega.values())
+        
+
         return stock_total_receta, costo_total
 
     def obtener_stock_componente(self, item_code):
         """Obtiene el stock de un componente desde la API."""
-        stock_data = self.get_stock(item_code)
-        return {bodega["WarehouseCode"]: bodega["InStock"] for bodega in stock_data.get("Stock", [])}
+        ApiClientSL = APIClient()
+        stock_data = ApiClientSL.urlPrueba(item_code)
+
+        # Extraer correctamente la lista de almacenes
+        warehouses = stock_data.get("ItemWarehouseInfoCollection", [])
+
+        # Devolver un diccionario con el stock por bodega
+        return {bodega["WarehouseCode"]: bodega["InStock"] for bodega in warehouses}
+
 
     def obtener_costo_componente(self, item_code):
         """Obtiene el costo promedio del componente desde la API."""
-        item_data = self.get_item(item_code)
+        ApiClientSL = APIClient()
+        item_data = ApiClientSL.urlPrueba(item_code)
         return item_data.get("AvgStdPrice", 0.0)
 
 

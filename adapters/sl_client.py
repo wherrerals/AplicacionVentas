@@ -736,10 +736,10 @@ class APIClient:
         print(url)
         return response.json()
 
-    def urlPrueba(self, skip=0):
+    def urlPrueba(self, codigo, skip=0):
 
         self.__login()
-        adicionales = "Items('N10800053K2')?$select=ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection&$filter=SalesItem eq 'tYES'&$orderby=ItemCode asc"
+        adicionales = f"Items('{codigo}')?$select=ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection&$filter=SalesItem eq 'tYES'&$orderby=ItemCode asc"
 
         url = f"{self.base_url}{adicionales}"
 

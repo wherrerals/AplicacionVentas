@@ -13,7 +13,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['192.168.3.13'] #Cambiar por el dominio o ip de la maquina en la que se va a desplegar la aplicacion
+ALLOWED_HOSTS = ['192.168.3.13', 'localhost'] #Cambiar por el dominio o ip de la maquina en la que se va a desplegar la aplicacion
 
 #Configuracion para docker
 """ DATABASES = {
