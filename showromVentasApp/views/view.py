@@ -28,6 +28,7 @@ from logicaVentasApp.services.socionegocio import SocioNegocio
 #librerias Python usadas
 import requests
 import json
+import math
 
 from logicaVentasApp.services.comuna import Comuna
 from datosLsApp.models.stockbodegasdb import StockBodegasDB
@@ -739,6 +740,7 @@ def busquedaProductos(request):
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
     
+
 def limitar_descuento(producto):
     """
     Limita el descuento máximo según el tipo de producto.
@@ -746,13 +748,9 @@ def limitar_descuento(producto):
     Para otros productos, si el descuento es mayor que 10%, lo ajusta a 10%.
     """
     if producto.marca == 'LST':
-        return min(producto.dsctoMaxTienda * 100, 15)
+        return math.floor(min(producto.dsctoMaxTienda * 100, 15))
     else:
-        return min(producto.dsctoMaxTienda * 100, 10)
-
-
-
-
+        return math.floor(min(producto.dsctoMaxTienda * 100, 10))
 
 
 def validar_contrasena(password):

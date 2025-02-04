@@ -85,25 +85,16 @@ class ProductoRepository:
                     # Asignar stock y costo al producto
                     producto.stockTotal = stock_receta
                     producto.costo = costo_receta
+                    
+                    print(f"datos de descuento maximo: {precio_venta}, {costo_receta}, {rentabilidad_minima}")
+                    
+                    margen_bruto, descuento_maximo = self.calculate_margen_descuentos(precio_venta, costo_receta, rentabilidad_minima)
+                    
+                    
+                    producto.dsctoMaxTienda = descuento_maximo
+                    producto.dctoMaxProyectos = descuento_maximo
                     producto.save()
-
-                    print(f"RESULTADO STOCK FINAL RECETA: {stock_receta}")
-
-                    # Obtener stock por bodega desde la API o base de datos
-                    stock_por_bodega = self.obtener_stock_componente(producto_info["codigo"])
-
-                    # Convertir stock por bodega al formato esperado por `sync_stock`
-                    bodegas_data = [
-                        {"nombre": bodega, "stock_disponible": stock, "stock_comprometido": 0} 
-                        for bodega, stock in stock_por_bodega.items()
-                    ]
-
-                    # Sincronizar stock del producto en las bodegas
-                    self.sync_stock(producto, bodegas_data)
-
-                    # Actualizar el stock total del producto basado en las bodegas
-                    self.update_stock_total(producto)
-
+                    
                 except Exception as e:
                     print(f"Error al calcular stock y costo de receta: {e}")
             else:
@@ -120,7 +111,7 @@ class ProductoRepository:
         ApiClientSL = APIClient()
         componentes = ApiClientSL.productTreesComponents(item_code).get("ProductTreeLines", [])
 
-        bodegas = ["ME", "TR_ME", "PH", "TR_PH", "LC", "TR_LC"]
+        bodegas = ["ME", "PH", "LC"]
 
         # Inicializamos el stock total por bodega con infinito
         stock_por_bodega = {bodega: float('inf') for bodega in bodegas}
@@ -131,10 +122,7 @@ class ProductoRepository:
             item_code_componente = componente["ItemCode"]
             cantidad_necesaria = componente["Quantity"]
             
-            print(f"Obteniendo stock del componente {item_code_componente}")
-            stock_componente = self.obtener_stock_componente(item_code_componente)
-            print(f"Stock componente: {stock_componente}")
-            
+            stock_componente = self.obtener_stock_componente(item_code_componente)            
             costo_componente = self.obtener_costo_componente(item_code_componente)
 
             # Calcular el total del stock del componente en todas sus bodegas
@@ -158,8 +146,8 @@ class ProductoRepository:
             costo_total += costo_componente * cantidad_necesaria
 
             # **Sincronizar stock del componente en las bodegas**
-            print(f"Sincronizando stock de {item_code_componente} en la base de datos")
-            producto = ProductoDB.objects.get(codigo=item_code_componente)  # Obtener la instancia del producto
+            print(f"Sincronizando stock de {item_code} en la base de datos")
+            producto = ProductoDB.objects.get(codigo=item_code)  # Obtener la instancia del producto
             bodegas_datos = [{"nombre": bodega, "stock_disponible": stock_componente.get(bodega, 0), "stock_comprometido": 0} for bodega in bodegas]
             self.sync_stock(producto, bodegas_datos)
 
@@ -173,7 +161,6 @@ class ProductoRepository:
         self.update_stock_total(producto)
 
         print("******" * 100)
-        
         return stock_total_receta, costo_total
 
 
@@ -213,6 +200,8 @@ class ProductoRepository:
             producto (ProductoDB): Instancia del producto.
             bodegas (list): Lista de diccionarios con datos de las bodegas y su stock.
         """
+        
+        print(f"Sincronizando stock de {producto.codigo} en la base de datos")
         for bodega_data in bodegas:
             # Validar que la bodega tenga el nombre requerido
             if "nombre" not in bodega_data:

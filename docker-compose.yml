@@ -60,11 +60,24 @@ services:
       CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
 
 
-  celery-worker:
+  celery-worker-products:
     build:
       context: .
       dockerfile: dockerfile.app
-    command: celery -A config worker --pool=solo -Q q_products_in,q_clients_in --loglevel=info
+    command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in
+    depends_on:
+      - rabbitmq
+      - db
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+
+  celery-worker-users:
+    build:
+      context: .
+      dockerfile: dockerfile.app
+    command: celery -A config worker --loglevel=info --concurrency=2 -Q q_clients_in
     depends_on:
       - rabbitmq
       - db
