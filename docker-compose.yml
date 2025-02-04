@@ -64,7 +64,7 @@ services:
     build:
       context: .
       dockerfile: dockerfile.app
-      command: celery -A config worker --pool=solo -Q q_products_in,q_clients_in --loglevel=info
+    command: celery -A config worker --pool=solo -Q q_products_in,q_clients_in --loglevel=info
     depends_on:
       - rabbitmq
       - db
