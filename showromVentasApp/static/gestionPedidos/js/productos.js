@@ -106,7 +106,7 @@ class Producto {
                         <small class="numeric-value" name="precio_venta" data-precio-unitario="100.00">${this.precioVenta}</small>
                     </div>
                     <div style="font-size: 11px;">
-                        <small class="numeric-value" style="color: rgb(153,153,153);" name="precio_lista">${this.precioLista}</small>
+                        <small class="numeric-value" style="color: rgb(153,153,153);" name="precio_lista">${formatCurrency(this.precioLista)}</small>
                     </div>
 
                     <div class="row" style="font-size: 11px;">
@@ -116,7 +116,7 @@ class Producto {
                             </svg>
                         </div>
                         <div class="col-sm-7 col-md-8">
-                            <small  class="numeric-value" style="color: rgb(255,0,0);" id="descuento" name="descuento_max" hidden>Max: ${this.precioDescuento}</small>
+                            <small  class="numeric-value" style="color: rgb(255,0,0);" id="descuento" name="descuento_max" hidden>Max: ${this.precioDescuento}%</small>
                         </div>
                     </div>
                 </td>

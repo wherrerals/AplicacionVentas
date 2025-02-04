@@ -104,24 +104,46 @@ function agregarInteractividad(newRow, codigoProducto) {
         let totalIva = 0;
         let totalBruto = 0;
         let totalNeto = 0;
-
+    
         productos.forEach(producto => {
             const valores = producto.calcularValores();
             totalIva += valores.iva;
             totalBruto += valores.bruto;
             totalNeto += valores.neto;
         });
-
+    
         // Redondear los totales al final
         totalIva = Math.round(totalIva);
         totalBruto = Math.round(totalBruto);
         totalNeto = Math.round(totalNeto);
-
-        console.log('Total IVA:', totalIva, 'Total Bruto:', totalBruto, 'Total Neto:', totalNeto);
-
-        document.querySelector('#iva').textContent = `$${totalIva.toFixed(0)}`;
-        document.querySelector('#total_bruto').textContent = `$${totalBruto.toFixed(0)}`;
-        document.querySelector('#total_neto').textContent = `$${totalNeto.toFixed(0)}`;
+    
+        console.log('Total IVA:', formatCurrency(totalIva), 
+                    'Total Bruto:', formatCurrency(totalBruto), 
+                    'Total Neto:', formatCurrency(totalNeto));
+    
+        document.querySelector('#iva').textContent = formatCurrency(totalIva);
+        document.querySelector('#total_bruto').textContent = formatCurrency(totalBruto);
+        document.querySelector('#total_neto').textContent = formatCurrency(totalNeto);
     }
 
+}
+
+
+function formatCurrency(value) {
+    // Convertimos el valor a número entero
+    const integerValue = Math.floor(value);
+    
+    // Usamos toLocaleString con minimumFractionDigits: 0 para no mostrar decimales
+    let formattedValue = integerValue.toLocaleString('es-ES', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0  // Esto asegura que no se muestren decimales
+    });
+
+    // Si el valor tiene 4 dígitos y no incluye un punto, lo añadimos manualmente
+    if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
+        formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
+    }
+
+    // Agregamos el símbolo de peso al principio
+    return `$ ${formattedValue}`;
 }
