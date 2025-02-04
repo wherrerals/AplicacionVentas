@@ -1,6 +1,8 @@
 from adapters.sl_client import APIClient
 from datosLsApp.models import ProductoDB, StockBodegasDB, BodegaDB
 from django.db.models import Sum
+import math
+
 
 
 class ProductoRepository:
@@ -74,13 +76,36 @@ class ProductoRepository:
             
             # Si el producto es una receta, calcular stock y costo de receta
             if producto_info.get("TreeType") == "iSalesTree":
-                print("Es una receta")
-                stock_receta, costo_receta = self.calcular_stock_y_costo_receta(producto_info["codigo"])
-                producto.stock_total = stock_receta
-                print(f"Stock total receta xxx: {stock_receta}")
-                producto.costo = costo_receta
-                print(f"Costo total receta xxx: {costo_receta}")
-                producto.save()
+                try:
+                    print("PROCESANDO RECETA")
+                    
+                    # Calcular stock y costo de la receta
+                    stock_receta, costo_receta = self.calcular_stock_y_costo_receta(producto_info["codigo"])
+                    
+                    # Asignar stock y costo al producto
+                    producto.stockTotal = stock_receta
+                    producto.costo = costo_receta
+                    producto.save()
+
+                    print(f"RESULTADO STOCK FINAL RECETA: {stock_receta}")
+
+                    # Obtener stock por bodega desde la API o base de datos
+                    stock_por_bodega = self.obtener_stock_componente(producto_info["codigo"])
+
+                    # Convertir stock por bodega al formato esperado por `sync_stock`
+                    bodegas_data = [
+                        {"nombre": bodega, "stock_disponible": stock, "stock_comprometido": 0} 
+                        for bodega, stock in stock_por_bodega.items()
+                    ]
+
+                    # Sincronizar stock del producto en las bodegas
+                    self.sync_stock(producto, bodegas_data)
+
+                    # Actualizar el stock total del producto basado en las bodegas
+                    self.update_stock_total(producto)
+
+                except Exception as e:
+                    print(f"Error al calcular stock y costo de receta: {e}")
             else:
                 if "Bodegas" in product_data:
                     self.sync_stock(producto, product_data["Bodegas"])
@@ -88,45 +113,89 @@ class ProductoRepository:
 
         return True
 
-    def calcular_stock_y_costo_receta(self, item_code):
-        """Calcula el stock y costo total de una receta."""
-        print(f"Calculando stock y costo de receta para {item_code}")
 
+    def calcular_stock_y_costo_receta(self, item_code):
+        """Calcula el stock total de la receta y el costo total."""
+        
         ApiClientSL = APIClient()
         componentes = ApiClientSL.productTreesComponents(item_code).get("ProductTreeLines", [])
+
         bodegas = ["ME", "TR_ME", "PH", "TR_PH", "LC", "TR_LC"]
-        
-        stock_por_bodega = {bodega: float("inf") for bodega in bodegas}
+
+        # Inicializamos el stock total por bodega con infinito
+        stock_por_bodega = {bodega: float('inf') for bodega in bodegas}
+        stock_total_receta = float('inf')
         costo_total = 0.0
-        
+
         for componente in componentes:
             item_code_componente = componente["ItemCode"]
             cantidad_necesaria = componente["Quantity"]
+            
+            print(f"Obteniendo stock del componente {item_code_componente}")
             stock_componente = self.obtener_stock_componente(item_code_componente)
+            print(f"Stock componente: {stock_componente}")
+            
             costo_componente = self.obtener_costo_componente(item_code_componente)
-            
-            for bodega in bodegas:
-                stock_bodega = stock_componente.get(bodega, 0) // cantidad_necesaria
-                stock_por_bodega[bodega] = min(stock_por_bodega[bodega], stock_bodega)
-            
-            costo_total += costo_componente * cantidad_necesaria
-        
-        stock_total_receta = min(stock_por_bodega.values())
-        
 
+            # Calcular el total del stock del componente en todas sus bodegas
+            stock_total_componente = sum(stock_componente.values())
+            
+            # Calcular stock disponible por la cantidad requerida
+            stock_disponible_componente = math.floor(stock_total_componente / cantidad_necesaria) if cantidad_necesaria > 0 else 0
+            
+            # Actualizar el stock total de la receta (mínimo entre todos los componentes)
+            stock_total_receta = min(stock_total_receta, stock_disponible_componente)
+
+            # Calcular el stock de la receta por bodega
+            for bodega in bodegas:
+                stock_bodega = stock_componente.get(bodega, 0)
+                stock_disponible = math.floor(stock_bodega / cantidad_necesaria) if cantidad_necesaria > 0 else 0
+                
+                # Actualizar el stock de la receta por bodega
+                stock_por_bodega[bodega] = min(stock_por_bodega[bodega], stock_disponible)
+
+            # Sumar el costo total de la receta
+            costo_total += costo_componente * cantidad_necesaria
+
+            # **Sincronizar stock del componente en las bodegas**
+            print(f"Sincronizando stock de {item_code_componente} en la base de datos")
+            producto = ProductoDB.objects.get(codigo=item_code_componente)  # Obtener la instancia del producto
+            bodegas_datos = [{"nombre": bodega, "stock_disponible": stock_componente.get(bodega, 0), "stock_comprometido": 0} for bodega in bodegas]
+            self.sync_stock(producto, bodegas_datos)
+
+        # Si stock_total_receta sigue siendo infinito, significa que no hay stock suficiente
+        stock_total_receta = stock_total_receta if stock_total_receta != float('inf') else 0
+
+        print(f"Stock total receta final: {stock_total_receta}")
+
+        # **Actualizar el stock total del producto después de sincronizar**
+        print("Actualizando stock total del producto en la base de datos")
+        self.update_stock_total(producto)
+
+        print("******" * 100)
+        
         return stock_total_receta, costo_total
 
+
+
     def obtener_stock_componente(self, item_code):
-        """Obtiene el stock de un componente desde la API."""
+        """Obtiene el stock disponible de un componente desde la API, filtrando por bodegas específicas."""
         ApiClientSL = APIClient()
         stock_data = ApiClientSL.urlPrueba(item_code)
 
         # Extraer correctamente la lista de almacenes
         warehouses = stock_data.get("ItemWarehouseInfoCollection", [])
 
-        # Devolver un diccionario con el stock por bodega
-        return {bodega["WarehouseCode"]: bodega["InStock"] for bodega in warehouses}
+        # Lista de bodegas permitidas
+        bodegas_permitidas = {"ME", "PH", "LC"}
 
+        # Filtrar y devolver un diccionario con el stock disponible (InStock - Committed)
+        return {
+            bodega["WarehouseCode"]: bodega["InStock"] - bodega.get("Committed", 0)
+            for bodega in warehouses
+            if bodega["WarehouseCode"] in bodegas_permitidas
+        }
+        
 
     def obtener_costo_componente(self, item_code):
         """Obtiene el costo promedio del componente desde la API."""

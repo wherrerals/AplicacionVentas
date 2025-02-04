@@ -87,10 +87,14 @@ CELERY_RESULT_BACKEND = 'rpc://'
 
 # Configuración de rutas de tareas a colas específicas
 CELERY_TASK_ROUTES = {
-    'taskApp.tasks.sync_products': {'queue': 'sync_queue'},# Asigna la tarea a una cola específica
-    'taskApp.tasks.syncUser': {'queue': 'sync_queue'},# Asigna la tarea a una cola específica
+    'taskApp.tasks.sync_products': {'queue': 'q_products_in'},# Asigna la tarea a una cola específica
+    'taskApp.tasks.syncUser': {'queue': 'q_clients_in'},# Asigna la tarea a una cola específica
 }
 
+""" CELERY_TASK_ROUTES = {
+    'taskApp.tasks.*': {'queue': 'default_queue'}  # Asigna todas las tareas a una cola predeterminada
+}
+ """
 # Configuración para crear colas faltantes
 CELERY_TASK_CREATE_MISSING_QUEUES = True
 
