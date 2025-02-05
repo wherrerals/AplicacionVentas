@@ -31,7 +31,7 @@ function agregarInteractividad(newRow, codigoProducto) {
     // Obtener referencias a los elementos dentro de la fila
     var inputCantidad = newRow.querySelector('#calcular_cantidad');
     var inputDescuento = newRow.querySelector('#agg_descuento');
-    var spanPrecioVenta = newRow.querySelector('small[name="precio_venta"]');
+    var spanPrecioVenta = newRow.querySelector('small[name="precio_venta"]').getAttribute('data-precioUnitario');
     var tdPrecioVenta = newRow.querySelector('#precio_Venta');
     var tdPrecioDescuento = newRow.querySelector('#Precio_Descuento');
 
@@ -58,7 +58,7 @@ function agregarInteractividad(newRow, codigoProducto) {
     // Función para calcular el precio total
     function calcularPrecioTotal() {
         var cantidad = parseFloat(inputCantidad.value) || 0;
-        var precioUnitario = parseFloat(spanPrecioVenta.textContent) || 0;
+        var precioUnitario = parseFloat(spanPrecioVenta) || 0;
         var precioTotal = cantidad * precioUnitario;
         var descuento = parseFloat(inputDescuento.value) || 0;
 
@@ -69,8 +69,8 @@ function agregarInteractividad(newRow, codigoProducto) {
         // Actualizar el producto en la lista
         producto.modificarPrecioFinal(precioFinal);
 
-        tdPrecioVenta.textContent = precioFinal.toFixed(2);
-        tdPrecioDescuento.textContent = precioConDescuento.toFixed(2);
+        tdPrecioVenta.textContent = formatCurrency(precioFinal);
+        tdPrecioDescuento.textContent = formatCurrency(precioConDescuento);
 
         actualizarValores();
     }

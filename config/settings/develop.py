@@ -2,27 +2,33 @@ from config.settings.base import *
 from config.logging import *
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-fexe1oq@sx@j&x3m#tw(#x(r!g32fylgea=whky=#ge^vn5f*h'
+SECRET_KEY = "django-insecure-fexe1oq@sx@j&x3m#tw(#x(r!g32fylgea=whky=#ge^vn5f*h"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','0.0.0.0:8000', '127.0.0.1',  '192.168.3.42']
+ALLOWED_HOSTS = ["localhost", "0.0.0.0:8000", "127.0.0.1", "192.168.3.42"]
 
-#Configuracion para DB docker
+# Base service Layer
+API_BASE_URL = "https://182.160.29.24:50003/b1s/v1/"
+COMPANY_DB = "TEST_LED_PROD"
+API_USERNAME = "manager"
+API_PASSWORD = "1245LED98"
+
+# Configuracion para DB docker
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'led_studio',
-        'USER': 'root',
-        'PASSWORD': 'Ea7hava5*',
-        'HOST': 'db',
-        'PORT': '3306',
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": "led_studio",
+        "USER": "root",
+        "PASSWORD": "Ea7hava5*",
+        "HOST": "db",
+        "PORT": "3306",
     }
 }
 
-#Configuracion para DB local
+# Configuracion para DB local
 
 """ DATABASES = {
     'default': {

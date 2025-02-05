@@ -187,7 +187,7 @@
                               <label class="col-form-label" style="font-size: 13px;">Teléfono</label>
                             </div>
                             <div class="col-sm-4">
-                              <input class="form-control" type="tel" name="telefonoSN" id="telefonoSN" value="{{ telefono }}" style="border-color: rgb(159,168,175); font-size: 12px;">
+                              <input class="form-control" type="tel" name="telefonoSN" id="telefonoSN" value="{{telefono|default:"+56" }}" style="border-color: rgb(159,168,175); font-size: 12px;">
                             </div>
                             <div class="col-sm-2" style="text-align: right;">
                               <label class="col-form-label" style="font-size: 13px;">Email</label>
@@ -511,15 +511,15 @@
         </div>
         <div class="col">
           <div class="row">
-            <div class="col-sm-7 text-end"><small>Total Neto:</small></div>
+            <div class="col-sm-7 text-end"><small><b>Total Neto:</b></small></div>
             <div class="col" style="text-align: right;" id="total_neto"><small>0</small></div>
         </div>
         <div class="row">
-            <div class="col-sm-7 text-end"><small>IVA:</small></div>
+            <div class="col-sm-7 text-end"><small><b>IVA:</b></small></div>
             <div class="col" style="text-align: right;"  id="iva"><small>0</small></div>
         </div>
         <div class="row">
-            <div class="col-sm-7 text-end"><small>Total Bruto:</small></div>
+            <div class="col-sm-7 text-end"><small><b>Total Bruto:</b></small></div>
             <div class="col" style="text-align: right;" id="total_bruto"><small>0</small></div>
         </div>
         

@@ -1,5 +1,6 @@
 class Producto {
     constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado) {
+        
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
         this.imagen = imagen;
@@ -13,7 +14,9 @@ class Producto {
         this.sucursal = sucursal;
         this.comentario = comentario;
         this.descuentoAplcado = descuentoAplcado;
+
     }
+    
 
     async obtenerStock(codigoProducto) {
         try {
@@ -103,7 +106,7 @@ class Producto {
                 </td>
                 <td style="background: transparent;border-style: none;padding-bottom: 0px;" rowspan="2">
                     <div style="font-size: 12px;">
-                        <small class="numeric-value" name="precio_venta" data-precio-unitario="100.00">${this.precioVenta}</small>
+                        <small class="numeric-value" name="precio_venta" data-precio-unitario="100.00" data-precioUnitario="${this.precioVenta}">${formatCurrency(this.precioVenta)}</small>
                     </div>
                     <div style="font-size: 11px;">
                         <small class="numeric-value" style="color: rgb(153,153,153);" name="precio_lista">${formatCurrency(this.precioLista)}</small>
@@ -130,7 +133,7 @@ class Producto {
                     <input class="form-control format-number" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad}">
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
-                    <span id="precio_Venta">${formatCurrency(this.totalProducto)}</span>
+                    <span id="precio_Venta" data-totalProductValue="${this.totalProducto}">${formatCurrency(this.totalProducto)}</span>
                 </td>
             </tr> 
             <tr style="font-size: 12px;background: transparent;">
@@ -235,6 +238,7 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
 
     let contprod = document.querySelectorAll('#productos tbody').length + 1;
 
+    // Crear una instancia de Producto
     let producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado);
 
     let newRow = producto.crearFila(contprod);

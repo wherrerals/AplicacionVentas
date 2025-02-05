@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class APIClient:
     """
     Una clase que representa el cliente de API para la capa de servicio.
@@ -14,13 +15,13 @@ class APIClient:
         base_url (str): La URL base para la API de la capa de servicio.
         session (requests.Session): Una sesión persistente para realizar solicitudes HTTP.
         autehnticated (bool): Estado de autenticación.
-    
+
     Métodos:
         login(): Autentica la sesión con la API usando las credenciales proporcionadas.
         logout(): Cirra la sesión con la API
     """
-    
-    def __init__(self): 
+
+    def __init__(self):
         """
         Inicializa una nueva instancia de APIClient.
 
@@ -35,13 +36,13 @@ class APIClient:
         self.__autehnticated = False
         self.__login()
 
-    def __login(self): 
+    def __login(self):
         """
         Construye la URL de inicio de sesión.
 
         Si la autenticacion es falsa, Autentica la sesión con la API usando las credenciales proporcionadas.
         Establece el estado de autenticación en True si la autenticación es exitosa.
-        
+
         Raises:
             HTTPError: Si la respuesta HTTP contiene un error de estado.
         """
@@ -56,8 +57,8 @@ class APIClient:
             response = self.session.post(login_url, json=auth_data, verify=False)
             response.raise_for_status()
             self.__autehnticated = True
-            return print('Autenticado con exito')
-    
+            return print("Autenticado con exito")
+
     def logout(self):
         """
         Construye la URL de fin de sesión.
@@ -87,9 +88,9 @@ class APIClient:
                 El número de registros a omitir desde el inicio del conjunto de resultados (por defecto es 0).
             filters : dict, opcional
                 Un diccionario de pares clave-valor para filtrar los resultados según condiciones específicas.
-            
+
         Returns:
-            
+
             dict
                 Un diccionario con la respuesta de la API en formato JSON.
         """
@@ -98,15 +99,15 @@ class APIClient:
         crossjoin = f"{endpoint},SalesPersons"
         expand = f"{endpoint}($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
         order_by = f"DocNum desc"
-        filter_condition = f"{endpoint}/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
+        filter_condition = (
+            f"{endpoint}/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
+        )
 
         if filters:
             for key, value in filters.items():
                 filter_condition += f" and {key} {value}"
 
-        headers = {
-            "Prefer": f"odata.maxpagesize={top}"
-        }
+        headers = {"Prefer": f"odata.maxpagesize={top}"}
 
         query_url = f"$crossjoin({crossjoin})?$expand={expand}&$orderby={order_by}&$filter={filter_condition}&$top={top}&$skip={skip}"
         url = f"{self.base_url}{query_url}"
@@ -129,9 +130,9 @@ class APIClient:
                 El número de registros a omitir desde el inicio del conjunto de resultados (por defecto es 0).
             filters : dict, opcional
                 Un diccionario de pares clave-valor para filtrar los resultados según condiciones específicas.
-            
+
         Returns:
-            
+
             dict
                 Un diccionario con la respuesta de la API en formato JSON.
         """
@@ -139,15 +140,15 @@ class APIClient:
         self.__login()
         crossjoin = f"{endpoint},SalesPersons"
         expand = f"{endpoint}($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
-        filter_condition = f"{endpoint}/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
+        filter_condition = (
+            f"{endpoint}/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
+        )
 
         if filters:
             for key, value in filters.items():
                 filter_condition += f" and {key} {value}"
 
-        headers = {
-            "Prefer": f"odata.maxpagesize={top}"
-        }
+        headers = {"Prefer": f"odata.maxpagesize={top}"}
 
         query_url = f"$crossjoin({crossjoin})?$expand={expand}&$filter={filter_condition}&$top={top}&$skip={skip}"
         url = f"{self.base_url}{query_url}"
@@ -157,16 +158,16 @@ class APIClient:
         print(url)
         return response.json()
 
-    
-    
     def obtenerCotizacionesDE(self, endpoint, docEntry, top=20, skip=0):
-        
+
         self.__login()
 
-        crossjoin = f"({endpoint},Quotations/DocumentLines,Items/ItemWarehouseInfoCollection)"
+        crossjoin = (
+            f"({endpoint},Quotations/DocumentLines,Items/ItemWarehouseInfoCollection)"
+        )
 
-        expand_fields = (f"{endpoint}/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)")
-        
+        expand_fields = f"{endpoint}/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
+
         filter_condition = f"{endpoint}/DocEntry eq {docEntry} and {endpoint}/DocumentLines/DocEntry eq {endpoint}/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq {endpoint}/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq Quotations/DocumentLines/WarehouseCode"
 
         # Construir la URL con el endpoint y la consulta
@@ -175,16 +176,17 @@ class APIClient:
             f"&$top={top}&$skip={skip}"
         )
         url = f"{self.base_url}{queryUrl}"
-        print (url)
+        print(url)
         try:
-            response = self.session.get(url, headers={"Prefer": f"odata.maxpagesize={top}"}, verify=False)
+            response = self.session.get(
+                url, headers={"Prefer": f"odata.maxpagesize={top}"}, verify=False
+            )
             response.raise_for_status()  # Esto generará una excepción para cualquier código de estado HTTP 4xx/5xx
             return response.json()
         except requests.exceptions.RequestException as e:
             print(f"Error en la solicitud a la API: {e}")
             raise
 
-    
     def get_orders(self, order_number):
         select = "DocEntry,DocNum,FolioNumber,U_ReportPdf,DocObjectCode,DocumentSubType"
         url = f"{self.base_url}Invoices?$select={select}&$filter=U_LED_NROPSH eq '{order_number}'"
@@ -192,7 +194,6 @@ class APIClient:
         response.raise_for_status()
         print(url)
         return response.json()
-    
 
     def crearCotizacionSL(self, endpoint, data=None, headers=None):
         """
@@ -217,14 +218,14 @@ class APIClient:
         url = f"{self.base_url}{endpoint}"
         try:
 
-        # Imprimir el JSON y los headers para ver qué se está enviando
+            # Imprimir el JSON y los headers para ver qué se está enviando
             print(f"URL: {url}")
             print(f"Data being sent: {json.dumps(data, indent=4)}")
 
             response = self.session.post(url, json=data, headers=headers, verify=False)
             response.raise_for_status()
             return response.json()
-        
+
         except requests.exceptions.RequestException as e:
             print(f"Error en la solicitud a la API: {e}")
             raise
@@ -254,18 +255,18 @@ class APIClient:
         print(url)
         try:
 
-        # Imprimir el JSON y los headers para ver qué se está enviando
+            # Imprimir el JSON y los headers para ver qué se está enviando
             print(f"URL: {url}")
             print(f"Data being sent: {json.dumps(data, indent=4)}")
 
             response = self.session.post(url, json=data, headers=headers, verify=False)
             response.raise_for_status()
             return response.json()
-        
+
         except requests.exceptions.RequestException as e:
             print(f"Error en la solicitud a la API: {e}")
             raise
-    
+
     def actualizarEstadoDocumentoSL(self, endpoint, docNum, estado):
         """
         Permite cambiar el estado de un documento en la base de datos de SAP.
@@ -294,25 +295,27 @@ class APIClient:
                 error_message = response.json().get("error", "Error desconocido")
             except ValueError:  # Si la respuesta no es JSON
                 error_message = response.text or "Error desconocido"
-            
+
             print(f"Error al actualizar estado: {error_message}")
-            return {'error': f'Error al actualizar el estado del documento: {error_message}'}
+            return {
+                "error": f"Error al actualizar el estado del documento: {error_message}"
+            }
 
         print(response)
         print(url)
 
         if response.status_code == 204:
-            return {'message': 'Estado actualizado correctamente'}
+            return {"message": "Estado actualizado correctamente"}
         elif response.status_code == 400:
             try:
-                error_message = response.json().get("error", "Detalles no proporcionados")
+                error_message = response.json().get(
+                    "error", "Detalles no proporcionados"
+                )
             except ValueError:
                 error_message = response.text or "Detalles no proporcionados"
-            
-            return {'error': f'Error al actualizar el estado: {error_message}'}
 
-        
-    
+            return {"error": f"Error al actualizar el estado: {error_message}"}
+
     def verificarCliente(self, endpoint, cardCode):
         """
         Verifica si un cliente existe en la base de datos de SAP
@@ -338,7 +341,7 @@ class APIClient:
     def crearCliente(self, data):
         """
         permite la creacion de clientes en la base de datos de SAP
-        
+
         Parámetros:
             data : dict, opcional
                 Un diccionario de pares clave-valor para crear el cliente.
@@ -360,19 +363,19 @@ class APIClient:
         except requests.exceptions.RequestException as e:
             print(f"Error en la solicitud a la API: {e}")
             raise
-    
+
     def getInfoSN(self, cardCode):
         print("Probando la conexión con la API...")
         print(f"CardCode: {cardCode}")
         print("*" * 50)
         details = f"BusinessPartners('{cardCode}')?$select=CardCode,CardName,CardType,Phone1,EmailAddress,Notes,GroupCode,FederalTaxID,BPAddresses,ContactEmployees"
         url = f"{self.base_url}{details}"
-        response = self.session.get(url, verify=False) # Se realiza la solicitud GET
-        response.raise_for_status() # Esto generará una excepción para cualquier código de estado HTTP 4xx/5xx
-        
+        response = self.session.get(url, verify=False)  # Se realiza la solicitud GET
+        response.raise_for_status()  # Esto generará una excepción para cualquier código de estado HTTP 4xx/5xx
+
         print(url)
         return response.json()
-    
+
     def detalleCotizacionCliente(self, docEntry):
         """
         permite obtener el detalle de una cotizacion de un cliente en la base de datos de SAP
@@ -384,15 +387,16 @@ class APIClient:
 
         crossjoin = "Quotations,SalesPersons,BusinessPartners/ContactEmployees"
         expand = "Quotations($select=DocEntry,DocNum, FederalTaxID, CardCode,CardName,TransportationCode,Address,Address2,DocDate,Comments,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
-        filter = f"Quotations/DocEntry eq {docEntry} and Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Quotations/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode"    
-        url = f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
+        filter = f"Quotations/DocEntry eq {docEntry} and Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Quotations/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode"
+        url = (
+            f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
+        )
 
         print(url)
 
         response = self.session.get(url, verify=False)
         response.raise_for_status()
         return response.json()
-    
 
     def detalleCotizacionLineas(self, docEntry):
         """
@@ -404,16 +408,20 @@ class APIClient:
 
         """
 
-        crossJoin = "Quotations,Quotations/DocumentLines,Items/ItemWarehouseInfoCollection"
+        crossJoin = (
+            "Quotations,Quotations/DocumentLines,Items/ItemWarehouseInfoCollection"
+        )
         expand = "Quotations/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
         filter = f"Quotations/DocEntry eq {docEntry} and Quotations/DocumentLines/DocEntry eq Quotations/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq Quotations/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq Quotations/DocumentLines/WarehouseCode"
 
-        url = f"{self.base_url}$crossjoin({crossJoin})?$expand={expand}&$filter={filter}"
+        url = (
+            f"{self.base_url}$crossjoin({crossJoin})?$expand={expand}&$filter={filter}"
+        )
 
         response = self.session.get(url, verify=False)
         response.raise_for_status()
         return response.json()
-    
+
     def detallesOrdenVentaCliente(self, docEntry):
         """
         https://182.160.29.24:50003/b1s/v1/$crossjoin(Quotations,SalesPersons,BusinessPartners/ContactEmployees)?$expand=Quotations($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address, Address2,DocDate,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)
@@ -422,15 +430,16 @@ class APIClient:
         crossjoin = "Orders,SalesPersons,BusinessPartners/ContactEmployees"
         expand = "Orders($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address,Address2,DocDate,DocDueDate,Comments,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
         filter = f"Orders/DocEntry eq {docEntry} and Orders/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Orders/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode"
-        url = f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
-        
+        url = (
+            f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
+        )
+
         print("URL DE CARGA CLIENTE ODV", url)
 
         response = self.session.get(url, verify=False)
         response.raise_for_status()
         return response.json()
-    
-    
+
     def detallesOrdenVentaLineas(self, docEntry):
         """
         https://182.160.29.24:50003/b1s/v1/$crossjoin(Orders,Orders/DocumentLines,Items/ItemWarehouseInfoCollection)?$expand=Orders/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)
@@ -439,14 +448,16 @@ class APIClient:
 
         crossjoin = "Orders,Orders/DocumentLines,Items/ItemWarehouseInfoCollection"
         expand = "Orders/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
-        filter= f"Orders/DocEntry eq {docEntry} and Orders/DocumentLines/DocEntry eq Orders/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq Orders/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq Orders/DocumentLines/WarehouseCode"
-    
-        url = f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
+        filter = f"Orders/DocEntry eq {docEntry} and Orders/DocumentLines/DocEntry eq Orders/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq Orders/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq Orders/DocumentLines/WarehouseCode"
+
+        url = (
+            f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
+        )
 
         response = self.session.get(url, verify=False)
         response.raise_for_status()
         return response.json()
-    
+
     def getDataSN(self, top=20, skip=0, filters=None):
         """
         Recupera datos de socios de negocio desde la API con filtros opcionales.
@@ -460,9 +471,7 @@ class APIClient:
             for key, value in filters.items():
                 filter_condition += f" and {key}, {value}"
 
-        headers = {
-            "Prefer": f"odata.maxpagesize={top}"
-        }
+        headers = {"Prefer": f"odata.maxpagesize={top}"}
 
         query_url = f"BusinessPartners?$select={select}&$orderby={order_by}&$filter={filter_condition}&$top={top}&$skip={skip}"
         url = f"{self.base_url}{query_url}"
@@ -472,14 +481,12 @@ class APIClient:
         print(url)  # Depuración
         return response.json()
 
-    
-
     def actualizarSocioNegocioSL(self, cardCode, data):
         """
         Actualiza un socio de negocio en SAP Business One.
         """
         self.__login()
-        
+
         url = f"{self.base_url}BusinessPartners('{cardCode}')"
 
         try:
@@ -493,18 +500,25 @@ class APIClient:
             # Manejar la respuesta según el código de estado
             if response.status_code == 204:
                 # Si la respuesta es 204, no hay contenido en la respuesta, pero la operación fue exitosa
-                print("Socio de negocio actualizado correctamente (sin contenido en la respuesta).")
-                return {'success': True, 'message': 'Socio de negocio actualizado correctamente.'}
+                print(
+                    "Socio de negocio actualizado correctamente (sin contenido en la respuesta)."
+                )
+                return {
+                    "success": True,
+                    "message": "Socio de negocio actualizado correctamente.",
+                }
             else:
                 # Si la respuesta tiene contenido (por ejemplo, 200 OK o 201 Created), procesar la respuesta
                 response.raise_for_status()  # Lanzar un error si la respuesta no es exitosa
-                print("Respuesta de la API:", response.json())  # Mostrar respuesta si tiene cuerpo
+                print(
+                    "Respuesta de la API:", response.json()
+                )  # Mostrar respuesta si tiene cuerpo
                 return response.json()
-            
+
         except requests.exceptions.HTTPError as e:
             # Si ocurre un error en la solicitud, imprimir y lanzar la excepción
             print(f"Error en la solicitud a la API: {e}")
-            if 'response' in locals() and response is not None:
+            if "response" in locals() and response is not None:
                 print(f"Cuerpo de la respuesta del servidor: {response.text}")
             raise
         except Exception as e:
@@ -525,7 +539,7 @@ class APIClient:
         response.raise_for_status()
         print("URL DE PRODUCTOS PARA SINCRONIZACION", url)
         return response.json()
-    
+
     def elementosReceta(self, itemCode):
 
         self.__login()
@@ -539,7 +553,7 @@ class APIClient:
         response.raise_for_status()
         print(url)
         return response.json()
-    
+
     def productTree(self, itemCode):
 
         url = f"{self.base_url}ProductTrees('{itemCode}')"
@@ -547,23 +561,20 @@ class APIClient:
         response.raise_for_status()
         print(url)
         return response.json()
-    
-    
+
     def getODV(self, top=20, skip=0, filters=None):
 
         self.__login()
         crossjoin = f"Orders,SalesPersons"
         expand = f"Orders($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
         order_by = f"DocNum desc"
-        filter_condition = f"Orders/SalesPersonCode eq SalesPersons/SalesEmployeeCode" 
+        filter_condition = f"Orders/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
 
         if filters:
             for key, value in filters.items():
                 filter_condition += f" and {key} {value}"
 
-        headers = {
-            "Prefer": f"odata.maxpagesize={top}"
-        }
+        headers = {"Prefer": f"odata.maxpagesize={top}"}
 
         query_url = f"$crossjoin({crossjoin})?$expand={expand}&$orderby={order_by}&$filter={filter_condition}&$top={top}&$skip={skip}"
         url = f"{self.base_url}{query_url}"
@@ -572,16 +583,16 @@ class APIClient:
         response.raise_for_status()
         print(url)
         return response.json()
-    
-    #usando patch actualizar las cotizaciones
+
+    # usando patch actualizar las cotizaciones
     def actualizarCotizacionesSL(self, docEntry, data):
         self.__login()
         url = f"{self.base_url}Quotations({docEntry})"
-        
+
         # Definir los encabezados, incluyendo el encabezado B1S-ReplaceCollectionsOnPatch
         headers = {
-            'B1S-ReplaceCollectionsOnPatch': 'true',  # Encabezado adicional
-            'Content-Type': 'application/json',  # Asegúrate de incluir este encabezado si es necesario
+            "B1S-ReplaceCollectionsOnPatch": "true",  # Encabezado adicional
+            "Content-Type": "application/json",  # Asegúrate de incluir este encabezado si es necesario
         }
 
         try:
@@ -595,25 +606,28 @@ class APIClient:
             print(response)
 
             if response.status_code == 204:
-                return {'success': True, 'message': 'Cotización actualizada correctamente.'}
+                return {
+                    "success": True,
+                    "message": "Cotización actualizada correctamente.",
+                }
             else:
                 response.raise_for_status()
                 print("Respuesta de la API:", response.json())
                 return response.json()
         except requests.exceptions.HTTPError as e:
             print(f"Error en la solicitud a la API: {e}")
-            if 'response' in locals() and response is not None:
+            if "response" in locals() and response is not None:
                 print(f"Cuerpo de la respuesta del servidor: {response.text}")
             raise
 
     def actualizarODVSL(self, docEntry, data):
         self.__login()
         url = f"{self.base_url}Orders({docEntry})"
-        
+
         # Definir los encabezados, incluyendo el encabezado B1S-ReplaceCollectionsOnPatch
         headers = {
-            'B1S-ReplaceCollectionsOnPatch': 'true',  # Encabezado adicional
-            'Content-Type': 'application/json',  # Asegúrate de incluir este encabezado si es necesario
+            "B1S-ReplaceCollectionsOnPatch": "true",  # Encabezado adicional
+            "Content-Type": "application/json",  # Asegúrate de incluir este encabezado si es necesario
         }
 
         try:
@@ -627,24 +641,27 @@ class APIClient:
             print(response)
 
             if response.status_code == 204:
-                return {'success': True, 'message': 'Cotización actualizada correctamente.'}
+                return {
+                    "success": True,
+                    "message": "Cotización actualizada correctamente.",
+                }
             else:
                 response.raise_for_status()
                 print("Respuesta de la API:", response.json())
                 return response.json()
         except requests.exceptions.HTTPError as e:
             print(f"Error en la solicitud a la API: {e}")
-            if 'response' in locals() and response is not None:
+            if "response" in locals() and response is not None:
                 print(f"Cuerpo de la respuesta del servidor: {response.text}")
             raise
-    
+
     def actualizarDireccionSL(self, cardCode, data):
         self.__login()
         url = f"{self.base_url}BusinessPartners('{cardCode}')"
 
         headers = {
-           'B1S-ReplaceCollectionsOnPatch': 'true',  # Encabezado adicional
-            'Content-Type': 'application/json',  # Asegúrate de incluir este encabezado si es necesario
+            "B1S-ReplaceCollectionsOnPatch": "true",  # Encabezado adicional
+            "Content-Type": "application/json",  # Asegúrate de incluir este encabezado si es necesario
         }
         try:
             print(f"URL: {url}")
@@ -654,14 +671,17 @@ class APIClient:
             print(f"Respuesta completa: {response.status_code} - {response.text}")
 
             if response.status_code == 204:
-                return {'success': True, 'message': 'Dirección actualizada correctamente.'}
+                return {
+                    "success": True,
+                    "message": "Dirección actualizada correctamente.",
+                }
             else:
                 response.raise_for_status()
                 print("Respuesta de la API:", response.json())
                 return response.json()
         except requests.exceptions.HTTPError as e:
             print(f"Error en la solicitud a la API: {e}")
-            if 'response' in locals() and response is not None:
+            if "response" in locals() and response is not None:
                 print(f"Cuerpo de la respuesta del servidor: {response.text}")
             raise
 
@@ -670,7 +690,7 @@ class APIClient:
         url = f"{self.base_url}BusinessPartners('{cardCode}')"
 
         headers = {
-            'Content-Type': 'application/json',  # Asegúrate de incluir este encabezado si es necesario
+            "Content-Type": "application/json",  # Asegúrate de incluir este encabezado si es necesario
         }
         try:
             print(f"URL: {url}")
@@ -680,14 +700,17 @@ class APIClient:
             print(f"Respuesta completa: {response.status_code} - {response.text}")
 
             if response.status_code == 204:
-                return {'success': True, 'message': 'Contacto actualizado correctamente.'}
+                return {
+                    "success": True,
+                    "message": "Contacto actualizado correctamente.",
+                }
             else:
                 response.raise_for_status()
                 print("Respuesta de la API:", response.json())
                 return response.json()
         except requests.exceptions.HTTPError as e:
             print(f"Error en la solicitud a la API: {e}")
-            if 'response' in locals() and response is not None:
+            if "response" in locals() and response is not None:
                 print(f"Cuerpo de la respuesta del servidor: {response.text}")
             raise
 
@@ -696,9 +719,9 @@ class APIClient:
         details = f"BusinessPartners('{cardCode}')/{tipo}"
         url = f"{self.base_url}{details}"
 
-        response = self.session.get(url, verify=False) # Se realiza la solicitud GET
-        response.raise_for_status() # Esto generará una excepción para cualquier código de estado HTTP 4xx/5xx
-        
+        response = self.session.get(url, verify=False)  # Se realiza la solicitud GET
+        response.raise_for_status()  # Esto generará una excepción para cualquier código de estado HTTP 4xx/5xx
+
         print(url)
 
         return response.json()
@@ -711,7 +734,7 @@ class APIClient:
         print("url del conteo", url)
         print(response.json())
         return response.json()
-    
+
     def getQuantityBusinessPartners(self):
         self.__login()
         url = f"{self.base_url}BusinessPartners?$apply=aggregate($count as BusinessPartners)&$filter=CardType eq 'cCustomer'"
@@ -720,7 +743,7 @@ class APIClient:
         print("url del conteo", url)
         print(response.json())
         return response.json()
-    
+
     def getBusinessPartners(self, skip=0):
         self.__login()
         url = f"{self.base_url}BusinessPartners?$select=CardCode,CardName,CardType,Phone1,EmailAddress,Notes,GroupCode,FederalTaxID,BPAddresses,ContactEmployees&$filter=CardType eq 'cCustomer'&$skip={skip}"
@@ -728,7 +751,7 @@ class APIClient:
         response.raise_for_status()
         print("url del conteo", url)
         return response.json()
-    
+
     def productTreesComponents(self, itemCode):
         url = f"{self.base_url}ProductTrees('{itemCode}')"
         response = self.session.get(url, verify=False)
@@ -747,7 +770,7 @@ class APIClient:
         response.raise_for_status()
         print("URL DE PRODUCTOS PARA SINCRONIZACION", url)
         return response.json()
-    
+
     def prueba(self, skip=0):
 
         self.__login()
