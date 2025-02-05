@@ -78,9 +78,7 @@ class Producto {
                 <td style="font-size: 12px;background: transparent;border-style: none;padding-bottom: 0px;"rowspan="2">
                     <div class="row">
                         <div class="col-md-11 col-xxl-6" style="font-size: 14px;font-weight: bold;"><small style="font-weight: bold;">
-                        <small id="indixe_producto">${contprod})</small>
-                        <small>&nbsp;&nbsp;</small>
-                        <small name="sku_producto">${this.productoCodigo}</small></div>
+                        <small id="indixe_producto">${contprod})</small><small>&nbsp;&nbsp;</small><small name="sku_producto">${this.productoCodigo}</small></div>
                         <div class="col-md-11 col-xxl-7" style="text-align: center;"><img src="${this.imagen}" width="50" height="50" style="width: 50px;height: 50px;"></div>
                     </div>
                 </td>
@@ -129,11 +127,19 @@ class Producto {
                 </td>
                    
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${this.precioSinDescuento}</td>
-                <td style="font-size: 12px;background: transparent;border-style: none;">    
-                    <input class="form-control" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad !== undefined ? this.cantidad : 0}">
+                <td style="font-size: 12px;background: transparent;border-style: none;">
+                    <div>
+                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad !== undefined ? this.cantidad : 0}">
+                    </div>
+                    <div class="valorCotizacion" hidden>
+                        <b><small style="color: rgb(255,0,0);" id="valorCotizacion">Cotiz: ${this.cantidad}</small></b>
+                    </div>
                 </td>
                 <td style="font-size: 11px;font-weight: bold;background: transparent;border-style: none;text-align: center;">
                     <span id="precio_Venta">${this.totalProducto}</span>
+                    <div class="valorCotizacion" style="font-size: 11px;" hidden>
+                    <span style="color: #FF0000;"><b>${formatCurrency(this.totalProducto)}</b></span>
+                    </div>
                 </td>
             </tr>
             <tr  style="font-size: 12px;background: transparent;">
