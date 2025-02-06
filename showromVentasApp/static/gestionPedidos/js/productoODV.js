@@ -1,5 +1,5 @@
 class Producto {
-    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, tipoentrega2, fechaEntrega = new Date().toISOString().split('T')[0]) {
+    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, cantidadCoti, precioCoti,  tipoentrega2, fechaEntrega = new Date().toISOString().split('T')[0]) {
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
         this.imagen = imagen;
@@ -11,6 +11,8 @@ class Producto {
         this.totalProducto = Math.round(precioVenta * cantidad);
         this.cantidad = cantidad;
         this.sucursal = sucursal;
+        this.cantidadCoti = cantidadCoti;
+        this.precioCoti = precioCoti;
         this.comentario = comentario;
         this.tipoEntrega2 = tipoentrega2;
         this.fechaEntrega = fechaEntrega;
@@ -132,13 +134,13 @@ class Producto {
                         <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad !== undefined ? this.cantidad : 0}">
                     </div>
                     <div class="valorCotizacion" hidden>
-                        <b><small style="color: rgb(255,0,0);" id="valorCotizacion">Cotiz: ${this.cantidad}</small></b>
+                        <b><small style="color: rgb(255,0,0);" id="valorCotizacion">Cotiz: ${this.cantidadCoti}</small></b>
                     </div>
                 </td>
                 <td style="font-size: 11px;font-weight: bold;background: transparent;border-style: none;text-align: center;">
                     <span id="precio_Venta">${this.totalProducto}</span>
                     <div class="valorCotizacion" style="font-size: 11px;" hidden>
-                    <span style="color: #FF0000;"><b>${formatCurrency(this.totalProducto)}</b></span>
+                    <span style="color: #FF0000;"><b>${formatCurrency(this.precioCoti)}</b></span>
                     </div>
                 </td>
             </tr>

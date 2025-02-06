@@ -6,6 +6,7 @@ from datosLsApp.models.productodb import ProductoDB
 from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.productorepository import ProductoRepository
+from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from logicaVentasApp.services.documento import Documento
 import logging
@@ -677,11 +678,14 @@ class Cotizacion(Documento):
             # obtener imagen por medio del codigo en la tabla de productos
             
             sku = line.get("ItemCode")
+            bodega = line.get("WarehouseCode")
             
             imagen = ProductoRepository.obtenerImagenProducto(sku)
             marca = ProductoRepository.obtenerMarcaProducto(sku)
             descuentoMax = ProductoRepository.descuentoMax(sku)
             priceList = ProductoRepository.obtenerPrecioLista(sku)
+
+            stock_bodega = StockBodegasRepository.consultarStockPorBodega(sku, bodega)
             
             if marca == "LST":
                 descuentoMax = min(descuentoMax * 100, 15)
@@ -715,6 +719,7 @@ class Cotizacion(Documento):
                 "LineStatus": line.get("LineStatus"),
                 "DescuentoMax": descuentoMax,
                 "PriceList": priceList,
+                "StockBodega": stock_bodega,
                 "WarehouseInfo": {
                     "WarehouseCode": warehouse_info.get("WarehouseCode"),
                     "InStock": warehouse_info.get("InStock"),

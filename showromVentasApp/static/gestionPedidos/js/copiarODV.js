@@ -127,17 +127,22 @@ document.addEventListener("DOMContentLoaded", function () {
             const precioLista = line.GrossPrice;
             const precioDescuento = line.DiscountPercent;
             const sucursal = line.WarehouseCode;
+            const stockBodega = line.StockBodega;
             const comentario = line.FreeText;
+            const precioCoti = precioVenta * line.Quantity;
+            const cantidadCoti = line.Quantity;
+
+            if (cantidadCoti > stockBodega) {
+              cantidad = stockBodega;
+            } else {
+              cantidad = cantidadCoti;
+            }
+            
 
             console.log("Agregando producto con datos:", {
               productoCodigo,
               nombre,
-              imagen,
-              precioVenta,
-              stockTotal,
-              precioLista,
-              comentario,
-              precioDescuento
+              stockBodega
             });
             
             setTimeout(() => {
@@ -146,11 +151,10 @@ document.addEventListener("DOMContentLoaded", function () {
               });
             }, 100); // Espera 100ms para que los elementos se generen antes de ejecutarse
             
-            agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario );
+            agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, line.Quantity, precioCoti);
           });
         }
         // Llamar a la función para inicializar el precio
-        actualizarPrecio();
         hideLoadingOverlay();
       })
       .catch(error => {
@@ -209,28 +213,5 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("No se proporcionó un RUT válido en la URL.");
   }
 });
-
-// Función para recalcular el precio
-function actualizarPrecio() {
-
-  console.log("Actualizando precio xxx...");
-  // Obtener el valor de la cantidad
-  const cantidad = document.getElementById("calcular_cantidad").value;
-
-  // Obtener el precio unitario desde los atributos del <small> (puede ser cualquiera de los dos)
-  const precioUnitario = document.querySelector("small[name='precio_venta']").getAttribute("data-preciounitario");
-
-  // Convertir el precio unitario a número
-  const precioUnitarioNum = parseFloat(precioUnitario);
-
-  // Calcular el precio total
-  const precioTotal = cantidad * precioUnitarioNum;
-
-  // Actualizar el valor del precio en el <small>
-  document.querySelector("small[name='precio_venta']").innerText = `$ ${precioTotal.toLocaleString()}`;
-}
-
-// Escuchar el evento 'input' para detectar cambios en el input
-document.getElementById("calcular_cantidad").addEventListener("input", actualizarPrecio);
 
 
