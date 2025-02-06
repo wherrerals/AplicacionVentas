@@ -5,11 +5,11 @@ document.addEventListener("DOMContentLoaded", function () {
     return urlParams.get(param);
   }
 
-  const documentoCopiado = getQueryParam('documento_copiado');
+  const documentoCopiado = getQueryParam("documento_copiado");
   if (documentoCopiado) {
     const vendedorDataElement = document.getElementById("vendedor_data");
     const showroomElement = document.getElementById("sucursal");
-    const estadoElement = document.getElementById('estado');
+    const estadoElement = document.getElementById("estado");
 
     if (vendedorDataElement) {
       vendedorDataElement.innerText = "Cargando...";
@@ -19,13 +19,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     showLoadingOverlay();
 
-
     fetch(`/ventas/copiar_a_odv/?documento_copiado=${documentoCopiado}`)
-      .then(response => {
-        if (!response.ok) throw new Error('Error al obtener la información de la cotización');
+      .then((response) => {
+        if (!response.ok)
+          throw new Error("Error al obtener la información de la cotización");
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         if (data.Cliente && data.Cliente.SalesPersons) {
           console.log("Datos de la cotización:", data);
 
@@ -40,9 +40,6 @@ document.addEventListener("DOMContentLoaded", function () {
           const tipoentrega = data.Cliente.Orders.TransportationCode;
           const tipoFactura = data.Cliente.Orders.U_LED_TIPDOC;
           const comentarios = data.Cliente.Orders.Comments;
-
-
-
 
           if (referencia) {
             const referenciaInput = document.getElementById("referencia");
@@ -64,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
           const tipoDocRadios = document.getElementsByName("tipoDocTributario");
 
           // Iterar sobre los radios para seleccionar el correspondiente
-          tipoDocRadios.forEach(radio => {
+          tipoDocRadios.forEach((radio) => {
             if (radio.value === tipoFactura) {
               radio.checked = true; // Seleccionar el radio cuyo valor coincide con tipoFactura
             }
@@ -75,7 +72,9 @@ document.addEventListener("DOMContentLoaded", function () {
             if (comentariotxt) {
               comentariotxt.value = comentarios; // Asigna el valor capturado al input
             } else {
-              console.warn("No se encontró el elemento con id 'comentariotxt'.");
+              console.warn(
+                "No se encontró el elemento con id 'comentariotxt'."
+              );
             }
           }
 
@@ -83,8 +82,12 @@ document.addEventListener("DOMContentLoaded", function () {
             cardCode = cardCode.slice(0, -1);
           }
 
-          const vendedorMatch = salesEmployeeName.match(/^[^-]+-\s*([^\s/]+.*?)\s*(\/|$)/);
-          const vendedorLimpio = vendedorMatch ? vendedorMatch[1].trim() : "Vendedor desconocido";
+          const vendedorMatch = salesEmployeeName.match(
+            /^[^-]+-\s*([^\s/]+.*?)\s*(\/|$)/
+          );
+          const vendedorLimpio = vendedorMatch
+            ? vendedorMatch[1].trim()
+            : "Vendedor desconocido";
 
           if (vendedorDataElement) {
             vendedorDataElement.innerText = vendedorLimpio;
@@ -100,7 +103,9 @@ document.addEventListener("DOMContentLoaded", function () {
             dueDateElement.textContent = `${docDate}`;
           }
 
-          const estadoElement = document.querySelector('p strong[data-estado="bost_Open"]');
+          const estadoElement = document.querySelector(
+            'p strong[data-estado="bost_Open"]'
+          );
           if (estadoElement) {
             if (canceled === "N" && DocumentStatus === "O") {
               estadoElement.textContent = "Abierta";
@@ -115,10 +120,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
           traerInformacionCliente(cardCode);
 
-          // Iteración sobre `DocumentLines` para añadir cada producto
           const documentLines = data.DocumentLines;
-          documentLines.forEach((line) => {
-            console.log("Producto: ", line)
+          documentLines.forEach((line, index) => {
+            console.log("Producto: ", line);
             const productoCodigo = line.ItemCode;
             const nombre = line.ItemDescription;
             const imagen = line.imagen;
@@ -132,33 +136,50 @@ document.addEventListener("DOMContentLoaded", function () {
             const precioCoti = precioVenta * line.Quantity;
             const cantidadCoti = line.Quantity;
 
-            if (cantidadCoti > stockBodega) {
-              cantidad = stockBodega;
-            } else {
-              cantidad = cantidadCoti;
-            }
-            
+            let cantidad =
+              cantidadCoti > stockBodega ? stockBodega : cantidadCoti;
 
             console.log("Agregando producto con datos:", {
               productoCodigo,
               nombre,
-              stockBodega
+              stockBodega,
             });
-            
+
+            // Asignar un ID único basado en el índice o un atributo data-id
             setTimeout(() => {
-              document.querySelectorAll(".valorCotizacion").forEach((element) => {
-                element.removeAttribute("hidden");
-              });
-            }, 100); // Espera 100ms para que los elementos se generen antes de ejecutarse
+              document
+                .querySelectorAll(`.valorCotizacion[data-itemcode="${productoCodigo}"]`)
+                .forEach((elementoLinea) => {
+                  if (cantidadCoti > stockBodega) {
+                    elementoLinea.removeAttribute("hidden");
+                  } else {
+                    elementoLinea.setAttribute("hidden", "true");
+                  }
+                });
+            }, 100);
             
-            agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, line.Quantity, precioCoti);
+
+            agregarProducto(
+              productoCodigo,
+              nombre,
+              imagen,
+              precioVenta,
+              stockTotal,
+              precioLista,
+              precioDescuento,
+              cantidad,
+              sucursal,
+              comentario,
+              line.Quantity,
+              precioCoti
+            );
           });
         }
         // Llamar a la función para inicializar el precio
         hideLoadingOverlay();
       })
-      .catch(error => {
-        console.error('Error en la solicitud AJAX:', error);
+      .catch((error) => {
+        console.error("Error en la solicitud AJAX:", error);
         if (vendedorDataElement) {
           vendedorDataElement.innerText = "Error al cargar datos";
         }
@@ -176,8 +197,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const telefonoCliente = getQueryParam("telefonoSN");
   const emailCliente = getQueryParam("emailSN");
 
-
-
   if (rutCliente) {
     //console.log("RUT recibido en la página de destino:", rutCliente);
     //console.log("Nombre recibido en la página de destino:", nombreCliente);
@@ -189,7 +208,9 @@ document.addEventListener("DOMContentLoaded", function () {
     traerInformacionCliente(rutCliente); // Llama a la función con el RUT
 
     if (grupoSN) {
-      document.querySelector(`input[name="grupoSN"][value="${grupoSN}"]`).checked = true;
+      document.querySelector(
+        `input[name="grupoSN"][value="${grupoSN}"]`
+      ).checked = true;
     }
     if (nombreSN) {
       document.getElementById("nombreSN").value = nombreCliente;
@@ -213,5 +234,3 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("No se proporcionó un RUT válido en la URL.");
   }
 });
-
-
