@@ -31,7 +31,7 @@ class DireccionManager {
     //newroww de id para poder eliminar
     newRow.style = "font-size: 12px;background: #f0f2f5;width: 230px; margin-right: 10px;";
     newRow.innerHTML = `
-        <div class="col-sm-12" style="width: 100%;height: 10px;"><span>&nbsp;</span></div>
+        <div class="col-sm-12" style="width: 150%;height: 10px;"><span>&nbsp;</span></div>
         
           <div class="row">
             <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
@@ -106,13 +106,14 @@ class DireccionManager {
             <div class="col">
               <select class="form-select" name="region[]" id="regionSN" style="font-size: 12px;border-color: rgb(159,168,175);">
                 <optgroup label="Región">
+                  <option value="" selected>Seleccione una Región</option>
+                  <option value="13">Metropolitana de Santiago</option>
                   <option value="15">Arica y Parinacota</option>
                   <option value="1">Tarapacá</option>
                   <option value="2">Antofagasta</option>
                   <option value="3">Atacama</option>
                   <option value="4">Coquimbo</option>
                   <option value="5">Valparaíso</option>
-                  <option value="13">Metropolitana de Santiago</option>
                   <option value="6">Libertador General Bernardo O'Higgins</option>
                   <option value="7">Maule</option>
                   <option value="16">Ñuble</option>

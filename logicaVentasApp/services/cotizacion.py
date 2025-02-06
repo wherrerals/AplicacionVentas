@@ -304,9 +304,6 @@ class Cotizacion(Documento):
             lineas = jsonData.get('DocumentLines', [])
             tipo_venta = self.tipoVentaTipoLineas(lineas)
         
-        print("TIPO DE VENTA 1", tipo_venta)
-        #CAPTURAR ADDRES Y ADDRESS2 Y CONSULTAR LA BASE DE DATOS PARA CONCATENAR DIRECCION, COMUNA.nombre /R CIUDAD /R REGION.nombre
-
         transportationCode = jsonData.get('TransportationCode')
 
         if tipo_venta == 'NA' and transportationCode != '1':
@@ -315,9 +312,7 @@ class Cotizacion(Documento):
             tipo_venta = 'PROY'
         elif tipo_venta == 'ECCO':
             tipo_venta = 'ECCO'
-            
-        print("TIPO DE VENTA 2", tipo_venta)
-        
+                    
         adrres = jsonData.get('Address')
         adrres2 = jsonData.get('Address2')
         
@@ -392,8 +387,7 @@ class Cotizacion(Documento):
         Returns:
             dict: Datos de la cotización preparados para ser enviados a SAP.
         """
-        print("PREPARANDO JSON COTIZACION AC")
-        print(f"JSON DATA: {jsonData}")
+
         codigo_vendedor = jsonData.get('SalesPersonCode')
         tipo_venta = self.tipoVentaTipoVendedor(codigo_vendedor)
         
@@ -403,8 +397,6 @@ class Cotizacion(Documento):
             tipo_venta = self.tipoVentaTipoLineas(lineas)
         
         #CAPTURAR ADDRES Y ADDRESS2 Y CONSULTAR LA BASE DE DATOS PARA CONCATENAR DIRECCION, COMUNA.nombre /R CIUDAD /R REGION.nombre
-
-        print("TIPO DE VENTA 1", tipo_venta)
         
         transportationCode = jsonData.get('TransportationCode')
 
@@ -414,9 +406,7 @@ class Cotizacion(Documento):
             tipo_venta = 'PROY'
         elif tipo_venta == 'ECCO':
             tipo_venta = 'ECCO'
-            
-        print("TIPO DE VENTA 2", tipo_venta)
-        
+                    
         adrres = jsonData.get('Address')
         adrres2 = jsonData.get('Address2')
         
@@ -429,7 +419,8 @@ class Cotizacion(Documento):
             numerocontactoSAp = "null"
         else:
             contacto = ContactoRepository.obtenerContacto(idContacto)
-            numerocontactoSAp = contacto.codigoInternoSap        #consultar en base de datos con el id capturado        
+            numerocontactoSAp = contacto.codigoInternoSap        #consultar en base de datos con el id capturado       
+             
         direccion1 = DireccionRepository.obtenerDireccion(adrres)
         direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)
         
@@ -488,7 +479,7 @@ class Cotizacion(Documento):
 
         try:
             docentry = int(docentry)
-            jsonData = self.prepararJsonCotizacionAC(data)
+            jsonData = self.prepararJsonCotizacion(data)
             
             response = self.client.actualizarCotizacionesSL(docentry, jsonData)
 
@@ -617,7 +608,6 @@ class Cotizacion(Documento):
         Returns:
             dict: Respuesta de la API.
         """
-        print("Actualizando estado de la cotización...")
         try:
             response = self.client.actualizarEstadoDocumentoSL(self.get_endpoint(), docNum, estado)
             return response
@@ -627,19 +617,11 @@ class Cotizacion(Documento):
         
     def formatearDatos(self, json_data):
         # Extraer y limpiar la información del cliente
-        
-        print("DETALLES DE COTIZACION FORMATEO DE DATOS")
-        print("JSON DATA", json_data)
-
         client_info = json_data["Client"]["value"][0]
         quotations = client_info.get("Quotations", {})
         salesperson = client_info.get("SalesPersons", {})
         contact_employee = client_info.get("BusinessPartners/ContactEmployees", {})
 
-        #print comments 
-        print("COMENTARIOS", quotations.get("Comments"))
-        
-        
         # Formatear los datos de cliente
         cliente = {
             "Quotations": {
@@ -743,8 +725,7 @@ class Cotizacion(Documento):
             "Cliente": cliente,
             "DocumentLines": document_lines
         }
-        
-        print("RESULTADO", resultado)
+
         return resultado
 
     def formataearDatosSoloLineas(self, json_data):

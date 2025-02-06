@@ -62,7 +62,6 @@ class CotizacionView(View):
     def get_route_map(self):
         return {
             '/ventas/listado_Cotizaciones': self.listarCotizaciones, # Listado de cotizaciones, no es necesaria se deja para ver si es usada en otra parte del codigo. 
-            '/ventas/obtener_detalles_cotizacion': self.obtenerDetallesCotizacion,
             '/ventas/detalles_cotizacion': self.detallesCotizacion,
             '/ventas/duplicar_cotizacion': self.duplicarCotizacion,
             '/ventas/copiar_a_odv': self.copiarAODV,
@@ -104,14 +103,11 @@ class CotizacionView(View):
     def filtrarCotizaciones(self, request):
         """
         Maneja la solicitud para filtrar cotizaciones, delegando la lógica de construcción de filtros a una función separada.
-        """
-        print("Request body:", request.body)  # Verifica el cuerpo de la solicitud JSON recibida
-        
+        """        
         client = APIClient()
 
         try:
             data = json.loads(request.body)
-            print("Received data:", data)  # Verifica los datos JSON recibidos
         except json.JSONDecodeError as e:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
@@ -125,62 +121,26 @@ class CotizacionView(View):
         except ValueError:
             return JsonResponse({'error': 'Invalid parameters'}, status=400)
 
-        print("Applying filters:", filters)  # Verifica los filtros aplicados
-        print("-" * 10)  
-        print(filters)
-
         # Manejar la solicitud de datos
         try:
             data = client.getData(endpoint=self.get_endpoint(), top=top, skip=skip, filters=filters)
             return JsonResponse({'data': data}, safe=False)
         except Exception as e:
-            print("Error:", e)  # Verifica el error específico que está ocurriendo
             return JsonResponse({'error': str(e)}, status=500)
-
-
-    """      
-    def obtenerDetallesCotizacion(self, request, *args, **kwargs):
-        docEntry = kwargs.get('docEntry')
-        print("DocEntry:", docEntry)
-        
-        if not docEntry:
-            return JsonResponse({'error': 'DocEntry no proporcionado'}, status=400)
-        
-        # Llamar al servicio de cotización
-        lines_data, error = Cotizacion.buscarDocumentosCotizacion(docEntry)
-        
-        # Verificar si se encontró un error
-        if error:
-            return JsonResponse({'error': error}, status=404 if 'No se encontró' in error else 500)
-        
-        # Devolver los datos si no hay error
-        #return JsonResponse({'DocumentLines': lines_data}, status=200)
-        render (request, 'cotizacion.html', {'DocumentLines': lines_data}) 
-        """
-    
 
     @csrf_exempt
     def crearOActualizarCotizacion(self, request):
         try:
-            # Cargar datos del cuerpo de la solicitud
             data = json.loads(request.body)
-
-            # Obtener `DocEntry` si está presente
             docEntry = data.get('DocEntry')
             docnum = data.get('DocNum')
-            print("DocEntry recibido:", docEntry)
 
-            cotizacion = Cotizacion()  # Instancia del modelo o clase de negocio
+            cotizacion = Cotizacion()
 
             if docEntry:
-                print("Actualizando cotización con DocEntry:", docEntry)
-                # Si `DocEntry` está presente, se realiza una actualización
-                print("Actualizando cotización con DocEntry:", docEntry)
                 actualizacion = cotizacion.actualizarDocumento(docnum, docEntry, data)
                 return JsonResponse(actualizacion, status=200)
             else:
-                # Si no está presente, se crea una nueva cotización
-                print("Creando nueva cotización")
                 creacion = cotizacion.crearDocumento(data)
                 return JsonResponse(creacion, status=201)
 
@@ -191,13 +151,8 @@ class CotizacionView(View):
 
 
     def actualizarEstadosCotizacion(self, request):
-        
-
         if request.method == 'POST':
             try:
-                print("Actualizando estado de cotización")
-                print("Request body:", request.body)
-                print("-" * 10)
                 data = json.loads(request.body)
                 docNum = data.get('DocNum')
                 estado = data.get('Estado')
@@ -216,9 +171,11 @@ class CotizacionView(View):
 
         # Llamar al método para obtener los detalles del cliente
         documentClient = client.detalleCotizacionCliente(docentry)
-        print("Document Client:", documentClient)
+
+        if documentClient.get("odata.metadata") == "$metadata#Collection(Edm.ComplexType)" and not documentClient.get("value"):
+            documentClient = client.detalleCotizacionCliente2(docentry)
+
         documentLine = client.detalleCotizacionLineas(docentry)
-        print("Document Line:", documentLine)
 
         # Extraer los datos de la clave 'value', asegurándose de manejar la estructura correctamente
         quotations_data = documentClient.get('value', [{}])[0].get('Quotations', {})
@@ -237,8 +194,6 @@ class CotizacionView(View):
         if sn.verificarSocioDB(cardCode):
             cotiza = Cotizacion()
             lines_data = cotiza.formatearDatos(data)
-
-            print("Lines data:", lines_data)  # Verificar los datos de las líneas de documento
 
             return JsonResponse(lines_data, safe=False)
         else:
@@ -271,66 +226,18 @@ class CotizacionView(View):
         return JsonResponse(lines_data, safe=False)
 
         
-        
     def duplicarCotizacion(self, request):
         
         docentry = request.GET.get('docentry')
-        
-        print("DocEntry:", docentry)
-        
-        print("Duplicando cotización")
-        
-        client = APIClient()
-        
-        # Llamar al método para obtener los detalles de la cotización
-        
+        client = APIClient()        
         lineasDocumento = client.detalleCotizacionLineas(docentry)
         
-                
         data = {
             "DocumentLine": lineasDocumento
         }
-        
-        
-        print("Data:", data)
-        # Verificar si el socio de negocio ya existe en la base de datos
-        
+                
         cotiza = Cotizacion()
         lines_data = cotiza.formataearDatosSoloLineas(data)
-        
-        print("Lines data:", lines_data)  # Verificar los datos de las líneas de documento
-        
+                
         return JsonResponse(lines_data, safe=False)
         
-
-
-
-
-    
-    def obtenerDetallesCotizacion(self, request, *args, **kwargs):
-        pass
-"""         docEntry = kwargs.get('docEntry')
-        print("DocEntry:", docEntry)
-        
-        if not docEntry:
-            return JsonResponse({'error': 'DocEntry no proporcionado'}, status=400) 
-        
-        # Llamar al servicio de cotización
-        lines_data, error = Cotizacion.buscarDocumentosCotizacion(docEntry)
-
-
-        print("*" * 10)
-
-        print("*" * 10)
-        print("Lines data:", lines_data)  # Verificar los datos de las líneas de documento
-        
-        # Verificar si se encontró un error
-        if error:
-            return render(request, 'error.html', {'error': error}, status=404 if 'No se encontró' in error else 500)
-        
-        print("*" * 10)
-        print(lines_data)
-        
-        # Renderizar la página HTML con los datos
-        #return JsonResponse({'DocumentLines': lines_data}, status=200)
-        return render(request,'cotizacion.html', {'DocumentLines': lines_data}) """

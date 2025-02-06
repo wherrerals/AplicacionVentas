@@ -130,7 +130,7 @@ class Producto {
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${formatCurrency(this.precioSinDescuento)}</td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
-                    <input class="form-control format-number" type="number" style="width: 65px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad}">
+                    <input class="form-control format-number" type="number" style="font-size: 12px;width: 60px;"  id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad}">
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
                     <span id="precio_Venta" data-totalProductValue="${this.totalProducto}">${formatCurrency(this.totalProducto)}</span>

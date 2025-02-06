@@ -153,13 +153,13 @@
                             <!-- Columna derecha: Radio buttons -->
                             <div class="col-sm-6">
                               <div class="form-check">
-                                <input class="form-check-input" type="radio" id="formCheck-5" name="grupoSN" value="100" style="border-color: rgb(159,168,175);" checked="" 
+                                <input class="form-check-input" type="radio" id="formCheck-5" name="grupoSN" value="105" style="border-color: rgb(159,168,175);" checked="" 
                                 onchange="cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow')">
                                 <label class="form-check-label" for="formCheck-5">Persona</label>
                               </div>
   
                               <div class="form-check">
-                                <input class="form-check-input" type="radio" id="formCheck-6" name="grupoSN" value="105" style="border-color: rgb(159,168,175);" 
+                                <input class="form-check-input" type="radio" id="formCheck-6" name="grupoSN" value="100" style="border-color: rgb(159,168,175);" 
                                 onchange="cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow')">
                                 <label class="form-check-label" for="formCheck-6">Empresa</label>
                               </div>
@@ -283,7 +283,7 @@
                 <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#contactoModal" style="font-size: 12px;" id="botonmodalcontacto"> + </button><!-- Boton sua-->
                 <div class="modal fade" role="dialog" tabindex="-1" id="contactoModal" aria-labelledby="contactoModalLabel" aria-hidden="true">
                   <div class="modal-dialog" role="document">
-                    <div class="modal-content">
+                    <div class="modal-content" style="width: 100%; position: absolute; left: 50%; transform: translateX(-50%);">
                     {% include "showromVentasApp/crear_contacto.html" %}
                     </div>
                   </div>
@@ -347,7 +347,7 @@
             <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#dirDespModal" style="font-size: 12px;"> + </button>
             <div class="modal fade" role="dialog" tabindex="-1" id="dirDespModal" aria-labelledby="dirDespModalLabel" aria-hidden="true">
               <div class="modal-dialog" role="document">
-                <div class="modal-content">
+                <div class="modal-content" style="width: 200%; position: absolute; left: 50%; transform: translateX(-50%);">
                   {% include "showromVentasApp/crear_dirdespacho.html" %}
                 </div>
               </div>
@@ -386,7 +386,7 @@
             <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#dirFactModal" style="font-size: 12px;"> + </button>
             <div class="modal fade" role="dialog" tabindex="-1" id="dirFactModal" aria-labelledby="dirFactModalLabel" aria-hidden="true">
               <div class="modal-dialog" role="document">
-                <div class="modal-content">
+                <div class="modal-content" style="width: 200%; position: absolute; left: 50%; transform: translateX(-50%);">
                   {% include "showromVentasApp/crear_dirfacturacion.html" %}
               </div>
             </div>

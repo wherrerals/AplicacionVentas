@@ -81,7 +81,6 @@ class OrdenVenta(Documento):
     def formatearDatos(self, json_data):
         # Extraer y limpiar la información del cliente
 
-        print("JSON DATA:", json_data)
         client_info = json_data["Client"]["value"][0]
         quotations = client_info.get("Orders", {})
         salesperson = client_info.get("SalesPersons", {})
@@ -208,8 +207,6 @@ class OrdenVenta(Documento):
         Returns:
             dict: Respuesta de la API.
         """
-        print("Creando documento")
-
         try:
             # Verificar los datos antes de preparar el JSON
             errores = self.validarDatosODV(data)
@@ -260,7 +257,6 @@ class OrdenVenta(Documento):
         Returns:
             str: Mensajes de error si hay problemas con los datos, o vacío si son correctos.
         """
-        print(f"Validando datos: {data}")
         errores = []
 
         # Verificar que el cardcode esté presente

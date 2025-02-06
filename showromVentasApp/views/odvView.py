@@ -9,10 +9,8 @@ from adapters.sl_client import APIClient
 import json
 from requests.exceptions import RequestException
 import urllib3
-
 from logicaVentasApp.services.odv import OrdenVenta
 from logicaVentasApp.services.socionegocio import SocioNegocio
-
 # Desactivar las advertencias de SSL inseguro (solo para desarrollo)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -56,7 +54,6 @@ class OdvView(View):
 
     def get_route_map(self):
         return {
-            "/ventas/pruevaGet": self.metodoPrueba,  # Listado de cotizaciones, no es necesaria se deja para ver si es usada en otra parte del codigo.
             "/ventas/detalles_ODV": self.detallesODV,
         }
 
@@ -102,11 +99,8 @@ class OdvView(View):
             data = client.getODV(top=top, skip=skip, filters=filters)
             return JsonResponse({"data": data}, safe=False)
         except Exception as e:
-            print("Error:", e)  # Verifica el error específico que está ocurriendo
             return JsonResponse({"error": str(e)}, status=500)
 
-    def metodoPrueba(self, request):
-        pass
 
     def detallesODV(self, request):
 
@@ -114,7 +108,12 @@ class OdvView(View):
         client = APIClient()
 
         documentClient = client.detallesOrdenVentaCliente(docentry)
+
+        if documentClient.get("odata.metadata") == "$metadata#Collection(Edm.ComplexType)" and not documentClient.get("value"):
+            documentClient = client.detallesOrdenVentaCliente2(docentry)
+
         documentLine = client.detallesOrdenVentaLineas(docentry)
+        
 
         quotations_data = documentClient.get("value", [{}])[0].get("Orders", {})
         cardCode = quotations_data.get("CardCode")
@@ -129,10 +128,6 @@ class OdvView(View):
             odv = OrdenVenta()
             lines_data = odv.formatearDatos(data)
 
-            print(
-                "Lines data:", lines_data
-            )  # Verificar los datos de las líneas de documento
-
             return JsonResponse(lines_data, safe=False)
         else:
             # Crear el cliente en caso de que no exista y responder
@@ -144,27 +139,16 @@ class OdvView(View):
     @csrf_exempt
     def crearOActualizarODV(self, request):
         try:
-            # Cargar datos del cuerpo de la solicitud
             data = json.loads(request.body)
-
-            print("Data recibida:", data)
-
-            # Obtener `DocEntry` si está presente
             docEntry = data.get("DocEntry")
             docnum = data.get("DocNum")
-            print("DocEntry recibido:", docEntry)
 
-            odv = OrdenVenta()  # Instancia del modelo o clase de negocio
+            odv = OrdenVenta()
 
             if docEntry:
-                print("Actualizando ODV con DocEntry:", docEntry)
-                # Si `DocEntry` está presente, se realiza una actualización
-                print("Actualizando ODV con DocEntry:", docEntry)
                 actualizacion = odv.actualizarDocumento(docnum, docEntry, data)
                 return JsonResponse(actualizacion, status=200)
             else:
-                # Si no está presente, se crea una nueva cotización
-                print("Creando nueva cotización")
                 creacion = odv.crearDocumento(data)
                 return JsonResponse(creacion, status=201)
 

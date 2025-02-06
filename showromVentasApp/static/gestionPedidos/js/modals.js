@@ -7,7 +7,7 @@ btnAgregarContacto.addEventListener("click", function() {
       let modalHtml = `
       <div class="modal fade" role="dialog" tabindex="-1" id="contactoModal"aria-labelledby="contactoModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
-          <div class="modal-content">
+          <div class="modal-content" style="width: 200%;" >
             <div class="modal-header">
               <h1 class="fs-5 modal-title" id="exampleModalLabel-2">Agregar Contacto</h1><button
                 class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
