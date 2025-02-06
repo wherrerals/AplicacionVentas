@@ -301,8 +301,11 @@ class OrdenVenta(Documento):
         
         idContacto = jsonData.get('ContactPersonCode')
         
-        contacto = ContactoRepository.obtenerContacto(idContacto)
-        numerocontactoSAp = contacto.codigoInternoSap
+        if idContacto == "No hay contactos disponibles":
+            numerocontactoSAp = "null"
+        else:
+            contacto = ContactoRepository.obtenerContacto(idContacto)
+            numerocontactoSAp = contacto.codigoInternoSap   
         
         direccion1 = DireccionRepository.obtenerDireccion(adrres)
         direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)

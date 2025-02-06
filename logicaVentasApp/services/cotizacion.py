@@ -424,8 +424,12 @@ class Cotizacion(Documento):
         #consultar en base de datos con el id capturado
         
         contacto = ContactoRepository.obtenerContacto(idContacto)
-        numerocontactoSAp = contacto.codigoInternoSap
-        
+
+        if idContacto == "No hay contactos disponibles":
+            numerocontactoSAp = "null"
+        else:
+            contacto = ContactoRepository.obtenerContacto(idContacto)
+            numerocontactoSAp = contacto.codigoInternoSap        #consultar en base de datos con el id capturado        
         direccion1 = DireccionRepository.obtenerDireccion(adrres)
         direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)
         
@@ -437,6 +441,7 @@ class Cotizacion(Documento):
             'DocDate': jsonData.get('DocDate'),
             'DocDueDate': jsonData.get('DocDueDate'),
             'TaxDate': jsonData.get('TaxDate'),
+            'ContactPersonCode': numerocontactoSAp,
             'Address': addresmodif,
             'Address2': addresmodif2,
             'CardCode': jsonData.get('CardCode'),
