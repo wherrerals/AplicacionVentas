@@ -171,89 +171,6 @@ class SocioNegocio:
             raise ValidationError(f"Tipo de socio de negocio no encontrado para el código: {'C' if self.gruposn == '100' else 'I'}")
         return tiposn
 
-    def crearNuevoCliente(self, codigosn, tiposn, grupoSN, tipoCliente):
-        
-        with transaction.atomic():
-
-            if self.gruposn == '105':
-                cliente = self.crearClientePersona(codigosn, self.rut, tiposn, tipoCliente, self.email, grupoSN)
-                
-            elif self.gruposn == '100':
-                cliente = self.crearClienteEmpresa(codigosn, tiposn, grupoSN, tipoCliente)
-            else:
-                raise ValidationError(f"Grupo de cliente no válido: {self.gruposn}")
-            SocioNegocio.agregarDireccionYContacto(self.request, cliente)
-
-        return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
-    
-    def crearNuevoCliente(self, codigosn, tiposn, grupoSN, tipoCliente):
-        with transaction.atomic():
-
-            if self.gruposn == '105':
-                cliente = self.crearClientePersona(codigosn, self.rut, tiposn, tipoCliente, self.email, grupoSN)
-                
-            elif self.gruposn == '100':
-                cliente = self.crearClienteEmpresa(codigosn, tiposn, grupoSN, tipoCliente)
-            else:
-                raise ValidationError(f"Grupo de cliente no válido: {self.gruposn}")
-            SocioNegocio.agregarDireccionYContacto(self.request, cliente)
-
-        return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
-
-    def manejarErrorValidacion(self, e):
-        return JsonResponse({'success': False, 'message': str(e)}, status=400)
-
-    def manejarErrorGeneral(self, e):
-        return JsonResponse({'success': False, 'message': 'Error al crear el cliente'}, status=500)
-
-    def crearClientePersona(self, codigosn, rut, tiposn, tipocliente, email, grupoSN):
-        """
-        Método para crear un cliente persona.
-        
-        Args:
-            codigosn (str): Código del socio de negocio.
-            rut (str): RUT del cliente.
-            tiposn (TipoSNDB): Tipo de socio de negocio.
-            tipocliente (TipoClienteDB): Tipo de cliente.
-            email (str): Email del cliente.
-            grupoSN (GrupoSNDB): Grupo de socio de negocio.
-
-        Returns:
-            Si el cliente se creó exitosamente, retorna un JsonResponse con un mensaje de éxito.
-            Si hubo un error, retorna un JsonResponse con un mensaje de error y un código de estado 400 o 500.
-        """
-
-        return SocioNegocioRepository.crearCliente(
-            codigoSN=codigosn, nombre=self.nombre, apellido=self.apellido, rut=rut, giro=self.giro,
-            telefono=self.telefono, email=email, grupoSN=grupoSN, tipoSN=tiposn,
-            tipoCliente=tipocliente
-        )
-
-
-    def crearClienteEmpresa(self, codigosn, tiposn, grupoSN, tipoCliente):
-        """
-        Método para crear un cliente empresa.
-
-        Args:
-            codigosn (str): Código del socio de negocio.
-            tiposn (TipoSNDB): Tipo de socio de negocio.
-            grupoSN (GrupoSNDB): Grupo de socio de negocio.
-            tipoCliente (TipoClienteDB): Tipo de cliente.
-
-        Returns:
-            JsonResponse: Mensaje de éxito o error según el resultado.
-        """
-        return SocioNegocioRepository.crearClienteEmpresa(
-            codigoSN=codigosn, nombre=self.razon_social, razonSocial=self.razon_social, rut=self.rut, giro=self.giro,
-            telefono=self.telefono, email=self.email, grupoSN=grupoSN, tipoSN=tiposn,
-            tipoCliente=tipoCliente
-        )
-
-
-
-
-        
-
 
     @staticmethod
     def validardatosObligatorios(self):
@@ -341,9 +258,6 @@ class SocioNegocio:
         agregarContacto(request, cliente, **contacto_data)  # Asegúrate de que `agregarContacto` acepte estos datos.
 
         return JsonResponse({"mensaje": "Dirección y contacto agregados exitosamente."})
-
-
-
 
     def buscarSocioNegocio(identificador, buscar_por_nombre=False):
         """
@@ -555,10 +469,7 @@ class SocioNegocio:
                 return False
         except Exception as e:
             return JsonResponse({'success': False, 'message': 'Error al verificar el socio de negocio'}, status=500)
-            
-
-
-        
+                    
     def verificarSocioNegocioSap(self, cardCode):
         """
         
@@ -1171,10 +1082,10 @@ class SocioNegocio:
             return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
         
         except ValidationError as e:
-            return self.manejarErrorValidacion(e)
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
         
         except Exception as e:
-            return self.manejarErrorGeneral(e)
+            return JsonResponse({'success': False, 'message': 'Error al procesar el cliente'}, status=500)
 
     def procesarNuevoCliente(self, dataSN):
         if not dataSN.get('direcciones'):
@@ -1237,8 +1148,11 @@ class SocioNegocio:
             id_comuna = address.get('comuna')
             comunas = ComunaRepository().obtenerComunaPorId(id_comuna)    
             tipo_direccion = address.get("tipoDireccion", "")
+
+            print(f"tiop de direccion: {tipo_direccion}")
+
             serialized_address = {
-                "AddressName": address.get("nombreDireccion", ""),
+                "AddressName": f'{address.get("nombreDireccion", "")}',
                 "Street": address.get("direccion", ""),
                 "City": address.get("ciudad", ""),
                 "County": f"{comunas.codigo} - {comunas.nombre}",
@@ -1246,20 +1160,24 @@ class SocioNegocio:
                 "State": int(address.get("region", "")),
                 "FederalTaxID": client_data.get("rutSN", "").split("-")[0],
                 "TaxCode": "IVA",
-                "AddressType": "bo_ShipTo" if tipo_direccion == "13" else "bo_BillTo"
+                "AddressType": "bo_ShipTo" if tipo_direccion == "12" else "bo_BillTo"
             }
+
+            print(serialized_address)
             serialized_data["BPAddresses"].append(serialized_address)
             tipos_direccion[tipo_direccion] = serialized_address
 
         # Genera la dirección faltante si solo hay una de las dos
-        if tipos_direccion["13"] and not tipos_direccion["12"]:
-            direccion_facturacion = tipos_direccion["13"].copy()
+        if tipos_direccion["12"] and not tipos_direccion["13"]:
+            direccion_facturacion = tipos_direccion["12"].copy()
             direccion_facturacion["AddressType"] = "bo_BillTo"
+            direccion_facturacion["AddressName"] = f'{direccion_facturacion["AddressName"]} - Facturación'
             serialized_data["BPAddresses"].append(direccion_facturacion)
 
-        if tipos_direccion["12"] and not tipos_direccion["13"]:
-            direccion_despacho = tipos_direccion["12"].copy()
+        if tipos_direccion["13"] and not tipos_direccion["12"]:
+            direccion_despacho = tipos_direccion["13"].copy()
             direccion_despacho["AddressType"] = "bo_ShipTo"
+            direccion_despacho["AddressName"] = f'{direccion_despacho["AddressName"]} - Despacho'
             serialized_data["BPAddresses"].append(direccion_despacho)
         
         # Serializa los contactos
