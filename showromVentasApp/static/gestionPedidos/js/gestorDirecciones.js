@@ -6,30 +6,41 @@ class DireccionManager {
 
   initializeEvents() {
     // Verificar existencia antes de agregar eventos
-    const agregarDirBtn = document.getElementById('agregar_dir');
+    const agregarDirBtn = document.getElementById("agregar_dir");
     if (agregarDirBtn) {
-      agregarDirBtn.addEventListener('click', () => this.agregarDireccion('dir', 'Despacho'));
+      agregarDirBtn.addEventListener("click", () =>
+        this.agregarDireccion("dir", "Despacho")
+      );
     }
 
-    const agregarDirFacturacionBtn = document.getElementById('agregar_dir_facturacion');
+    const agregarDirFacturacionBtn = document.getElementById(
+      "agregar_dir_facturacion"
+    );
     if (agregarDirFacturacionBtn) {
-      agregarDirFacturacionBtn.addEventListener('click', () => this.agregarDireccion('listaDireccionFacturacion', 'Facturación'));
+      agregarDirFacturacionBtn.addEventListener("click", () =>
+        this.agregarDireccion("listaDireccionFacturacion", "Facturación")
+      );
     }
 
-    const agregarDirDespachoBtn = document.getElementById('agregar_dir_despacho');
+    const agregarDirDespachoBtn = document.getElementById(
+      "agregar_dir_despacho"
+    );
     if (agregarDirDespachoBtn) {
-      agregarDirDespachoBtn.addEventListener('click', () => this.agregarDireccion('listaDireccionDespacho', 'Despacho'));
+      agregarDirDespachoBtn.addEventListener("click", () =>
+        this.agregarDireccion("listaDireccionDespacho", "Despacho")
+      );
     }
   }
 
   agregarDireccion(containerId, tipoDireccion) {
-    this.contdir++;  // Incrementa el contador cada vez que se agrega una nueva dirección
+    this.contdir++; // Incrementa el contador cada vez que se agrega una nueva dirección
 
     // Crear una nueva fila para la dirección
-    let newRow = document.createElement('div');
+    let newRow = document.createElement("div");
     newRow.className = "col-sm-5 direcciones";
     //newroww de id para poder eliminar
-    newRow.style = "font-size: 12px;background: #f0f2f5;width: 230px; margin-right: 10px;";
+    newRow.style =
+      "font-size: 12px;background: #f0f2f5;width: 230px; margin-right: 10px;";
     newRow.innerHTML = `
         <div class="col-sm-12" style="width: 150%;height: 10px;"><span>&nbsp;</span></div>
         
@@ -70,8 +81,12 @@ class DireccionManager {
             <div class="col">
               <select class="form-select" id="direccionSN" name="tipodireccion[]" style="font-size: 12px;border-color: rgb(159,168,175);">
                 <optgroup label="Tipo">
-                  <option value="12" ${tipoDireccion === 'Despacho' ? 'selected' : ''}>Despacho</option>
-                  <option value="13" ${tipoDireccion === 'Facturación' ? 'selected' : ''}>Facturación</option>
+                  <option value="12" ${
+                    tipoDireccion === "Despacho" ? "selected" : ""
+                  }>Despacho</option>
+                  <option value="13" ${
+                    tipoDireccion === "Facturación" ? "selected" : ""
+                  }>Facturación</option>
                 </optgroup>
               </select>
             </div>
@@ -174,53 +189,47 @@ class DireccionManager {
     container.appendChild(newRow);
 
     container.appendChild(newRow);
-    newRow.querySelector('#eliminar_dir').addEventListener('click', () => newRow.remove());
+    newRow
+      .querySelector("#eliminar_dir")
+      .addEventListener("click", () => newRow.remove());
   }
 }
-
 
 // Crear una instancia de DireccionManager al cargar la página
 $(document).ready(() => {
   new DireccionManager();
 });
 
+// Función genérica para manejar la apertura de modales
+function manejarAperturaModal(modalId, tipoDireccion, listaDireccionId) {
+  $(modalId).off("show.bs.modal").on("show.bs.modal", function () {
+    let clienteRut = $("#inputCliente").attr("data-rut")?.trim();
+    if (clienteRut) {
+      cargarDirecciones(clienteRut, tipoDireccion, listaDireccionId);
+    } else {
+      $(listaDireccionId).html("<p>No se ha seleccionado un cliente.</p>");
+    }
+  });
+}
 
 // Inicializa los eventos y configuraciones
 function initDireccionManager() {
   $(document).ready(() => {
-    // Evento para abrir el modal de despacho
-    $('#dirDespModal').on('show.bs.modal', () => {
-      let clienteRut = $('#inputCliente').attr('data-rut');
-      console.log("RUT del cliente:", clienteRut);
-      if (clienteRut) {
-        cargarDirecciones(clienteRut, "12", '#listaDireccionDespacho'); // Cargar solo direcciones de despacho (tipo 12)
-      } else {
-        $('#listaDireccionDespacho').html('<p>No se ha seleccionado un cliente.</p>');
-      }
-    });
-
-    // Evento para abrir el modal de facturación
-    $('#dirFactModal').on('show.bs.modal', () => {
-      let clienteRut = $('#inputCliente').attr('data-rut');
-      console.log("RUT del cliente:", clienteRut);
-      if (clienteRut) {
-        cargarDirecciones(clienteRut, "13", '#listaDireccionFacturacion'); // Cargar solo direcciones de facturación (tipo 13)
-      } else {
-        $('#listaDireccionFacturacion').html('<p>No se ha seleccionado un cliente.</p>');
-      }
-    });
+    manejarAperturaModal("#dirDespModal", "12", "#listaDireccionDespacho");
+    manejarAperturaModal("#dirFactModal", "13", "#listaDireccionFacturacion");
   });
 }
 
+
 // Función para cargar direcciones del cliente seleccionado
 function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
-  console.log("Cargando direcciones del cliente:", clienteRut, "Tipo:", tipoDireccion);
-  let buscarClientesUrl = '/ventas/buscar_clientes/';
+
+  let buscarClientesUrl = "/ventas/buscar_clientes/";
 
   $.ajax({
     url: buscarClientesUrl,
-    data: { 'numero': clienteRut },
-    dataType: 'json',
+    data: { numero: clienteRut },
+    dataType: "json",
     success: (data) => {
       $(listaSelector).empty(); // Limpiar el contenido previo
 
@@ -230,7 +239,9 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
         console.log("Direcciones encontradas:", direcciones);
 
         // Filtrar direcciones por tipo
-        const direccionesFiltradas = direcciones.filter(direccion => direccion.tipoDireccion === tipoDireccion);
+        const direccionesFiltradas = direcciones.filter(
+          (direccion) => direccion.tipoDireccion === tipoDireccion
+        );
 
         if (direccionesFiltradas.length > 0) {
           direccionesFiltradas.forEach((direccion, index) => {
@@ -240,7 +251,9 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                 <div class="row">
                                     <div class="col-sm-12" style="height: 15px; background: transparent;"><span>&nbsp;</span></div>
                                     <div class="col" style="text-align: center;">
-                                        <span style="font-weight: bold;" id="direcciones_indice">Dirección Nº${index + 1}</span>
+                                        <span style="font-weight: bold;" id="direcciones_indice">Dirección Nº${
+                                          index + 1
+                                        }</span>
                                     </div>
                                     <div class="col-sm-12" style="height: 5px; background: transparent;"><span>&nbsp;</span></div>
                                 </div>
@@ -265,7 +278,11 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                   <div class="col-sm-12" style="height: 10px;background: transparent;"><span>&nbsp;</span></div>
                                 </div>
 
-                                <input type="hidden" name="direccionid[]" data-rowNum="${direccion.rowNum}" value="${direccion.id}" id="contacto_id_${index}">
+                                <input type="hidden" name="direccionid[]" data-rowNum="${
+                                  direccion.rowNum
+                                }" value="${
+              direccion.id
+            }" id="contacto_id_${index}">
 
                                 <div class="row">
                                     <div class="col-sm-4">
@@ -274,9 +291,21 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                   <div class="col">
                                     <select
                                         class="form-select" name="tipoDireccion_static[]" id="tipoDireccion_${index}" style="font-size: 12px; border-color: rgb(159,168,175);" disabled>
-                                        <option value="" ${!direccion.tipoDireccion ? 'selected' : ''}>Seleccionar</option>
-                                        <option value="12" ${direccion.tipoDireccion === '12' ? 'selected' : ''}>Despacho</option>
-                                        <option value="13" ${direccion.tipoDireccion === '13' ? 'selected' : ''}>Facturación</option>
+                                        <option value="" ${
+                                          !direccion.tipoDireccion
+                                            ? "selected"
+                                            : ""
+                                        }>Seleccionar</option>
+                                        <option value="12" ${
+                                          direccion.tipoDireccion === "12"
+                                            ? "selected"
+                                            : ""
+                                        }>Despacho</option>
+                                        <option value="13" ${
+                                          direccion.tipoDireccion === "13"
+                                            ? "selected"
+                                            : ""
+                                        }>Facturación</option>
                                     </select>
                                   </div>
                                 </div>
@@ -286,7 +315,9 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                       <label class="col-form-label" style="font-size: 13px;">Nombre</label>
                                       </div>
                                     <div class="col">
-                                    <input class="form-control" name="direccion_static[]" id=direccion_${index} type="text" value="${direccion.nombreDireccion}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled>
+                                    <input class="form-control" name="direccion_static[]" id=direccion_${index} type="text" value="${
+              direccion.nombreDireccion
+            }" style="border-color: rgb(159,168,175); font-size: 12px;" disabled>
                                     </div>
                                 </div>
 
@@ -297,7 +328,9 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                   <div class="col">
                                     <select class="form-select" id=pais_${index} name="pais_static[]" style="font-size: 12px; border-color: rgb(159,168,175);" disabled>
                                       <optgroup label="País">
-                                        <option value="${direccion.pais}" selected>Chile</option>
+                                        <option value="${
+                                          direccion.pais
+                                        }" selected>Chile</option>
                                       </optgroup>
                                     </select>
                                   </div>
@@ -311,22 +344,86 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                   <div class="col">
                                     <select class="form-select" id="region_${index}" name="region_static[]" style="font-size: 12px; border-color: rgb(159,168,175);" disabled>
                                       <optgroup label="Región">
-                                        <option value="15" ${direccion.region_numero === 15 ? "selected" : ""}>Arica y Parinacota</option>
-                                        <option value="1" ${direccion.region_numero === 1 ? "selected" : ""}>Tarapacá</option>
-                                        <option value="2" ${direccion.region_numero === 2 ? "selected" : ""}>Antofagasta</option>
-                                        <option value="3" ${direccion.region_numero === 3 ? "selected" : ""}>Atacama</option>
-                                        <option value="4" ${direccion.region_numero === 4 ? "selected" : ""}>Coquimbo</option>
-                                        <option value="5" ${direccion.region_numero === 5 ? "selected" : ""}>Valparaíso</option>
-                                        <option value="13" ${direccion.region_numero === 13 ? "selected" : ""}>Metropolitana de Santiago</option>
-                                        <option value="6" ${direccion.region_numero === 6 ? "selected" : ""}>Libertador General Bernardo O'Higgins</option>
-                                        <option value="7" ${direccion.region_numero === 7 ? "selected" : ""}>Maule</option>
-                                        <option value="16" ${direccion.region_numero === 16 ? "selected" : ""}>Ñuble</option>
-                                        <option value="8" ${direccion.region_numero === 8 ? "selected" : ""}>Biobío</option>
-                                        <option value="9" ${direccion.region_numero === 9 ? "selected" : ""}>La Araucanía</option>
-                                        <option value="14" ${direccion.region_numero === 14 ? "selected" : ""}>Los Ríos</option>
-                                        <option value="10" ${direccion.region_numero === 10 ? "selected" : ""}>Los Lagos</option>
-                                        <option value="11" ${direccion.region_numero === 11 ? "selected" : ""}>Aysén del General Carlos Ibáñez del Campo</option>
-                                        <option value="12" ${direccion.region_numero === 12 ? "selected" : ""}>Magallanes y de la Antártica Chilena</option>
+                                        <option value="15" ${
+                                          direccion.region_numero === 15
+                                            ? "selected"
+                                            : ""
+                                        }>Arica y Parinacota</option>
+                                        <option value="1" ${
+                                          direccion.region_numero === 1
+                                            ? "selected"
+                                            : ""
+                                        }>Tarapacá</option>
+                                        <option value="2" ${
+                                          direccion.region_numero === 2
+                                            ? "selected"
+                                            : ""
+                                        }>Antofagasta</option>
+                                        <option value="3" ${
+                                          direccion.region_numero === 3
+                                            ? "selected"
+                                            : ""
+                                        }>Atacama</option>
+                                        <option value="4" ${
+                                          direccion.region_numero === 4
+                                            ? "selected"
+                                            : ""
+                                        }>Coquimbo</option>
+                                        <option value="5" ${
+                                          direccion.region_numero === 5
+                                            ? "selected"
+                                            : ""
+                                        }>Valparaíso</option>
+                                        <option value="13" ${
+                                          direccion.region_numero === 13
+                                            ? "selected"
+                                            : ""
+                                        }>Metropolitana de Santiago</option>
+                                        <option value="6" ${
+                                          direccion.region_numero === 6
+                                            ? "selected"
+                                            : ""
+                                        }>Libertador General Bernardo O'Higgins</option>
+                                        <option value="7" ${
+                                          direccion.region_numero === 7
+                                            ? "selected"
+                                            : ""
+                                        }>Maule</option>
+                                        <option value="16" ${
+                                          direccion.region_numero === 16
+                                            ? "selected"
+                                            : ""
+                                        }>Ñuble</option>
+                                        <option value="8" ${
+                                          direccion.region_numero === 8
+                                            ? "selected"
+                                            : ""
+                                        }>Biobío</option>
+                                        <option value="9" ${
+                                          direccion.region_numero === 9
+                                            ? "selected"
+                                            : ""
+                                        }>La Araucanía</option>
+                                        <option value="14" ${
+                                          direccion.region_numero === 14
+                                            ? "selected"
+                                            : ""
+                                        }>Los Ríos</option>
+                                        <option value="10" ${
+                                          direccion.region_numero === 10
+                                            ? "selected"
+                                            : ""
+                                        }>Los Lagos</option>
+                                        <option value="11" ${
+                                          direccion.region_numero === 11
+                                            ? "selected"
+                                            : ""
+                                        }>Aysén del General Carlos Ibáñez del Campo</option>
+                                        <option value="12" ${
+                                          direccion.region_numero === 12
+                                            ? "selected"
+                                            : ""
+                                        }>Magallanes y de la Antártica Chilena</option>
                                       </optgroup>
                                     </select>
                                   </div>
@@ -348,13 +445,17 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
 
                                   <div class="row">
                                       <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Ciudad</label></div>
-                                      <div class="col"><input id=ciudad_${index} name="cuidad_static[]" class="form-control" type="text" value="${direccion.ciudad}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                      <div class="col"><input id=ciudad_${index} name="cuidad_static[]" class="form-control" type="text" value="${
+              direccion.ciudad
+            }" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
                                   </div>
 
 
                                 <div class="row">
                                     <div class="col-sm-4"><label class="col-form-label" style="font-size: 13px;">Dirección</label></div>
-                                    <div class="col"><input id=nombreDireccion_${index} name="nombreDireccion_static[]" class="form-control" type="text" value="${direccion.calleNumero}" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
+                                    <div class="col"><input id=nombreDireccion_${index} name="nombreDireccion_static[]" class="form-control" type="text" value="${
+              direccion.calleNumero
+            }" style="border-color: rgb(159,168,175); font-size: 12px;" disabled></div>
                                 </div>
                             </div>
                         `;
@@ -365,72 +466,89 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
             $(listaSelector).append(direccionElemento); // Agregar la dirección al modal correspondiente
 
             const regionSelect = $(`#region_${index}`);
-            const comunaSelect = $(`#comuna_${index}`);
-            cargarComunas(direccion.region_numero, comunaSelect, direccion.comuna_codigo);
+
+            const modal = $(listaSelector).closest('.modal'); // Detectar el modal donde se agregó la dirección
 
 
-
+            const comunaSelect = modal.find(`#comuna_${index}`);
+            cargarComunas(
+              direccion.region_numero,
+              comunaSelect,
+              direccion.comuna_codigo
+            );
 
             // Añadir los atributos name a los campos editados
-            $(`#tipoDireccion_${index}`).attr('name', 'tipodireccion[]');
-            $(`#direccion_${index}`).attr('name', 'nombre_direccion[]');
-            $(`#pais_${index}`).attr('name', 'pais[]');
-            $(`#region_${index}`).attr('name', 'region[]');
-            $(`#ciudad_${index}`).attr('name', 'ciudad[]');
-            $(`#comuna_${index}`).attr('name', 'comuna[]').attr('data-comuna', direccion.comuna);
-            $(`#nombreDireccion_${index}`).attr('name', 'direccion[]');
-            $(`#contacto_id_${index}`).attr('name', 'direccionid[]');
+            // Añadir los atributos name a los campos editados
+            $(`#tipoDireccion_${index}`).attr("name", "tipodireccion[]");
+            $(`#direccion_${index}`).attr("name", "nombre_direccion[]");
+            $(`#pais_${index}`).attr("name", "pais[]");
+            $(`#region_${index}`).attr("name", "region[]");
+            $(`#ciudad_${index}`).attr("name", "ciudad[]");
+            $(`#comuna_${index}`)
+              .attr("name", "comuna[]")
+              .attr("data-comuna", direccion.comuna);
+            $(`#nombreDireccion_${index}`).attr("name", "direccion[]");
+            $(`#contacto_id_${index}`).attr("name", "direccionid[]");
 
-
-            $(document).on('click', `[id^="editar_dir_"]`, function () {
-              // Extraer el índice del ID dinámico
-              const index = $(this).attr('id').split('_')[2];
-              console.log("Habilitando edición para la dirección con index:", index);
-
-              // Hacer los campos editables
-              $(`#tipoDireccion_${index}`).prop('disabled', false);
-              $(`#direccion_${index}`).prop('disabled', false);
-              $(`#pais_${index}`).prop('disabled', false);
-              $(`#region_${index}`).prop('disabled', false);
-              $(`#ciudad_${index}`).prop('disabled', false);
-              $(`#comuna_${index}`).prop('disabled', false);
-              $(`#nombreDireccion_${index}`).prop('disabled', false);
-
-              let tipoDireccion = $(`#tipoDireccion_${index}`).val();
-              console.log('Valor capturado de tipoDireccion:', tipoDireccion);
-
+            // Evento para habilitar edición
+            $('.modal').on("click", `[id^="editar_dir_"]`, function () {
+              const index = $(this).attr("id").split("_")[2];
+          
+              // Obtener el modal actual (el más cercano al botón de editar)
+              const modal = $(this).closest(".modal");
+          
+              console.log(`Habilitando edición en el modal: ${modal.attr("id")}, índice: ${index}`);
+          
+              // Habilitar solo los campos dentro del modal correspondiente
+              modal.find(`#tipoDireccion_${index}`).prop("disabled", false);
+              modal.find(`#direccion_${index}`).prop("disabled", false);
+              modal.find(`#pais_${index}`).prop("disabled", false);
+              modal.find(`#region_${index}`).prop("disabled", false);
+              modal.find(`#ciudad_${index}`).prop("disabled", false);
+              modal.find(`#comuna_${index}`).prop("disabled", false);
+              modal.find(`#nombreDireccion_${index}`).prop("disabled", false);
+          
+              let tipoDireccion = modal.find(`#tipoDireccion_${index}`).val();
+              console.log("Valor capturado de tipoDireccion:", tipoDireccion);
               console.log("Edición habilitada para la dirección con index:", index);
-            });
+          });
+          
 
+            // Evento para eliminar dirección
+            $(document).on("click", `[id^="eliminar_dir_"]`, function () {
+              if (
+                confirm("¿Estás seguro que deseas eliminar esta dirección?")
+              ) {
+                $(this).closest(".col-sm-5").remove();
 
-            $(`#eliminar_dir_${index}`).on('click', function () {
-              if (confirm('¿Estás seguro que deseas eliminar esta direccion?')) {
-                // Remove the current address row
-                $(this).closest('.col-sm-5').remove();
-                
-                // Reindex all remaining address rows
-                $('.col-sm-5').each(function(newIndex) {
-                  // Update the direction number in the span
-                  $(this).find('#direcciones_indice').text(`Dirección Nº${newIndex - 1}`);
+                // Reindexar direcciones
+                $(".col-sm-5").each(function (newIndex) {
+                  $(this)
+                    .find("#direcciones_indice")
+                    .text(`Dirección Nº${newIndex + 1}`);
                 });
               }
             });
-
-
           });
         } else {
-          console.log(`No hay direcciones de tipo ${tipoDireccion} para este cliente`);
-          $(listaSelector).html(`<p id="dirmens1">No hay direcciones disponibles de este tipo.</p>`);
+          console.log(
+            `No hay direcciones de tipo ${tipoDireccion} para este cliente`
+          );
+          $(listaSelector).html(
+            `<p id="dirmens1">No hay direcciones disponibles de este tipo.</p>`
+          );
         }
       } else {
         console.log("No se encontraron clientes con el RUT proporcionado");
-        $(listaSelector).html('<p id="dirmens1>Error al cargar direcciones.</p>');
+        $(listaSelector).html(
+          '<p id="dirmens1>Error al cargar direcciones.</p>'
+        );
       }
     },
     error: (xhr, status, error) => {
-      console.error('Error al obtener las direcciones del cliente:', error);
+      console.error("Error al obtener las direcciones del cliente:", error);
       $(listaSelector).html('<p id="dirmens1>Error al cargar direcciones.</p>');
-    }
+    },
   });
 }
 
@@ -439,58 +557,71 @@ $(document).ready(() => {
   initDireccionManager();
 });
 
-
 // Función para inicializar región y comunas al cargar la página o datos existentes
 function inicializarRegionYComuna(direccion, index) {
   const regionSelect = $(`#region_${index}`); // Selector del campo de región
   const comunaSelect = $(`#comuna_${index}`); // Selector del campo de comuna
 
   // Seleccionar la región
-  regionSelect.val(direccion.region_numero).trigger('change'); // Dispara el evento change para cargar comunas
+  regionSelect.val(direccion.region_numero).trigger("change"); // Dispara el evento change para cargar comunas
 
   // Cargar las comunas y seleccionar la correspondiente
   cargarComunas(direccion.region_numero, comunaSelect, direccion.comuna_codigo);
 }
 
 // Evento para cuando cambia la región al crear una nueva dirección
-$(document).on('change', '[id^="region_"], select[name="region[]"]', function () {
-  const regionId = $(this).val(); // Obtener el valor de la región seleccionada
-  const index = $(this).attr('id') ? $(this).attr('id').split('_')[1] : null; // Extraer índice si existe
-  const comunaSelect = index
-    ? $(`#comuna_${index}`) // Para elementos con ID dinámico
-    : $(this).closest('.row').next('.row').find('select[name="comuna[]"]'); // Para elementos con estructura estática
+$(document).on(
+  "change",
+  '[id^="region_"], select[name="region[]"]',
+  function () {
+    const regionId = $(this).val(); // Obtener el valor de la región seleccionada
+    const index = $(this).attr("id") ? $(this).attr("id").split("_")[1] : null; // Extraer índice si existe
+    const comunaSelect = index
+      ? $(`#comuna_${index}`) // Para elementos con ID dinámico
+      : $(this).closest(".row").next(".row").find('select[name="comuna[]"]'); // Para elementos con estructura estática
 
-  if (regionId) {
-    cargarComunas(regionId, comunaSelect); // Llamar a la función para cargar comunas
-  } else {
-    $(comunaSelect).empty().append('<option value="">Seleccione una comuna</option>'); // Limpiar si no hay región seleccionada
+    if (regionId) {
+      cargarComunas(regionId, comunaSelect); // Llamar a la función para cargar comunas
+    } else {
+      $(comunaSelect)
+        .empty()
+        .append('<option value="">Seleccione una comuna</option>'); // Limpiar si no hay región seleccionada
+    }
   }
-});
+);
 
 // Función para cargar comunas dinámicamente y seleccionar la correspondiente si existe
 function cargarComunas(regionId, comunaSelect, comunaSeleccionada = null) {
   $.ajax({
     url: `/ventas/obtener_comunas_por_region/?idRegion=${regionId}`, // Asegúrate de que esta ruta sea la correcta
-    method: 'GET',
+    method: "GET",
     success: function (data) {
       $(comunaSelect).empty();
       $(comunaSelect).append('<option value="">Seleccione una comuna</option>');
 
       // Rellenar el select con las comunas obtenidas
       data.forEach(function (comuna) {
-        let selected = comunaSeleccionada && comunaSeleccionada === comuna.codigo ? "selected" : "";
-        $(comunaSelect).append(`<option value="${comuna.codigo}" ${selected}>${comuna.nombre}</option>`);
+        let selected =
+          comunaSeleccionada && comunaSeleccionada === comuna.codigo
+            ? "selected"
+            : "";
+        $(comunaSelect).append(
+          `<option value="${comuna.codigo}" ${selected}>${comuna.nombre}</option>`
+        );
       });
     },
     error: function (xhr, status, error) {
       console.error("Error al cargar comunas:", error);
-      $(comunaSelect).empty().append('<option value="">Error al cargar comunas</option>');
-    }
+      $(comunaSelect)
+        .empty()
+        .append('<option value="">Error al cargar comunas</option>');
+    },
   });
 }
 
 // Función para inicializar las regiones y comunas al cargar la página
 function inicializarFormularioDirecciones(direcciones) {
+  
   direcciones.forEach((direccion, index) => {
     inicializarRegionYComuna(direccion, index); // Inicializar cada dirección
   });
