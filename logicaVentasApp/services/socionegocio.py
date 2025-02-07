@@ -185,6 +185,20 @@ class SocioNegocio:
             SocioNegocio.agregarDireccionYContacto(self.request, cliente)
 
         return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
+    
+    def crearNuevoCliente(self, codigosn, tiposn, grupoSN, tipoCliente):
+        with transaction.atomic():
+
+            if self.gruposn == '105':
+                cliente = self.crearClientePersona(codigosn, self.rut, tiposn, tipoCliente, self.email, grupoSN)
+                
+            elif self.gruposn == '100':
+                cliente = self.crearClienteEmpresa(codigosn, tiposn, grupoSN, tipoCliente)
+            else:
+                raise ValidationError(f"Grupo de cliente no válido: {self.gruposn}")
+            SocioNegocio.agregarDireccionYContacto(self.request, cliente)
+
+        return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
 
     def manejarErrorValidacion(self, e):
         return JsonResponse({'success': False, 'message': str(e)}, status=400)
@@ -1133,50 +1147,47 @@ class SocioNegocio:
 #Creacion Socio Negocio
 
     def crearOActualizarCliente(self):
-
+        
+        # Obtener los datos del request
         dataSN = self.request
 
+        # Validar el RUT
         if not self.verificarRutValido(self.rut):
-            return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)
-        
+            return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)        
         
         try:
-            
+            # Validar los datos obligatorios
             self.validarDatosObligatorios()
 
             rut = self.rut            
             codigoSN = SocioNegocio.generarCodigoSN(rut)
+
+            # Verificar si el cliente ya existe
             clienteExistente = SocioNegocioRepository.obtenerPorRut(self.rut)
-                        
             if clienteExistente is not None:
                 return self.procesarClienteExistente(codigoSN, clienteExistente, datosNuevos=dataSN)
             
-
-            
             self.procesarNuevoCliente(dataSN)
-            
             return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
+        
         except ValidationError as e:
             return self.manejarErrorValidacion(e)
+        
         except Exception as e:
             return self.manejarErrorGeneral(e)
 
     def procesarNuevoCliente(self, dataSN):
-
         if not dataSN.get('direcciones'):
             raise ValidationError("No se proporcionaron direcciones")        
 
         try:
-
             codigoSN = SocioNegocio.generarCodigoSN(self.rut)
 
             if not codigoSN:
                 raise ValueError("No se pudo generar el código del cliente.")
             
             jsonData = self.serializarSN(dataSN)
-            
             data = self.creacionSocioSAP(jsonData)
-
             data_creacion = self.procesarDatosSocionegocio(self.convertirJsonObjeto(data))
 
             cliente = self.guardarClienteCompleto(data_creacion)
@@ -1185,23 +1196,9 @@ class SocioNegocio:
         
         except Exception as e: 
             return JsonResponse({'success': False, 'message': 'Error al procesar el cliente'}, status=500)
-        
-    def crearNuevoCliente(self, codigosn, tiposn, grupoSN, tipoCliente):
-        with transaction.atomic():
-
-            if self.gruposn == '105':
-                cliente = self.crearClientePersona(codigosn, self.rut, tiposn, tipoCliente, self.email, grupoSN)
-                
-            elif self.gruposn == '100':
-                cliente = self.crearClienteEmpresa(codigosn, tiposn, grupoSN, tipoCliente)
-            else:
-                raise ValidationError(f"Grupo de cliente no válido: {self.gruposn}")
-            SocioNegocio.agregarDireccionYContacto(self.request, cliente)
-
-        return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
 
     def serializarSN(self, data):
-        # Decodifica el JSON de entrada
+        
         rut = data.get("rutSN", "")
         cardcode = self.generarCodigoSN(rut)
         client_data = data
@@ -1257,13 +1254,11 @@ class SocioNegocio:
         # Genera la dirección faltante si solo hay una de las dos
         if tipos_direccion["13"] and not tipos_direccion["12"]:
             direccion_facturacion = tipos_direccion["13"].copy()
-            direccion_facturacion["County"] = "12"  # Cambia a tipo 12
             direccion_facturacion["AddressType"] = "bo_BillTo"
             serialized_data["BPAddresses"].append(direccion_facturacion)
 
         if tipos_direccion["12"] and not tipos_direccion["13"]:
             direccion_despacho = tipos_direccion["12"].copy()
-            direccion_despacho["County"] = "13"  # Cambia a tipo 13
             direccion_despacho["AddressType"] = "bo_ShipTo"
             serialized_data["BPAddresses"].append(direccion_despacho)
         

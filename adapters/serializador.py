@@ -49,6 +49,8 @@ class Serializador:
     def mapearDirecciones(self, datos, cardCode, rut):
         dirRepo = DireccionRepository()
 
+        print("DATOS CREACION DE DIRECCIONES:", datos)
+
         if not isinstance(datos, list):
             raise ValueError("Se esperaba una lista de direcciones en 'datos'.")
 
@@ -91,7 +93,7 @@ class Serializador:
             for complementaria in complementarias:
                 if not any(d['AddressName'] == complementaria.get('nombreDireccion', '') for d in direcciones_mapeadas):
                     
-                    id_comuna = direccion.get('comuna')        
+                    id_comuna = complementaria.get('comuna')        
                     # Buscar la comuna por id 
                     comunas = ComunaRepository().obtenerComunaPorId(id_comuna)
                     
@@ -132,8 +134,6 @@ class Serializador:
                     'TaxCode': 'IVA',
                     'AddressType': "bo_BillTo" if direccion_db['tipoDireccion'] == "13" else "bo_ShipTo"
                 })
-
-        print("DIRECCIONES MAPEADAS:", direcciones_mapeadas)
 
         return {
             'BPAddresses': direcciones_mapeadas
