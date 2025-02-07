@@ -734,4 +734,5 @@ class APIClient:
 
         response = self.session.get(url, verify=False)
         response.raise_for_status()
+        print(f"URL DE SINC PRODUCTOS: {url}")
         return response.json()

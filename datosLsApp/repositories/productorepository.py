@@ -148,7 +148,8 @@ class ProductoRepository:
             # **Sincronizar stock del componente en las bodegas**
             print(f"Sincronizando stock de {item_code} en la base de datos")
             producto = ProductoDB.objects.get(codigo=item_code)  # Obtener la instancia del producto
-            bodegas_datos = [{"nombre": bodega, "stock_disponible": stock_componente.get(bodega, 0), "stock_comprometido": 0} for bodega in bodegas]
+            bodegas_datos = [{"nombre": bodega, "stock_disponible": stock_componente.get(bodega, 0) / cantidad_necesaria, "stock_comprometido": 0} for bodega in bodegas]
+            print(f"bodegas_datos: {bodegas_datos}")
             self.sync_stock(producto, bodegas_datos)
 
         # Si stock_total_receta sigue siendo infinito, significa que no hay stock suficiente

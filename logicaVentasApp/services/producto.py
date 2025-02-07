@@ -48,6 +48,7 @@ class Producto:
 
         productos = cliente.obtenerProductosSL(skip=skip)
         #productos = cliente.prueba(skip=40)
+
         # Si hay productos, sincronizarlos
         if productos:
             # Serializar los productos
