@@ -122,58 +122,67 @@ document.addEventListener("DOMContentLoaded", function () {
 
           const documentLines = data.DocumentLines;
           documentLines.forEach((line, index) => {
-            console.log("Producto: ", line);
-            const productoCodigo = line.ItemCode;
-            const nombre = line.ItemDescription;
-            const imagen = line.imagen;
-            const precioVenta = line.PriceAfterVAT;
-            const stockTotal = 0;
-            const precioLista = line.GrossPrice;
-            const precioDescuento = line.DiscountPercent;
-            const sucursal = line.WarehouseCode;
-            const stockBodega = line.StockBodega;
-            const comentario = line.FreeText;
-            const precioCoti = precioVenta * line.Quantity;
-            const cantidadCoti = line.Quantity;
-
-            let cantidad =
-              cantidadCoti > stockBodega ? stockBodega : cantidadCoti;
-
-            console.log("Agregando producto con datos:", {
-              productoCodigo,
-              nombre,
-              stockBodega,
-            });
-
-            // Asignar un ID único basado en el índice o un atributo data-id
-            setTimeout(() => {
-              document
-                .querySelectorAll(`.valorCotizacion[data-itemcode="${productoCodigo}"]`)
-                .forEach((elementoLinea) => {
-                  if (cantidadCoti > stockBodega) {
-                    elementoLinea.removeAttribute("hidden");
-                  } else {
-                    elementoLinea.setAttribute("hidden", "true");
-                  }
-                });
-            }, 100);
-            
-
-            agregarProducto(
-              productoCodigo,
-              nombre,
-              imagen,
-              precioVenta,
-              stockTotal,
-              precioLista,
-              precioDescuento,
-              cantidad,
-              sucursal,
-              comentario,
-              line.Quantity,
-              precioCoti
-            );
+              console.log("Producto: ", line);
+              const productoCodigo = line.ItemCode;
+              const nombre = line.ItemDescription;
+              const imagen = line.imagen;
+              const precioVenta = line.PriceAfterVAT;
+              const stockTotal = 0;
+              const precioLista = line.GrossPrice;
+              const precioDescuento = line.DiscountPercent;
+              const sucursal = line.WarehouseCode;
+              const stockBodega = line.StockBodega;
+              const comentario = line.FreeText;
+              const precioCoti = precioVenta * line.Quantity;
+              const cantidadCoti = line.Quantity;
+          
+              let cantidad = cantidadCoti;  // Dejar la cantidad igual a cantidadCoti para todos los casos.
+          
+              console.log("Agregando producto con datos:", {
+                  productoCodigo,
+                  nombre,
+                  stockBodega,
+              });
+          
+              // Verificar si el código del producto comienza con "SV"
+              const isSVProduct = productoCodigo.startsWith("SV");
+          
+              // Asignar un ID único basado en el índice o un atributo data-id
+              setTimeout(() => {
+                  document
+                      .querySelectorAll(`.valorCotizacion[data-itemcode="${productoCodigo}"]`)
+                      .forEach((elementoLinea) => {
+                          if (isSVProduct) {
+                              // Si el producto tiene "SV" en el código, mantenemos el atributo hidden y no se ajusta la cantidad
+                              elementoLinea.setAttribute("hidden", "true");
+                          } else {
+                              // Para los productos que no son SV, verificamos la cantidad y el stock
+                              if (cantidadCoti > stockBodega) {
+                                  elementoLinea.removeAttribute("hidden");
+                              } else {
+                                  elementoLinea.setAttribute("hidden", "true");
+                              }
+                          }
+                      });
+              }, 100);
+          
+              agregarProducto(
+                  productoCodigo,
+                  nombre,
+                  imagen,
+                  precioVenta,
+                  stockTotal,
+                  precioLista,
+                  precioDescuento,
+                  cantidad,
+                  sucursal,
+                  comentario,
+                  line.Quantity,
+                  precioCoti
+              );
           });
+          
+             
         }
         // Llamar a la función para inicializar el precio
         hideLoadingOverlay();

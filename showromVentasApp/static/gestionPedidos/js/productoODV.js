@@ -261,23 +261,28 @@ class Producto {
         // Obtener el elemento #numero_orden
         const numeroOrdenElem = document.getElementById('numero_orden');
         const docEntry = numeroOrdenElem?.getAttribute('data-docentry');
-
+    
         // Verificar si hay un valor en data-docentry
-/*         if (docEntry) {
+        /* if (docEntry) {
             console.log("No se ejecuta limitarCantidad porque data-docentry tiene un valor:", numeroOrdenElem);
             return;
-        }
- */
+        } */
+    
         let cantidadInput = row.querySelector('#calcular_cantidad');
         let stockBodegaElem = row.querySelector('[name="stock_bodega"]'); // Referencia al elemento de stock
-
-
-
+        let skuElem = row.querySelector('[name="sku_producto"]'); // Referencia al nombre del producto
+    
+        // Verificar si el nombre del producto comienza con "SV"
+        if (skuElem && skuElem.textContent.startsWith('SV')) {
+            // Si empieza con "SV", no limitamos la cantidad
+            return;
+        }
+    
         // Función para validar y limitar la cantidad
         const validarCantidad = () => {
             let maxStock = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
             let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
-
+    
             if (cantidadActual > maxStock) {
                 cantidadInput.value = maxStock;
             } else if (cantidadActual < 1) {
