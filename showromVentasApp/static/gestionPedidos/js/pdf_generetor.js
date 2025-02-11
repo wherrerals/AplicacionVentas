@@ -51,8 +51,8 @@ document.addEventListener("DOMContentLoaded", function () {
             // capturar imagen de etiqueta imagen con id img_productox
             const img = row.querySelector("#img_productox").src;
 
-            const total = parseFloat(totalspan);
-            const discount = parseFloat(discountspan);
+            const total = totalspan;
+            const discount = discountspan;
 
             const line = {
                 "LineNum": index,

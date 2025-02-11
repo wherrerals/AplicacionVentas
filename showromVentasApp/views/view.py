@@ -1029,6 +1029,8 @@ def generar_cotizacion_pdf(request, cotizacion_id):
 
         try:
             data = json.loads(request.body)
+
+            
             print(f"Data recibida para PDF: {data}")
             
             codigoSn = data.get('rut')
@@ -1036,6 +1038,11 @@ def generar_cotizacion_pdf(request, cotizacion_id):
             snrepo = SocioNegocioRepository()
 
             datossocio = snrepo.obtenerPorCodigoSN(codigoSn)
+
+            if datossocio.grupoSN == "105":
+                name = datossocio.nombre + " " + datossocio.apellido,
+            else:
+                name = datossocio.razonSocial
 
             usuarios = UsuarioDB.objects.get(vendedor__codigo=data.get('vendedor'))
 
@@ -1066,7 +1073,7 @@ def generar_cotizacion_pdf(request, cotizacion_id):
                 },
                 'cliente': {
                     'rut': datossocio.rut,
-                    'nombre': datossocio.nombre + " " + datossocio.apellido,
+                    'nombre': name,
                     'telefono': datossocio.telefono,
                     'tipo': datossocio.grupoSN.nombre,
                     'email': datossocio.email,
@@ -1083,10 +1090,10 @@ def generar_cotizacion_pdf(request, cotizacion_id):
             }
 
             # Renderizar plantilla HTML
-            html_string = render_to_string('cotizacion_template.html', {'cotizacion': cotizacion})
+            html_string = render_to_string('cotizacion_template2.html', {'cotizacion': cotizacion})
 
             # Generar PDF
-            pdf_file = HTML(string=html_string).write_pdf()
+            pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
 
             # Devolver PDF como respuesta
             response = HttpResponse(pdf_file, content_type='application/pdf')

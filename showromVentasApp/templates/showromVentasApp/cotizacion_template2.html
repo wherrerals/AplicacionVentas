@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>PDF Cotización</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Estilos generales */
+
+    @page {
+      size: letter;
+      /* Tamaño de la hoja */
+      margin: 0;
+      /* Elimina márgenes */
+      margin-header: 0;
+      margin-footer: 0;
+      font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: inherit;
+      line-height: normal;
+      counter-reset: none;
+      text-indent: 0;
+      letter-spacing: normal;
+      word-spacing: normal;
+    }
+
+    /* Estilo cuerpo de html */
+    body {
+      font-size: 12px;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      line-height: 1.4;
+      font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    .th-product {
+      display: table-cell;
+      vertical-align: inherit;
+      font-weight: bold;
+      /* Esto ya aplica negrita */
+      text-align: -internal-center;
+      unicode-bidi: isolate;
+    }
+
+    /* Estilos de las tablas */
+    .terminos-titulo {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .terminos-contenido {
+      font-size: 10px;
+    }
+
+    td,
+    th {
+      font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      margin-right: 0;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+    }
+
+    /* Estilos de la cabecera */
+    .header-logo {
+      width: 391px;
+      height: 50px;
+      padding: 10px;
+      background-color: #000000;
+      text-align: center;
+    }
+
+    .img-logo {
+      max-width: 231px;
+      height: auto;
+    }
+
+    .header-number {
+      background-color: #caaa74;
+      text-align: center;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: bold;
+      width: 470px;
+      height: 50px;
+      padding: 10px;
+    }
+
+    /* Estilos de las tablas */
+    .main-table {
+      width: 792px;
+      border: 0;
+      margin: 0 auto;
+      border-spacing: 0;
+      padding: 3px;
+    }
+
+    .spacer2 {
+      height: 20px;
+      margin-top: 50px;
+    }
+
+    .spacer3 {
+      height: 30px;
+      margin-top: 50px;
+    }
+
+    .spacer {
+      height: 5px;
+      margin-top: 0px;
+    }
+
+    .content-table {
+      width: 700px;
+      border: 0;
+      margin: 0 auto;
+      padding: 3px;
+    }
+
+    .data-table {
+      width: 750px;
+      border: 0;
+      margin: 0 auto;
+      border-spacing: 0;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 10px;
+      font-weight: bold;
+      font-size: 10px;
+      /* Espaciado interno de 10px */
+    }
+
+    /* Estilos de texto */
+    .section-title {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .regular-text {
+      font-size: 10px;
+    }
+
+    .header-text {
+      font-size: 18px;
+    }
+
+    /* Estilos específicos */
+    .product-header {
+      background-color: #caaa74;
+      color: #ffffff;
+      font-weight: bold;
+      align-items: center;
+    }
+
+    .product-comment {
+      color: #9a999e;
+    }
+
+    .total-row {
+      background-color: #5b5b5f;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .border-bottom {
+      border-bottom: 1px solid black;
+    }
+
+    /* Alineaciones */
+    .text-center {
+      text-align: center;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .valign-top {
+      vertical-align: top;
+    }
+
+    /* Espaciados */
+    .spacer {
+      height: 20px;
+    }
+
+    .img-footer {
+      max-width: 744px;
+      height: auto;
+    }
+
+    .img-product {
+      max-width: 40px;
+      max-height: 40px;
+      object-fit: contain;
+    }
+
+    .content-table-info {
+      page-break-before: always;
+      /* Fuerza un salto de página antes de este div */
+      margin-top: 1cm;
+      /* Espacio opcional antes del contenido */
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <table class="main-table">
+      <tbody>
+        <tr class="header-text">
+          <td class="header-logo">
+            <img class="img-logo"
+              src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/a156f0f3-157a-40f7-b3b9-848ec960ed5a___19c4cc248f9416bc9d534b43493bd501.png" />
+          </td>
+          <td class="header-number">Cotización Nº{{ cotizacion.numero }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </header>
+
+  <div class="spacer2"></div>
+
+  <table class="content-table">
+    <tbody>
+      <tr class="section-title">
+        <td width="300">Datos del Cliente</td>
+        <td width="10">&nbsp;</td>
+        <td>Detalles de la Cotización</td>
+      </tr>
+      <tr class="regular-text">
+        <td>
+          10880683-4 <br />Aura TI y Asociados SPA <br />Servicios de datos
+          <br />Avenida Kennedy 7031, Las Condes <br />Contacto: Leonardo
+          Silva <br />Teléfono: +56993092776 <br />Email: lsilva@ledstudio.cl
+        </td>
+        <td>&nbsp;</td>
+        <td>
+          Fecha: 15-01-2025 <br />Válido hasta: 25-01-2025 <br />Vendedor: LC
+          - Mayra Molinares <br />Email: mmolinares@ledstudio.cl
+          <br />Teléfono: +56223853700 <br />Showroom Las Condes: Av. Las
+          Condes 7363, Las Condes Santiago <br />Observaciones: Descuento de
+          arquitectura
+        </td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="data-table">
+    <tbody>
+      <tr class="product-header">
+        <th class="th-product">Nº</th>
+        <th>&nbsp;</th>
+        <th class="th-product">SKU</th>
+        <th class="th-product">Descripción</th>
+        <th class="th-product">Precio con IVA</th>
+        <th class="th-product">%Dscto</th>
+        <th class="th-product">Precio con Dscto</th>
+        <th class="th-product">Cantidad</th>
+        <th class="th-product">Subtotal</th>
+      </tr>
+      {% for producto in cotizacion.productos %}
+      {% if forloop.counter|divisibleby:8 and not forloop.first %}
+      <tr style="page-break-before: always;">
+        <td colspan="9"></td> <!-- Fila vacía para evitar cortes en celdas -->
+      </tr>
+      <!-- Espaciador para evitar que el contenido quede debajo del header -->
+      <tr>
+        <td colspan="9">
+          <div class="spacer3"></div>
+        </td>
+      </tr>
+      <!-- Nueva cabecera de productos -->
+      <tr class="product-header">
+        <th>Nº</th>
+        <th>&nbsp;</th>
+        <th>SKU</th>
+        <th>Descripción</th>
+        <th>Precio con IVA</th>
+        <th>%Dscto</th>
+        <th>Precio con Dscto</th>
+        <th>Cantidad</th>
+        <th>Subtotal</th>
+      </tr>
+      {% endif %}
+      <tr>
+        <td rowspan="2" class="border-bottom">{{ forloop.counter }}</td>
+        <td rowspan="2" class="border-bottom">
+          <img class="img-product" src="{{ producto.imagen }}" alt="{{ producto.descripcion }}" class="image" />
+        </td>
+        <td class="text-center">{{ producto.sku }}</td>
+        <td class="nowrap">{{ producto.descripcion }}</td>
+        <td class="text-center nowrap">$ 33.529</td>
+        <td class="text-center">{{ producto.porcentaje_descuento }}%</td>
+        <td class="text-center nowrap">$ 31.853</td>
+        <td class="text-center">{{ producto.cantidad }}&nbsp;</td>
+        <td class="nowrap">{{ producto.subtotal_neto }}</td>
+      </tr>
+      <tr class="product-comment">
+        <td class="border-bottom">Comentario:</td>
+        <td colspan="6" class="border-bottom">
+          Comentarios
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table class="content-table">
+    <tbody class="regular-text">
+      <tr>
+        <td colspan="3">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="250" class="valign-top">
+          <table class="detail-table">
+            <tbody>
+              <tr>
+                <td colspan="3" width="150">
+                  <b>Detalle de los descuentos</b>
+                </td>
+              </tr>
+              <tr>
+                <td>Total sin Descuento Valor Neto</td>
+                <td width="10">$</td>
+                <td class="text-right">7.755.714</td>
+              </tr>
+              <tr>
+                <td>Total Descuento Valor Neto</td>
+                <td>$</td>
+                <td class="text-right">477.160</td>
+              </tr>
+              <tr class="total-row">
+                <td>Total Valor Neto</td>
+                <td>$</td>
+                <td class="text-right">7.278.555</td>
+              </tr>
+              <tr>
+                <td>Total sin Descuento con IVA</td>
+                <td>$</td>
+                <td class="text-right">9.229.300</td>
+              </tr>
+              <tr>
+                <td>Total Descuento con IVA</td>
+                <td>$</td>
+                <td class="text-right">567.820</td>
+              </tr>
+              <tr class="total-row">
+                <td>Total a pagar con IVA</td>
+                <td>$</td>
+                <td class="text-right">8.661.480</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+        <td>&nbsp;</td>
+        <td width="280">
+          <table class="total-table">
+            <tbody>
+              <tr class="medium-text">
+                <td width="150">Subtotal Neto</td>
+                <td width="10">$</td>
+                <td class="text-right">7.278.555</td>
+              </tr>
+              <tr class="medium-text">
+                <td>IVA 19%</td>
+                <td>$</td>
+                <td class="text-right">1.382.925</td>
+              </tr>
+              <tr class="total-row medium-text">
+                <td>Total a Pagar</td>
+                <td>$</td>
+                <td class="text-right">8.661.480</td>
+              </tr>
+              <tr class="small-text">
+                <td colspan="3">
+                  <b>Datos para transferencia:</b><br />
+                  Nombre: Studio Group SPA.<br />
+                  Rut: 76.927.160-0<br />
+                  Email comprobante: cobranza@ledstudio.cl<br />
+                  Showroom Santiago Centro: Banco Scotiabank: N° Cta.Cte.
+                  280096717<br />
+                  Showroom Las Condes: Banco Scotiabank: N° Cta.Cte.
+                  1640022721<br />
+                  Showroom Vitacura: Banco Scotiabank: N° Cta.Cte.
+                  1070003742<br />
+                  Todos los Showroom: Banco Santander N° Cta.Cte.
+                  0-000-6618926-0
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3">&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="content-table-info">
+    <div class="spacer"></div>
+    <table class="content-table">
+      <tbody>
+        <tr>
+          <td colspan="6">&nbsp;</td>
+        </tr>
+        <tr class="section-title">
+          <td colspan="6">Horarios de Atención y Retiro de Productos</td>
+        </tr>
+        <tr class="regular-text valign-top">
+          <td>
+            <b>Showroom Las Condes</b><br />
+            Av. Las Condes 7363, Las Condes<br />
+            Horario de Atención:<br />
+            Lunes a viernes: 9:30 a 19:00 Hrs.<br />
+            Sábados: 10:00 a 14:00 Hrs.<br />
+            Teléfono: (56) 2 2385 3700
+          </td>
+          <td>&nbsp;</td>
+          <td>
+            <b>Showroom Vitacura</b><br />
+            Av. Padre Hurtado Norte 1199, Vitacura<br />
+            Horario de Atención:<br />
+            Lunes a viernes: 9:30 a 19:00 Hrs.<br />
+            Sábados: 10:00 a 14:00 Hrs.<br />
+            Teléfono: (56) 2 2385 3600
+          </td>
+          <td>&nbsp;</td>
+          <td>
+            <b>Showroom Patio Panal</b><br />
+            Av. Pdte Eduardo Frei Montalva 550, Mod 2, Renca<br />
+            Horario de Atención:<br />
+            Lunes a viernes: 8:30 a 18:00 Hrs.<br />
+            Teléfono: (56) 2 2385 3500
+          </td>
+          <td>
+            <b>¡PRONTO EN REÑACA!<br />
+              Showroom Reñaca</b><br />
+            Av. Reñaca Norte 25, Edificio 2, Viña del Mar<br />
+          </td>
+        </tr>
+        <tr>
+          <td colspan="6">&nbsp;</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="content-table">
+      <tbody>
+        <tr class="section-title">
+          <td>Políticas de Garantía, Devolución y Cambio</td>
+        </tr>
+        <tr class="regular-text">
+          <td>
+            <b>Estimado Cliente:</b> Con su preferencia usted ha adquirido
+            equipos de alta calidad, que bajo condiciones normales, operan en
+            forma ininterrumpida por muchos años.<br /><br />
+            <ul class="policy-list">
+              <li>
+                LED Studio no garantiza la existencia del stock cotizado en el
+                momento de hacer efectiva la compra.
+              </li>
+              <li>
+                Esta cotización tiene una vigencia de 10 días corridos desde el
+                día de su creación.
+              </li>
+              <li>
+                LED Studio garantiza sus productos, siempre y cuando sean
+                instalados y utilizados adecuadamente.
+              </li>
+              <li>
+                LED Studio velará por el cumplimiento en la entrega de productos
+                hasta la recepción conforme del cliente por la empresa de
+                transporte, basado en la Ley de Consumidor Nº 19.496 y N°21.398.
+              </li>
+              <li>
+                LED Studio te recuerda revisar tus productos en cuanto los
+                recibas, ya sea por una entrega en la tienda o por despacho a
+                través de Courier, solo responderemos por daños o
+                disconformidades hasta 48 horas después de recibidos los
+                productos.
+              </li>
+              <li>
+                LED Studio acepta las siguientes formas de pago: tarjetas de
+                débito / crédito (Transbank), transferencias y efectivo. No se
+                aceptan cheques.
+              </li>
+              <li>
+                LED Studio en cada compra con factura, solicitará siempre la
+                presentación del Rut de la empresa de forma física o e-Rut
+                (nuevo Rut electrónico) junto a la Cédula de identidad del
+                usuario.
+              </li>
+              <li>
+                LED Studio no se hace responsable por daños y perjuicios como
+                resultado de la instalación y uso de nuestros equipos por
+                personal externo a la empresa. En estos casos LED Studio no
+                asumirá el costo del transporte, siendo así este costo
+                responsabilidad del cliente.
+              </li>
+              <li>
+                LED Studio no realiza devoluciones de dinero por desistimiento
+                de compra.
+              </li>
+              <li>
+                LED Studio cuenta con Servicio Técnico y Reparación, estos
+                costos se detallarán una vez que el producto sea revisado por
+                nuestro servicio técnico y se haga un reporte de la falla que
+                presenta el mismo.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="regular-text">
+          <td>
+            <b>NOTA IMPORTANTE:</b> Las notas de crédito deben ser utilizadas en
+            su totalidad de una sola vez. No está permitido el uso parcializado
+            de las mismas; es decir, debe ser utilizada en una misma compra de
+            igual o mayor valor. No se realizan cambios ni devoluciones los días
+            sábado.<br />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="content-table">
+      <tbody>
+        <tr class="section-title">
+          <td>Garantía Legal y Voluntaria</td>
+        </tr>
+        <tr class="regular-text">
+          <td>
+            <ul class="warranty-list">
+              <li>
+                Garantía legal 6 meses: Cliente dispone de 6 meses para optar
+                por cualquiera de estas 3 opciones: devolución de dinero, cambio
+                de producto o reparación gratuita, siempre y cuando; sea un
+                producto nuevo que este defectuoso, le falten piezas o partes,
+                no es apto para el uso que fue destinado, que fue anteriormente
+                arreglado, pero sus deficiencias persisten o presenta nuevas
+                fallas, entre otras situaciones que menciona la Ley del
+                Consumidor Nº 19.496 y N°21.398.
+              </li>
+              <li>
+                Garantía extendida 6 meses más: donde pasando el tiempo de la
+                garantía Legal, LED STUDIO se hace cargo de los 6 meses restante
+                ofreciendo solo REPARACIÓN O CAMBIO del mismo producto. Para
+                realizar cualquier tipo de cambio, es imprescindible la
+                presentación del producto sin uso y con su embalaje original
+                (caja, bolsas, manuales, accesorios, etc.) junto con el respaldo
+                de la boleta, factura de compra.
+              </li>
+              <li>
+                Garantías en regiones: cliente debe enviar foto o video de la
+                falla de su producto, y en relación a esto se le indicará cómo
+                proceder con el cambio o garantía.
+              </li>
+              <li>Verificar el período de garantía.</li>
+              <li>
+                Revisión del producto en Servicio Técnico (3 días hábiles).
+              </li>
+              <li>Productos en liquidación no cuentan con garantía.</li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="terminos-titulo">
+          <td>Costo de Servicio Técnico y Reparación</td>
+        </tr>
+        <tr class="terminos-contenido">
+          <td>
+            <ul>
+              <li>
+                En caso que no corresponda el uso de la Garantía, el producto
+                podrá ser entregado a nuestro Servicio Técnico Especializado. El
+                costo de reparación se detallará una vez que el producto sea
+                revisado por nuestro servicio técnico y se haga un reporte de la
+                falla que presenta el mismo.<br />
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="terminos-titulo">
+          <td>Devolución y Cambio</td>
+        </tr>
+        <tr class="terminos-contenido">
+          <td>
+            <ul>
+              <li>
+                Cambios de lunes a viernes (sábados no) y dentro de los primeros
+                tres periodos desde la fecha de compra, dejando saldo a favor
+                sin derecho a devolución del cliente, usando saldo en la misma
+                tienda.
+              </li>
+              <li>
+                Productos en liquidación y remate, no tienen opción de cambio.
+              </li>
+              <li>
+                Frente a fallas de producto, rige lo establecido en las
+                modificaciones introducidas por la Ley N° 21.398 y que reforzó
+                la Ley N° 19.496.
+              </li>
+              <li>
+                Devolución de dinero: El cliente dispone de 10 días corridos
+                desde que recibe el producto, opción solo disponible para
+                compras Online.
+              </li>
+              <li>
+                Cambios por otros productos por disconformidad: El cliente
+                dispone de 60 días corridos para emitir un cambio, por otro
+                producto.
+              </li>
+              <li>
+                En caso de compras con despacho a domicilio, se reembolsará
+                solamente el valor pagado por el producto. Es decir, no se
+                devolverá el costo del despacho.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="terminos-titulo">
+          <td>Términos y Condiciones</td>
+        </tr>
+        <tr class="terminos-contenido">
+          <td>
+            Estos Términos y Condiciones se aplicarán y se entenderán
+            incorporados en todas las compras y a todos los servicios que
+            contrates con “Studio Group Spa”, RUT 76.927.160-0, domiciliada en
+            “Avenida Las Condes 7363, Las Condes, Santiago de Chile”.
+            Representada por don Luis Pazzanese Mardones mediante los sistemas
+            de comercialización comprendidos en este sitio web.
+          </td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer align="center">
+    <img class="img-footer"
+      src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/40aac7af-b4ca-409a-93cd-7c290b360e42___4d2edb6083ea62378e58b96a97762c17.png"
+      alt="" />
+  </footer>
+</body>
+
+</html>
