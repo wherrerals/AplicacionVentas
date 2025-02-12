@@ -18,6 +18,8 @@ RUN apk update && apk add --no-cache \
     fontconfig \
     ttf-freefont \
     build-base \
+    libintl \
+    libuuid \
     && pip install --upgrade pip
 
 # Copiar el archivo de requerimientos antes de la instalación
@@ -26,6 +28,9 @@ COPY ./requirements.txt ./
 # Instalar dependencias de Python desde requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Generar la caché de fuentes
+RUN fc-cache -f
+
 # Eliminar las herramientas de compilación para reducir el tamaño de la imagen
 RUN apk del build-base
 
@@ -33,6 +38,9 @@ RUN apk del build-base
 COPY ./ ./
 
 RUN ls -la /app
+
+# Dar permisos de ejecución al entrypoint
+RUN chmod +x entrypoint.sh
 
 # Exponer el puerto 7000 para la aplicación
 EXPOSE 7000

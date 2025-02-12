@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
               const nombre = line.ItemDescription;
               const imagen = line.imagen;
               const precioVenta = line.PriceAfterVAT;
-              const stockTotal = 0;
+              const stockTotal = line.stockBodega;
               const precioLista = line.GrossPrice;
               const precioDescuento = line.DiscountPercent;
               const sucursal = line.WarehouseCode;
@@ -143,9 +143,16 @@ document.addEventListener("DOMContentLoaded", function () {
                   nombre,
                   stockBodega,
               });
+              
           
               // Verificar si el código del producto comienza con "SV"
               const isSVProduct = productoCodigo.startsWith("SV");
+
+
+              if (stockBodega <= 0 && !isSVProduct) {
+                cantidad = 0;
+            } else {
+                cantidad = cantidadCoti;}
           
               // Asignar un ID único basado en el índice o un atributo data-id
               setTimeout(() => {

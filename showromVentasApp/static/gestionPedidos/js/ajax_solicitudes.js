@@ -1,6 +1,7 @@
 $(document).ready(function () {
     $('#inputNumero').on('input', function () { // escucha el evento de entrada en input con #inputNumero
         let numero = $(this).val();
+        let tipoDoucmento = $('#tipoDocumento').text().trim();
         if (numero) {
             let buscarProductosUrl = '/ventas/buscarproductos/'; // URL para buscar productos
             $.ajax({ // realiza una solicitud ajax al servidor a la url buscar/
@@ -42,10 +43,16 @@ $(document).ready(function () {
                                 let stockTotal = parseInt(this.getAttribute('data-stockTotal'));
                                 let precioLista = parseFloat(this.getAttribute('data-precioAnterior'));
                                 let precioDescuento = parseFloat(this.getAttribute('data-maxDescuento'));
+
+                                if (stockTotal <= 0) {
+                                   cantidad = 0;
+                                } else {
+                                      cantidad = 1;
+                                  } 
                                 
                                 console.log('Producto seleccionado:', codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento);
                                 
-                                agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad=1, sucursal); // Ejecuta la función agregar producto
+                                agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal); // Ejecuta la función agregar producto
 
                                 // Limpia el input #inputNumero al seleccionar un producto
                                 $('#inputNumero').val('');

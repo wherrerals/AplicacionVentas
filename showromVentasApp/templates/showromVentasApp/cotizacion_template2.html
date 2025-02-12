@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>PDF Cotización</title>
-  <link rel="stylesheet" href="styles.css" />
   <style>
     /* Estilos generales */
 
@@ -12,16 +11,8 @@
       size: letter;
       /* Tamaño de la hoja */
       margin: 0;
-      /* Elimina márgenes */
-      margin-header: 0;
-      margin-footer: 0;
-      font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
-      font-size: inherit;
-      line-height: normal;
       counter-reset: none;
-      text-indent: 0;
-      letter-spacing: normal;
-      word-spacing: normal;
+      /* Elimina márgenes */
     }
 
     /* Estilo cuerpo de html */
@@ -31,7 +22,12 @@
       margin: 0;
       padding: 0;
       line-height: 1.4;
-      font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: normal;
+      /* Por defecto, sin negrita */
+      text-indent: 0;
+      letter-spacing: normal;
+      word-spacing: normal;
     }
 
     .th-product {
@@ -53,11 +49,6 @@
       font-size: 10px;
     }
 
-    td,
-    th {
-      font-family: Gotham, "Helvetica Neue", Helvetica, Arial, sans-serif;
-    }
-
     header {
       position: fixed;
       top: 0;
@@ -65,8 +56,11 @@
     }
 
     footer {
-      position: fixed;
+      /* position: fixed; */
       bottom: 0;
+      margin-top: 300px;
+      position: absolute;
+
     }
 
     /* Estilos de la cabecera */
@@ -109,8 +103,13 @@
     }
 
     .spacer3 {
-      height: 30px;
-      margin-top: 50px;
+      height: 10px;
+      margin-top: 28px;
+    }
+
+    .spacer4 {
+      height: 80px;
+      margin-top: 250px;
     }
 
     .spacer {
@@ -127,18 +126,28 @@
 
     .data-table {
       width: 750px;
-      border: 0;
+      border: 2px solid black;
+      /* Borde alrededor de la tabla */
+      border-collapse: collapse;
+      /* Colapsar los bordes para que no haya espacio entre ellos */
       margin: 0 auto;
-      border-spacing: 0;
     }
 
-    .data-table th,
-    .data-table td {
+    .data-table td,
+    .data-table th {
+      padding: 8px;
+      /* Añadir un poco de padding para que el contenido no esté pegado a los bordes */
       padding: 10px;
+      font-family: 'Arial MT', Arial, sans-serif;
       font-weight: bold;
       font-size: 10px;
-      /* Espaciado interno de 10px */
     }
+
+    .data-table tr {
+      border: none;
+      /* Eliminar los bordes de las filas */
+    }
+    
 
     /* Estilos de texto */
     .section-title {
@@ -147,7 +156,12 @@
     }
 
     .regular-text {
-      font-size: 10px;
+      font-size: 9px;
+    }
+
+    .regular-text2 {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
     }
 
     .header-text {
@@ -156,10 +170,12 @@
 
     /* Estilos específicos */
     .product-header {
-      background-color: #caaa74;
+      background-color: #000000;
       color: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
       font-weight: bold;
       align-items: center;
+
     }
 
     .product-comment {
@@ -234,11 +250,11 @@
   <table class="content-table">
     <tbody>
       <tr class="section-title">
-        <td width="300">Datos del Cliente</td>
-        <td width="10">&nbsp;</td>
+        <td>Datos del Cliente</td>
+        <td>&nbsp;</td>
         <td>Detalles de la Cotización</td>
       </tr>
-      <tr class="regular-text">
+      <tr class="regular-text2">
         <td>
           10880683-4 <br />Aura TI y Asociados SPA <br />Servicios de datos
           <br />Avenida Kennedy 7031, Las Condes <br />Contacto: Leonardo
@@ -277,15 +293,13 @@
       {% for producto in cotizacion.productos %}
       {% if forloop.counter|divisibleby:8 and not forloop.first %}
       <tr style="page-break-before: always;">
-        <td colspan="9"></td> <!-- Fila vacía para evitar cortes en celdas -->
+        <td colspan="9"></td>
       </tr>
-      <!-- Espaciador para evitar que el contenido quede debajo del header -->
       <tr>
         <td colspan="9">
           <div class="spacer3"></div>
         </td>
       </tr>
-      <!-- Nueva cabecera de productos -->
       <tr class="product-header">
         <th>Nº</th>
         <th>&nbsp;</th>
@@ -321,23 +335,34 @@
     </tbody>
   </table>
 
+  <!-- Si hay exactamente 7 productos, agregar un salto de línea -->
+  {% if cotizacion.productos|length == 7 %}
+  <tr style="page-break-before: always;">
+    <td colspan="9"></td>
+  </tr>
+  <tr>
+    <td colspan="9">
+      <div class="spacer4"></div>
+    </td>
+  </tr>
+  {% endif %}
   <table class="content-table">
     <tbody class="regular-text">
       <tr>
         <td colspan="3">&nbsp;</td>
       </tr>
       <tr>
-        <td width="250" class="valign-top">
+        <td class="valign-top">
           <table class="detail-table">
             <tbody>
               <tr>
-                <td colspan="3" width="150">
+                <td colspan="3">
                   <b>Detalle de los descuentos</b>
                 </td>
               </tr>
               <tr>
                 <td>Total sin Descuento Valor Neto</td>
-                <td width="10">$</td>
+                <td>$</td>
                 <td class="text-right">7.755.714</td>
               </tr>
               <tr>
@@ -369,12 +394,12 @@
           </table>
         </td>
         <td>&nbsp;</td>
-        <td width="280">
+        <td>
           <table class="total-table">
             <tbody>
               <tr class="medium-text">
-                <td width="150">Subtotal Neto</td>
-                <td width="10">$</td>
+                <td>Subtotal Neto</td>
+                <td>$</td>
                 <td class="text-right">7.278.555</td>
               </tr>
               <tr class="medium-text">
@@ -412,6 +437,11 @@
       </tr>
     </tbody>
   </table>
+  <footer align="center">
+    <img class="img-footer"
+      src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/40aac7af-b4ca-409a-93cd-7c290b360e42___4d2edb6083ea62378e58b96a97762c17.png"
+      alt="" />
+  </footer>
   <div class="content-table-info">
     <div class="spacer"></div>
     <table class="content-table">
@@ -649,12 +679,6 @@
       </tbody>
     </table>
   </div>
-
-  <footer align="center">
-    <img class="img-footer"
-      src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/40aac7af-b4ca-409a-93cd-7c290b360e42___4d2edb6083ea62378e58b96a97762c17.png"
-      alt="" />
-  </footer>
 </body>
 
 </html>
