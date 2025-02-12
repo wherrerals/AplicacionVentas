@@ -124,6 +124,15 @@
       padding: 3px;
     }
 
+    .detail-table {
+      width: 300px;
+      border: 1px solid black;
+      /* Borde alrededor de la tabla */
+      border-collapse: collapse;
+      /* Colapsar los bordes para que no haya espacio entre ellos */
+      margin: 0 auto;
+    }
+
     .data-table {
       width: 750px;
       border: 2px solid black;
@@ -149,6 +158,12 @@
     }
     
 
+    
+    .total-table {
+      border-collapse: collapse;
+      margin: 0 auto;
+    }
+
     /* Estilos de texto */
     .section-title {
       font-size: 14px;
@@ -160,7 +175,7 @@
     }
 
     .regular-text2 {
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: serif;
       font-size: 14px;
     }
 
@@ -183,11 +198,13 @@
     }
 
     .total-row {
-      background-color: #5b5b5f;
+      background-color: #000000;
       color: #ffffff;
       margin: 0;
+      font-weight: bold;
     }
 
+    
     .border-bottom {
       border-bottom: 1px solid black;
     }
@@ -256,15 +273,15 @@
       </tr>
       <tr class="regular-text2">
         <td>
-          10880683-4 <br />Aura TI y Asociados SPA <br />Servicios de datos
-          <br />Avenida Kennedy 7031, Las Condes <br />Contacto: Leonardo
-          Silva <br />Teléfono: +56993092776 <br />Email: lsilva@ledstudio.cl
+          {{ cotizacion.cliente.rut }} <br /> 
+          {{ cotizacion.cliente.nombre }} <br />{{cotizacion.cliente.giro}}
+          <br />{{ cotizacion.cliente.direccion }}<br />Contacto: Leonardo
+          Silva <br />Teléfono: {{ cotizacion.cliente.telefono }} <br />Email: {{ cotizacion.cliente.email }}
         </td>
         <td>&nbsp;</td>
         <td>
-          Fecha: 15-01-2025 <br />Válido hasta: 25-01-2025 <br />Vendedor: LC
-          - Mayra Molinares <br />Email: mmolinares@ledstudio.cl
-          <br />Teléfono: +56223853700 <br />Showroom Las Condes: Av. Las
+          Fecha: {{ cotizacion.fecha }} <br />Válido hasta: {{ cotizacion.validez }} <br />Vendedor: {{ cotizacion.vendedor.nombre }} <br />Email: {{ cotizacion.vendedor.email }}
+          <br />Teléfono: {{ cotizacion.vendedor.telefono }} <br />Showroom Las Condes: Av. Las
           Condes 7363, Las Condes Santiago <br />Observaciones: Descuento de
           arquitectura
         </td>
@@ -292,14 +309,14 @@
       </tr>
       {% for producto in cotizacion.productos %}
       {% if forloop.counter|divisibleby:8 and not forloop.first %}
-      <tr style="page-break-before: always;">
-        <td colspan="9"></td>
-      </tr>
-      <tr>
-        <td colspan="9">
-          <div class="spacer3"></div>
-        </td>
-      </tr>
+    </tbody>
+    </table>
+    <div style="page-break-before: always;"></div>
+    <div class="spacer3"></div>
+    <div class="spacer3"></div>
+
+    <table class="data-table">
+      <tbody>    
       <tr class="product-header">
         <th>Nº</th>
         <th>&nbsp;</th>
@@ -326,9 +343,9 @@
         <td class="nowrap">{{ producto.subtotal_neto }}</td>
       </tr>
       <tr class="product-comment">
-        <td class="border-bottom">Comentario:</td>
+        <td class="border-bottom"></td>
         <td colspan="6" class="border-bottom">
-          Comentarios
+          Comentario: {{ producto.comentarios }}
         </td>
       </tr>
       {% endfor %}

@@ -48,6 +48,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const porcentaje_descuento = row.querySelector("#agg_descuento").value.trim();
             const discountspan = row.querySelector("#Precio_Descuento").textContent;
             const totalspan = row.querySelector("#precio_Venta").textContent;
+            const comentarios = row.querySelector("#comentarios-1").value; //selecionando comentarios por fila de producto por medio de id
+
             // capturar imagen de etiqueta imagen con id img_productox
             const img = row.querySelector("#img_productox").src;
 
@@ -58,6 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "LineNum": index,
                 "sku": itemCode,
                 "imagen": img,
+                "comentarios": comentarios,
                 "descripcion": name,
                 "cantidad": quantity,
                 "porcentaje_descuento": porcentaje_descuento,

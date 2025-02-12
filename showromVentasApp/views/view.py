@@ -1039,7 +1039,9 @@ def generar_cotizacion_pdf(request, cotizacion_id):
 
             datossocio = snrepo.obtenerPorCodigoSN(codigoSn)
 
-            if datossocio.grupoSN == "105":
+            print("grupoSN: ", datossocio.grupoSN)
+
+            if datossocio.grupoSN == "Persona":
                 name = datossocio.nombre + " " + datossocio.apellido,
             else:
                 name = datossocio.razonSocial
@@ -1074,8 +1076,10 @@ def generar_cotizacion_pdf(request, cotizacion_id):
                 'cliente': {
                     'rut': datossocio.rut,
                     'nombre': name,
+                    'razonSocial': datossocio.razonSocial,
+                    'giro': datossocio.giro,
                     'telefono': datossocio.telefono,
-                    'tipo': datossocio.grupoSN.nombre,
+                    'tipo': datossocio.grupoSN.codigo,
                     'email': datossocio.email,
                     
                 },
