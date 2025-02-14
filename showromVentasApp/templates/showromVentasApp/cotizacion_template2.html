@@ -348,7 +348,7 @@
       </tr>
       {% endif %}
       <tr>
-        <td rowspan="2" class="border-bottom">{{ forloop.counter }}</td>
+        <td rowspan="2" class="border-bottom">{{ forloop.counter }}.</td>
         <td rowspan="2" class="border-bottom">
           <img class="img-product" src="{{ producto.imagen }}" alt="{{ producto.descripcion }}" class="image" />
         </td>
@@ -425,7 +425,7 @@
               <tr class="total-row">
                 <td>Total a pagar con IVA</td>
                 <td>$</td>
-                <td class="text-right">8.661.480</td>
+                <td class="text-right">{{ cotizacion.totalbruto }}</td>
               </tr>
             </tbody>
           </table>
