@@ -161,3 +161,16 @@ class DireccionRepository:
         
         return direcciones_diccionario
 
+
+    def obtenerDireccionesID(id):
+        """
+        Obtiene una dirección por su id
+
+        params:
+            id: int - Id de la dirección
+        """
+
+        try:
+            return DireccionDB.objects.get(id=id)
+        except DireccionDB.DoesNotExist:
+            return "PENDIENTE DE REGISTO DIRECCIONES"

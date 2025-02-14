@@ -33,8 +33,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const totalbruto = document.querySelector("#total_bruto").textContent;
 
+        const selectElement = document.getElementById("direcciones_despacho");
+        const direccion2 = selectElement.value;
 
-        
+        const contactoCliente = document.getElementById("contactos_cliete");
+        const contacto = contactoCliente.value;
+        const sucursal = document.getElementById("sucursal").textContent.trim();
+        const observaciones = document.getElementById("Observaciones-1").value; //selecionando observaciones por fila de producto por medio de id
+
 
         // Construir líneas del documento
         const lines = [];
@@ -49,7 +55,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const discountspan = row.querySelector("#Precio_Descuento").textContent;
             const totalspan = row.querySelector("#precio_Venta").textContent;
             const comentarios = row.querySelector("#comentarios-1").value; //selecionando comentarios por fila de producto por medio de id
+                    // Obtener el elemento <select>
 
+            
             // capturar imagen de etiqueta imagen con id img_productox
             const img = row.querySelector("#img_productox").src;
 
@@ -81,7 +89,11 @@ document.addEventListener("DOMContentLoaded", function () {
             "DocumentLines": lines,
             "totalbruto": totalbruto,
             "iva": ivaGeneral,
-            "totalNeto": totalNeto
+            "totalNeto": totalNeto,
+            "direccion": direccion2,
+            "contacto": contacto,
+            "sucursal": sucursal,
+            "observaciones": observaciones,
         };
 
         console.log("Datos del documento:", documentData);

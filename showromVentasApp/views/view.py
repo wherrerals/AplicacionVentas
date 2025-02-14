@@ -13,10 +13,13 @@ from django.db import transaction
 from django.http import JsonResponse, HttpResponse
 from weasyprint import HTML
 #Modulos Diseñados
+from datosLsApp.models.sucursaldb import SucursalDB
 from datosLsApp.models.usuariodb import User 
 from datosLsApp.models import (ProductoDB, SocioNegocioDB, UsuarioDB, RegionDB, GrupoSNDB, TipoSNDB, TipoClienteDB, DireccionDB, ComunaDB, ContactoDB)
 from adapters.sl_client import APIClient
 from datosLsApp.repositories.comunarepository import ComunaRepository
+from datosLsApp.repositories.contactorepository import ContactoRepository
+from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.regionrepository import RegionRepository
 from datosLsApp.repositories.socionegociorepository import SocioNegocioRepository
 from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
@@ -1037,22 +1040,30 @@ def generar_cotizacion_pdf(request, cotizacion_id):
             
             snrepo = SocioNegocioRepository()
 
+            direcciones = DireccionRepository.obtenerDireccionesID(data.get('direccion'))
+            contactos = ContactoRepository.obtenerContacto(data.get('contacto'))
+            sucursal = data.get('sucursal')
+            address = f"{direcciones.calleNumero}, {direcciones.comuna.nombre}"
             datossocio = snrepo.obtenerPorCodigoSN(codigoSn)
+            direcciones = direcciones
+            detalle_sucursal = SucursalDB.objects.filter(codigo=sucursal).first()
 
-            print("grupoSN: ", datossocio.grupoSN)
+            
+            if contactos.nombre != "1":
+                contactos = contactos.nombreCompleto
+            else:
+                contactos = datossocio.nombre
 
-            if datossocio.grupoSN == "Persona":
-                name = datossocio.nombre + " " + datossocio.apellido,
+            if datossocio.grupoSN.codigo == "105":
+                name_user = datossocio.nombre
+                last_name = datossocio.apellido or ""
+
+                name = name_user + " " + last_name
             else:
                 name = datossocio.razonSocial
 
             usuarios = UsuarioDB.objects.get(vendedor__codigo=data.get('vendedor'))
-
             fecha = data.get('valido_hasta'),
-
-            print(f"fECHA: {fecha}")
-
-            #formatear fecha para que pase de 2025-01-19 a 19-01-2025
             fecha = fecha[0].split("-")
             fecha = fecha[2] + "-" + fecha[1] + "-" + fecha[0]
 
@@ -1068,6 +1079,7 @@ def generar_cotizacion_pdf(request, cotizacion_id):
                 'totalNeto': data.get('totalNeto'),
                 'iva': data.get('iva'),
                 'totalbruto': data.get('totalbruto'),
+                'observaciones': data.get('observaciones'),
                 'vendedor': {
                     'nombre': usuarios.nombre,
                     'email': usuarios.email,
@@ -1081,6 +1093,9 @@ def generar_cotizacion_pdf(request, cotizacion_id):
                     'telefono': datossocio.telefono,
                     'tipo': datossocio.grupoSN.codigo,
                     'email': datossocio.email,
+                    'direccion': address,
+                    'contacto': contactos,
+                    'sucursal': detalle_sucursal.ubicacion,
                     
                 },
                 'productos': data.get('DocumentLines', []),

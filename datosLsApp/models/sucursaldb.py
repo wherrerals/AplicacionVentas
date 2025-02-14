@@ -8,6 +8,7 @@ class SucursalDB(models.Model):
 
     codigo = models.CharField(primary_key=True,max_length=50)
     nombre = models.CharField(max_length=50,null = False)
+    ubicacion = models.CharField(max_length=100,null = False, default="NO DATA")
     def __str__(self):
         return f'{self.nombre}'
     

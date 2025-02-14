@@ -92,8 +92,6 @@ class SocioNegocioRepository:
         return:
             SocioNegocioDB | None
         """
-        print("Esto es el repositorio de SocioNegocio")
-        print("codigoSN", codigoSN)
         
         try:
             return SocioNegocioDB.objects.get(codigoSN=codigoSN)

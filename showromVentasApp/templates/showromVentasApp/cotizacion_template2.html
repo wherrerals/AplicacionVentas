@@ -145,15 +145,21 @@
     .data-table td,
     .data-table th {
       padding: 8px;
+      margin: auto;
+      width: 100px;
       /* Añadir un poco de padding para que el contenido no esté pegado a los bordes */
-      padding: 10px;
       font-family: 'Arial MT', Arial, sans-serif;
       font-weight: bold;
       font-size: 10px;
     }
+    
+    /* Asegurar que las celdas hereden el ancho de sus encabezados */
+    .data-table td {
+      width: inherit;
+    }
 
     .data-table tr {
-      border: none;
+      border: none; 
       /* Eliminar los bordes de las filas */
     }
     
@@ -176,7 +182,7 @@
 
     .regular-text2 {
       font-family: serif;
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .header-text {
@@ -233,8 +239,8 @@
     }
 
     .img-product {
-      max-width: 40px;
-      max-height: 40px;
+      max-width: 50px;
+      max-height: 50px;
       object-fit: contain;
     }
 
@@ -275,15 +281,13 @@
         <td>
           {{ cotizacion.cliente.rut }} <br /> 
           {{ cotizacion.cliente.nombre }} <br />{{cotizacion.cliente.giro}}
-          <br />{{ cotizacion.cliente.direccion }}<br />Contacto: Leonardo
-          Silva <br />Teléfono: {{ cotizacion.cliente.telefono }} <br />Email: {{ cotizacion.cliente.email }}
+          <br />{{ cotizacion.cliente.direccion}}<br />Contacto: {{ cotizacion.cliente.contacto}}
+           <br />Teléfono: {{ cotizacion.cliente.telefono }} <br />Email: {{ cotizacion.cliente.email }}
         </td>
         <td>&nbsp;</td>
         <td>
           Fecha: {{ cotizacion.fecha }} <br />Válido hasta: {{ cotizacion.validez }} <br />Vendedor: {{ cotizacion.vendedor.nombre }} <br />Email: {{ cotizacion.vendedor.email }}
-          <br />Teléfono: {{ cotizacion.vendedor.telefono }} <br />Showroom Las Condes: Av. Las
-          Condes 7363, Las Condes Santiago <br />Observaciones: Descuento de
-          arquitectura
+          <br />Teléfono: {{ cotizacion.vendedor.telefono }} <br /> Sucursal: {{ cotizacion.cliente.sucursal }}<br />Observaciones: {{ cotizacion.observaciones }}
         </td>
       </tr>
       <tr>
@@ -326,7 +330,7 @@
         <th>%Dscto</th>
         <th>Precio con Dscto</th>
         <th>Cantidad</th>
-        <th>Subtotal</th>
+        <th class="Subtotal">Subtotal</th>
       </tr>
       {% endif %}
       <tr>
@@ -336,11 +340,11 @@
         </td>
         <td class="text-center">{{ producto.sku }}</td>
         <td class="nowrap">{{ producto.descripcion }}</td>
-        <td class="text-center nowrap">$ 33.529</td>
+        <td class="text-center nowrap">$ 3.333.529</td>
         <td class="text-center">{{ producto.porcentaje_descuento }}%</td>
-        <td class="text-center nowrap">$ 31.853</td>
-        <td class="text-center">{{ producto.cantidad }}&nbsp;</td>
-        <td class="nowrap">{{ producto.subtotal_neto }}</td>
+        <td class="text-center nowrap">$ 3.333.853</td>
+        <td class="text-center">{{ producto.cantidad }}</td>
+        <td class="text-align nowrap">$ 3.333.529</td>
       </tr>
       <tr class="product-comment">
         <td class="border-bottom"></td>
