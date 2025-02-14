@@ -1099,6 +1099,7 @@ def generar_cotizacion_pdf(request, cotizacion_id):
                     
                 },
                 'productos': data.get('DocumentLines', []),
+                'descuento_por_producto': [int(item.get('porcentaje_descuento', 0)) for item in data.get('DocumentLines', [])],                
                 'totales': {
                     'total_sin_descuento': 10,#sum(item['subtotal_neto'] + item['descuento'] for item in data['DocumentLines']),
                     'total_descuento': 10,#sum(item['descuento'] for item in data['DocumentLines']),
@@ -1107,6 +1108,8 @@ def generar_cotizacion_pdf(request, cotizacion_id):
                     'subtotal_neto': 10,#sum(item['subtotal_neto'] for item in data['DocumentLines']) * 1.19,
                 },
             }
+
+            cotizacion["tiene_descuento"] = any(cotizacion["descuento_por_producto"])
 
             # Renderizar plantilla HTML
             html_string = render_to_string('cotizacion_template2.html', {'cotizacion': cotizacion})

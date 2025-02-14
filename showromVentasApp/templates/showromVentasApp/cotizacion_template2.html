@@ -133,6 +133,16 @@
       margin: 0 auto;
     }
 
+    
+    .detail-table2 {
+      width: 300px;
+      border: 1px solid white;
+      /* Borde alrededor de la tabla */
+      border-collapse: collapse;
+      /* Colapsar los bordes para que no haya espacio entre ellos */
+      margin: 0 auto;
+    }
+
     .data-table {
       width: 750px;
       border: 2px solid black;
@@ -144,7 +154,7 @@
 
     .data-table td,
     .data-table th {
-      padding: 8px;
+      padding: 6px;
       margin: auto;
       width: 100px;
       /* Añadir un poco de padding para que el contenido no esté pegado a los bordes */
@@ -162,9 +172,7 @@
       border: none; 
       /* Eliminar los bordes de las filas */
     }
-    
 
-    
     .total-table {
       border-collapse: collapse;
       margin: 0 auto;
@@ -210,6 +218,12 @@
       font-weight: bold;
     }
 
+    .total-row2 {
+      background-color: white;
+      color: #ffffff;
+      margin: 0;
+      font-weight: bold;
+    }
     
     .border-bottom {
       border-bottom: 1px solid black;
@@ -239,8 +253,8 @@
     }
 
     .img-product {
-      max-width: 50px;
-      max-height: 50px;
+      max-width: 40px;
+      max-height: 40px;
       object-fit: contain;
     }
 
@@ -338,13 +352,13 @@
         <td rowspan="2" class="border-bottom">
           <img class="img-product" src="{{ producto.imagen }}" alt="{{ producto.descripcion }}" class="image" />
         </td>
-        <td class="text-center">{{ producto.sku }}</td>
+        <td class="text-align">{{ producto.sku }}</td>
         <td class="nowrap">{{ producto.descripcion }}</td>
-        <td class="text-center nowrap">$ 3.333.529</td>
-        <td class="text-center">{{ producto.porcentaje_descuento }}%</td>
-        <td class="text-center nowrap">$ 3.333.853</td>
+        <td class="text-center nowrap">{{ producto.precio_unitario }}</td>
+        <td class="text-center">{{ producto.porcentaje_descuento }} %</td>
+        <td class="text-center nowrap">{{ producto.descuento }}</td>
         <td class="text-center">{{ producto.cantidad }}</td>
-        <td class="text-align nowrap">$ 3.333.529</td>
+        <td class="text-align nowrap">{{ producto.subtotal_neto }}</td>
       </tr>
       <tr class="product-comment">
         <td class="border-bottom"></td>
@@ -367,6 +381,8 @@
     </td>
   </tr>
   {% endif %}
+
+  {% if cotizacion.tiene_descuento %}
   <table class="content-table">
     <tbody class="regular-text">
       <tr>
@@ -414,6 +430,55 @@
             </tbody>
           </table>
         </td>
+        {% elif cotizacion.tiene_descuento == False %}
+        <table class="content-table">
+          <tbody class="regular-text">
+            <tr>
+              <td colspan="3">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="valign-top">
+                <table class="detail-table2">
+                  <tbody>
+                    <tr>
+                      <td colspan="3">
+                        <b></b>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td></td>
+                      <td class="text-right"></td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td></td>
+                      <td class="text-right"></td>
+                    </tr>
+                    <tr class="total-row2">
+                      <td></td>
+                      <td></td>
+                      <td class="text-right"></td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td></td>
+                      <td class="text-right"></td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td></td>
+                      <td class="text-right"></td>
+                    </tr>
+                    <tr class="total-row2">
+                      <td></td>
+                      <td></td>
+                      <td class="text-right"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+        {% endif %}
         <td>&nbsp;</td>
         <td>
           <table class="total-table">
@@ -421,17 +486,17 @@
               <tr class="medium-text">
                 <td>Subtotal Neto</td>
                 <td>$</td>
-                <td class="text-right">7.278.555</td>
+                <td class="text-right">{{ cotizacion.totalNeto }}</td>
               </tr>
               <tr class="medium-text">
                 <td>IVA 19%</td>
                 <td>$</td>
-                <td class="text-right">1.382.925</td>
+                <td class="text-right">{{ cotizacion.iva }}</td>
               </tr>
               <tr class="total-row medium-text">
                 <td>Total a Pagar</td>
                 <td>$</td>
-                <td class="text-right">8.661.480</td>
+                <td class="text-right">{{ cotizacion.totalbruto }}</td>
               </tr>
               <tr class="small-text">
                 <td colspan="3">

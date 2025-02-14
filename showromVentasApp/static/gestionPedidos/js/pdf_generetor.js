@@ -51,6 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const itemCode = row.querySelector("[name='sku_producto']").innerText.trim();
             const name = row.querySelector("[name='nombre_producto']").innerText.trim();
             const quantity = row.querySelector("[name='cantidad']").value.trim();
+            const price = row.querySelector("[name='precio_venta']").textContent;
             const porcentaje_descuento = row.querySelector("#agg_descuento").value.trim();
             const discountspan = row.querySelector("#Precio_Descuento").textContent;
             const totalspan = row.querySelector("#precio_Venta").textContent;
@@ -73,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "cantidad": quantity,
                 "porcentaje_descuento": porcentaje_descuento,
                 "descuento": discount,
+                "precio_unitario": price,
                 "subtotal_neto": total,
             };
 
