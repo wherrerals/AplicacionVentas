@@ -131,6 +131,7 @@
       border-collapse: collapse;
       /* Colapsar los bordes para que no haya espacio entre ellos */
       margin: 0 auto;
+      font-size: 12px;
     }
 
     
@@ -141,6 +142,7 @@
       border-collapse: collapse;
       /* Colapsar los bordes para que no haya espacio entre ellos */
       margin: 0 auto;
+      font-size: 12px;
     }
 
     .data-table {
@@ -176,6 +178,7 @@
     .total-table {
       border-collapse: collapse;
       margin: 0 auto;
+      font-size: 11px;
     }
 
     /* Estilos de texto */
@@ -400,32 +403,32 @@
               <tr>
                 <td>Total sin Descuento Valor Neto</td>
                 <td>$</td>
-                <td class="text-right">7.755.714</td>
+                <td class="text-right">{{ cotizacion.totales.total_sin_descuento_neto }}</td>
               </tr>
               <tr>
                 <td>Total Descuento Valor Neto</td>
                 <td>$</td>
-                <td class="text-right">477.160</td>
+                <td class="text-right">{{ cotizacion.totales.total_descuento_neto }}</td>
               </tr>
               <tr class="total-row">
                 <td>Total Valor Neto</td>
                 <td>$</td>
-                <td class="text-right">7.278.555</td>
+                <td class="text-right">{{ cotizacion.totales.total_valor_neto }}</td>
               </tr>
               <tr>
                 <td>Total sin Descuento con IVA</td>
                 <td>$</td>
-                <td class="text-right">9.229.300</td>
+                <td class="text-right">{{ cotizacion.totales.total_sin_descuento_bruto }}</td>
               </tr>
               <tr>
                 <td>Total Descuento con IVA</td>
                 <td>$</td>
-                <td class="text-right">567.820</td>
+                <td class="text-right">{{ cotizacion.totales.total_descuento_bruto }}</td>
               </tr>
               <tr class="total-row">
                 <td>Total a pagar con IVA</td>
                 <td>$</td>
-                <td class="text-right">{{ cotizacion.totalbruto }}</td>
+                <td class="text-right">{{ cotizacion.totales.total_valor_bruto }}</td>
               </tr>
             </tbody>
           </table>

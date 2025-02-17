@@ -23,6 +23,7 @@ from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.regionrepository import RegionRepository
 from datosLsApp.repositories.socionegociorepository import SocioNegocioRepository
 from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
+from logicaVentasApp.services.calculador import CalculadoraTotales
 from logicaVentasApp.services.contacto import Contacto
 from logicaVentasApp.services.cotizacion import Cotizacion
 from logicaVentasApp.services.direccion import Direccion
@@ -1108,6 +1109,12 @@ def generar_cotizacion_pdf(request, cotizacion_id):
                     'subtotal_neto': 10,#sum(item['subtotal_neto'] for item in data['DocumentLines']) * 1.19,
                 },
             }
+
+            calculadora = CalculadoraTotales(data)
+            totales = calculadora.calcular_totales()
+            print(totales)
+
+            cotizacion["totales"] = totales
 
             cotizacion["tiene_descuento"] = any(cotizacion["descuento_por_producto"])
 
