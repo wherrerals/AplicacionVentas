@@ -122,6 +122,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const numeroCotizacion = document.getElementById('numero_orden');
                 const esActualizacion = numeroCotizacion && numeroCotizacion.getAttribute('data-docentry');
+                const vendedor= document.getElementById("vendedor_data")
+
 
                 // Determinar si es creación o actualización
                 const titulo = esActualizacion ? 'Orden Venta actualizada' : 'Orden Venta creada';
@@ -142,6 +144,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (numeroCotizacion) {
                         numeroCotizacion.textContent = `${data.docNum}`;
                         numeroCotizacion.setAttribute('data-docEntry', `${data.docEntry}`);
+                    }
+
+                    const vendedorData = data.salesPersonCode;
+
+                    if (vendedorData != undefined) {
+                        vendedor.textContent = `${data.salesPersonName}`;
+                        vendedor.setAttribute('data-codeVen', `${data.salesPersonCode}`);
                     }
 
                     bloquearCampos();

@@ -9,6 +9,7 @@ from adapters.sl_client import APIClient
 import json
 from requests.exceptions import RequestException
 import urllib3
+from datosLsApp.models.usuariodb import UsuarioDB
 from logicaVentasApp.services.odv import OrdenVenta
 from logicaVentasApp.services.socionegocio import SocioNegocio
 # Desactivar las advertencias de SSL inseguro (solo para desarrollo)
@@ -140,14 +141,19 @@ class OdvView(View):
     def crearOActualizarODV(self, request):
         try:
             data = json.loads(request.body)
+            users_data = self.user_data(request)
             docEntry = data.get("DocEntry")
             docnum = data.get("DocNum")
-
             odv = OrdenVenta()
 
             if docEntry:
-                actualizacion = odv.actualizarDocumento(docnum, docEntry, data)
-                return JsonResponse(actualizacion, status=200)
+                if self.validar_vendedor(users_data['vendedor'], data['SalesPersonCode']) == True:
+                    actualizacion = odv.actualizarDocumento(docnum, docEntry, data)
+                    return JsonResponse(actualizacion, status=200)
+                else:
+                    data['SalesPersonCode'] = users_data['vendedor']
+                    creacion = odv.crearDocumento(data)
+                    return JsonResponse(creacion, status=201)
             else:
                 creacion = odv.crearDocumento(data)
                 return JsonResponse(creacion, status=201)
@@ -156,3 +162,27 @@ class OdvView(View):
             return JsonResponse({"error": "JSON inválido"}, status=400)
         except Exception as e:
             return JsonResponse({"error": f"Error inesperado: {str(e)}"}, status=500)
+
+    def user_data(self, request):
+        user = request.user
+
+        codigoVendedor = UsuarioDB.objects.get(usuarios=user).vendedor.codigo
+
+        return {
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'is_staff': user.is_staff,
+            'is_superuser': user.is_superuser,
+            'is_active': user.is_active,
+            'vendedor': codigoVendedor
+        }
+    
+    def validar_vendedor(self, vendedor1, vendedor2):
+        print(vendedor1)
+        print(vendedor2)
+        if vendedor1 == vendedor2:
+            return True
+        else:
+            return False

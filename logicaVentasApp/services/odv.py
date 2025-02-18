@@ -227,10 +227,14 @@ class OrdenVenta(Documento):
                 if 'DocEntry' in response:
                     doc_num = response.get('DocNum')
                     doc_entry = response.get('DocEntry')
+                    salesPersonCode = response.get('SalesPersonCode')
+                    name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
                     return {
                         'success': 'Orden Venta creada exitosamente',
                         'docNum': doc_num,
-                        'docEntry': doc_entry
+                        'docEntry': doc_entry,
+                        'salesPersonCode': salesPersonCode,
+                        'salesPersonName': name_vendedor
                     }
                 
                 # Si contiene un mensaje de error, manejarlo

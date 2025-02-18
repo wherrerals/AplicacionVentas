@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.success) {
                     const numeroCotizacion = document.getElementById('numero_cotizacion');
                     const esActualizacion = numeroCotizacion && numeroCotizacion.getAttribute('data-docentry');
-
+                    const vendedor= document.getElementById("vendedor_data")
 
                     // Determinar si es creación o actualización
                     const titulo = esActualizacion ? 'Cotización actualizada' : 'Cotización creada';
@@ -163,6 +163,15 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (numeroCotizacion) {
                         numeroCotizacion.textContent = `${data.docNum}`;
                         numeroCotizacion.setAttribute('data-docEntry', `${data.docEntry}`);
+                    }
+
+                    // actualizar los datos del vendedor 
+
+                    const vendedorData = data.salesPersonCode;
+
+                    if (vendedorData != undefined) {
+                        vendedor.textContent = `${data.salesPersonName}`;
+                        vendedor.setAttribute('data-codeVen', `${data.salesPersonCode}`);
                     }
 
                     console.log("Numero de cotizacion:", data.docNum);

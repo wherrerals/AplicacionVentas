@@ -8,3 +8,11 @@ class VendedorRepository:
 
         vendedor = VendedorDB.objects.get(codigo=codigo)
         return vendedor.tipoVendedor
+    
+    def obtenerNombreVendedor(codigo):
+        """
+        Obtiene el nombre del vendedor.
+        """
+
+        vendedor = VendedorDB.objects.get(codigo=codigo)
+        return vendedor.nombre

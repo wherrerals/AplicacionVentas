@@ -482,6 +482,8 @@ class Cotizacion(Documento):
             jsonData = self.prepararJsonCotizacion(data)
             
             response = self.client.actualizarCotizacionesSL(docentry, jsonData)
+            print(response)
+
 
             if 'success' in response:
                 return {
@@ -516,6 +518,9 @@ class Cotizacion(Documento):
             
             # Realizar la solicitud a la API
             response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
+
+
+            print(response)
             
             # Verificar si response es un diccionario
             if isinstance(response, dict):
@@ -523,11 +528,14 @@ class Cotizacion(Documento):
                 if 'DocEntry' in response:
                     doc_num = response.get('DocNum')
                     doc_entry = response.get('DocEntry')
+                    salesPersonCode = response.get('SalesPersonCode')
+                    name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
                     return {
                         'success': 'Cotización creada exitosamente',
                         'docNum': doc_num,
-                        'docEntry': doc_entry
-
+                        'docEntry': doc_entry,
+                        'salesPersonCode': salesPersonCode,
+                        'salesPersonName': name_vendedor
                     }
                 
                 # Si contiene un mensaje de error, manejarlo

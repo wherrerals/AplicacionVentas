@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
             // Extracción de datos principales
             const salesEmployeeName = data.Cliente.SalesPersons.SalesEmployeeName;
+            const salesPersonCode = data.Cliente.SalesPersons.SalesEmployeeCode;
             const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
             const numCotizacion = data.Cliente.Orders.DocNum;
             const docDate = data.Cliente.Orders.DocDueDate;
@@ -87,6 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
             if (vendedorDataElement) {
               vendedorDataElement.innerText = vendedorLimpio;
+              vendedorDataElement.setAttribute("data-codeven", salesPersonCode);
             }
   
             const showroomElement = document.getElementById("sucursal");
