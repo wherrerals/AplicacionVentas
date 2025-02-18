@@ -46,6 +46,12 @@ class Productos(View):
             logger.error(f"Error in POST method: {str(e)}")
             return self.handle_error(e)
 
+    def post_route_map(self):
+        
+        return {
+            '/listado_productos_filtrados/': self.filtrarCotizaciones,
+        }
+    
     def handle_invalid_route(self, request):
         return JsonResponse({'error': 'Ruta inválida'}, status=404)
     
@@ -56,12 +62,6 @@ class Productos(View):
             return JsonResponse({'error': 'Error de conexión con el servidor externo'}, status=503)
         logger.exception("Unexpected error")
         return JsonResponse({'error': 'Error interno del servidor'}, status=500)
-
-    def post_route_map(self):
-        
-        return {
-            '/listado_productos_filtrados/': self.listadoProductos,
-        }
 
     def listadoProductos(self, request):
         client = APIClient()

@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Guardar los filtros activos para que funcionen con la paginación
         activeFilters = filters;
 
-        fetch('/ventas/listado_Cotizaciones_filtrado/', {
+        fetch('/ventas/listado_productos_filtrados/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Función para aplicar el filtro basado en el contenido del campo de búsqueda
 const aplicarFiltroDesdeBusqueda = () => {
-    const searchText = document.querySelector('#buscarlistacootizacion').value.trim();
+    const searchText = document.querySelector('#buscarProductos').value.trim();
 
     // Coloca el valor en el campo de filtro correspondiente
     if (!isNaN(searchText)) {
@@ -81,7 +81,7 @@ const aplicarFiltroDesdeBusqueda = () => {
     }
 
     // Limpiar el input de búsqueda después de colocar el valor
-    document.querySelector('#buscarlistacootizacion').value = '';
+    document.querySelector('#buscarProductos').value = '';
 
     // Aplica los filtros y realiza la búsqueda
     const filters = getFilterData();
@@ -90,7 +90,7 @@ const aplicarFiltroDesdeBusqueda = () => {
 };
 
 // Evento para capturar texto en el campo de búsqueda y aplicar el filtro al presionar "Enter"
-document.querySelector('#buscarlistacootizacion').addEventListener('keydown', function(event) {
+document.querySelector('#buscarProductos').addEventListener('keydown', function(event) {
     if (event.key === "Enter") {
         event.preventDefault(); 
         aplicarFiltroDesdeBusqueda();
@@ -105,7 +105,7 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
 showLoadingOverlay();
 
     const displayQuotations = (quotations) => {
-        const tbody = document.querySelector('#listadoCotizaciones');
+        const tbody = document.querySelector('#reporteStock');
         tbody.innerHTML = '';
     
         showLoadingOverlay();
@@ -339,20 +339,6 @@ showLoadingOverlay();
 
     // Llamar a la función para agregar los eventos de limpiar filtros
     attachClearEventListeners();
-
-    // Selecciona los campos de bruto y neto
-    const inputBruto = document.getElementById('buscar_bruto');
-    const inputNeto = document.getElementById('buscar_neto');
-
-    // Escucha los cambios en el campo de bruto
-    inputBruto.addEventListener('input', function() {
-    // Convierte el valor del bruto a número y calcula el neto
-    const brutoValue = parseFloat(inputBruto.value) || 0;
-    const netoValue = brutoValue * 0.84;
-
-    // Muestra el valor calculado en el campo neto
-    inputNeto.value = netoValue; // Limita a 2 decimales
-    });
     
 
     const urlParams = new URLSearchParams(window.location.search);
