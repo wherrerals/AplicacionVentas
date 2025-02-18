@@ -33,6 +33,7 @@ from logicaVentasApp.services.socionegocio import SocioNegocio
 import requests
 import json
 import math
+from datetime import date
 
 from logicaVentasApp.services.comuna import Comuna
 from datosLsApp.models.stockbodegasdb import StockBodegasDB
@@ -1065,8 +1066,12 @@ def generar_cotizacion_pdf(request, cotizacion_id):
 
             usuarios = UsuarioDB.objects.get(vendedor__codigo=data.get('vendedor'))
             fecha = data.get('valido_hasta'),
-            fecha = fecha[0].split("-")
-            fecha = fecha[2] + "-" + fecha[1] + "-" + fecha[0]
+            if fecha != None:
+                fecha = fecha[0].split("-")
+                fecha = fecha[2] + "-" + fecha[1] + "-" + fecha[0]
+            else:
+                today = date.today()
+                fecha = f"{today.day}-{today.month}-{today.year}"
 
 
             # Datos generales
