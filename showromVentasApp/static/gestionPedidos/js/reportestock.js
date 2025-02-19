@@ -1,361 +1,303 @@
 document.addEventListener("DOMContentLoaded", function () {
-    let currentPage = 1; // Controlar la página actual
-    const recordsPerPage = 20; // Cantidad de registros por página
-    let totalPages = null; // No conocemos el total de páginas inicialmente
-    let activeFilters = {}; // Variable para almacenar los filtros aplicados
+  let currentPage = 1; // Controlar la página actual
+  const recordsPerPage = 20; // Cantidad de registros por página
+  let activeFilters = {}; // Variable para almacenar los filtros aplicados
 
-    const getSkip = (page) => (page - 1) * recordsPerPage;
+  const getSkip = (page) => (page - 1) * recordsPerPage;
 
-    const applyFiltersAndFetchData = (filters, page = 1) => {
-        showLoadingOverlay();
-        const skip = getSkip(page); // Calcular el número de registros a omitir
-        const filterData = {
-            top: recordsPerPage,
-            skip,
-            ...filters
-        };
-
-        // Guardar los filtros activos para que funcionen con la paginación
-        activeFilters = filters;
-
-        fetch('/ventas/listado_productos_filtrados/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(filterData),
-        })
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.json();
-        })
-        .then(data => {
-            document.querySelector('#reporteStock').innerHTML = '';
-            if (data && data.data && Array.isArray(data.data.value)) {
-                displayQuotations(data.data.value);
-
-                // Si el backend devuelve el número total de registros
-                if (data.totalRecords) {
-                    totalPages = Math.ceil(data.totalRecords / recordsPerPage);
-                }
-
-                updatePagination(page); // Actualizar la paginación
-                hideLoader();
-            } else {
-                console.error('Error: Expected data.data.value to be an array');
-                displayQuotations([]);
-                hideLoader();
-            }
-        })
-        .catch(error => {
-            console.error('Error applying filters:', error);
-            hideLoader();
-        });
+  const applyFiltersAndFetchData = (filters, page = 1) => {
+    showLoadingOverlay();
+    const filterData = {
+        top: recordsPerPage,
+        page: page,  // Agregar la página actual
+        filters: {
+            nombre: filters.nombre || null,
+            codigo: filters.codigo || null,
+        }
     };
 
-// Función para aplicar el filtro basado en el contenido del campo de búsqueda
-const aplicarFiltroDesdeBusqueda = () => {
-    const searchText = document.querySelector('#buscarProductos').value.trim();
+    // Guardar los filtros activos para que funcionen con la paginación
+    activeFilters = filters;
+
+    fetch("/ventas/productos/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(filterData),
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Network response was not ok");
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Data:", data);
+        document.querySelector("#reporteStock").innerHTML = "";
+        if (data && data.data && Array.isArray(data.data.value)) {
+          displayProducts(data.data.value);
+
+          // Verificar que totalRecords existe
+          const totalRecords = data.totalRecords || 0;
+          console.log("Total de registros:", totalRecords); // Para debug
+
+          currentPage = page; // Actualizar la página actual
+          updatePagination(page, data.totalRecords); // Modificar esta línea
+          hideLoader();
+        } else {
+          console.error("Error: Expected data.data.value to be an array");
+          displayProducts([]);
+          updatePagination(1, 0); // Resetear paginación si no hay datos
+          hideLoader();
+        }
+      })
+      .catch((error) => {
+        console.error("Error applying filters:", error);
+        displayProducts([]);
+        updatePagination(1, 0); // Resetear paginación en caso de error
+        hideLoader();
+      });
+  };
+
+  // Función para aplicar el filtro basado en el contenido del campo de búsqueda
+  const aplicarFiltroDesdeBusqueda = () => {
+    const searchText = document.querySelector("#buscarProductos").value.trim();
 
     // Coloca el valor en el campo de filtro correspondiente
     if (!isNaN(searchText)) {
-        // Número de documento (SAP)
-        document.querySelector('[name="docNum"]').value = searchText;
+      // Número de documento (SAP)
+      document.querySelector('[name="docNum"]').value = searchText;
     } else if (/^\d{1,4}[-\/]\d{1,2}[-\/]\d{1,4}$/.test(searchText)) {
-        // Fecha en formato YYYY-MM-DD
-        document.querySelector('[name="fecha_documento"]').value = searchText;
-    } else if (["abierto", "cerrado", "cancelado", "Abierto", "Cerrado", "Cancelado"].includes(searchText)) {
-        // Estado del documento
-        const estadoMap = {
-            "abierto": "O",
-            "cerrado": "C",
-            "cancelado": "Y",
-            "Abierto": "O",
-            "Cerrado": "C",
-            "Cancelado": "Y"
-        };
-        document.querySelector('[name="DocumentStatus"]').value = estadoMap[searchText];
+      // Fecha en formato YYYY-MM-DD
+      document.querySelector('[name="fecha_documento"]').value = searchText;
+    } else if (
+      [
+        "abierto",
+        "cerrado",
+        "cancelado",
+        "Abierto",
+        "Cerrado",
+        "Cancelado",
+      ].includes(searchText)
+    ) {
+      // Estado del documento
+      const estadoMap = {
+        abierto: "O",
+        cerrado: "C",
+        cancelado: "Y",
+        Abierto: "O",
+        Cerrado: "C",
+        Cancelado: "Y",
+      };
+      document.querySelector('[name="DocumentStatus"]').value =
+        estadoMap[searchText];
     } else {
-        // Nombre del cliente
-        document.querySelector('[name="cardName"]').value = searchText;
+      // Nombre del cliente
+      document.querySelector('[name="cardName"]').value = searchText;
     }
 
     // Limpiar el input de búsqueda después de colocar el valor
-    document.querySelector('#buscarProductos').value = '';
+    document.querySelector("#buscarProductos").value = "";
 
     // Aplica los filtros y realiza la búsqueda
     const filters = getFilterData();
     applyFiltersAndFetchData(filters); // Aplica los filtros
     window.scrollTo(0, 0); // Desplazar hacia la parte superior de la página
-};
+  };
 
-// Evento para capturar texto en el campo de búsqueda y aplicar el filtro al presionar "Enter"
-document.querySelector('#buscarProductos').addEventListener('keydown', function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault(); 
+  // Evento para capturar texto en el campo de búsqueda y aplicar el filtro al presionar "Enter"
+  document
+    .querySelector("#buscarProductos")
+    .addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
         aplicarFiltroDesdeBusqueda();
-    }
-});
+      }
+    });
 
-// Evento para aplicar el filtro al hacer clic en la lupa
-document.querySelector('#lupa-busqueda').addEventListener('click', function() {
-    aplicarFiltroDesdeBusqueda();
-});
+  // Evento para aplicar el filtro al hacer clic en la lupa
+  document
+    .querySelector("#lupa-busqueda")
+    .addEventListener("click", function () {
+      aplicarFiltroDesdeBusqueda();
+    });
 
-showLoadingOverlay();
+  showLoadingOverlay();
 
-    const displayQuotations = (quotations) => {
-        const tbody = document.querySelector('#reporteStock');
-        tbody.innerHTML = '';
-    
-        showLoadingOverlay();
-        quotations.forEach(entry => {
-            const quotation = entry.Quotations || {};
-            const salesPerson = entry.SalesPersons || {};
-            function formatCurrency(value) {
-                // Convertimos el valor a número entero
-                const integerValue = Math.floor(value);
-                let formattedValue = integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-            
-                // Si el valor tiene 4 dígitos y no incluye un punto, lo añadimos manualmente
-                if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
-                    formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
-                }
-            
-                // Agregamos el símbolo de peso al principio
-                return `$ ${formattedValue}`;
-            }
-            
-            // Aplicamos la función a los valores necesarios
-            const vatSumFormatted = formatCurrency(quotation.DocTotalNeto);
-            const docTotalFormatted = formatCurrency(quotation.DocTotal);
-            
-            
-            const getStatus = (quotation) => {
-                if (quotation.Cancelled === 'Y') return 'Cancelado';
-                else if (quotation.DocumentStatus === 'O') return 'Abierto';
-                else if (quotation.DocumentStatus === 'C') return 'Cerrado';
-                else return 'Activo';
-            };
-            const status = getStatus(quotation);
-            let urlModel = `/ventas/detalles_cotizacion/?docentry=${quotation.DocEntry}`;
+  const displayProducts = (products) => {
+    const tbody = document.querySelector("#reporteStock");
+    tbody.innerHTML = "";
+    showLoadingOverlay();
 
-            date = quotation.DocDate
-            let partesFecha = date.split("-");
+    products.forEach((product) => {
+      // Función auxiliar para encontrar el stock de una bodega específica
+      const getStockBodega = (idBodega) => {
+        const bodega = product.bodegas.find((b) => b.id_Bodega === idBodega);
+        return bodega ? bodega.stock_V : 0;
+      };
 
-            // Cambia el orden de las partes para obtener "dd/mm/aaaa"
-            let fechaFormateada = `${partesFecha[2]}/${partesFecha[1]}/${partesFecha[0]}`;
-    
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>N10100004</td>
-                <td>LÁMPARA DE MESA PHILIPS BANJAMÍN GRIS X1</td>
-                <td>2</td>
-                <td>1</td>
-                <td>3</td>
-                <td style="text-align: right;">2</td>
-                <td style="text-align: right;">2.781.006</td>
-                <td style="text-align: center;">4%</td>
-                <td style="text-align: center;">14%</td>
+      // Obtener stock para cada bodega
+      const stockME = getStockBodega("ME");
+      const stockPH = getStockBodega("PH");
+      const stockLC = getStockBodega("LC");
+      // quitar los decimales de los desucentos
+      const descuentoTienda = Math.round(product.dsctoMaxTienda * 100);
+      const descuentoProyecto = Math.round(product.dctoMaxProyectos * 100);
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+                <td>${product.codigo}</td>
+                <td>${product.nombre}</td>
+                <td>${stockME}</td>
+                <td>${stockPH}</td>
+                <td>${stockLC}</td>
+                <td style="text-align: center;">${product.stockTotal}</td>
+                <td style="text-align: right;">${product.precioVenta}</td>
+                <td style="text-align: center;">${descuentoTienda}</td>
+                <td style="text-align: center;">${descuentoProyecto}</td>
             `;
-            tbody.appendChild(tr);
-        });
-        
-        document.querySelectorAll('.docentry-link').forEach(link => {
-        link.addEventListener('click', (event) => {
-            event.preventDefault();
-            const docEntry = event.target.getAttribute('data-docentry');
-            
-            if (docEntry) {
-                showLoadingOverlay();
-                // Redirige a la página de generación de cotización con docentry en la URL
-                window.location.href = `/ventas/generar_cotizacion/?docentry=${docEntry}`;
-            } else {
-                hideLoadingOverlay();
-                alert("No se pudo obtener el DocEntry de la cotización.");
-            }
-        });
+      tbody.appendChild(tr);
     });
 
     hideLoadingOverlay();
+  };
 
+  const updatePagination = (page, totalRecords) => {
+    console.log('Actualizando paginación:', { page, totalRecords }); // Para debug
+    
+    const totalPages = Math.ceil(totalRecords / recordsPerPage);
+    const paginationContainers = document.querySelectorAll('.pagination');
 
-        // Agrega el evento click a todos los enlaces de clientes después de añadir las filas
-        document.querySelectorAll('.cliente-link').forEach(link => {
-            link.addEventListener('click', (event) => {
-                event.preventDefault();
-                let cadCode = event.target.getAttribute('data-cadcode');
-        
-                // Eliminar la "C" final si está presente
-                if (cadCode && cadCode.endsWith("C")) {
-                    cadCode = cadCode.slice(0, -1);
-                }
-        
-                if (cadCode) {
-                    showLoadingOverlay();
-                    // Realiza la solicitud AJAX al backend para obtener la información del cliente
-                    fetch(`/ventas/informacion_cliente/?rut=${cadCode}`)
-                        .then(response => {
-                            if (!response.ok) throw new Error('Error al obtener la información del cliente');
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Información del cliente:', data);
-        
-                            // Redirige a la página de creación de cliente después de obtener los datos
-                            window.location.href = `/ventas/creacion_clientes/?rut=${cadCode}`;
-                        })
-                        .catch(error => {
-                            hideLoadingOverlay();
-                            console.error('Error en la solicitud AJAX:', error);
-                        });
-                } else {
-                    hideLoadingOverlay();
-                    alert("No se pudo obtener el RUT del cliente.");
-                }
-            });
+    if (totalPages === 0) {
+        // Si no hay páginas, ocultar o limpiar la paginación
+        paginationContainers.forEach(container => {
+            container.innerHTML = '';
         });
-        ;
-    };
-    
-    const getFilterData = () => {
-        return {
-            fecha_inicio: document.querySelector('[name="fecha_inicio"]').value,
-            fecha_fin: document.querySelector('[name="fecha_fin"]').value,
-            fecha_doc: document.querySelector('[name="fecha_documento"]').value,
-            docNum: document.querySelector('[name="docNum"]').value,
-            carData: document.querySelector('[name="cardName"]').value,
-            salesEmployeeName: document.querySelector('[name="salesEmployeeName"]').value,
-            DocumentStatus: document.querySelector('[name="DocumentStatus"]').value,
-            docTotal: document.querySelector('[name="docTotal"]').value
-        };
-    };
+        return;
+    }
 
+    paginationContainers.forEach(paginationContainer => {
+        // Limpiar contenido existente
+        paginationContainer.innerHTML = '';
 
-    const updatePagination = (page) => {
-        const paginationContainers = document.querySelectorAll('.pagination');
-    
-        paginationContainers.forEach(paginationContainer => {
-            paginationContainer.innerHTML = ''; // Limpiar la paginación actual
-    
-            // Botón "Anterior"
-            const prevButton = document.createElement('li');
-            prevButton.classList.add('page-item');
-            prevButton.innerHTML = `
-                <a class="page-link" aria-label="Previous" href="#">
-                    <span aria-hidden="true">«</span>
-                </a>`;
-            if (page > 1) {
-                prevButton.querySelector('a').addEventListener('click', (event) => {
-                    event.preventDefault();
-                    currentPage -= 1;
-                    fetchAndDisplayData(currentPage);
-                });
-            } else {
-                prevButton.classList.add('disabled');
-            }
-            paginationContainer.appendChild(prevButton);
-    
-            // Números de página
-            let startPage = Math.max(1, page - 1);
-            let endPage = Math.min(totalPages || page + 1, page + 1);
-    
-            for (let i = startPage; i <= endPage; i++) {
+        // Botón "Anterior"
+        const prevButton = document.createElement('li');
+        prevButton.classList.add('page-item');
+        if (page <= 1) prevButton.classList.add('disabled');
+        prevButton.innerHTML = `
+            <a class="page-link" aria-label="Previous" href="#">
+                <span aria-hidden="true">«</span>
+            </a>`;
+        if (page > 1) {
+            prevButton.querySelector('a').addEventListener('click', (event) => {
+                event.preventDefault();
+                fetchAndDisplayData(page - 1);
+            });
+        }
+        paginationContainer.appendChild(prevButton);
+
+        // Números de página
+        for (let i = 1; i <= totalPages; i++) {
+            if (
+                i === 1 || // Primera página
+                i === totalPages || // Última página
+                (i >= page - 1 && i <= page + 1) // Páginas alrededor de la actual
+            ) {
                 const pageItem = document.createElement('li');
                 pageItem.classList.add('page-item');
-                if (i === page) {
-                    pageItem.classList.add('active');
-                }
+                if (i === page) pageItem.classList.add('active');
                 pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
                 pageItem.querySelector('a').addEventListener('click', (event) => {
                     event.preventDefault();
-                    currentPage = i;
-                    fetchAndDisplayData(currentPage);
+                    fetchAndDisplayData(i);
                 });
                 paginationContainer.appendChild(pageItem);
+            } else if (
+                (i === 2 && page > 3) || // Elipsis después de la primera página
+                (i === totalPages - 1 && page < totalPages - 2) // Elipsis antes de la última página
+            ) {
+                const ellipsis = document.createElement('li');
+                ellipsis.classList.add('page-item', 'disabled');
+                ellipsis.innerHTML = '<span class="page-link">...</span>';
+                paginationContainer.appendChild(ellipsis);
             }
-    
-            // Botón "Siguiente"
-            const nextButton = document.createElement('li');
-            nextButton.classList.add('page-item');
-            nextButton.innerHTML = `
-                <a class="page-link" aria-label="Next" href="#">
-                    <span aria-hidden="true">»</span>
-                </a>`;
-            if (totalPages === null || page < totalPages) {
-                nextButton.querySelector('a').addEventListener('click', (event) => {
-                    event.preventDefault();
-                    currentPage += 1;
-                    fetchAndDisplayData(currentPage);
-                });
-            } else {
-                nextButton.classList.add('disabled');
-            }
-            paginationContainer.appendChild(nextButton);
-        });
-    };
-    
-    const fetchAndDisplayData = (page = 1) => {
-        applyFiltersAndFetchData(activeFilters, page);
-        window.scrollTo(0, 0); // Desplazar hacia la parte superior de la página
-    };
-    
-
-    // Llamar a la función para cargar la primera página con filtros activos al inicio
-    fetchAndDisplayData(currentPage);
-
-    // Escuchar el evento 'keydown' para capturar "Enter" en los campos de entrada
-    const filterForm = document.querySelector('#filterForm');
-    filterForm.addEventListener('keydown', function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault(); // Evita que se envíe el formulario
-            const filters = getFilterData();
-            applyFiltersAndFetchData(filters); // Aplica los filtros cuando se presiona Enter
-            window.scrollTo(0, 0); // Desplazar hacia la parte superior de la página
         }
-    });
 
-    // Escuchar el evento 'change' en los selectores para aplicar los filtros automáticamente
-    const selects = document.querySelectorAll('select');
-    selects.forEach(select => {
-        select.addEventListener('change', () => {
-            const filters = getFilterData();
-            applyFiltersAndFetchData(filters); // Aplicar los filtros cuando cambia el selector
-        });
-    });
-
-    const attachClearEventListeners = () => {
-        const filterInputs = document.querySelectorAll('#filterForm input');
-        
-        filterInputs.forEach(input => {
-            input.addEventListener('input', () => {
-                if (input.value === '') {
-                    const filters = getFilterData();
-                    applyFiltersAndFetchData(filters); // Actualiza los datos cuando se borra un campo
-                }
+        // Botón "Siguiente"
+        const nextButton = document.createElement('li');
+        nextButton.classList.add('page-item');
+        if (page >= totalPages) nextButton.classList.add('disabled');
+        nextButton.innerHTML = `
+            <a class="page-link" aria-label="Next" href="#">
+                <span aria-hidden="true">»</span>
+            </a>`;
+        if (page < totalPages) {
+            nextButton.querySelector('a').addEventListener('click', (event) => {
+                event.preventDefault();
+                fetchAndDisplayData(page + 1);
             });
-        });
-    };
+        }
+        paginationContainer.appendChild(nextButton);
+    });
+};
 
-    // Llamar a la función para agregar los eventos de limpiar filtros
-    attachClearEventListeners();
-    
+const fetchAndDisplayData = (page = 1) => {
+    console.log('Obteniendo datos para página:', page); // Para debug
+    applyFiltersAndFetchData(activeFilters, page);
+    window.scrollTo(0, 0);
+};
+  // Llamar a la función para cargar la primera página con filtros activos al inicio
+  fetchAndDisplayData(currentPage);
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const rutSN = urlParams.get("rutSN") || "";
-    const nombreSN = urlParams.get("nombreSN") || "";
-  
-    // Si hay parámetros en la URL, aplicarlos automáticamente
-    if (rutSN || nombreSN) {
-      console.log("Aplicando filtros desde la URL:", { rutSN, nombreSN });
-  
-      // Colocar los valores en los campos correspondientes
-      if (rutSN) document.querySelector('[name="cardName"]').value = rutSN;
-      if (nombreSN) document.querySelector('[name="cardName"]').value = nombreSN;
-  
-      // Aplicar los filtros automáticamente
+  // Escuchar el evento 'keydown' para capturar "Enter" en los campos de entrada
+  const filterForm = document.querySelector("#filterForm");
+  filterForm.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Evita que se envíe el formulario
       const filters = getFilterData();
-      applyFiltersAndFetchData(filters);
+      applyFiltersAndFetchData(filters); // Aplica los filtros cuando se presiona Enter
+      window.scrollTo(0, 0); // Desplazar hacia la parte superior de la página
     }
+  });
 
+  // Escuchar el evento 'change' en los selectores para aplicar los filtros automáticamente
+  const selects = document.querySelectorAll("select");
+  selects.forEach((select) => {
+    select.addEventListener("change", () => {
+      const filters = getFilterData();
+      applyFiltersAndFetchData(filters); // Aplicar los filtros cuando cambia el selector
+    });
+  });
+
+  const attachClearEventListeners = () => {
+    const filterInputs = document.querySelectorAll("#filterForm input");
+
+    filterInputs.forEach((input) => {
+      input.addEventListener("input", () => {
+        if (input.value === "") {
+          const filters = getFilterData();
+          applyFiltersAndFetchData(filters); // Actualiza los datos cuando se borra un campo
+        }
+      });
+    });
+  };
+
+  // Llamar a la función para agregar los eventos de limpiar filtros
+  attachClearEventListeners();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const rutSN = urlParams.get("rutSN") || "";
+  const nombreSN = urlParams.get("nombreSN") || "";
+
+  // Si hay parámetros en la URL, aplicarlos automáticamente
+  if (rutSN || nombreSN) {
+    console.log("Aplicando filtros desde la URL:", { rutSN, nombreSN });
+
+    // Colocar los valores en los campos correspondientes
+    if (rutSN) document.querySelector('[name="cardName"]').value = rutSN;
+    if (nombreSN) document.querySelector('[name="cardName"]').value = nombreSN;
+
+    // Aplicar los filtros automáticamente
+    const filters = getFilterData();
+    applyFiltersAndFetchData(filters);
+  }
 });

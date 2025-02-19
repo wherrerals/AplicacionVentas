@@ -40,11 +40,33 @@
             <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001a1.007 1.007 0 0 0-.058.058l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.059-.058zm-5.442-9.29a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11z"/>
         </svg>
     </div>
-
     
       <div class="col-sm-4" style="text-align: left;"><a class="btn btn-primary" role="button"
           style="text-align: left;font-size: 12px;" href="cotizacion.html">Buscar</a></div>
     </div>
+
+    <div class="row">
+      <div class="col">
+        <p></p>
+      </div>
+    </div>
+
+    <nav>
+      <ul class="pagination" id="pagination-bottom">
+        <li class="page-item">
+          <a class="page-link" aria-label="Previous" href="#" id="prevButtonBottom">
+            <span aria-hidden="true">«</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" aria-label="Next" href="#" id="nextButtonBottom">
+            <span aria-hidden="true">»</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    
+      
     <div class="row">
       <div class="col">
         <p></p>
@@ -62,27 +84,22 @@
                 </th>
                 <th style="background: transparent;color: var(--bs-table-bg);">
                   <div><span>Nombre</span></div>
-                  <div><input type="search" style="width: 100%;"></div>
+                  <div><input type="search" style="width: 50%;"></div>
                 </th>
                 <th style="background: transparent;color: var(--bs-table-bg);">
                   <div><span>Bodega ME</span></div>
-                  <div><input type="search" style="width: 100%;"></div>
                 </th>
-                <th style="background: transparent;color: var(--bs-table-bg);">
-                  <div><span>Bodega GR</span></div>
-                  <div><input type="search" style="width: 100%;"></div>
-                </th>
-                <th style="background: transparent;color: var(--bs-table-bg);">
-                  <div><span>Bodega LC</span></div>
-                  <div><input type="search" style="width: 100%;"></div>
-                </th>
-                <th style="background: transparent;color: var(--bs-table-bg);">
+                <th style="background: transparent;color: var(--bs-table-bg);text-align: center;">
                   <div><span>Bodega PH</span></div>
-                  <div><input type="search" style="width: 100%;"></div>
                 </th>
-                <th style="background: transparent;color: var(--bs-table-bg);">
-                  <div><span>Precio</span></div>
-                  <div><input type="search" style="width: 100%;"></div>
+                <th style="background: transparent;color: var(--bs-table-bg);text-align: center;">
+                  <div><span>Bodega LC</span></div>
+                </th>
+                <th style="background: transparent;color: var(--bs-table-bg);text-align: center;">
+                  <div><span>Stock Total</span></div>
+                </th>
+                <th style="background: transparent;color: var(--bs-table-bg);text-align: center;">
+                  <div><span>Precio Venta</span></div>
                 </th>
                 <th style="background: transparent;color: var(--bs-table-bg);text-align: center;">
                   <div><span>Dscto Máx. Tienda</span></div>
@@ -102,14 +119,16 @@
     </div>
     <nav>
       <ul class="pagination">
-        <li class="page-item"><a class="page-link" aria-label="Previous" href="#"><span aria-hidden="true">«</span></a>
+        <li class="page-item">
+          <a class="page-link" aria-label="Previous" href="#" id="prevButtonBottom">
+            <span aria-hidden="true">«</span>
+          </a>
         </li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#">4</a></li>
-        <li class="page-item"><a class="page-link" href="#">5</a></li>
-        <li class="page-item"><a class="page-link" aria-label="Next" href="#"><span aria-hidden="true">»</span></a></li>
+        <li class="page-item">
+          <a class="page-link" aria-label="Next" href="#" id="nextButtonBottom">
+            <span aria-hidden="true">»</span>
+          </a>
+        </li>
       </ul>
     </nav>
   </div>

@@ -238,6 +238,8 @@ showLoadingOverlay();
 
 
     const updatePagination = (page) => {
+        console.log('Updating pagination:', { page, totalPages });
+
         const paginationContainers = document.querySelectorAll('.pagination');
     
         paginationContainers.forEach(paginationContainer => {

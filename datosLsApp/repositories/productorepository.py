@@ -1,7 +1,9 @@
+from django.db import connection
 from adapters.sl_client import APIClient
 from datosLsApp.models import ProductoDB, StockBodegasDB, BodegaDB
 from django.db.models import Sum
 import math
+from django.db.models import Sum, F
 
 
 
@@ -281,4 +283,54 @@ class ProductoRepository:
         producto = ProductoDB.objects.get(codigo=codigo)
         return producto.marca
 
-    
+    @staticmethod
+    def obtener_productos(filtro_nombre=None, filtro_codigo=None, offset=0, limite=20):
+        producto_query = ProductoDB.objects.annotate(
+            stock_total=Sum('stockbodegasdb__stock')
+        ).values(
+            'codigo', 'nombre', 'marca', 'costo', 'precioVenta', 'stockTotal', "dsctoMaxTienda", "dctoMaxProyectos", "precioLista"
+        )
+
+        if filtro_nombre:
+            producto_query = producto_query.filter(nombre__icontains=filtro_nombre)
+        if filtro_codigo:
+            producto_query = producto_query.filter(codigo=filtro_codigo)
+        
+        producto_query = producto_query[offset:offset + limite]
+
+        producto_lista = list(producto_query)
+
+        for producto in producto_lista:
+            bodegas = StockBodegasDB.objects.filter(idProducto__codigo=producto['codigo']).values(
+                producto_codigo=F('idProducto__codigo'),
+                id_Bodega=F('idBodega'),
+                stock_V=F('stock')
+            )
+            producto['bodegas'] = list(bodegas)
+
+        return producto_lista
+
+    @staticmethod
+    def obtener_total_productos(filtro_nombre=None, filtro_codigo=None):
+        # Crear la consulta base
+        query = """
+            SELECT COUNT(*) as total
+            FROM Producto
+            WHERE 1=1
+        """
+        params = []
+
+        # Agregar filtros si existen
+        if filtro_nombre:
+            query += " AND nombre LIKE %s"
+            params.append(f"%{filtro_nombre}%")
+        
+        if filtro_codigo:
+            query += " AND codigo LIKE %s"
+            params.append(f"%{filtro_codigo}%")
+
+        # Ejecutar la consulta
+        with connection.cursor() as cursor:
+            cursor.execute(query, params)
+            result = cursor.fetchone()
+            return result[0] if result else 0
