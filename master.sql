@@ -446,3 +446,23 @@ INSERT INTO Comuna (codigo, nombre, region_id) VALUES
 ('13803', 'Isla de Maipo', 13),
 ('13804', 'Padre Hurtado', 13),
 ('13805', 'Peñaflor', 13);
+
+# codigo, nombre, region_id, codgio_postal
+INSERT INTO Comuna (codigo, nombre, region_id, codgio_postal) VALUES
+
+('1', 'SIN COMUNA', '1', '1'),
+('10', 'SIN COMUNA', '10', '1'),
+('11', 'SIN COMUNA', '11', '1'),
+('12', 'SIN COMUNA', '12', '1'),
+('13', 'SIN COMUNA', '13', '1'),
+('14', 'SIN COMUNA', '14', '1'),
+('15', 'SIN COMUNA', '15', '1'),
+('16', 'SIN COMUNA', '16', '1'),
+('2', 'SIN COMUNA', '2', '1'),
+('3', 'SIN COMUNA', '3', '1'),
+('4', 'SIN COMUNA', '4', '1'),
+('5', 'SIN COMUNA', '5', '1'),
+('6', 'SIN COMUNA', '6', '1'),
+('7', 'SIN COMUNA', '7', '1'),
+('8', 'SIN COMUNA', '8', '1'),
+('9', 'SIN COMUNA', '9', '1'),
