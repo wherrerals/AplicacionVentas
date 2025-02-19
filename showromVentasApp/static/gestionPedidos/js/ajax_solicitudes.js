@@ -1,7 +1,7 @@
 $(document).ready(function () {
     $('#inputNumero').on('input', function () { // escucha el evento de entrada en input con #inputNumero
         let numero = $(this).val();
-        let tipoDoucmento = $('#tipoDocumento').text().trim();
+        let tipoDoucmento = $('.tipoDocumento').text().trim();
         if (numero) {
             let buscarProductosUrl = '/ventas/buscarproductos/'; // URL para buscar productos
             $.ajax({ // realiza una solicitud ajax al servidor a la url buscar/
@@ -49,7 +49,13 @@ $(document).ready(function () {
                                 } else {
                                       cantidad = 1;
                                   } 
-                                
+
+                                  if (tipoDoucmento == 'Cotización') {
+                                    cantidad = 1;
+                                    
+                                    console.log('Cotización:', cantidad);
+                                    }
+
                                 console.log('Producto seleccionado:', codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento);
                                 
                                 agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal); // Ejecuta la función agregar producto
