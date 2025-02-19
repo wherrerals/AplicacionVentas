@@ -294,7 +294,7 @@ class ProductoRepository:
         if filtro_nombre:
             producto_query = producto_query.filter(nombre__icontains=filtro_nombre)
         if filtro_codigo:
-            producto_query = producto_query.filter(codigo=filtro_codigo)
+            producto_query = producto_query.filter(codigo__icontains=filtro_codigo)
         
         producto_query = producto_query[offset:offset + limite]
 

@@ -161,6 +161,13 @@ document.addEventListener("DOMContentLoaded", function () {
     hideLoadingOverlay();
   };
 
+  const getFilterData = () => {
+    return {
+        codigo: document.querySelector('[name="sku_producto"]').value,
+        nombre: document.querySelector('[name="name_producto"]').value,
+    };
+};
+
   const updatePagination = (page, totalRecords) => {
     console.log('Actualizando paginación:', { page, totalRecords }); // Para debug
     
@@ -285,16 +292,16 @@ const fetchAndDisplayData = (page = 1) => {
   attachClearEventListeners();
 
   const urlParams = new URLSearchParams(window.location.search);
-  const rutSN = urlParams.get("rutSN") || "";
-  const nombreSN = urlParams.get("nombreSN") || "";
+  const nombre = urlParams.get("nombre") || "";
+  const codigo = urlParams.get("codigo") || "";
 
   // Si hay parámetros en la URL, aplicarlos automáticamente
-  if (rutSN || nombreSN) {
+  if (nombre || codigo) {
     console.log("Aplicando filtros desde la URL:", { rutSN, nombreSN });
 
     // Colocar los valores en los campos correspondientes
-    if (rutSN) document.querySelector('[name="cardName"]').value = rutSN;
-    if (nombreSN) document.querySelector('[name="cardName"]').value = nombreSN;
+    if (codigo) document.querySelector('[name="sku_producto"]').value = codigo;
+    if (nombre) document.querySelector('[name="name_producto"]').value = nombre;
 
     // Aplicar los filtros automáticamente
     const filters = getFilterData();
