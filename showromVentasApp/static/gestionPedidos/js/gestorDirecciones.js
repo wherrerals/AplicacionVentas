@@ -41,9 +41,7 @@ class DireccionManager {
     //newroww de id para poder eliminar
     newRow.style =
       "font-size: 12px;background: #f0f2f5;width: 230px; margin-right: 10px;";
-    newRow.innerHTML = `
-        <div class="col-sm-12" style="width: 150%;height: 10px;"><span>&nbsp;</span></div>
-        
+    newRow.innerHTML = `        
           <div class="row">
             <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>
             <div class="col" style="text-align: center;">
@@ -51,12 +49,15 @@ class DireccionManager {
             <div class="col-sm-12" style="height: 5px;background: transparent;"><span>&nbsp;</span></div>
           </div>
 
+          <div class="col-sm-12" style="height: 5px; background: transparent;"><span>&nbsp;</span></div>
+
+
           <div class="row">
             <div class="col-sm-9"><span></span>
-              <!--<div class="form-check" disabled>
+              <div class="form-check">
                 <input class="form-check-input" type="radio" id="formCheck-1" name="dirDespacho" value="1" style="border-color: rgb(159,168,175);" checked="">
                 <label class="form-check-label" for="formCheck-3" >Principal</label>
-              </div>-->
+              </div>
             </div>
           </div>
   
@@ -256,6 +257,16 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
                                         }</span>
                                     </div>
                                     <div class="col-sm-12" style="height: 5px; background: transparent;"><span>&nbsp;</span></div>
+
+                                <div class="row">
+                                  <div class="col-sm-9"><span></span>
+                                    <div class="form-check">
+                                      <input class="form-check-input" type="radio" id="formCheck-1" name="dirDespacho" value="1" style="border-color: rgb(159,168,175);" checked="">
+                                      <label class="form-check-label" for="formCheck-3" >Principal</label>
+                                    </div>
+                                  </div>
+                                </div>                                    
+
                                 </div>
                                 <div class="row">
                                   <div class="col-sm-8"><span></span></div>
