@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 from datosLsApp.models import DireccionDB
 from datosLsApp.models.comunadb import ComunaDB
 from datosLsApp.models.regiondb import RegionDB
@@ -65,7 +66,7 @@ class DireccionRepository:
         direccion_obj.pais = pais
         direccion_obj.save()
 
-    def crearDireccion(socio, rownum, nombre_direccion, ciudad, calle_numero, comuna_id, region_id, tipo_direccion, pais):
+    def crearDireccion(socio, rownum, nombre_direccion, ciudad, calle_numero, comuna_id, region_id, tipo_direccion, pais, es_principal=False):
         """
         Crea una dirección
 
@@ -81,25 +82,29 @@ class DireccionRepository:
         """
         
         try:
+            with transaction.atomic():
             # Obtiene la comuna y la región
-            comuna = get_object_or_404(ComunaDB, codigo=comuna_id)
-            region = get_object_or_404(RegionDB, numero=region_id)
-            
-            # Obtiene el objeto SocioNegocioDB correspondiente al socio
-            socio_obj = get_object_or_404(SocioNegocioDB, codigoSN=socio)
+                comuna = get_object_or_404(ComunaDB, codigo=comuna_id)
+                region = get_object_or_404(RegionDB, numero=region_id)
+                
+                # Obtiene el objeto SocioNegocioDB correspondiente al socio
+                socio_obj = get_object_or_404(SocioNegocioDB, codigoSN=socio)
 
-            # Crea la dirección
-            nueva_direccion = DireccionDB.objects.create(
-                rowNum = rownum,
-                nombreDireccion=nombre_direccion,
-                ciudad=ciudad,
-                calleNumero=calle_numero,
-                tipoDireccion=tipo_direccion,
-                pais=pais,
-                SocioNegocio=socio_obj,
-                comuna=comuna,
-                region=region,
-            )
+                if es_principal:
+                    DireccionDB.objects.filter(SocioNegocio=socio_obj, es_principal=True).update(es_principal=False)
+                # Crea la dirección
+                nueva_direccion = DireccionDB.objects.create(
+                    rowNum = rownum,
+                    nombreDireccion=nombre_direccion,
+                    ciudad=ciudad,
+                    calleNumero=calle_numero,
+                    tipoDireccion=tipo_direccion,
+                    pais=pais,
+                    SocioNegocio=socio_obj,
+                    comuna=comuna,
+                    region=region,
+                    es_principal=es_principal
+                )
 
         except Exception as e:
             print(f"Error al crear la dirección: {e}")

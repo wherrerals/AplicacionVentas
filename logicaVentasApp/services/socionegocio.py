@@ -963,7 +963,8 @@ class SocioNegocio:
                 comuna_id= comuna_id,
                 region_id=direccion["region"],
                 tipo_direccion=direccion["tipoDireccion"],
-                pais=direccion.get("pais", "Chile")  # Valor por defecto
+                pais=direccion.get("pais", "Chile"),  # Valor por defecto
+                es_principal=direccion.get("esPrincipal", False)  # Valor por defecto
             )
 
         # Crear los contactos asociados al cliente usando el método del repositorio
@@ -1243,11 +1244,12 @@ class SocioNegocio:
                 comuna = comunas.codigo
                 direccion = direccion.get("direccion")
                 tipo = tipoDireccion
+                es_principal = direccion.get("esPrincipal", False)
                 
                 if nombre_direccion:
                     
                     try:
-                        DireccionRepository.crearDireccion(socio, rownum, nombre_direccion, ciudad, direccion, comuna, region, tipo, pais)
+                        DireccionRepository.crearDireccion(socio, rownum, nombre_direccion, ciudad, direccion, comuna, region, tipo, pais, es_principal)
                     except Exception as e:
                         print(f"Ocurrió un error al crear la dirección: {str(e)}")
                 else:
