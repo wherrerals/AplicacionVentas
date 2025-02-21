@@ -40,7 +40,7 @@ class DireccionManager {
     newRow.className = "col-sm-5 direcciones";
     //newroww de id para poder eliminar
     newRow.style =
-      "font-size: 12px;background: #f0f2f5;width: 230px; margin-right: 10px;";
+      "font-size: 12px;background: #f0f2f5;width: 230px;"
     newRow.innerHTML = `        
           <div class="row">
             <div class="col-sm-12" style="height: 15px;background: transparent;"><span>&nbsp;</span></div>

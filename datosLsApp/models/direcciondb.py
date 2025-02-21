@@ -21,6 +21,9 @@ class DireccionDB(models.Model):
     SocioNegocio = models.ForeignKey(SocioNegocioDB,on_delete=models.CASCADE, default=1) 
     comuna = models.ForeignKey(ComunaDB,on_delete=models.CASCADE, default=1)
     region = models.ForeignKey(RegionDB,on_delete=models.CASCADE, default=1)
+    es_principal = models.BooleanField(default=False)
+
+
 
     def __str__(self):
         return f"{self.nombreDireccion}"
