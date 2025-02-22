@@ -1,5 +1,6 @@
 from django.urls import path
 from showromVentasApp.views.cotizacionview import CotizacionView
+from showromVentasApp.views.devolucionesview import ReturnsView
 from showromVentasApp.views.odvView import OdvView
 from showromVentasApp.views.socionegocioview import SocioNegocioView
 from showromVentasApp.views.productoview import Productos
@@ -10,8 +11,6 @@ cotizacionView = CotizacionView()
 
 urlpatterns = [
     path('', view.home, name="home"),
-    path('listado_Cotizaciones/', CotizacionView.as_view(), name='listado_Cotizaciones'),
-    path('listado_Cotizaciones_filtrado/', CotizacionView.as_view(), name='listado_Cotizaciones_filtrado'),
     path('agregar_editar_clientes/', SocioNegocioView.as_view(), name='agregar_editar_clientes'),
     path('listado_socios_negocio/', SocioNegocioView.as_view(), name='listado_socios_negocio'),
     path('informacion_cliente/', SocioNegocioView.as_view(), name='informacion_cliente'),
@@ -20,10 +19,14 @@ urlpatterns = [
     path('filtrar_socios_negocio/', SocioNegocioView.as_view(), name='filtrar_socios_negocio'),
     path('crear_cotizacion/', CotizacionView.as_view(), name='crear_cotizacion'),
     path('copiar_a_odv/', CotizacionView.as_view(), name='copiar_a_odv'),
+    path('cambiar_estado_cotizacion/', CotizacionView.as_view(), name='cambiar_estado_cotizacion'),
+    path('listado_Cotizaciones/', CotizacionView.as_view(), name='listado_Cotizaciones'),
+    path('listado_Cotizaciones_filtrado/', CotizacionView.as_view(), name='listado_Cotizaciones_filtrado'),
     path('listado_odv/', OdvView.as_view(), name='listado_odv'),
     path('crear_odv/', OdvView.as_view(), name='crear_odv'),
+    path('detalles_ODV/', OdvView.as_view(), name='detalles_ODV'),
+    path('listado_solicitudes_devolucion/', ReturnsView.as_view(), name='listado_solicitudes_devolucion'),
     path('productos/', Productos.as_view(), name='productos'),
-    path('cambiar_estado_cotizacion/', CotizacionView.as_view(), name='cambiar_estado_cotizacion'),
     path('lista_cotizaciones/', view.list_quotations, name="lista_cotizaciones"),
     path('generar_cotizacion/', view.quotations, name="generar_cotizacion"),
     path('lista_ovs/', view.lista_ovs, name='lista_ovs'),
@@ -47,7 +50,6 @@ urlpatterns = [
     path('obtener_stock_bodegas/', view.obtenerStockBodegas, name='obtener_stock'),
     path('detalles_cotizacion/', cotizacionView.detallesCotizacion, name='detalles_cotizacion'),
     path('duplicar_cotizacion/', cotizacionView.duplicarCotizacion, name='duplicar_cotizacion'),
-    path('detalles_ODV/', OdvView.as_view(), name='detalles_ODV'),
     path('ordenesVentas/', view.odv, name='ordenesVentas'),
     path('imagen/', view.onbtenerImgProducto, name='imagen'),
     path('pruebas/', view.pryebas, name='pruebas'),
