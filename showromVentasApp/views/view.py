@@ -479,6 +479,8 @@ def mis_datos(request):
     usuario = UsuarioDB.objects.get(usuarios=request.user)
     user = request.user
 
+    print(f"Usuario: {usuario}, User: {user}")
+
     if request.method == "POST":
         nombre = request.POST['nombre']
         telefono = request.POST['telefono']
@@ -517,7 +519,8 @@ def mis_datos(request):
             
             return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje})
         
-    nombre = user.first_name
+    nombre = usuario
+    print(f"Nombre: {nombre}")
 
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 

@@ -8,9 +8,12 @@
     <title>Ventas Showroom V0.1</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles.min.css' %}">
+    <link rel="stylesheet" href="{% static 'gestionPedidos/css/home_style.css' %}">
 </head>
 
 <body>
+
+        
     <nav class="navbar navbar-expand-md bg-body py-3">
         <div class="container">
             
@@ -29,23 +32,23 @@
                 <div class="collapse navbar-collapse" id="navcol-2">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link active" href="{% url 'lista_cotizaciones' %}">Cotizaciones</a>
+                            <a class="nav-link" href="{% url 'lista_cotizaciones' %}" data-page="lista_cotizaciones,generar_cotizacion">Cotizaciones</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'lista_ovs' %}">Órdenes de Venta</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'lista_solic_devoluciones' %}">Solicitudes de Devolución</a>
+                            <a class="nav-link" href="{% url 'lista_ovs' %}" data-page="lista_ovs,ordenesVentas">Órdenes de Venta</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'lista_clientes' %}">Clientes</a>
+                            <a class="nav-link" href="{% url 'lista_solic_devoluciones' %}" data-page="lista_solic_devoluciones,solicitudes_devolucion">Solicitudes de Devolución</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'lista_clientes' %}" data-page="lista_clientes,creacion_clientes">Clientes</a>
                         </li>
 
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'reporte_stock' %}">Reporte Stock</a>
+                            <a class="nav-link" href="{% url 'reporte_stock' %}" data-page="reporte_stock">Reporte Stock</a>
                         </li>
                 {% endif %}
 
@@ -57,6 +60,20 @@
             </a>
         </div>
     </nav>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let path = window.location.pathname;
+        let navLinks = document.querySelectorAll(".nav-link");
+
+        navLinks.forEach(link => {
+            let pages = link.getAttribute("data-page").split(","); // Dividir los valores por coma
+            if (pages.some(page => path.includes(page))) { // Verificar si alguno coincide
+                link.classList.add("active");
+            }
+        });
+    });
+        </script>
 </body>
 
 </html>
