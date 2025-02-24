@@ -34,18 +34,22 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'lista_ovs' %}">Órdenes de Venta</a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'lista_solic_devoluciones' %}">Solicitudes de Devolución</a>
+                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'lista_clientes' %}">Clientes</a>
                         </li>
+
+
                         <li class="nav-item">
-                            <a class="nav-link" href="#" hidden>Reportes</a>
+                            <a class="nav-link" href="{% url 'reporte_stock' %}">Reporte Stock</a>
                         </li>
                 {% endif %}
 
                 {% if 'Administrador' in grupos_usuario %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'lista_solic_devoluciones' %}">Solicitudes de Devolución</a>
-                        </li>
                 {% endif %}
                     </ul>
                 </div>

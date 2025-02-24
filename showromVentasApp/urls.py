@@ -51,6 +51,7 @@ urlpatterns = [
     path('detalles_cotizacion/', cotizacionView.detallesCotizacion, name='detalles_cotizacion'),
     path('duplicar_cotizacion/', cotizacionView.duplicarCotizacion, name='duplicar_cotizacion'),
     path('ordenesVentas/', view.odv, name='ordenesVentas'),
+    path('solicitudes_devolucion/', view.return_requests, name='solicitudes_devolucion'),
     path('imagen/', view.onbtenerImgProducto, name='imagen'),
     path('pruebas/', view.pryebas, name='pruebas'),
     path('cotizacion/<int:cotizacion_id>/pdf/', view.generar_cotizacion_pdf, name='cotizacion_pdf'),
