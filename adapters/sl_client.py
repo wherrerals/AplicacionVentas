@@ -476,6 +476,8 @@ class APIClient:
         query_url = f"BusinessPartners?$select={select}&$orderby={order_by}&$filter={filter_condition}&$top={top}&$skip={skip}"
         url = f"{self.base_url}{query_url}"
 
+        print(url)
+
         response = self.session.get(url, headers=headers, verify=False)
         response.raise_for_status()
         return response.json()

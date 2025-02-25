@@ -1034,13 +1034,25 @@ class SocioNegocio:
         Returns:
             dict: Filtros para la consulta de socios de negocio.
         """
+        print(data)
         filters = {}
+
+
+
         filter_data = data.get('filters', {})
+
+        name = filter_data.get('nombre')
+        name_mayus = name.upper() if name else None
+        print(name_mayus)
+        name_minus = name.lower() if name else None
+        print(name_minus)
+        name_title = name.title() if name else None
+        print(name_title)
 
         if filter_data.get('codigo'):
             filters['contains(CardCode'] = f"'{filter_data['codigo']}')"
         if filter_data.get('nombre'):
-            filters['contains(CardName'] = f"'{filter_data['nombre']}')"
+            filters['(contains(CardName'] = f"'{name_mayus}') or contains(CardName, '{name_minus}') or contains(CardName, '{name_title}'))"
         if filter_data.get('tipo'):
             groupCode = int(filter_data['tipo'])
             filters['GroupCode eq '] = f"{groupCode} "

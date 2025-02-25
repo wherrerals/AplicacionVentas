@@ -97,7 +97,6 @@ class Cotizacion(Documento):
             raise ValueError(f"Campos requeridos faltantes: {', '.join(missing_fields)}")
     
     def construirFiltrosCotizaciones(data):
-
         """
         Construye los filtros para la consulta de cotizaciones basados en los datos proporcionados.
 
@@ -110,6 +109,14 @@ class Cotizacion(Documento):
 
         filters = {}
 
+        name = data.get('carData')
+        name_mayus = name.upper() if name else None
+        print(name_mayus)
+        name_minus = name.lower() if name else None
+        print(name_minus)
+        name_title = name.title() if name else None
+        print(name_title)
+
         if data.get('fecha_doc'):
             filters['Quotations/DocDate ge'] = str(f"'{data.get('fecha_doc')}'")
             filters['Quotations/DocDate le'] = str(f"'{data.get('fecha_doc')}'")
@@ -121,24 +128,20 @@ class Cotizacion(Documento):
             docum = int(data.get('docNum'))
             filters['contains(Quotations/DocNum,'] = f"{docum})"
 
+        # Modificación para el filtro de CardName con múltiples opciones de formato
+        # Mantener la lógica original para carData
         if data.get('carData'):
             car_data = data.get('carData')
             
             if car_data.isdigit():  # Si es un número
                 filters['contains(Quotations/CardCode,'] = f"'{car_data}')"
             else:  # Si contiene letras (nombre)
-                filters['contains(Quotations/CardName,'] = f"'{car_data}')"
+                filters['(contains(Quotations/CardName,'] = f"'{name_mayus}') or contains(Quotations/CardName, '{name_minus}') or contains(Quotations/CardName, '{name_title}'))"
 
         if data.get('salesEmployeeName'):
             numecode = int(data.get('salesEmployeeName'))
             filters['contains(SalesPersons/SalesEmployeeCode,'] = f"{numecode})" 
         
-        #if data.get('DocumentStatus'):
-        #   filters['Quotations/DocumentStatus eq'] = f"'{data.get('DocumentStatus')}'"
-
-        #if data.get('cancelled'):
-        #    filters['Quotations/Cancelled eq'] = f"'{data.get('cancelled')}'"
-
         if data.get('DocumentStatus'):
             document_status = data.get('DocumentStatus')
 
@@ -154,7 +157,6 @@ class Cotizacion(Documento):
         if data.get('docTotal'):
             docTotal = float(data.get('docTotal'))
             filters['Quotations/DocTotal eq'] = f"{docTotal}"
-
 
         # Limpiar filtros vacíos o inválidos
         filters = {k: v for k, v in filters.items() if v and v != "''"}

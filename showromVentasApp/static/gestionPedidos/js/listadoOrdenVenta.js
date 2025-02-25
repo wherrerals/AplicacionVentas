@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const getSkip = (page) => (page - 1) * recordsPerPage;
 
+    // Capturar el valor dinámico seleccionado por defecto en el filtro del vendedor
     const vendedorSelect = document.querySelector('#filtro_vendedor');
     const defaultVendedorValue = vendedorSelect.value; // Obtener el valor seleccionado por defecto
 
@@ -13,7 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     const applyFiltersAndFetchData = (filters, page = 1) => {
-        //console.log("Applying filters:", filters, "Page:", page);
         showLoadingOverlay();
         const skip = getSkip(page); // Calcular el número de registros a omitir
         const filterData = {
@@ -25,8 +25,6 @@ document.addEventListener("DOMContentLoaded", function () {
         // Guardar los filtros activos para que funcionen con la paginación
         activeFilters = filters;
 
-        console.log("Fetching data with payload:", filterData);
-
         fetch('/ventas/listado_odv/', {
             method: 'POST',
             headers: {
@@ -35,13 +33,10 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify(filterData),
         })
         .then(response => {
-            console.log("Fetch response status:", response.status);
             if (!response.ok) throw new Error('Network response was not ok');
             return response.json();
         })
         .then(data => {
-            console.log("Data received from backend:", data);
-
             document.querySelector('tbody').innerHTML = '';
             if (data && data.data && Array.isArray(data.data.value)) {
                 displayOrders(data.data.value);
@@ -50,7 +45,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (data.totalRecords) {
                     totalPages = Math.ceil(data.totalRecords / recordsPerPage);
                 }
-                console.log("Total pages calculated:", totalPages);
 
                 updatePagination(page); // Actualizar la paginación
                 hideLoader();
@@ -66,194 +60,182 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     };
 
-    const applyGeneralSearch = () => {
-        const searchText = document.getElementById("buscar").value.trim();
-        const filters = getFilterData(); // Obtén los filtros actuales
+// Función para aplicar el filtro basado en el contenido del campo de búsqueda
+const aplicarFiltroDesdeBusqueda = () => {
+    const searchText = document.querySelector('#y').value.trim();
 
-        // Identificar el campo donde escribir el valor ingresado
-        if (!isNaN(searchText)) {
-            filters.docNum = searchText;
-            document.getElementById("buscar_num_sap").value = searchText;
-        } else if (searchText.toLowerCase() === "míos" || searchText.toLowerCase() === "todos") {
-            const vendedorMap = {
-                "míos": "12",
-                "todos": ""
-            };
-            filters.salesEmployeeName = vendedorMap[searchText.toLowerCase()];
-            document.getElementById("filtro_vendedor").value = vendedorMap[searchText.toLowerCase()];
-        } else if (/^\d{4}-\d{2}-\d{2}$/.test(searchText)) {
-            filters.fecha_doc = searchText;
-        } else if (["abierto", "cerrado", "cancelado", "Abierto", "Cerrado", "Cancelado"].includes(searchText)) {
-            const estadoMap = {
-                "abierto": "O",
-                "cerrado": "C",
-                "cancelado": "Y",
-                "Abierto": "O",
-                "Cerrado": "C",
-                "Cancelado": "Y"
-            };
-            filters.DocumentStatus = estadoMap[searchText.toLowerCase()];
-            document.getElementById("filtro_estado").value = estadoMap[searchText.toLowerCase()];
-        } else if (/^\d+(\.\d{1,2})?$/.test(searchText)) {
-            filters.docTotal = searchText;
-            document.getElementById("buscar_bruto").value = searchText;
-        } else {
-            filters.cardName = searchText;
-            document.getElementById("buscar_cliente").value = searchText;
-        }
+    // Coloca el valor en el campo de filtro correspondiente
+    if (!isNaN(searchText)) {
+        // Número de documento (SAP)
+        document.querySelector('[name="docNum"]').value = searchText;
+    } else if (/^\d{1,4}[-\/]\d{1,2}[-\/]\d{1,4}$/.test(searchText)) {
+        // Fecha en formato YYYY-MM-DD
+        document.querySelector('[name="fecha_documento"]').value = searchText;
+    } else if (["abierto", "cerrado", "cancelado", "Abierto", "Cerrado", "Cancelado"].includes(searchText)) {
+        // Estado del documento
+        const estadoMap = {
+            "abierto": "O",
+            "cerrado": "C",
+            "cancelado": "Y",
+            "Abierto": "O",
+            "Cerrado": "C",
+            "Cancelado": "Y"
+        };
+        document.querySelector('[name="DocumentStatus"]').value = estadoMap[searchText];
+    } else {
+        // Nombre del cliente
+        document.querySelector('[name="cardName"]').value = searchText;
+    }
 
-        document.getElementById("buscar").value = "";
-        
-        // Actualizar los filtros en el backend
-        applyFiltersAndFetchData(filters);
-    };
+    // Limpiar el input de búsqueda después de colocar el valor
+    document.querySelector('#buscar').value = '';
 
+    // Aplica los filtros y realiza la búsqueda
+    const filters = getFilterData();
+    applyFiltersAndFetchData(filters); // Aplica los filtros
+    window.scrollTo(0, 0); // Desplazar hacia la parte superior de la página
+};
 
+// Evento para capturar texto en el campo de búsqueda y aplicar el filtro al presionar "Enter"
+document.querySelector('#buscar').addEventListener('keydown', function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); 
+        aplicarFiltroDesdeBusqueda();
+    }
+});
 
-    // Evento para capturar "Enter" en el campo de búsqueda
-    document.getElementById("buscar").addEventListener("keydown", function (event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            applyGeneralSearch();
-        }
-    });
+// Evento para aplicar el filtro al hacer clic en la lupa
+document.querySelector('#lupa-busqueda').addEventListener('click', function() {
+    aplicarFiltroDesdeBusqueda();
+});
 
-    // Evento para aplicar el filtro al hacer clic en la lupa
-    document.getElementById("lupa-busqueda").addEventListener("click", function () {
-        applyGeneralSearch();
-    });
-    
 showLoadingOverlay();
 
-    const displayOrders = (orders) => {
-        console.log("Displaying orders:", orders);
-        const tbody = document.querySelector('tbody');
-        tbody.innerHTML = '';
-    
-        showLoadingOverlay();
-        orders.forEach(entry => {
-            const order = entry.Orders || {};
-            const salesPerson = entry.SalesPersons || {};
-            
-            function formatCurrency(value) {
-                const integerValue = Math.floor(value);
-                let formattedValue = integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-    
-                if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
-                    formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
-                }
-                
-                return `$ ${formattedValue}`;
+const displayOrders = (orders) => {
+    console.log("Displaying orders:", orders);
+    const tbody = document.querySelector('tbody');
+    tbody.innerHTML = '';
+
+    showLoadingOverlay();
+    orders.forEach(entry => {
+        const order = entry.Orders || {};
+        const salesPerson = entry.SalesPersons || {};
+        
+        function formatCurrency(value) {
+            const integerValue = Math.floor(value);
+            let formattedValue = integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+            if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
+                formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
             }
-    
-            const vatSumFormatted = formatCurrency(order.DocTotalNeto);
-            const docTotalFormatted = formatCurrency(order.DocTotal);
-    
-            const getStatus = (order) => {
-                if (order.Cancelled === 'Y') return 'Cancelado';
-                else if (order.DocumentStatus === 'O') return 'Abierto';
-                else if (order.DocumentStatus === 'C') return 'Cerrado';
-                else return 'Activo';
-            };
-            const status = getStatus(order);
-    
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><a href="#" class="order-link" data-docentry="${order.DocEntry}">${order.DocNum}</a></td>
-                <td><a href="#" class="cliente-link" data-cadcode="${order.CardCode}">${order.CardCode} - ${order.CardName || 'Cliente Desconocido'}</a></td>
-                <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
-                <td>${order.DocDate}</td>
-                <td>${status}</td>
-                <td style="text-align: right;">${vatSumFormatted}</td>
-                <td style="text-align: right;">${docTotalFormatted}</td>
-            `;
-            tbody.appendChild(tr);
+            
+            return `$ ${formattedValue}`;
+        }
+
+        const vatSumFormatted = formatCurrency(order.DocTotalNeto);
+        const docTotalFormatted = formatCurrency(order.DocTotal);
+
+        const getStatus = (order) => {
+            if (order.Cancelled === 'Y') return 'Cancelado';
+            else if (order.DocumentStatus === 'O') return 'Abierto';
+            else if (order.DocumentStatus === 'C') return 'Cerrado';
+            else return 'Activo';
+        };
+        const status = getStatus(order);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><a href="#" class="order-link" data-docentry="${order.DocEntry}">${order.DocNum}</a></td>
+            <td><a href="#" class="cliente-link" data-cadcode="${order.CardCode}">${order.CardCode} - ${order.CardName || 'Cliente Desconocido'}</a></td>
+            <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
+            <td>${order.DocDate}</td>
+            <td>${status}</td>
+            <td style="text-align: right;">${vatSumFormatted}</td>
+            <td style="text-align: right;">${docTotalFormatted}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+        
+        document.querySelectorAll('.docentry-link').forEach(link => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const docEntry = event.target.getAttribute('data-docentry');
+            
+            if (docEntry) {
+                showLoadingOverlay();
+                // Redirige a la página de generación de cotización con docentry en la URL
+                window.location.href = `/ventas/generar_cotizacion/?docentry=${docEntry}`;
+            } else {
+                hideLoadingOverlay();
+                alert("No se pudo obtener el DocEntry de la cotización.");
+            }
         });
-    
-        // Agrega eventos a los enlaces de orden
-        document.querySelectorAll('.order-link').forEach(link => {
-            link.addEventListener('click', (event) => {
-                event.preventDefault();
-                const docEntry = event.target.getAttribute('data-docentry');
-                
-                if (docEntry) {
-                    showLoadingOverlay();
-                    window.location.href = `/ventas/ordenesVentas/?docentry=${docEntry}`;
-                } else {
-                    hideLoadingOverlay();
-                    alert("No se pudo obtener el DocEntry de la orden.");
-                }
-            });
-        });
-    
+    });
+
     hideLoadingOverlay();
 
 
-        // Agrega eventos a los enlaces de clientes
+        // Agrega el evento click a todos los enlaces de clientes después de añadir las filas
         document.querySelectorAll('.cliente-link').forEach(link => {
             link.addEventListener('click', (event) => {
                 event.preventDefault();
                 let cadCode = event.target.getAttribute('data-cadcode');
-    
+        
+                // Eliminar la "C" final si está presente
                 if (cadCode && cadCode.endsWith("C")) {
                     cadCode = cadCode.slice(0, -1);
                 }
-    
+        
                 if (cadCode) {
                     showLoadingOverlay();
+                    // Realiza la solicitud AJAX al backend para obtener la información del cliente
                     fetch(`/ventas/informacion_cliente/?rut=${cadCode}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`Error al obtener la información del cliente: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Información del cliente:', data);
-                        window.location.href = `/ventas/creacion_clientes/?rut=${cadCode}`;
-                    })
-                    .catch(error => {
-                        hideLoadingOverlay();
-                        console.error('Error en la solicitud AJAX:', error);
-                        alert('Hubo un problema al obtener la información del cliente. Por favor, intenta de nuevo.');
-                    });
-                
+                        .then(response => {
+                            if (!response.ok) throw new Error('Error al obtener la información del cliente');
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Información del cliente:', data);
+        
+                            // Redirige a la página de creación de cliente después de obtener los datos
+                            window.location.href = `/ventas/creacion_clientes/?rut=${cadCode}`;
+                        })
+                        .catch(error => {
+                            hideLoadingOverlay();
+                            console.error('Error en la solicitud AJAX:', error);
+                        });
                 } else {
                     hideLoadingOverlay();
                     alert("No se pudo obtener el RUT del cliente.");
                 }
             });
         });
+        ;
     };
     
-
-    const formatCurrency = (value) => {
-        const integerValue = Math.floor(value);
-        return `$ ${integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
-    };
-
     const getFilterData = () => {
-        const filters = {
+        return {
             fecha_inicio: document.getElementById('fecha_inicio').value,
             fecha_fin: document.getElementById('fecha_fin').value,
             fecha_doc: document.getElementById('fecha_doc').value,
             docNum: document.getElementById('buscar_num_sap').value,
-            cardName: document.getElementById('buscar_cliente').value,
+            carData: document.getElementById('buscar_cliente').value,
             salesEmployeeName: document.getElementById('filtro_vendedor').value,
             DocumentStatus: document.getElementById('filtro_estado').value,
             docTotal: document.getElementById('buscar_bruto').value
         };
-        console.log("Collected filter data:", filters);
-        return filters;
+
     };
 
+
     const updatePagination = (page) => {
-        console.log("Updating pagination for page:", page, "Total pages:", totalPages);
+        console.log('Updating pagination:', { page, totalPages });
+
         const paginationContainers = document.querySelectorAll('.pagination');
-
+    
         paginationContainers.forEach(paginationContainer => {
-            paginationContainer.innerHTML = '';
-
+            paginationContainer.innerHTML = ''; // Limpiar la paginación actual
+    
             // Botón "Anterior"
             const prevButton = document.createElement('li');
             prevButton.classList.add('page-item');
@@ -271,11 +253,11 @@ showLoadingOverlay();
                 prevButton.classList.add('disabled');
             }
             paginationContainer.appendChild(prevButton);
-
+    
             // Números de página
             let startPage = Math.max(1, page - 1);
             let endPage = Math.min(totalPages || page + 1, page + 1);
-
+    
             for (let i = startPage; i <= endPage; i++) {
                 const pageItem = document.createElement('li');
                 pageItem.classList.add('page-item');
@@ -290,7 +272,7 @@ showLoadingOverlay();
                 });
                 paginationContainer.appendChild(pageItem);
             }
-
+    
             // Botón "Siguiente"
             const nextButton = document.createElement('li');
             nextButton.classList.add('page-item');
@@ -310,111 +292,82 @@ showLoadingOverlay();
             paginationContainer.appendChild(nextButton);
         });
     };
-
+    
     const fetchAndDisplayData = (page = 1) => {
-        console.log("Fetching and displaying data for page:", page);
         applyFiltersAndFetchData(activeFilters, page);
-        window.scrollTo(0, 0);
+        window.scrollTo(0, 0); // Desplazar hacia la parte superior de la página
     };
+    
 
-    // Cargar la primera página con los filtros activos
-    console.log("Initializing data fetch...");
+    // Llamar a la función para cargar la primera página con filtros activos al inicio
     fetchAndDisplayData(currentPage);
 
-    document.getElementById('OVsForm').addEventListener('keydown', function (event) {
+    // Escuchar el evento 'keydown' para capturar "Enter" en los campos de entrada
+    const filterForm = document.querySelector('#filterForm');
+    filterForm.addEventListener('keydown', function(event) {
         if (event.key === "Enter") {
-            event.preventDefault();
+            event.preventDefault(); // Evita que se envíe el formulario
             const filters = getFilterData();
-            console.log("Filters applied via Enter key:", filters);
-            applyFiltersAndFetchData(filters);
+            applyFiltersAndFetchData(filters); // Aplica los filtros cuando se presiona Enter
+            window.scrollTo(0, 0); // Desplazar hacia la parte superior de la página
         }
     });
 
-    const attachImmediateClearListeners = () => {
-        // Lista de inputs a observar
-        const inputsToWatch = [
-            { id: 'buscar_num_sap', filterKey: 'docNum' },
-            { id: 'buscar_cliente', filterKey: 'cardName' },
-            { id: 'buscar_bruto', filterKey: 'docTotal' }
-        ];
-    
-        // Agrega eventos a cada input
-        inputsToWatch.forEach(({ id, filterKey }) => {
-            const input = document.getElementById(id);
-    
-            if (input) { // Validar que el input exista
-                input.addEventListener('input', function () {
-                    const filters = getFilterData(); // Obtiene los filtros actuales
-                    const inputValue = this.value.trim();
-    
-                    if (inputValue === '') {
-                        // Si el campo está vacío, elimina el filtro y ejecuta la búsqueda
-                        console.log(`Input cleared: ${id}, removing filter: ${filterKey}`);
-                        filters[filterKey] = ''; // Elimina el filtro correspondiente
-                        applyFiltersAndFetchData(filters); // Update data when the field is cleared
-                    } else {
-                        // Si tiene texto, actualiza el filtro con el valor del input
-                        console.log(`Input updated: ${id}, applying filter: ${filterKey}`);
-                        filters[filterKey] = inputValue;
-                        applyFiltersAndFetchData(filters); // Update data when the field is cleared
+    // Escuchar el evento 'change' en los selectores para aplicar los filtros automáticamente
+    const selects = document.querySelectorAll('select');
+    selects.forEach(select => {
+        select.addEventListener('change', () => {
+            const filters = getFilterData();
+            applyFiltersAndFetchData(filters); // Aplicar los filtros cuando cambia el selector
+        });
+    });
 
-                    }
-    
-                    // Aplica la búsqueda con los filtros actualizados
-                    console.log("Filters after change:", filters);
-                    applyFiltersAndFetchData(filters);
-                });
-            } else {
-                console.warn(`Input with ID "${id}" not found. Ensure the HTML element exists.`);
-            }
+    const attachClearEventListeners = () => {
+        const filterInputs = document.querySelectorAll('#filterForm input');
+        
+        filterInputs.forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.value === '') {
+                    const filters = getFilterData();
+                    applyFiltersAndFetchData(filters); // Actualiza los datos cuando se borra un campo
+                }
+            });
         });
     };
 
-    
-    // Evento para aplicar búsqueda automáticamente al cambiar el estado
-    const applyFiltersOnChange = (filterIds) => {
-        filterIds.forEach((filterId) => {
-            const filterElement = document.getElementById(filterId);
-            if (filterElement) {
-                filterElement.addEventListener("change", function () {
-                    const filters = getFilterData(); // Obtiene los filtros actuales
-                    console.log(`${filterId} cambiado, aplicando filtros:`, filters);
-                    applyFiltersAndFetchData(filters); // Ejecuta la búsqueda automáticamente
-                });
-            } else {
-                console.warn(`No se encontró el elemento con id=${filterId}.`);
-            }
-        });
-    };
-    
-    // Llama a la función con los IDs de los filtros que deseas observar
-    applyFiltersOnChange(["filtro_estado", "filtro_vendedor"]);
-    
-    
+    // Llamar a la función para agregar los eventos de limpiar filtros
+    attachClearEventListeners();
+
+    // Selecciona los campos de bruto y neto
+    const inputBruto = document.getElementById('buscar_bruto');
+    const inputNeto = document.getElementById('buscar_neto');
+
+    // Escucha los cambios en el campo de bruto
+    inputBruto.addEventListener('input', function() {
+    // Convierte el valor del bruto a número y calcula el neto
+    const brutoValue = parseFloat(inputBruto.value) || 0;
+    const netoValue = brutoValue * 0.84;
+
+    // Muestra el valor calculado en el campo neto
+    inputNeto.value = netoValue; // Limita a 2 decimales
+    });
     
 
-
-    attachImmediateClearListeners(); // Activa los listeners para eliminar filtros inmediatamente
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    
-});
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    const buscarBrutoInput = document.getElementById("buscar_bruto");
-    const buscarNetoInput = document.getElementById("buscar_neto");
-
-    if (buscarBrutoInput && buscarNetoInput) {
-        buscarBrutoInput.addEventListener("input", function () {
-            const brutoValue = parseFloat(this.value) || 0; // Leer el valor de buscar_bruto
-            const netoValue = brutoValue * 0.84; // Calcular el valor neto
-            buscarNetoInput.value = `$${netoValue.toFixed(2)}`;
-            
-        });
-    } else {
-        console.warn("No se encontraron los elementos con id buscar_bruto o buscar_neto.");
+    const urlParams = new URLSearchParams(window.location.search);
+    const rutSN = urlParams.get("rutSN") || "";
+    const nombreSN = urlParams.get("nombreSN") || "";
+  
+    // Si hay parámetros en la URL, aplicarlos automáticamente
+    if (rutSN || nombreSN) {
+      console.log("Aplicando filtros desde la URL:", { rutSN, nombreSN });
+  
+      // Colocar los valores en los campos correspondientes
+      if (rutSN) document.querySelector('[name="cardName"]').value = rutSN;
+      if (nombreSN) document.querySelector('[name="cardName"]').value = nombreSN;
+  
+      // Aplicar los filtros automáticamente
+      const filters = getFilterData();
+      applyFiltersAndFetchData(filters);
     }
-});
 
+});

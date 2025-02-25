@@ -25,7 +25,16 @@ class OrdenVenta(Documento):
             dict: Filtros para la consulta de cotizaciones.
         """
 
+
         filters = {}
+
+        name = data.get('carData')
+        name_mayus = name.upper() if name else None
+        print(name_mayus)
+        name_minus = name.lower() if name else None
+        print(name_minus)
+        name_title = name.title() if name else None
+        print(name_title)
 
         if data.get('fecha_doc'):
             filters['Orders/DocDate ge'] = str(f"'{data.get('fecha_doc')}'")
@@ -44,7 +53,7 @@ class OrdenVenta(Documento):
             if car_data.isdigit():  # Si es un número
                 filters['contains(Orders/CardCode,'] = f"'{car_data}')"
             else:  # Si contiene letras (nombre)
-                filters['contains(Orders/CardName,'] = f"'{car_data}')"
+                filters['(contains(Orders/CardName,'] = f"'{name_mayus}') or contains(Orders/CardName, '{name_minus}') or contains(Orders/CardName, '{name_title}'))"
 
         if data.get('salesEmployeeName'):
             numecode = int(data.get('salesEmployeeName'))
