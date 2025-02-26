@@ -85,6 +85,9 @@ document.addEventListener('DOMContentLoaded', function () {
         // Ocultar o mostrar el botón de acciones en la vista de impresión
         btn2.style.display = noTieneTexto ? 'inline-block' : 'none';
 
+        ocultar();
+
+
         // Deshabilitar o habilitar campos
         camposADeshabilitar.forEach(campo => {
             campo.disabled = tieneTexto;
@@ -96,8 +99,28 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function ocultar() {
+        const estado = document.getElementById('estado').textContent.trim();
+        const btn = document.getElementById('copiar-ODV');
+        const btn2 = document.getElementById('botonacciones');
+    
+        console.log(estado);
+    
+        if (estado === "Cerrado" || estado === "Cancelado") {
+            btn.style.display = "none"; // Ocultar el botón
+            btn2.style.display = "none"; // Ocultar el botón
+            console.log("Oculto");
+        } else {
+            btn.style.display = "block"; // Mostrar el botón
+            btn2.style.display = "block"; // Mostrar el botón
+            console.log("Visible");
+        }
+    }
+    
     // Verificar el estado inicial
+    ocultar();
     checkElementos();
+    
 
     // Configurar observadores para todos los elementos monitoreados
     elementosMonitoreados.forEach(elemento => {
