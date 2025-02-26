@@ -220,7 +220,8 @@ function handleAction(action) {
 }
 
 document.getElementById("tipoEntrega-1").addEventListener("change", function() {
-    const newValue = ["2","3","4"].includes(this.value) ? "2" : this.value;
+    const newValue = this.value;
+    console.log(newValue);
     document.querySelectorAll("#tipoEntrega").forEach(select => select.value = newValue);
 });
 
