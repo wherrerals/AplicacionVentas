@@ -156,21 +156,21 @@ const displayOrders = (orders) => {
         tbody.appendChild(tr);
     });
         
-        document.querySelectorAll('.docentry-link').forEach(link => {
-        link.addEventListener('click', (event) => {
-            event.preventDefault();
-            const docEntry = event.target.getAttribute('data-docentry');
-            
-            if (docEntry) {
-                showLoadingOverlay();
-                // Redirige a la página de generación de cotización con docentry en la URL
-                window.location.href = `/ventas/generar_cotizacion/?docentry=${docEntry}`;
-            } else {
-                hideLoadingOverlay();
-                alert("No se pudo obtener el DocEntry de la cotización.");
-            }
+        // Agrega eventos a los enlaces de orden
+        document.querySelectorAll('.order-link').forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const docEntry = event.target.getAttribute('data-docentry');
+                
+                if (docEntry) {
+                    showLoadingOverlay();
+                    window.location.href = `/ventas/ordenesVentas/?docentry=${docEntry}`;
+                } else {
+                    hideLoadingOverlay();
+                    alert("No se pudo obtener el DocEntry de la orden.");
+                }
+            });
         });
-    });
 
     hideLoadingOverlay();
 
