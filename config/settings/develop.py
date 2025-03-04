@@ -12,8 +12,8 @@ ALLOWED_HOSTS = ["localhost", "0.0.0.0:8000", "127.0.0.1", "192.168.3.42"]
 
 # Base service Layer
 API_BASE_URL = "https://182.160.29.24:50003/b1s/v1/"
-#COMPANY_DB = "TEST_LED_PROD" #pruebas
-COMPANY_DB = "LED_PROD" #produccion
+COMPANY_DB = "TEST_LED_PROD" #pruebas
+#COMPANY_DB = "LED_PROD" #produccion
 API_USERNAME = "manager"
 API_PASSWORD = "1245LED98"
 

@@ -2,12 +2,15 @@ import json
 from django.http import JsonResponse
 from requests import request
 from adapters.sl_client import APIClient
+from datosLsApp.models.stockbodegasdb import StockBodegasDB
 from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.productorepository import ProductoRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from logicaVentasApp.services.documento import Documento
 import logging
+
+from logicaVentasApp.services.stcokService import StockService
 logger = logging.getLogger(__name__)
 
 class OrdenVenta(Documento):
@@ -180,30 +183,57 @@ class OrdenVenta(Documento):
 
         return resultado
 
-    def actualizarDocumento(self,docnum, docentry, data):
-        
-        docentry = docentry
+    def actualizarDocumento(self, docnum, docentry, data):
 
+        print(docentry)
+        print(f"Data: {data}")
         try:
-            docentry = int(docentry)
+            stock_service = StockService()
+            apiClient = APIClient()
+
+            # Obtener líneas del documento antes de actualizar stock
+            documents_lines = apiClient.detallesOrdenVentaLineas(docentry)
+
+            print(documents_lines)
+
+            # Capturar el stock inicial de cada producto antes de hacer cambios
+            for item in data.get('value', []):  # Itera sobre la lista de valores
+                document_line = item.get('Orders/DocumentLines', {})  # Accede a la línea del documento
+                if document_line:  # Asegurar que no sea None
+                    sku = document_line.get('ItemCode')
+                    bodega_id = document_line.get('WarehouseCode')  # Cambiar 'WhsCode' por 'WarehouseCode'
+                    print(f"SKU: {sku}, Bodega: {bodega_id}")
+                    stock_actual = StockBodegasDB.objects.filter(
+                        idProducto__codigo=sku, idBodega=bodega_id
+                    ).values_list('stock', flat=True).first()
+
+                    stock_service.capture_initial_stock(sku, bodega_id, stock_actual)
+
+            # Actualizar stock con los nuevos valores
+            for item in data['DocumentLines']:
+                sku = item['ItemCode']
+                bodega_id = item['WarehouseCode']
+                nueva_cantidad = item['Quantity']
+
+                stock_service.actualizar_stock(sku, bodega_id, nueva_cantidad)
+
+            # Preparar JSON y actualizar documento en SAP
             jsonData = self.prepararJsonODV(data)
-            
             client = APIClient()
+            response = client.actualizarODVSL(int(docentry), jsonData)
 
-            response = client.actualizarODVSL(docentry, jsonData)
-
-            if 'success' in response:
+            # Verificar respuesta de la API
+            if response.get('success'):
                 return {
-                    'success': 'Orden Venta creada exitosamente',
+                    'success': 'Orden Venta actualizada exitosamente',
                     'docNum': docnum,
                     'docEntry': docentry
                 }
 
-        
         except Exception as e:
             logger.error(f"Error al actualizar la cotización: {str(e)}")
-            
             return {'error': str(e)}
+
 
 
     def crearDocumento(self, data):
@@ -217,44 +247,59 @@ class OrdenVenta(Documento):
             dict: Respuesta de la API.
         """
         try:
-            # Verificar los datos antes de preparar el JSON
-            errores = self.validarDatosODV(data)
-            if errores:
-                return {'error': errores}
 
-            # Preparar el JSON para la cotización
-            jsonData = self.prepararJsonODV(data)
+            stock_service = StockService()
 
-            sl = APIClient()
-            
-            # Realizar la solicitud a la API
-            response = sl.crearODV(jsonData)
-            
-            # Verificar si response es un diccionario
-            if isinstance(response, dict):
-                # Si contiene DocEntry, es un éxito
-                if 'DocEntry' in response:
-                    doc_num = response.get('DocNum')
-                    doc_entry = response.get('DocEntry')
-                    salesPersonCode = response.get('SalesPersonCode')
-                    name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
-                    return {
-                        'success': 'Orden Venta creada exitosamente',
-                        'docNum': doc_num,
-                        'docEntry': doc_entry,
-                        'salesPersonCode': salesPersonCode,
-                        'salesPersonName': name_vendedor
-                    }
+            for item in data['DocumentLines']:
+                sku = item['ItemCode']
+                bodega_id = item['WarehouseCode']
+                cantidad = item['Quantity']
                 
-                # Si contiene un mensaje de error, manejarlo
-                elif 'error' in response:
-                    error_message = response.get('error', 'Error desconocido')
-                    return {'error': f"Error: {error_message}"}
+                # Capturar el stock inicial antes de descontarlo
+                stock_actual = StockBodegasDB.objects.filter(idProducto__codigo=sku, idBodega=bodega_id).values_list('stock', flat=True).first()
+                stock_service.capture_initial_stock(sku, bodega_id, stock_actual)
+
+                # Descontar stock
+                stock_service.actualizar_stock(sku, bodega_id, -cantidad)  # Descontar la cantidad vendida
+
+                # Verificar los datos antes de preparar el JSON
+                errores = self.validarDatosODV(data)
+                if errores:
+                    return {'error': errores}
+
+                # Preparar el JSON para la cotización
+                jsonData = self.prepararJsonODV(data)
+
+                sl = APIClient()
+                
+                # Realizar la solicitud a la API
+                response = sl.crearODV(jsonData)
+                
+                # Verificar si response es un diccionario
+                if isinstance(response, dict):
+                    # Si contiene DocEntry, es un éxito
+                    if 'DocEntry' in response:
+                        doc_num = response.get('DocNum')
+                        doc_entry = response.get('DocEntry')
+                        salesPersonCode = response.get('SalesPersonCode')
+                        name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
+                        return {
+                            'success': 'Orden Venta creada exitosamente',
+                            'docNum': doc_num,
+                            'docEntry': doc_entry,
+                            'salesPersonCode': salesPersonCode,
+                            'salesPersonName': name_vendedor
+                        }
+                    
+                    # Si contiene un mensaje de error, manejarlo
+                    elif 'error' in response:
+                        error_message = response.get('error', 'Error desconocido')
+                        return {'error': f"Error: {error_message}"}
+                    else:
+                        return {'error': 'Respuesta inesperada de la API.'}
+                
                 else:
-                    return {'error': 'Respuesta inesperada de la API.'}
-            
-            else:
-                return {'error': 'La respuesta de la API no es válida.'}
+                    return {'error': 'La respuesta de la API no es válida.'}
         
         except Exception as e:
             # Manejo de excepciones generales
