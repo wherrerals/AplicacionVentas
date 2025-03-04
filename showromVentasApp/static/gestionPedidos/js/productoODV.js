@@ -257,16 +257,15 @@ class Producto {
     }
 
     limitarCantidad(row) {
-
         // Obtener el elemento #numero_orden
         const numeroOrdenElem = document.getElementById('numero_orden');
         const docEntry = numeroOrdenElem?.getAttribute('data-docentry');
     
         // Verificar si hay un valor en data-docentry
-        /* if (docEntry) {
-            console.log("No se ejecuta limitarCantidad porque data-docentry tiene un valor:", numeroOrdenElem);
-            return;
-        } */
+        if (docEntry) {
+            console.log("No se ejecuta limitarCantidad porque data-docentry tiene un valor:", docEntry);
+            return; // Salir del método si hay un docEntry
+        }
     
         let cantidadInput = row.querySelector('#calcular_cantidad');
         let stockBodegaElem = row.querySelector('[name="stock_bodega"]'); // Referencia al elemento de stock
@@ -289,11 +288,11 @@ class Producto {
                 cantidadInput.value = 0;
             }
         };
-
+    
         // Agregar evento para validar en tiempo real
         cantidadInput.addEventListener('input', validarCantidad);
         cantidadInput.addEventListener('change', validarCantidad);
-
+    
         // Si el stock cambia dinámicamente (llamado después de actualizar stock)
         const stockBodegaObserver = new MutationObserver(validarCantidad);
         stockBodegaObserver.observe(stockBodegaElem, { childList: true, subtree: true });
