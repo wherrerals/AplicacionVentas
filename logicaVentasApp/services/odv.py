@@ -197,7 +197,7 @@ class OrdenVenta(Documento):
             print(documents_lines)
 
             # Capturar el stock inicial de cada producto antes de hacer cambios
-            for item in data.get('value', []):  # Itera sobre la lista de valores
+            for item in documents_lines.get('value', []):  # Itera sobre la lista de valores
                 document_line = item.get('Orders/DocumentLines', {})  # Accede a la línea del documento
                 if document_line:  # Asegurar que no sea None
                     sku = document_line.get('ItemCode')
