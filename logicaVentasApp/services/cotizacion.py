@@ -531,6 +531,8 @@ class Cotizacion(Documento):
         
     def formatearDatos(self, json_data):
         # Extraer y limpiar la información del cliente
+
+        print(f"DATOS: {json_data}")
         client_info = json_data["Client"]["value"][0]
         quotations = client_info.get("Quotations", {})
         salesperson = client_info.get("SalesPersons", {})

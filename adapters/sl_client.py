@@ -385,27 +385,43 @@ class APIClient:
 
     def detalleCotizacionLineas(self, docEntry):
         """
-        Permite obtener el detalle de las lineas de una cotizacion en la base de datos de SAP
+        Obtiene el detalle de las líneas de una cotización en SAP,
+        iterando sobre los resultados paginados hasta obtener todos los registros.
 
         Parámetros:
-            docEntry : int, opcional
-                El numero de documento de la cotizacion.
+            docEntry : int
+                Número de documento de la cotización.
 
+        Retorna:
+            dict: Respuesta consolidada con todas las líneas de la cotización.
         """
-
         crossJoin = (
             "Quotations,Quotations/DocumentLines,Items/ItemWarehouseInfoCollection"
         )
+        
         expand = "Quotations/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
         filter = f"Quotations/DocEntry eq {docEntry} and Quotations/DocumentLines/DocEntry eq Quotations/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq Quotations/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq Quotations/DocumentLines/WarehouseCode"
 
-        url = (
-            f"{self.base_url}$crossjoin({crossJoin})?$expand={expand}&$filter={filter}"
-        )
+        base_url = self.base_url # Asegura que no haya doble "/"
+        url = f"{base_url}/$crossjoin({crossJoin})?$expand={expand}&$filter={filter}"
 
-        response = self.session.get(url, verify=False)
-        response.raise_for_status()
-        return response.json()
+        all_data = []  # Lista para almacenar todos los valores
+
+        while url:
+            response = self.session.get(url, verify=False)
+            response.raise_for_status()
+            data = response.json()
+
+            # Agregar los resultados actuales a la lista acumulada
+            all_data.extend(data.get("value", []))
+
+            # Obtener el próximo enlace si existe
+            next_link = data.get("odata.nextLink")
+            url = f"{base_url}/{next_link}" if next_link else None  # Agregar base_url si es necesario
+
+        return {"value": all_data}
+
+
 
     def detallesOrdenVentaCliente(self, docEntry):
         """
@@ -446,17 +462,31 @@ class APIClient:
         &$filter=Orders/DocEntry eq 201882 and Orders/DocumentLines/DocEntry eq Orders/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq Orders/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq Orders/DocumentLines/WarehouseCode
         """
 
-        crossjoin = "Orders,Orders/DocumentLines,Items/ItemWarehouseInfoCollection"
+        crossJoin = (
+            "Orders,Orders/DocumentLines,Items/ItemWarehouseInfoCollection"
+            )
+        
         expand = "Orders/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
         filter = f"Orders/DocEntry eq {docEntry} and Orders/DocumentLines/DocEntry eq Orders/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq Orders/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq Orders/DocumentLines/WarehouseCode"
 
-        url = (
-            f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
-        )
+        base_url = self.base_url # Asegura que no haya doble "/"
+        url = f"{base_url}/$crossjoin({crossJoin})?$expand={expand}&$filter={filter}"
 
-        response = self.session.get(url, verify=False)
-        response.raise_for_status()
-        return response.json()
+        all_data = []  # Lista para almacenar todos los valores
+
+        while url:
+            response = self.session.get(url, verify=False)
+            response.raise_for_status()
+            data = response.json()
+
+            # Agregar los resultados actuales a la lista acumulada
+            all_data.extend(data.get("value", []))
+
+            # Obtener el próximo enlace si existe
+            next_link = data.get("odata.nextLink")
+            url = f"{base_url}/{next_link}" if next_link else None  # Agregar base_url si es necesario
+
+        return {"value": all_data}
 
     def getDataSN(self, top=20, skip=0, filters=None):
         """
