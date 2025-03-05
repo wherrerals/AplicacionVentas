@@ -104,7 +104,6 @@ class OdvView(View):
 
 
     def detallesODV(self, request):
-
         docentry = request.GET.get("docentry")
         client = APIClient()
 
@@ -122,14 +121,16 @@ class OdvView(View):
 
         sn = SocioNegocio(request)
 
-        data = {"Client": documentClient, "DocumentLine": documentLine}
+        data = {"Client": documentClient, 
+                "DocumentLine": documentLine
+                }
 
-        # Verificar si el socio de negocio ya existe en la base de datos
         if sn.verificarSocioDB(cardCode):
             odv = OrdenVenta()
             lines_data = odv.formatearDatos(data)
 
             return JsonResponse(lines_data, safe=False)
+        
         else:
             # Crear el cliente en caso de que no exista y responder
             sn.crearYresponderCliente(cardCode, rut)

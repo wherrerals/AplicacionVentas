@@ -271,6 +271,8 @@ class ProductoRepository:
         """
         metodo para obtener la imagen por medio del codigo del producto
         """
+
+        print(f"codigo: {codigo}")
         
         producto = ProductoDB.objects.get(codigo=codigo)
         return producto.imagen
