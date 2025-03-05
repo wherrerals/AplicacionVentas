@@ -758,11 +758,32 @@ def guardarContactosAJAX(request):
         return JsonResponse({'success': True})
     return JsonResponse({'success': False, 'message': 'Método no permitido'})
 
+def user_data(request):
+    user = request.user
+
+    codigoVendedor = UsuarioDB.objects.get(usuarios=user).vendedor.codigo
+
+    tipoVendedor = UsuarioDB.objects.get(usuarios=user).vendedor.tipoVendedor
+
+    return {
+        'username': user.username,
+        'email': user.email,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'is_staff': user.is_staff,
+        'is_superuser': user.is_superuser,
+        'is_active': user.is_active,
+        'vendedor': codigoVendedor,
+        'tipoVendedor': tipoVendedor
+    }
+    
 
 @login_required
 def busquedaProductos(request):
     if request.method == 'GET' and 'numero' in request.GET:
         numero = request.GET.get('numero')
+        users_data = user_data(request)
+
         # Realiza la consulta a la base de datos para obtener los resultados
         resultados = ProductoDB.objects.filter(codigo__icontains=numero)
         # Convierte los resultados en una lista de diccionarios
@@ -774,7 +795,7 @@ def busquedaProductos(request):
                 'precio': producto.precioVenta,
                 'stockTotal': producto.stockTotal,
                 'precioAnterior': producto.precioLista,
-                'maxDescuento': limitar_descuento(producto),  # Aplica el nuevo método aquí
+                'maxDescuento': limitar_descuento(producto, users_data),  # Aplica el nuevo método aquí
             }
             for producto in resultados
         ]
@@ -785,16 +806,22 @@ def busquedaProductos(request):
         return JsonResponse({'error': 'No se proporcionó un número válido'})
     
 
-def limitar_descuento(producto):
+def limitar_descuento(producto, users_data):
     """
     Limita el descuento máximo según el tipo de producto.
     Si el producto es LST y el descuento es mayor que 15%, lo ajusta a 15%.
     Para otros productos, si el descuento es mayor que 10%, lo ajusta a 10%.
     """
-    if producto.marca == 'LST':
-        return math.floor(min(producto.dsctoMaxTienda * 100, 15))
+    if users_data['tipoVendedor'] == 'P':
+        if producto.marca == 'LST':
+            return math.floor(min(producto.dsctoMaxTienda * 100, 25))
+        else:
+            return math.floor(min(producto.dsctoMaxTienda * 100, 15))
     else:
-        return math.floor(min(producto.dsctoMaxTienda * 100, 10))
+        if producto.marca == 'LST':
+            return math.floor(min(producto.dsctoMaxTienda * 100, 15))
+        else:
+            return math.floor(min(producto.dsctoMaxTienda * 100, 10))
 
 
 def validar_contrasena(password):

@@ -19,7 +19,7 @@ class SocioNegocioDB(models.Model):
     telefono = models.CharField(max_length=18)
     giro = models.CharField(max_length=100)
     condicionPago = models.IntegerField(default=-1)
-    plazoReclamaciones = models.CharField(max_length=255, default="STANDAR")
+    plazoReclamaciones = models.CharField(max_length=255, default="ESTANDAR")
     clienteExportacion = models.CharField(max_length=255, default="N")
     vendedor = models.IntegerField(default=-1)
     grupoSN = models.ForeignKey(GrupoSNDB, on_delete=models.CASCADE, default=1)
