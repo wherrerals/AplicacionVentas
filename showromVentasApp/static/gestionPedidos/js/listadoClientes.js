@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         clients.forEach(client => {
             const cardCodeClean = client.CardCode ? client.CardCode.replace(/C$/, '') : 'N/A';
-            const groupType = client.GroupCode === 100 ? 'Persona' : client.GroupCode === 105 ? 'Empresa' : 'N/A';
+            const groupType = client.GroupCode === 105 ? 'Persona' : client.GroupCode === 100 ? 'Empresa' : 'N/A';
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
