@@ -186,38 +186,57 @@ class OrdenVenta(Documento):
         return resultado
 
     def actualizarDocumento(self, docnum, docentry, data):
-
-        print(docentry)
-        print(f"Data: {data}")
         try:
             stock_service = StockService()
             apiClient = APIClient()
 
             # Obtener líneas del documento antes de actualizar stock
-            documents_lines = apiClient.detallesOrdenVentaLineas(docentry)
+            documents_lines = apiClient.detallesOrdenVentaLineas(docentry) 
 
-            print(documents_lines)
+            # 
+            stock_anterior = {}
 
             # Capturar el stock inicial de cada producto antes de hacer cambios
-            for item in documents_lines.get('value', []):  # Itera sobre la lista de valores
-                document_line = item.get('Orders/DocumentLines', {})  # Accede a la línea del documento
-                if document_line:  # Asegurar que no sea None
+            for item in documents_lines.get('value', []):  
+                document_line = item.get('Orders/DocumentLines', {})  
+                if document_line:
                     sku = document_line.get('ItemCode')
-                    bodega_id = document_line.get('WarehouseCode')  # Cambiar 'WhsCode' por 'WarehouseCode'
-                    print(f"SKU: {sku}, Bodega: {bodega_id}")
+                    bodega_id = document_line.get('WarehouseCode')
+                    cantidad_anterior = document_line.get('Quantity')
+
+                    stock_anterior[(sku, bodega_id)] = cantidad_anterior
+
                     stock_actual = StockBodegasDB.objects.filter(
                         idProducto__codigo=sku, idBodega=bodega_id
-                    ).values_list('stock', flat=True).first()
+                    ).values_list('stock', flat=True).first() or 0
 
-                    stock_service.capture_initial_stock(sku, bodega_id)
+                    stock_service.capture_initial_stock(sku, bodega_id, stock_actual)
 
-            # Actualizar stock con los nuevos valores
+            # Comparar con las nuevas líneas y actualizar stock si es necesario
+            stock_nuevo = {}
+
             for item in data['DocumentLines']:
                 sku = item['ItemCode']
                 bodega_id = item['WarehouseCode']
                 nueva_cantidad = item['Quantity']
 
-                stock_service.actualizar_stock(sku, bodega_id, nueva_cantidad)
+                stock_nuevo[(sku, bodega_id)] = nueva_cantidad
+
+                cantidad_anterior = stock_anterior.get((sku, bodega_id), 0)
+
+                # Determinar si hay diferencia en la cantidad
+                diferencia = nueva_cantidad - cantidad_anterior
+
+                if diferencia != 0:  # Si hay un cambio en la cantidad
+                    stock_actual = stock_service.get_initial_stock(sku, bodega_id)
+                    stock_service.actualizar_stock(sku, bodega_id, diferencia, stock_actual)
+
+            # Verificar si alguna línea anterior desapareció en la nueva data
+            for (sku, bodega_id), cantidad_anterior in stock_anterior.items():
+                if (sku, bodega_id) not in stock_nuevo:
+                    print(f"SKU {sku} en bodega {bodega_id} no está en la nueva lista, reponiendo stock.")
+                    stock_actual = stock_service.get_initial_stock(sku, bodega_id)
+                    stock_service.actualizar_stock_diferencia(sku, bodega_id, -cantidad_anterior, stock_actual)
 
             # Preparar JSON y actualizar documento en SAP
             jsonData = self.prepararJsonODV(data)
@@ -235,6 +254,7 @@ class OrdenVenta(Documento):
         except Exception as e:
             logger.error(f"Error al actualizar la cotización: {str(e)}")
             return {'error': str(e)}
+
 
 
 
@@ -261,7 +281,7 @@ class OrdenVenta(Documento):
                 stock_inicial.append((sku, bodega_id, stock_actual))  # Guardar para rollback
 
                 # Descontar stock
-                stock_service.actualizar_stock(sku, bodega_id, cantidad, stock_actual)
+                stock_service.actualizar_stock(sku, bodega_id, -cantidad, stock_actual)
 
             # Preparar el JSON para la cotización
             jsonData = self.prepararJsonODV(data)

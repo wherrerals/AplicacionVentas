@@ -26,6 +26,7 @@ class StockService:
         """
         Actualiza el stock de una bodega específica y el stock total del producto.
         """
+        print(f"Actualizando stock para SKU {sku} en Bodega {bodega_id} | Nueva Cantidad: {nueva_cantidad} (stock actual: {stock_actual})")
         stock_bodega = StockBodegasDB.objects.select_for_update().filter(idProducto__codigo=sku, idBodega=bodega_id).first()
 
         # Determinar si se está agregando o quitando stock
@@ -35,6 +36,22 @@ class StockService:
 
         # Actualizar el stock total del producto
         self.actualizar_stock_total(sku)
+
+    @transaction.atomic
+    def actualizar_stock_diferencia(self, sku, bodega_id, diferencia, stock_actual):
+        """
+        Actualiza el stock con base en la diferencia de cantidad.
+        Si la diferencia es positiva, se resta del stock.
+        Si la diferencia es negativa, se suma al stock.
+        """
+        print(f"Ajustando stock para SKU {sku} en Bodega {bodega_id} | Diferencia: {diferencia} (stock actual: {stock_actual})")
+        stock_bodega = StockBodegasDB.objects.select_for_update().filter(idProducto__codigo=sku, idBodega=bodega_id).first()
+
+        if stock_bodega:
+            stock_bodega.stock = stock_actual - diferencia  # Restar o sumar la diferencia
+            stock_bodega.save()
+
+            self.actualizar_stock_total(sku)
 
     def actualizar_stock_total(self, sku):
         """ Actualiza el stock total sumando los stocks de todas las bodegas del producto """

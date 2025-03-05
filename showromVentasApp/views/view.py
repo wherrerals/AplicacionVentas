@@ -800,7 +800,6 @@ def busquedaProductos(request):
             for producto in resultados
         ]
         
-        print("mostrar stock total", resultados_formateados)
         return JsonResponse({'resultados': resultados_formateados})
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
