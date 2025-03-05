@@ -24,6 +24,10 @@ class ProductoRepository:
             print("Advertencia: El precio de venta debe ser mayor a 0.")
             return 0, 0
         
+        if costo <= 0:
+            print("Advertencia: El costo debe ser mayor a 0.")
+            return 0, 0
+        
         precio_sin_iva = precio_venta / 1.19  # Calcular el precio sin IVA
         margen_bruto = (precio_sin_iva - costo) / precio_sin_iva
         descuento_maximo = margen_bruto - (rentabilidad_minima / 100)
