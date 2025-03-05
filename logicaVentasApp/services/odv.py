@@ -209,7 +209,7 @@ class OrdenVenta(Documento):
                         idProducto__codigo=sku, idBodega=bodega_id
                     ).values_list('stock', flat=True).first()
 
-                    stock_service.capture_initial_stock(sku, bodega_id, stock_actual)
+                    stock_service.capture_initial_stock(sku, bodega_id)
 
             # Actualizar stock con los nuevos valores
             for item in data['DocumentLines']:
@@ -239,73 +239,66 @@ class OrdenVenta(Documento):
 
 
     def crearDocumento(self, data):
-        """
-        Crea una nueva cotización y maneja las excepciones según el código de respuesta.
 
-        Args:
-            data (dict): Datos de la cotización.
-
-        Returns:
-            dict: Respuesta de la API.
-        """
         try:
-
             stock_service = StockService()
+            sl = APIClient()
+            errores = self.validarDatosODV(data)
+            
+            if errores:
+                return {'error': errores}
+            
+            stock_inicial = []  # Para rollback en caso de error
 
             for item in data['DocumentLines']:
                 sku = item['ItemCode']
                 bodega_id = item['WarehouseCode']
                 cantidad = item['Quantity']
-                
+
                 # Capturar el stock inicial antes de descontarlo
-                stock_actual = StockBodegasDB.objects.filter(idProducto__codigo=sku, idBodega=bodega_id).values_list('stock', flat=True).first()
-                stock_service.capture_initial_stock(sku, bodega_id, stock_actual)
+                stock_actual = StockBodegasDB.objects.filter(idProducto__codigo=sku, idBodega=bodega_id).values_list('stock', flat=True).first() or 0
+
+                stock_inicial.append((sku, bodega_id, stock_actual))  # Guardar para rollback
 
                 # Descontar stock
-                stock_service.actualizar_stock(sku, bodega_id, -cantidad)  # Descontar la cantidad vendida
+                stock_service.actualizar_stock(sku, bodega_id, cantidad, stock_actual)
 
-                # Verificar los datos antes de preparar el JSON
-                errores = self.validarDatosODV(data)
-                if errores:
-                    return {'error': errores}
+            # Preparar el JSON para la cotización
+            jsonData = self.prepararJsonODV(data)
 
-                # Preparar el JSON para la cotización
-                jsonData = self.prepararJsonODV(data)
+            # Realizar la solicitud a la API
+            response = sl.crearODV(jsonData)
 
-                sl = APIClient()
-                
-                # Realizar la solicitud a la API
-                response = sl.crearODV(jsonData)
-                
-                # Verificar si response es un diccionario
-                if isinstance(response, dict):
-                    # Si contiene DocEntry, es un éxito
-                    if 'DocEntry' in response:
-                        doc_num = response.get('DocNum')
-                        doc_entry = response.get('DocEntry')
-                        salesPersonCode = response.get('SalesPersonCode')
-                        name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
-                        return {
-                            'success': 'Orden Venta creada exitosamente',
-                            'docNum': doc_num,
-                            'docEntry': doc_entry,
-                            'salesPersonCode': salesPersonCode,
-                            'salesPersonName': name_vendedor
-                        }
-                    
-                    # Si contiene un mensaje de error, manejarlo
-                    elif 'error' in response:
-                        error_message = response.get('error', 'Error desconocido')
-                        return {'error': f"Error: {error_message}"}
-                    else:
-                        return {'error': 'Respuesta inesperada de la API.'}
-                
+            if isinstance(response, dict):
+                if 'DocEntry' in response:
+                    doc_num = response.get('DocNum')
+                    doc_entry = response.get('DocEntry')
+                    salesPersonCode = response.get('SalesPersonCode')
+                    name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
+                    return {
+                        'success': 'Orden Venta creada exitosamente',
+                        'docNum': doc_num,
+                        'docEntry': doc_entry,
+                        'salesPersonCode': salesPersonCode,
+                        'salesPersonName': name_vendedor
+                    }
+                elif 'error' in response:
+                    return {'error': f"Error: {response.get('error', 'Error desconocido')}"}
                 else:
-                    return {'error': 'La respuesta de la API no es válida.'}
-        
+                    return {'error': 'Respuesta inesperada de la API.'}
+            else:
+                return {'error': 'La respuesta de la API no es válida.'}
+
         except Exception as e:
-            # Manejo de excepciones generales
             logger.error(f"Error al crear la cotización: {str(e)}")
+
+            # Rollback del stock si algo falla
+            for sku, bodega_id, stock_original in stock_inicial:
+                StockBodegasDB.objects.filter(idProducto__codigo=sku, idBodega=bodega_id).update(stock=stock_original)
+
+            return {'error': str(e)}
+
+            
 
     def validarDatosODV(self, data):
         """
