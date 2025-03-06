@@ -76,10 +76,6 @@ class ProductoRepository:
                     "linkProducto": product_data.get("linkProducto", ""),
                 },
             )
-            print("******" * 100)
-            
-            print(f'TreeType: {producto_info.get("TreeType")},')
-            print(f'producto:  {producto_info.get("nombre")},')
             
             # Si el producto es una receta, calcular stock y costo de receta
             if producto_info.get("TreeType") == "iSalesTree":
@@ -155,24 +151,15 @@ class ProductoRepository:
             costo_total += costo_componente * cantidad_necesaria
 
             # **Sincronizar stock del componente en las bodegas**
-            print(f"Sincronizando stock de {item_code} en la base de datos")
             producto = ProductoDB.objects.get(codigo=item_code)  # Obtener la instancia del producto
             bodegas_datos = [{"nombre": bodega, "stock_disponible": stock_componente.get(bodega, 0) / cantidad_necesaria, "stock_comprometido": 0} for bodega in bodegas]
-            print(f"bodegas_datos: {bodegas_datos}")
             self.sync_stock(producto, bodegas_datos)
-            print(f"EJECUTADDDDDDDDDDDDDDDDDOOOOOOOOOOOOOOOOOOOO")
 
 
-        # Si stock_total_receta sigue siendo infinito, significa que no hay stock suficiente
         stock_total_receta = stock_total_receta if stock_total_receta != float('inf') else 0
 
-        print(f"Stock total receta final: {stock_total_receta}")
-
-        # **Actualizar el stock total del producto después de sincronizar**
-        print("Actualizando stock total del producto en la base de datos")
         self.update_stock_total(producto)
 
-        print("******" * 100)
         return stock_total_receta, costo_total
 
 
@@ -212,39 +199,40 @@ class ProductoRepository:
             producto (ProductoDB): Instancia del producto.
             bodegas (list): Lista de diccionarios con datos de las bodegas y su stock.
         """
-        print("PRODUCTO: ", producto)
-        print("BODEGAS: ", bodegas)
         
         for bodega_data in bodegas:
 
-            print ("BODEGA DATA: ", bodega_data)
             # Validar que la bodega tenga el nombre requerido
             if "nombre" not in bodega_data:
                 print(f"Advertencia: Bodega sin nombre. Datos: {bodega_data}")
                 continue  # Saltar esta bodega
 
-            # Obtener la instancia de la bodega
-            bodega = BodegaDB.objects.get(nombre=bodega_data["nombre"])
+            # Obtener la instancia de la bodega asegurando que el nombre no tenga espacios extras
+            try:
+                bodega = BodegaDB.objects.get(nombre=bodega_data["nombre"].strip())
+            except BodegaDB.DoesNotExist:
+                print(f"Error: No se encontró la bodega con nombre '{bodega_data['nombre']}'")
+                continue  # Saltar esta bodega si no existe
 
-            print(f"BODEGA SINCRONIZADA: {bodega}")
-            
-            # Calcular el stock de venta (stock disponible - stock comprometido)
-            stockVentaDAto = bodega_data.get("stock_disponible", -1) - bodega_data.get("stock_comprometido", -1),
-            
-            stockVenta = stockVentaDAto[0]
+            # Corregir el cálculo de stockVenta (asegurarnos de obtener un entero)
+            stockVenta = bodega_data.get("stock_disponible", -1) - bodega_data.get("stock_comprometido", -1)
 
-                  
-            
+            # Buscar el registro de stock correctamente
+            try:
+                stock_bodega = StockBodegasDB.objects.get(idProducto=producto, idBodega=bodega)
+                # Si existe, actualizamos los valores
+                stock_bodega.stock = stockVenta
+                stock_bodega.stockDisponibleReal = bodega_data.get("stock_disponible", -1)
+                stock_bodega.save()
+            except StockBodegasDB.DoesNotExist:
+                # Si no existe, creamos un nuevo registro
+                StockBodegasDB.objects.create(
+                    idProducto=producto,
+                    idBodega=bodega,
+                    stock=stockVenta,
+                    stockDisponibleReal=bodega_data.get("stock_disponible", -1)
+                )
 
-            # Sincronizar el stock de la bodega para este producto
-            StockBodegasDB.objects.update_or_create(
-                idProducto=producto,
-                idBodega=bodega,
-                defaults={
-                    "stock": stockVenta,
-                    "stockDisponibleReal": bodega_data.get("stock_disponible", -1),
-                },
-            )
 
     def update_stock_total(self, producto):
         """
