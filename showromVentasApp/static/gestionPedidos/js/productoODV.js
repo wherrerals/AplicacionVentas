@@ -131,7 +131,7 @@ class Producto {
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${this.precioSinDescuento}</td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <div>
-                        <input class="form-control" type="number" inputmode="numeric" style="font-size: 12px;width: 60px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad !== undefined ? this.cantidad : 0}">
+                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad !== undefined ? this.cantidad : 0}">
                     </div>
                     <div class="valorCotizacion" data-itemcode=${this.productoCodigo} hidden>
                         <b><small style="color: rgb(255,0,0);" id="valorCotizacion">Cotiz: ${this.cantidadCoti}</small></b>
@@ -255,7 +255,31 @@ class Producto {
             }
         });
     }
+
+    botonesCantidad(row) {
+        let cantidadInput = row.querySelector('#calcular_cantidad');
     
+        // Crear botones personalizados para incrementar y decrementar
+        const incrementButton = document.createElement('button');
+        incrementButton.textContent = '+';
+        incrementButton.name = 'cantidad';
+        incrementButton.className = 'incrementar';
+        incrementButton.style.cursor = 'pointer';
+    
+        const decrementButton = document.createElement('button');
+        decrementButton.textContent = '-';
+        decrementButton.name = 'cantidad';
+        decrementButton.className = 'decrementar';
+        decrementButton.style.cursor = 'pointer';
+    
+        // Insertar los botones junto al input
+        cantidadInput.insertAdjacentElement('afterend', decrementButton); // Primero el botón de decremento
+        cantidadInput.insertAdjacentElement('afterend', incrementButton); // Luego el botón de incremento
+    
+        // Retornar los botones para usarlos en otros métodos
+        return { incrementButton, decrementButton };
+    }
+
     limitarCantidad(row) {
         // Obtener el elemento #numero_orden
         const numeroOrdenElem = document.getElementById('numero_orden');
@@ -271,26 +295,12 @@ class Producto {
             return;
         }
     
-        // Crear botones personalizados para incrementar y decrementar
-        const incrementButton = document.createElement('button');
-        incrementButton.textContent = '+';
-        incrementButton.name = 'cantidad';
-        incrementButton.style.cursor = 'pointer';
-    
-        const decrementButton = document.createElement('button');
-        decrementButton.textContent = '-';
-        decrementButton.name = 'cantidad';
-        decrementButton.style.cursor = 'pointer';
-    
-        // Insertar los botones junto al input
-        cantidadInput.insertAdjacentElement('afterend', decrementButton);
-        cantidadInput.insertAdjacentElement('afterend', incrementButton);
-    
         // Ocultar las flechas nativas del input de tipo number
         cantidadInput.style.appearance = 'none';
         cantidadInput.style.MozAppearance = 'textfield'; // Firefox
-        //cantidadInput.style.pointerEvents = 'none'; // Deshabilitar las flechas de incremento
-
+    
+        // Crear los botones de incremento y decremento
+        const { incrementButton, decrementButton } = this.botonesCantidad(row);
     
         // Función para validar y limitar la cantidad
         const validarCantidad = () => {
