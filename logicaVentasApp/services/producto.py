@@ -20,6 +20,9 @@ class Producto:
         skip = state.value
         total_synced = 0
 
+        # Inicializar el contador de intentos vacíos
+        empty_count = 0
+
         # Crear instancia de APIClient
         cliente = APIClient()
 
@@ -35,19 +38,22 @@ class Producto:
                 return "Error: No se encontró la clave 'ItemsCount' en el resultado."
         else:
             return "Error: El método contarProductos no retornó datos válidos."
-        
+
         print(f"Total de productos: {total_items}")
+        print(f"Skip actual: {state.value}")
 
         # Verificar si `skip` ha alcanzado el total y reiniciar si es necesario
         if skip >= total_items:
+            print("Reiniciando el valor de `skip`...")
+            print(f"Skip antes de reiniciar: {state.value}")
+            print(f"Total de productos: {total_items}")
             skip = 0
             state.value = 0
             state.save()
+            print(f"Skip después de reiniciar: {state.value}")
 
         # Obtener productos desde la API de SalesLayer usando `skip`
-
         productos = cliente.obtenerProductosSL(skip=skip)
-        #productos = cliente.prueba(skip=40)
 
         # Si hay productos, sincronizarlos
         if productos:
@@ -57,19 +63,32 @@ class Producto:
             
             # Sincronizar los productos y su stock
             repo = ProductoRepository()
-            creacion = repo.sync_products_and_stock(jsonserializado)
+            creacion, listadoProductos = repo.sync_products_and_stock(jsonserializado)
+
+            # Verificar si el listado de productos está vacío
+            if not listadoProductos:
+                empty_count += 1
+            else:
+                empty_count = 0  # Resetear el contador si el listado no está vacío
 
             # Incrementar el valor de `skip` si la sincronización fue exitosa
             if creacion:
-                synced_count = len(jsonserializado)
+                synced_count = len(listadoProductos)
                 total_synced += synced_count
                 
                 # Actualizar el valor de `skip` para la próxima llamada
                 state.value += synced_count
                 state.save()
 
+            # Verificar si el listado ha estado vacío 3 veces consecutivas
+            if empty_count >= 3:
+                print("Reiniciando el valor de `state.value` a 0 debido a 3 intentos vacíos consecutivos.")
+                state.value = 0  # Reiniciar el valor de `state.value` a 0
+                state.save()
+                empty_count = 0  # Resetear el contador de intentos vacíos
+
         # Retornar el mensaje con la cantidad de productos sincronizados
-        return f"{total_synced} productos sincronizados exitosamente"
+        return f"{total_synced} productos sincronizados exitosamente{listadoProductos}"
 
     
     def obtenerReceta(self, codigo):
