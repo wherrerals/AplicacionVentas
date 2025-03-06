@@ -73,6 +73,7 @@ class Producto:
 
             # Incrementar el valor de `skip` si la sincronización fue exitosa
             if creacion:
+                #synced_count = len(jsonserializado)
                 synced_count = len(listadoProductos)
                 total_synced += synced_count
                 

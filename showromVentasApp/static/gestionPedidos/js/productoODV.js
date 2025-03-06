@@ -255,17 +255,11 @@ class Producto {
             }
         });
     }
-
+    
     limitarCantidad(row) {
         // Obtener el elemento #numero_orden
         const numeroOrdenElem = document.getElementById('numero_orden');
         const docEntry = numeroOrdenElem?.getAttribute('data-docentry');
-    
-        // Verificar si hay un valor en data-docentry
-        if (docEntry) {
-            console.log("No se ejecuta limitarCantidad porque data-docentry tiene un valor:", docEntry);
-            return; // Salir del método si hay un docEntry
-        }
     
         let cantidadInput = row.querySelector('#calcular_cantidad');
         let stockBodegaElem = row.querySelector('[name="stock_bodega"]'); // Referencia al elemento de stock
@@ -277,17 +271,71 @@ class Producto {
             return;
         }
     
+        // Crear botones personalizados para incrementar y decrementar
+        const incrementButton = document.createElement('button');
+        incrementButton.textContent = '+';
+        incrementButton.name = 'cantidad';
+        incrementButton.style.cursor = 'pointer';
+    
+        const decrementButton = document.createElement('button');
+        decrementButton.textContent = '-';
+        decrementButton.name = 'cantidad';
+        decrementButton.style.cursor = 'pointer';
+    
+        // Insertar los botones junto al input
+        cantidadInput.insertAdjacentElement('afterend', decrementButton);
+        cantidadInput.insertAdjacentElement('afterend', incrementButton);
+    
+        // Ocultar las flechas nativas del input de tipo number
+        cantidadInput.style.appearance = 'none';
+        cantidadInput.style.MozAppearance = 'textfield'; // Firefox
+    
         // Función para validar y limitar la cantidad
         const validarCantidad = () => {
             let maxStock = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
             let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
     
-            if (cantidadActual > maxStock) {
-                cantidadInput.value = maxStock;
-            } else if (cantidadActual < 1) {
-                cantidadInput.value = 0;
+            // Si docEntry está presente
+            if (docEntry) {
+                // Si el stock es 0, deshabilitar solo el botón de incrementar
+                if (maxStock === 0) {
+                    incrementButton.disabled = true;
+                    incrementButton.style.opacity = '0.5'; // Hacer el botón más transparente
+                } else {
+                    incrementButton.disabled = false;
+                    incrementButton.style.opacity = '1'; // Restaurar la opacidad
+                    // Permitir decrementar pero no incrementar más allá del stock actual
+                    if (cantidadActual > maxStock) {
+                        cantidadInput.value = maxStock;
+                    } else if (cantidadActual < 1) {
+                        cantidadInput.value = 0;
+                    }
+                }
+            } else {
+                // Si docEntry no está presente, mantener la lógica original
+                if (cantidadActual > maxStock) {
+                    cantidadInput.value = maxStock;
+                } else if (cantidadActual < 1) {
+                    cantidadInput.value = 0;
+                }
             }
         };
+    
+        // Eventos para los botones personalizados
+        incrementButton.addEventListener('click', () => {
+            let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
+            cantidadInput.value = cantidadActual + 1;
+            validarCantidad();
+        });
+    
+        decrementButton.addEventListener('click', () => {
+            let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
+            cantidadInput.value = Math.max(cantidadActual - 1, 0); // No permitir valores negativos
+            validarCantidad();
+        });
+    
+        // Validar la cantidad al cargar la página
+        validarCantidad();
     
         // Agregar evento para validar en tiempo real
         cantidadInput.addEventListener('input', validarCantidad);
