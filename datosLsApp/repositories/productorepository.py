@@ -42,6 +42,7 @@ class ProductoRepository:
             products (list): Lista de diccionarios con datos de productos y su stock.
         """
         rentabilidad_minima = 50
+        productos_procesados = []
         
         for product_data in products:
             producto_info = product_data.get("Producto", {}).get("Producto")
@@ -108,7 +109,9 @@ class ProductoRepository:
                     self.sync_stock(producto, product_data["Bodegas"])
                     self.update_stock_total(producto)
 
-        return True
+            productos_procesados.append(producto.codigo)
+
+        return True, productos_procesados
 
 
     def calcular_stock_y_costo_receta(self, item_code):
