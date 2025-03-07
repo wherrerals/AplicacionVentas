@@ -288,7 +288,16 @@ class Producto {
         let cantidadInput = row.querySelector('#calcular_cantidad');
         let stockBodegaElem = row.querySelector('[name="stock_bodega"]'); // Referencia al elemento de stock
         let skuElem = row.querySelector('[name="sku_producto"]'); // Referencia al nombre del producto
+        
+        // Agregar referencia para el stock total (cantidad inicial/base)
+        let stockTotalElem = row.querySelector('[name="stock_total"]') || { textContent: '0' }; // Por si no existe
     
+        // Almacenar la cantidad inicial cuando carga el documento
+        // Solo inicializar una vez cuando el script se ejecuta por primera vez
+        if (!cantidadInput.hasAttribute('data-initial-value') && docEntry) {
+            cantidadInput.setAttribute('data-initial-value', cantidadInput.value || '0');
+        }
+        
         // Verificar si el nombre del producto comienza con "SV"
         if (skuElem && skuElem.textContent.startsWith('SV')) {
             // Si empieza con "SV", no limitamos la cantidad
@@ -304,33 +313,44 @@ class Producto {
     
         // Función para validar y limitar la cantidad
         const validarCantidad = () => {
-            let maxStock = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
+            let stockBodega = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
+            let stockTotal = parseInt(stockTotalElem.textContent, 10) || 0;
             let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
+            let cantidadInicial = parseInt(cantidadInput.getAttribute('data-initial-value'), 10) || 0;
     
-            // Si docEntry está presente
+            // Si docEntry está presente (segundo caso)
             if (docEntry) {
-                // Si el stock es 0, deshabilitar solo el botón de incrementar
-                if (maxStock === 0) {
-                    incrementButton.disabled = true;
-                    incrementButton.style.opacity = '0.5'; // Hacer el botón más transparente
-                } else {
-                    incrementButton.disabled = false;
-                    incrementButton.style.opacity = '1'; // Restaurar la opacidad
-                    // Permitir decrementar pero no incrementar más allá del stock actual
-                    if (cantidadActual > maxStock) {
-                        cantidadInput.value = maxStock;
-                    } else if (cantidadActual < 1) {
-                        cantidadInput.value = 0;
-                    }
-                }
-            } else {
-                // Si docEntry no está presente, mantener la lógica original
-                if (cantidadActual > maxStock) {
-                    cantidadInput.value = maxStock;
-                } else if (cantidadActual < 1) {
+                // Para el caso con docEntry, preservamos la cantidad inicial
+                // y permitimos agregar hasta stockBodega
+                let cantidadMaxima = cantidadInicial + stockBodega;
+                
+                // No reiniciar la cantidad, solo limitarla si excede el máximo
+                if (cantidadActual > cantidadMaxima) {
+                    cantidadInput.value = cantidadMaxima;
+                } else if (cantidadActual < 0) {
                     cantidadInput.value = 0;
                 }
+                
+                // Habilitar/deshabilitar botón de incremento según límite
+                incrementButton.disabled = cantidadActual >= cantidadMaxima;
+                incrementButton.style.opacity = incrementButton.disabled ? '0.5' : '1';
+            } else {
+                // Caso sin docEntry (primer caso)
+                // La cantidad no puede exceder el stock de bodega
+                if (cantidadActual > stockBodega) {
+                    cantidadInput.value = stockBodega;
+                } else if (cantidadActual < 0) {
+                    cantidadInput.value = 0;
+                }
+                
+                // Habilitar/deshabilitar botón de incremento según stock
+                incrementButton.disabled = cantidadActual >= stockBodega;
+                incrementButton.style.opacity = incrementButton.disabled ? '0.5' : '1';
             }
+            
+            // Siempre deshabilitar el botón de decremento si la cantidad es 0
+            decrementButton.disabled = cantidadActual <= 0;
+            decrementButton.style.opacity = decrementButton.disabled ? '0.5' : '1';
         };
     
         // Eventos para los botones personalizados
@@ -412,16 +432,16 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
         });
     }    
 
-
-
-    // Validar que la cantidad no supere el stock
+/*     // Validar que la cantidad no supere el stock
     const cantidadInput = newRow.querySelector('#calcular_cantidad');
     cantidadInput.addEventListener('input', function () {
         const max = parseInt(cantidadInput.max, 10) || 0;
         if (parseInt(cantidadInput.value, 10) > max) {
             cantidadInput.value = max;
         }
-    });
+        console.log("Cantidad actualizada:", cantidad
+        );
+    }); */
 
     producto.actualizarStock(newRow);
 
@@ -429,6 +449,7 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     newRow.querySelector('.form-select').addEventListener('change', function () {
         producto.actualizarStock(newRow);
     });
+    
     const inputNumero = document.getElementById("inputNumero");
 
     // Llamar a la función agregarInteractividad si es necesario

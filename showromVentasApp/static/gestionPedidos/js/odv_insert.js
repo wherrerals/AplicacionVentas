@@ -123,85 +123,60 @@ document.addEventListener("DOMContentLoaded", function () {
           throw new Error("Error en la creación del documento");
         }
       })
+
       .then((data) => {
         console.log("Documento creado exitosamente:", data);
-        // Puedes hacer algo aquí como redirigir al usuario o mostrar un mensaje de éxito
-
+    
         const numeroCotizacion = document.getElementById("numero_orden");
         const esActualizacion =
-          numeroCotizacion && numeroCotizacion.getAttribute("data-docentry");
+            numeroCotizacion && numeroCotizacion.getAttribute("data-docentry");
         const vendedor = document.getElementById("vendedor_data");
-
+    
         // Determinar si es creación o actualización
         const titulo = esActualizacion
-          ? "Orden Venta actualizada"
-          : "Orden Venta creada";
+            ? "Orden Venta actualizada"
+            : "Orden Venta creada";
         const mensaje = esActualizacion
-          ? `La Orden Venta fue actualizada exitosamente. N°: ${data.docNum}`
-          : `La Orden Venta fue creada exitosamente. N°: ${data.docNum}`;
-
+            ? `La Orden Venta fue actualizada exitosamente. N°: ${data.docNum}`
+            : `La Orden Venta fue creada exitosamente. N°: ${data.docNum}`;
+    
         if (data.success) {
-          // Mostrar el número de documento y el mensaje de éxito en un popup bonito
-          Swal.fire({
-            icon: "success",
-            title: titulo,
-            text: mensaje,
-            confirmButtonText: "Aceptar",
-          });
-
-          if (numeroCotizacion) {
-            numeroCotizacion.textContent = `${data.docNum}`;
-            numeroCotizacion.setAttribute("data-docEntry", `${data.docEntry}`);
-          }
-
-          const vendedorData = data.salesPersonCode;
-
-          if (vendedorData != undefined) {
-            vendedor.textContent = `${data.salesPersonName}`;
-            vendedor.setAttribute("data-codeVen", `${data.salesPersonCode}`);
-          }
-
-          bloquearCampos();
-
-          // Refrescar el stock para cada producto en la cotización
-          const productosEnviados = JSON.parse(jsonData).productos; // Asegúrate de que jsonData contiene la lista de productos
-          productosEnviados.forEach((producto) => {
-            const row = document.querySelector(
-              `[sku_producto="${producto.productoCodigo}"]`
-            );
-            if (row) {
-              const productoInstancia = new Producto(
-                producto.productoCodigo,
-                producto.nombre,
-                producto.imagen,
-                producto.precioVenta,
-                producto.stockTotal,
-                producto.precioLista,
-                producto.precioDescuento,
-                producto.cantidad,
-                producto.sucursal,
-                producto.comentario,
-                producto.cantidadCoti,
-                producto.precioCoti,
-                producto.tipoentrega2,
-                producto.fechaEntrega
-              );
-              productoInstancia.actualizarStock(row);
-              console.log("Stock actualizado para:", producto.productoCodigo);
+            Swal.fire({
+                icon: "success",
+                title: titulo,
+                text: mensaje,
+                confirmButtonText: "Aceptar",
+            });
+    
+            if (numeroCotizacion) {
+                numeroCotizacion.textContent = `${data.docNum}`;
+                numeroCotizacion.setAttribute("data-docEntry", `${data.docEntry}`);
             }
-          });
-
+    
+            if (data.salesPersonCode != undefined) {
+                vendedor.textContent = `${data.salesPersonName}`;
+                vendedor.setAttribute("data-codeVen", `${data.salesPersonCode}`);
+            }
+        
+            // 🔥 Nueva funcionalidad: Actualizar stock después de la ODV
+            const productRows = document.querySelectorAll(".product-row"); 
+            productRows.forEach((row) => {
+                const productoCodigo = row.querySelector("[name='sku_producto']").innerText;
+                const producto = new Producto(productoCodigo); // Crear instancia de Producto
+                producto.actualizarStock(row); // Llamar la función para actualizar stock
+                console.log("Stock actualizado para:", productoCodigo);
+            });
+    
         } else {
-          // Mostrar el mensaje de error en un popup
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: `Error al crear la Orden Venta: ${data.error}`,
-            confirmButtonText: "Aceptar",
-          });
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: `Error al crear la Orden Venta: ${data.error}`,
+                confirmButtonText: "Aceptar",
+            });
         }
-      })
-
+    })
+    
       .catch((error) => {
         console.error("Hubo un error al crear el documento:", error);
       })
