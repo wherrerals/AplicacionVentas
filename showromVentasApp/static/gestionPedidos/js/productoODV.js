@@ -273,8 +273,8 @@ class Producto {
         decrementButton.style.cursor = 'pointer';
     
         // Insertar los botones junto al input
-        cantidadInput.insertAdjacentElement('afterend', decrementButton); // Primero el botón de decremento
         cantidadInput.insertAdjacentElement('afterend', incrementButton); // Luego el botón de incremento
+        cantidadInput.insertAdjacentElement('afterend', decrementButton); // Primero el botón de decremento
     
         // Retornar los botones para usarlos en otros métodos
         return { incrementButton, decrementButton };
