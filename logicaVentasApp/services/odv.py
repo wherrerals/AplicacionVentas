@@ -185,6 +185,7 @@ class OrdenVenta(Documento):
 
         return resultado
 
+    # En odv.py - Método actualizado para manejar múltiples líneas del mismo SKU/bodega
     def actualizarDocumento(self, docnum, docentry, data):
         try:
             stock_service = StockService()
@@ -193,8 +194,10 @@ class OrdenVenta(Documento):
             # Obtener líneas del documento antes de actualizar stock
             documents_lines = apiClient.detallesOrdenVentaLineas(docentry) 
 
-            # 
+            # Almacenar el stock inicial por SKU y bodega, sumando todas las cantidades
             stock_anterior = {}
+            # Almacenar cada línea individual para identificar líneas eliminadas específicas
+            lineas_anteriores = []
 
             # Capturar el stock inicial de cada producto antes de hacer cambios
             for item in documents_lines.get('value', []):  
@@ -203,40 +206,95 @@ class OrdenVenta(Documento):
                     sku = document_line.get('ItemCode')
                     bodega_id = document_line.get('WarehouseCode')
                     cantidad_anterior = document_line.get('Quantity')
+                    linea_id = document_line.get('LineNum')  # Identificador único de línea
 
-                    stock_anterior[(sku, bodega_id)] = cantidad_anterior
+                    # Guardar cada línea individual para comparación posterior
+                    lineas_anteriores.append({
+                        'sku': sku,
+                        'bodega_id': bodega_id,
+                        'cantidad': cantidad_anterior,
+                        'linea_id': linea_id
+                    })
 
-                    stock_actual = StockBodegasDB.objects.filter(
-                        idProducto__codigo=sku, idBodega=bodega_id
-                    ).values_list('stock', flat=True).first() or 0
+                    # Sumar cantidades para el mismo par (sku, bodega_id)
+                    key = (sku, bodega_id)
+                    if key in stock_anterior:
+                        stock_anterior[key] += cantidad_anterior
+                    else:
+                        stock_anterior[key] = cantidad_anterior
 
-                    stock_service.capture_initial_stock(sku, bodega_id, stock_actual)
+            # Obtener el stock actual de cada bodega
+            for (sku, bodega_id), cantidad_total in stock_anterior.items():
+                stock_actual = StockBodegasDB.objects.filter(
+                    idProducto__codigo=sku, idBodega=bodega_id
+                ).values_list('stock', flat=True).first() or 0
+                
+                # Capturar el stock actual en memoria para referencia
+                stock_service.capture_initial_stock(sku, bodega_id, stock_actual)
+                print(f"Stock inicial total para {sku} en bodega {bodega_id}: {cantidad_total} (DB: {stock_actual})")
 
-            # Comparar con las nuevas líneas y actualizar stock si es necesario
+            # Procesar las nuevas líneas y calcular diferencias
             stock_nuevo = {}
+            lineas_nuevas = []
 
-            for item in data['DocumentLines']:
+            # Primero, agrupar las nuevas líneas por (sku, bodega_id) y sumar cantidades
+            for idx, item in enumerate(data['DocumentLines']):
                 sku = item['ItemCode']
                 bodega_id = item['WarehouseCode']
                 nueva_cantidad = item['Quantity']
+                linea_id = item.get('LineNum', idx)  # Usar LineNum si existe, si no, usar el índice
 
-                stock_nuevo[(sku, bodega_id)] = nueva_cantidad
+                # Guardar cada línea individual
+                lineas_nuevas.append({
+                    'sku': sku,
+                    'bodega_id': bodega_id,
+                    'cantidad': nueva_cantidad,
+                    'linea_id': linea_id
+                })
 
-                cantidad_anterior = stock_anterior.get((sku, bodega_id), 0)
+                # Sumar cantidades para el mismo par (sku, bodega_id)
+                key = (sku, bodega_id)
+                if key in stock_nuevo:
+                    stock_nuevo[key] += nueva_cantidad
+                else:
+                    stock_nuevo[key] = nueva_cantidad
 
-                # Determinar si hay diferencia en la cantidad
-                diferencia = nueva_cantidad - cantidad_anterior
-
-                if diferencia != 0:  # Si hay un cambio en la cantidad
+            # Ahora procesar las diferencias por par (sku, bodega_id)
+            for (sku, bodega_id), nueva_cantidad_total in stock_nuevo.items():
+                # Obtener la cantidad anterior total (si existía)
+                cantidad_anterior_total = stock_anterior.get((sku, bodega_id), 0)
+                
+                # Calcular la diferencia neta entre totales
+                diferencia = nueva_cantidad_total - cantidad_anterior_total
+                
+                # Si es una línea nueva (no existía antes), verificamos si es negativa
+                if (sku, bodega_id) not in stock_anterior and nueva_cantidad_total > 0:
+                    # Es una línea nueva con valor positivo
                     stock_actual = stock_service.get_initial_stock(sku, bodega_id)
-                    stock_service.actualizar_stock(sku, bodega_id, diferencia, stock_actual)
+                    if stock_actual == 0:  # Si no teníamos registro previo, buscar en la DB
+                        stock_actual = StockBodegasDB.objects.filter(
+                            idProducto__codigo=sku, idBodega=bodega_id
+                        ).values_list('stock', flat=True).first() or 0
+                        stock_service.capture_initial_stock(sku, bodega_id, stock_actual)
+                    
+                    print(f"Nueva línea: SKU {sku} en bodega {bodega_id} con cantidad {nueva_cantidad_total}")
+                    # Restar del stock disponible (es una nueva venta)
+                    stock_service.actualizar_stock_por_diferencia(sku, bodega_id, -nueva_cantidad_total, stock_actual)
+                elif diferencia != 0:  # Si hay un cambio en la cantidad total
+                    stock_actual = stock_service.get_initial_stock(sku, bodega_id)
+                    print(f"Cambio en línea existente: SKU {sku} en bodega {bodega_id}, diferencia {diferencia}")
+                    # Si diferencia es positiva: se está pidiendo más, debemos restar al stock
+                    # Si diferencia es negativa: se está pidiendo menos, debemos sumar al stock
+                    stock_service.actualizar_stock_por_diferencia(sku, bodega_id, -diferencia, stock_actual)
 
-            # Verificar si alguna línea anterior desapareció en la nueva data
-            for (sku, bodega_id), cantidad_anterior in stock_anterior.items():
+            # Verificar líneas eliminadas: devolver el stock a las bodegas
+            for (sku, bodega_id), cantidad_anterior_total in stock_anterior.items():
                 if (sku, bodega_id) not in stock_nuevo:
-                    print(f"SKU {sku} en bodega {bodega_id} no está en la nueva lista, reponiendo stock.")
+                    print(f"SKU {sku} en bodega {bodega_id} fue eliminado, devolviendo {cantidad_anterior_total} unidades al stock.")
                     stock_actual = stock_service.get_initial_stock(sku, bodega_id)
-                    stock_service.actualizar_stock_diferencia(sku, bodega_id, -cantidad_anterior, stock_actual)
+                    
+                    # Como el producto fue eliminado, devolvemos la cantidad al stock (sumamos)
+                    stock_service.actualizar_stock_por_diferencia(sku, bodega_id, cantidad_anterior_total, stock_actual)
 
             # Preparar JSON y actualizar documento en SAP
             jsonData = self.prepararJsonODV(data)
@@ -254,7 +312,6 @@ class OrdenVenta(Documento):
         except Exception as e:
             logger.error(f"Error al actualizar la cotización: {str(e)}")
             return {'error': str(e)}
-
 
 
 
@@ -288,7 +345,7 @@ class OrdenVenta(Documento):
 
             # Realizar la solicitud a la API
             response = sl.crearODV(jsonData)
-
+            
             if isinstance(response, dict):
                 if 'DocEntry' in response:
                     doc_num = response.get('DocNum')
