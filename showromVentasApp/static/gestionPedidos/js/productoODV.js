@@ -263,13 +263,13 @@ class Producto {
         const incrementButton = document.createElement('button');
         incrementButton.textContent = '+';
         incrementButton.name = 'cantidad';
-        incrementButton.className = 'incrementar';
+        incrementButton.className = 'agg_cantidad';
         incrementButton.style.cursor = 'pointer';
     
         const decrementButton = document.createElement('button');
         decrementButton.textContent = '-';
         decrementButton.name = 'cantidad';
-        decrementButton.className = 'decrementar';
+        decrementButton.className = 'agg_cantidad';
         decrementButton.style.cursor = 'pointer';
     
         // Insertar los botones junto al input
@@ -338,14 +338,20 @@ class Producto {
             let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
             cantidadInput.value = cantidadActual + 1;
             validarCantidad();
+            
+            // 🔥 Disparar el evento 'input' manualmente para que se actualicen los cálculos
+            cantidadInput.dispatchEvent(new Event('input', { bubbles: true }));
         });
-    
+        
         decrementButton.addEventListener('click', () => {
             let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
             cantidadInput.value = Math.max(cantidadActual - 1, 0); // No permitir valores negativos
             validarCantidad();
+        
+            // 🔥 Disparar el evento 'input' manualmente para que se actualicen los cálculos
+            cantidadInput.dispatchEvent(new Event('input', { bubbles: true }));
         });
-    
+        
         // Validar la cantidad al cargar la página
         validarCantidad();
     
