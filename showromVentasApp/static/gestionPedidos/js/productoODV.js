@@ -67,6 +67,8 @@ class Producto {
             const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
             stockBodegaElem.textContent = `Stock: ${stockBodega}`;
             stockBodegaElem.setAttribute('data-stock', stockBodega);  // Almacenar el valor en un atributo data-stock
+
+            console.log("Stock actualizado:", stockBodega); // Verifica que el stock se esté actualizando
         }
     }
 
@@ -97,7 +99,7 @@ class Producto {
                         </select>
                     </div>
                     <div class="col" style="text-align: center;">
-                        <small style="font-size: 12px;" name="stock_bodega" data-stock="">Stock: </small>
+                        <small style="font-size: 12px;" name="stock_bodega" id="stock_bodega" data-stock="">Stock: </small>
                         <small name="stock_total" id="stock_total">Total: </small>
                     </div>
                     </div>
@@ -274,131 +276,250 @@ class Producto {
         decrementButton.style.cursor = 'pointer';
     
         // Insertar los botones junto al input
-        cantidadInput.insertAdjacentElement('afterend', incrementButton); // Luego el botón de incremento
-        cantidadInput.insertAdjacentElement('afterend', decrementButton); // Primero el botón de decremento
+        cantidadInput.insertAdjacentElement('afterend', incrementButton); 
+        cantidadInput.insertAdjacentElement('afterend', decrementButton);
     
         // Retornar los botones para usarlos en otros métodos
         return { incrementButton, decrementButton };
     }
 
+
+
+
+    
     limitarCantidad(row) {
         // Obtener el elemento #numero_orden
         const numeroOrdenElem = document.getElementById('numero_orden');
         const docEntry = numeroOrdenElem?.getAttribute('data-docentry');
     
-        let cantidadInput = row.querySelector('#calcular_cantidad');
-        let stockBodegaElem = row.querySelector('[name="stock_bodega"]'); // Referencia al elemento de stock
-        let stockBodegaElem2 = row.querySelector('[name="stock_bodega"]').getAttribute('data-stock'); // Referencia al elemento de stock
-        let skuElem = row.querySelector('[name="sku_producto"]'); // Referencia al nombre del producto
+        // Referencias a elementos DOM
+        const cantidadInput = row.querySelector('#calcular_cantidad');
+        const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
+        const stockTotalElem = row.querySelector('[name="stock_total"]') || { textContent: '0' };
+        const skuElem = row.querySelector('[name="sku_producto"]');
         
-        // Agregar referencia para el stock total (cantidad inicial/base)
-        let stockTotalElem = row.querySelector('[name="stock_total"]') || { textContent: '0' }; // Por si no existe
+        // Si el producto comienza con "SV", no limitamos la cantidad
+        if (skuElem && skuElem.textContent.startsWith('SV')) {
+            return;
+        }
     
+        // Banderas y estado inicial
+        let isUpdating = false;
+        let lastValidatedQuantity = parseInt(cantidadInput.value || '0', 10);
+        
         // Almacenar la cantidad inicial cuando carga el documento
-        // Solo inicializar una vez cuando el script se ejecuta por primera vez
         if (!cantidadInput.hasAttribute('data-initial-value') && docEntry) {
             cantidadInput.setAttribute('data-initial-value', cantidadInput.value || '0');
         }
         
-        // Verificar si el nombre del producto comienza con "SV"
-        if (skuElem && skuElem.textContent.startsWith('SV')) {
-            // Si empieza con "SV", no limitamos la cantidad
-            return;
-        }
-    
         // Ocultar las flechas nativas del input de tipo number
         cantidadInput.style.appearance = 'none';
         cantidadInput.style.MozAppearance = 'textfield'; // Firefox
-    
+        
         // Crear los botones de incremento y decremento
         const { incrementButton, decrementButton } = this.botonesCantidad(row);
     
-        // Función para validar y limitar la cantidad
-        const validarCantidad = () => {
-            let stockBodega = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
-            let stockBodega2 = parseInt(stockBodegaElem2, 10) || 0;
-            let stockTotal = parseInt(stockTotalElem.textContent, 10) || 0;
-            let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
-            let cantidadInicial = parseInt(cantidadInput.getAttribute('data-initial-value'), 10) || 0;
-    
-            // Si docEntry está presente (segundo caso)
+        // Función unificada para obtener valores actuales
+        const obtenerValores = () => {
+            return {
+                stockBodega2: parseInt(stockBodegaElem.getAttribute('data-stock') || '0', 10),
+                cantidadActual: parseInt(cantidadInput.value || '0', 10),
+                cantidadInicial: parseInt(cantidadInput.getAttribute('data-initial-value') || '0', 10),
+                stockBodegaTexto: parseInt(stockBodegaElem.textContent.replace('Stock: ', '') || '0', 10),
+                stockTotalTexto: parseInt(stockTotalElem.textContent.replace('Total: ', '') || '0', 10)
+            };
+        };
+        
+        // Función para calcular la cantidad máxima permitida
+        const calcularCantidadMaxima = (valores) => {
             if (docEntry) {
-                // Para el caso con docEntry, preservamos la cantidad inicial
-                // y permitimos agregar hasta stockBodega
-                let cantidadMaxima = cantidadInicial + stockBodega2;
-                
-                // No reiniciar la cantidad, solo limitarla si excede el máximo
-                if (cantidadActual > cantidadMaxima) {
-                    cantidadInput.value = cantidadMaxima;
-                } else if (cantidadActual < 0) {
-                    cantidadInput.value = 0;
-                }
-                
-                // Habilitar/deshabilitar botón de incremento según límite
-                incrementButton.disabled = cantidadActual >= cantidadMaxima;
-                incrementButton.style.opacity = incrementButton.disabled ? '0.5' : '1';
+                return valores.cantidadInicial + valores.stockBodega2;
             } else {
-                // Caso sin docEntry (primer caso)
-                // La cantidad no puede exceder el stock de bodega
-                if (cantidadActual > stockBodega2) {
-                    cantidadInput.value = stockBodega2;
-                } else if (cantidadActual < 0) {
-                    cantidadInput.value = 0;
+                return valores.stockBodega2;
+            }
+        };
+        
+        // Función centralizada para cambiar la cantidad
+        const cambiarCantidad = (nuevaCantidad) => {
+            if (isUpdating) return;
+            isUpdating = true;
+            
+            try {
+                const valores = obtenerValores();
+                const cantidadAnterior = lastValidatedQuantity; // Usar el último valor validado
+                
+                // Determinar la cantidad máxima permitida
+                const cantidadMaxima = calcularCantidadMaxima(valores);
+                
+                // Validar y aplicar la nueva cantidad (asegurarse de que sea un número)
+                let cantidadNumerica = parseInt(nuevaCantidad, 10);
+                if (isNaN(cantidadNumerica)) cantidadNumerica = 0;
+                
+                const cantidadValidada = Math.max(0, Math.min(cantidadNumerica, cantidadMaxima));
+                
+                // Forzar el valor validado en el input (garantiza que siempre está dentro de límites)
+                cantidadInput.value = cantidadValidada;
+                
+                // Calcular la diferencia entre la cantidad anterior y la nueva
+                const diferencia = cantidadValidada - cantidadAnterior;
+                
+                // Solo continuar si hay un cambio real
+                if (diferencia !== 0) {
+                    // Actualizar stockBodega
+                    let stockBodegaActualizado;
+                    if (docEntry) {
+                        stockBodegaActualizado = valores.stockBodega2 - (cantidadValidada - valores.cantidadInicial);
+                    } else {
+                        stockBodegaActualizado = valores.stockBodega2 - cantidadValidada;
+                    }
+                    
+                    // Desconectar observers temporalmente
+                    const stockObserver = stockBodegaElem._observer;
+                    if (stockObserver) stockObserver.disconnect();
+                    
+                    // Actualizar stockBodega
+                    stockBodegaElem.textContent = `Stock: ${Math.max(0, stockBodegaActualizado)}`;
+                    
+                    // Actualizar stockTotal
+                    if (stockTotalElem && stockTotalElem.textContent) {
+                        // Calcular stock total basado en la diferencia exacta
+                        const stockTotalActualizado = valores.stockTotalTexto - diferencia;
+                        stockTotalElem.textContent = `Total: ${Math.max(0, stockTotalActualizado)}`;
+                    }
+                    
+                    // Reconectar observers
+                    if (stockObserver) {
+                        stockObserver.observe(stockBodegaElem, { 
+                            childList: true, 
+                            subtree: true, 
+                            attributes: true, 
+                            attributeFilter: ['data-stock'] 
+                        });
+                    }
+                    
+                    // Disparar evento de input para notificar a otros componentes
+                    cantidadInput.dispatchEvent(new Event('input', { bubbles: true }));
                 }
                 
-                // Habilitar/deshabilitar botón de incremento según stock
-                incrementButton.disabled = cantidadActual >= stockBodega2;
+                // Registrar la nueva cantidad validada incluso si no hubo cambio
+                lastValidatedQuantity = cantidadValidada;
+                
+                // Habilitar/deshabilitar botones según límites
+                incrementButton.disabled = cantidadValidada >= cantidadMaxima;
                 incrementButton.style.opacity = incrementButton.disabled ? '0.5' : '1';
+                
+                decrementButton.disabled = cantidadValidada <= 0;
+                decrementButton.style.opacity = decrementButton.disabled ? '0.5' : '1';
+            } finally {
+                isUpdating = false;
+            }
+        };
+    
+        // Implementar restricciones directas en el input
+        cantidadInput.addEventListener('keydown', (event) => {
+            // Permitir: backspace, delete, tab, escape, enter, puntos, comas y números
+            if (
+                event.key === 'Backspace' || 
+                event.key === 'Delete' || 
+                event.key === 'Tab' || 
+                event.key === 'Escape' || 
+                event.key === 'Enter' || 
+                event.key === '.' || 
+                event.key === ',' || 
+                (event.key >= '0' && event.key <= '9')
+            ) {
+                // Permitir estas teclas
+                return;
             }
             
-            // Siempre deshabilitar el botón de decremento si la cantidad es 0
-            decrementButton.disabled = cantidadActual <= 0;
-            decrementButton.style.opacity = decrementButton.disabled ? '0.5' : '1';
-        };
-
-
+            // Permitir: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X, flechas
+            if (
+                (event.ctrlKey && (event.key === 'a' || event.key === 'c' || event.key === 'v' || event.key === 'x')) || 
+                event.key === 'ArrowLeft' || 
+                event.key === 'ArrowRight'
+            ) {
+                // Permitir estas combinaciones
+                return;
+            }
+            
+            // Bloquear otras teclas
+            event.preventDefault();
+        });
+    
+        // Manejador para incremento con lógica explícita
         incrementButton.addEventListener('click', () => {
-            let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
-            let stockBodega = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
-            let stockTotal = parseInt(stockTotalElem.textContent.replace('Total: ', ''), 10) || 0;
-        
-            if (cantidadActual < stockBodega) {
-                cantidadInput.value = cantidadActual + 1;
-                stockBodegaElem.textContent = `Stock: ${stockBodega - 1}`;
-                stockTotalElem.textContent = `Total: ${stockTotal - 1}`;
-            }
-            validarCantidad();
-            cantidadInput.dispatchEvent(new Event('input', { bubbles: true }));
-
+            const valores = obtenerValores();
+            // Incrementar en 1 de forma explícita
+            cambiarCantidad(valores.cantidadActual + 1);
         });
         
+        // Manejador para decremento con lógica explícita
         decrementButton.addEventListener('click', () => {
-            let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
-            let stockBodega = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
-            let stockTotal = parseInt(stockTotalElem.textContent.replace('Total: ', ''), 10) || 0;
-        
-            if (cantidadActual > 0) {
-                cantidadInput.value = cantidadActual - 1;
-                stockBodegaElem.textContent = `Stock: ${stockBodega + 1}`;
-                stockTotalElem.textContent = `Total: ${stockTotal + 1}`;
-            }
-            validarCantidad();
-            cantidadInput.dispatchEvent(new Event('input', { bubbles: true }));
+            const valores = obtenerValores();
+            // Decrementar en 1 de forma explícita
+            cambiarCantidad(valores.cantidadActual - 1);
         });
         
-        // Validar la cantidad al cargar la página
-        validarCantidad();
-    
-        // Agregar evento para validar en tiempo real
-        cantidadInput.addEventListener('input', validarCantidad);
-        cantidadInput.addEventListener('change', validarCantidad);
-    
-        // Si el stock cambia dinámicamente (llamado después de actualizar stock)
-        const stockBodegaObserver = new MutationObserver(validarCantidad);
-        stockBodegaObserver.observe(stockBodegaElem, { childList: true, subtree: true });
+        // Validar el input después de cambios directos
+        cantidadInput.addEventListener('input', () => {
+            if (!isUpdating) {
+                const valores = obtenerValores();
+                
+                // Forzar validación inmediata para entrada directa
+                cambiarCantidad(valores.cantidadActual);
+            }
+        });
+        
+        // Validación adicional al perder el foco
+        cantidadInput.addEventListener('blur', () => {
+            if (!isUpdating) {
+                const valores = obtenerValores();
+                const cantidadMaxima = calcularCantidadMaxima(valores);
+                
+                // Asegurar que el valor esté dentro de los límites al perder el foco
+                if (valores.cantidadActual > cantidadMaxima) {
+                    cambiarCantidad(cantidadMaxima);
+                } else if (valores.cantidadActual < 0) {
+                    cambiarCantidad(0);
+                }
+            }
+        });
+        
+        // Manejar cambios en el stock de la bodega
+        const manejarCambioBodega = () => {
+            if (!isUpdating) {
+                const valores = obtenerValores();
+                const cantidadMaxima = calcularCantidadMaxima(valores);
+                
+                // Si la cantidad actual excede el nuevo máximo, ajustarla
+                if (valores.cantidadActual > cantidadMaxima) {
+                    cambiarCantidad(cantidadMaxima);
+                } else {
+                    // De lo contrario, actualizar visualización
+                    cambiarCantidad(valores.cantidadActual);
+                }
+            }
+        };
+        
+        // Observador para cambios en el stock
+        const stockBodegaObserver = new MutationObserver(manejarCambioBodega);
+        stockBodegaElem._observer = stockBodegaObserver;
+        stockBodegaObserver.observe(stockBodegaElem, { 
+            childList: true, 
+            subtree: true, 
+            attributes: true, 
+            attributeFilter: ['data-stock'] 
+        });
+        
+        // Inicializar estado
+        lastValidatedQuantity = parseInt(cantidadInput.value || '0', 10);
+        cambiarCantidad(lastValidatedQuantity);
     }
 
+
 }
+
+
 
 
 function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, tipoEntrega2, fechaEntrega) {
@@ -457,11 +578,13 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
         );
     }); */
 
+    
     producto.actualizarStock(newRow);
 
     // Evento para actualizar el stock al cambiar de bodega
     newRow.querySelector('.form-select').addEventListener('change', function () {
         producto.actualizarStock(newRow);
+        
     });
     
     const inputNumero = document.getElementById("inputNumero");
