@@ -20,19 +20,14 @@ class ProductoRepository:
         Returns:
             tuple: Margen bruto y descuento máximo.
         """
-        if precio_venta <= 0:
-            print("Advertencia: El precio de venta debe ser mayor a 0.")
+
+        if precio_venta <= 0 or costo <= 0:
             return 0, 0
-        
-        if costo <= 0:
-            print("Advertencia: El costo debe ser mayor a 0.")
-            return 0, 0
-        
-        precio_sin_iva = precio_venta / 1.19  # Calcular el precio sin IVA
-        margen_bruto = (precio_sin_iva - costo) / precio_sin_iva
-        descuento_maximo = margen_bruto - (rentabilidad_minima / 100)
-        
-        return margen_bruto, max(descuento_maximo, 0)  # Asegurar que no sea negativo
+        else:
+            precio_sin_iva = precio_venta / 1.19  # Calcular el precio sin IVA
+            margen_bruto = (precio_sin_iva - costo) / precio_sin_iva
+            descuento_maximo = margen_bruto - (rentabilidad_minima / 100)
+            return margen_bruto, max(descuento_maximo, 0)  # Asegurar que no sea negativo
 
     def sync_products_and_stock(self, products):
         """
