@@ -1116,18 +1116,21 @@ def generar_cotizacion_pdf(request, cotizacion_id):
                 direcciones = DireccionRepository.obtenerDireccionesID(id_direrccion)
                 address = f"{direcciones.calleNumero}, {direcciones.comuna.nombre}"
 
-            
-            contactos = ContactoRepository.obtenerContacto(data.get('contacto'))
+            if data.get('contacto') == 'No hay contactos disponibles':
+                contactos = ''
+            else:
+                contactos = ContactoRepository.obtenerContacto(data.get('contacto'))
+                if contactos.nombre != "1":
+                    contactos = contactos.nombreCompleto
+                else:
+                    contactos = datossocio.nombre
+
             sucursal = data.get('sucursal')
             datossocio = snrepo.obtenerPorCodigoSN(codigoSn)
 
             detalle_sucursal = SucursalDB.objects.filter(codigo=sucursal).first()
 
-            
-            if contactos.nombre != "1":
-                contactos = contactos.nombreCompleto
-            else:
-                contactos = datossocio.nombre
+
 
             if datossocio.grupoSN.codigo == "105":
                 name_user = datossocio.nombre
