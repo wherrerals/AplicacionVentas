@@ -66,6 +66,7 @@ class Producto {
             // Mostrar el stock de la bodega seleccionada
             const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
             stockBodegaElem.textContent = `Stock: ${stockBodega}`;
+            stockBodegaElem.setAttribute('data-stock', stockBodega);  // Almacenar el valor en un atributo data-stock
         }
     }
 
@@ -96,7 +97,7 @@ class Producto {
                         </select>
                     </div>
                     <div class="col" style="text-align: center;">
-                        <small style="font-size: 12px;" name="stock_bodega">Stock: </small>
+                        <small style="font-size: 12px;" name="stock_bodega" data-stock="">Stock: </small>
                         <small name="stock_total" id="stock_total">Total: </small>
                     </div>
                     </div>
@@ -287,6 +288,7 @@ class Producto {
     
         let cantidadInput = row.querySelector('#calcular_cantidad');
         let stockBodegaElem = row.querySelector('[name="stock_bodega"]'); // Referencia al elemento de stock
+        let stockBodegaElem2 = row.querySelector('[name="stock_bodega"]').getAttribute('data-stock'); // Referencia al elemento de stock
         let skuElem = row.querySelector('[name="sku_producto"]'); // Referencia al nombre del producto
         
         // Agregar referencia para el stock total (cantidad inicial/base)
@@ -314,6 +316,7 @@ class Producto {
         // Función para validar y limitar la cantidad
         const validarCantidad = () => {
             let stockBodega = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
+            let stockBodega2 = parseInt(stockBodegaElem2, 10) || 0;
             let stockTotal = parseInt(stockTotalElem.textContent, 10) || 0;
             let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
             let cantidadInicial = parseInt(cantidadInput.getAttribute('data-initial-value'), 10) || 0;
@@ -322,7 +325,7 @@ class Producto {
             if (docEntry) {
                 // Para el caso con docEntry, preservamos la cantidad inicial
                 // y permitimos agregar hasta stockBodega
-                let cantidadMaxima = cantidadInicial + stockBodega;
+                let cantidadMaxima = cantidadInicial + stockBodega2;
                 
                 // No reiniciar la cantidad, solo limitarla si excede el máximo
                 if (cantidadActual > cantidadMaxima) {
@@ -337,14 +340,14 @@ class Producto {
             } else {
                 // Caso sin docEntry (primer caso)
                 // La cantidad no puede exceder el stock de bodega
-                if (cantidadActual > stockBodega) {
-                    cantidadInput.value = stockBodega;
+                if (cantidadActual > stockBodega2) {
+                    cantidadInput.value = stockBodega2;
                 } else if (cantidadActual < 0) {
                     cantidadInput.value = 0;
                 }
                 
                 // Habilitar/deshabilitar botón de incremento según stock
-                incrementButton.disabled = cantidadActual >= stockBodega;
+                incrementButton.disabled = cantidadActual >= stockBodega2;
                 incrementButton.style.opacity = incrementButton.disabled ? '0.5' : '1';
             }
             
@@ -352,23 +355,34 @@ class Producto {
             decrementButton.disabled = cantidadActual <= 0;
             decrementButton.style.opacity = decrementButton.disabled ? '0.5' : '1';
         };
-    
-        // Eventos para los botones personalizados
+
+
         incrementButton.addEventListener('click', () => {
             let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
-            cantidadInput.value = cantidadActual + 1;
+            let stockBodega = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
+            let stockTotal = parseInt(stockTotalElem.textContent.replace('Total: ', ''), 10) || 0;
+        
+            if (cantidadActual < stockBodega) {
+                cantidadInput.value = cantidadActual + 1;
+                stockBodegaElem.textContent = `Stock: ${stockBodega - 1}`;
+                stockTotalElem.textContent = `Total: ${stockTotal - 1}`;
+            }
             validarCantidad();
-            
-            // 🔥 Disparar el evento 'input' manualmente para que se actualicen los cálculos
             cantidadInput.dispatchEvent(new Event('input', { bubbles: true }));
+
         });
         
         decrementButton.addEventListener('click', () => {
             let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
-            cantidadInput.value = Math.max(cantidadActual - 1, 0); // No permitir valores negativos
-            validarCantidad();
+            let stockBodega = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
+            let stockTotal = parseInt(stockTotalElem.textContent.replace('Total: ', ''), 10) || 0;
         
-            // 🔥 Disparar el evento 'input' manualmente para que se actualicen los cálculos
+            if (cantidadActual > 0) {
+                cantidadInput.value = cantidadActual - 1;
+                stockBodegaElem.textContent = `Stock: ${stockBodega + 1}`;
+                stockTotalElem.textContent = `Total: ${stockTotal + 1}`;
+            }
+            validarCantidad();
             cantidadInput.dispatchEvent(new Event('input', { bubbles: true }));
         });
         
