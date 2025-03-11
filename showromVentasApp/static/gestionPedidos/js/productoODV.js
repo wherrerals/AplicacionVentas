@@ -72,6 +72,9 @@ class Producto {
         }
     }
 
+
+
+
     crearFila(contprod) {
         let newRow = document.createElement('tbody');
         newRow.className = 'product-row';
@@ -294,7 +297,6 @@ class Producto {
         const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
         const stockTotalElem = row.querySelector('[name="stock_total"]') || { textContent: '0' };
         const skuElem = row.querySelector('[name="sku_producto"]');
-
         
         // Si el producto comienza con "SV", no limitamos la cantidad
         if (skuElem && skuElem.textContent.startsWith('SV')) {
@@ -366,7 +368,7 @@ class Producto {
                 cantidadInput.value = cantidadValidada;
                 
                 // Calcular la diferencia entre la cantidad anterior y la nueva
-                let diferencia = cantidadValidada - cantidadAnterior;
+                const diferencia = cantidadValidada - cantidadAnterior;
                 
                 // Solo continuar si hay un cambio real
                 if (diferencia !== 0) {
@@ -388,14 +390,7 @@ class Producto {
                     // Actualizar stockTotal
                     if (stockTotalElem && stockTotalElem.textContent) {
                         // Calcular stock total basado en la diferencia exacta
-                        
-                        
-                        if (diferencia < 0){
-                            diferencia = 0;
-                        }
-
                         const stockTotalActualizado = valores.stockTotalTexto - diferencia;
-                        console.log("Stock total actualizado:", stockTotalActualizado);
                         stockTotalElem.textContent = `Total: ${Math.max(0, stockTotalActualizado)}`;
                     }
                     
@@ -532,7 +527,16 @@ class Producto {
 }
 
 
+let lineasDocumento = {}; // Objeto para almacenar las líneas por producto
+
+
 function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, tipoEntrega2, fechaEntrega) {
+    
+    
+    lineasDocumento[productoCodigo] = {
+        bodega: sucursal,
+        cantidad: cantidad
+    };    
 
     console.log("Cantidad recibida en agregarProducto:", cantidad);
 
@@ -596,7 +600,8 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
         // Actualizar stock de la nueva bodega
         producto.actualizarStock(newRow);
     
-        setTimeout(() => { // Pequeño delay para asegurar que actualizarStock termine
+        setTimeout(() => { // Pequeño delay para asegurar que `actualizarStock` termine
+            // Obtener el stock disponible de la NUEVA bodega seleccionada
             let stockDisponible = parseInt(stockBodegaElem.getAttribute('data-stock') || '0', 10);
             if (isNaN(stockDisponible) || stockDisponible < 0) stockDisponible = 0;
     
@@ -604,7 +609,6 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
             cantidadInput.max = stockDisponible;
     
             // Verificar el stock y ajustar la cantidad
-            let cantidadAjustada = cantidadActual; // Guardamos la cantidad original antes de ajustar
             if (stockDisponible > 0) {
                 cantidadInput.value = 1;
             } else {
@@ -612,27 +616,20 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
                 mostrarAlerta('No contamos con stock disponible para esta bodega.');
             }
     
+            // Calcular la diferencia de cantidad y corregir el stock total
             let nuevaCantidad = parseInt(cantidadInput.value || '0', 10);
-            let diferenciaCantidad = nuevaCantidad - cantidadAjustada;
+            let diferenciaCantidad = nuevaCantidad - cantidadActual;
     
-            // **Evitar que el ajuste a 1 o 0 altere el total**
-            if ((cantidadAjustada === 0 && nuevaCantidad === 1) || (cantidadAjustada === 1 && nuevaCantidad === 0)) {
-                diferenciaCantidad = 0;
-            }
-
-            console.log("Diferencia de cantidad:", diferenciaCantidad);
-            console.log("Cantidad ajustada:", nuevaCantidad);
-    
+            // Actualizar el stock de la bodega actual basado en el stock disponible
             let stockBodegaActualizado = stockDisponible - nuevaCantidad;
             stockBodegaElem.textContent = `Stock: ${stockBodegaActualizado}`;
             console.log("Nuevo stock de bodega:", stockBodegaActualizado);
     
-            // Ajustar el stock total sin sumar cambios no deseados
+            // Ajustar el total asegurando que no quede negativo
             let nuevoStockTotal = Math.max(0, stockTotalActual - diferenciaCantidad);
             stockTotalElem.textContent = `Total: ${nuevoStockTotal}`;
         }, 50);
     });
-    
     
     // Función para mostrar la alerta con Bootstrap
     function mostrarAlerta(mensaje) {
@@ -658,3 +655,30 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     agregarInteractividad(newRow, productoCodigo);
 
 }
+
+document.addEventListener('productoEliminado', function(event) {
+    const { codigoProducto } = event.detail;
+
+    if (lineasDocumento[codigoProducto]) {
+        let cantidadEliminada = lineasDocumento[codigoProducto].cantidad;
+        
+        // Buscar la fila eliminada
+        let filaEliminada = document.querySelector(`.product-row [name="sku_producto"]:contains(${codigoProducto})`)?.closest('.product-row');
+        if (!filaEliminada) return; // Si no encuentra la fila, salir
+
+        // Obtener los elementos específicos de la fila eliminada
+        let stockBodegaElem = filaEliminada.querySelector('[name="stock_bodega"]');
+        let stockTotalElem = filaEliminada.querySelector('[name="stock_total"]');
+
+        let stockBodegaActual = parseInt(stockBodegaElem.getAttribute('data-stock') || '0', 10);
+        let stockTotalActual = parseInt(stockTotalElem.textContent.replace('Total: ', '') || '0', 10);
+
+        // Restaurar stock sumando la cantidad eliminada
+        stockBodegaElem.textContent = `Stock: ${stockBodegaActual + cantidadEliminada}`;
+        stockBodegaElem.setAttribute('data-stock', stockBodegaActual + cantidadEliminada);
+        stockTotalElem.textContent = `Total: ${stockTotalActual + cantidadEliminada}`;
+
+        // Eliminar el producto de la memoria
+        delete lineasDocumento[codigoProducto];
+    }
+});
