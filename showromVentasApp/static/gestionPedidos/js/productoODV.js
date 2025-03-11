@@ -134,7 +134,7 @@ class Producto {
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${this.precioSinDescuento}</td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <div>
-                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="$${this.cantidad > 0 ? this.cantidad : 1}">
+                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad !== undefined ? this.cantidad : 0}">
                     </div>
                     <div class="valorCotizacion" data-itemcode=${this.productoCodigo} hidden>
                         <b><small style="color: rgb(255,0,0);" id="valorCotizacion">Cotiz: ${this.cantidadCoti}</small></b>
