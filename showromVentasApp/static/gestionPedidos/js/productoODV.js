@@ -53,6 +53,7 @@ class Producto {
             // Mostrar el stock total solo si se solicita
             if (actualizarStockTotal) {
                 const stockTotalElem = row.querySelector('[name="stock_total"]');
+                console.log("Stock total actualizado en actualizar Stock:", stockTotal);
                 stockTotalElem.textContent = `Total: ${stockTotal}`;
             }
 
@@ -372,7 +373,7 @@ class Producto {
                 cantidadInput.value = cantidadValidada;
                 
                 // Calcular la diferencia entre la cantidad anterior y la nueva
-                const diferencia = cantidadValidada - cantidadAnterior;
+                let diferencia = cantidadValidada - cantidadAnterior;
                 
                 // Solo continuar si hay un cambio real
                 if (diferencia !== 0) {
@@ -393,8 +394,15 @@ class Producto {
                     
                     // Actualizar stockTotal
                     if (stockTotalElem && stockTotalElem.textContent) {
+                        console.log("diferencia de entrada:", diferencia);
+                        if(diferencia < 0){
+                            diferencia = 0;
+                        }
+                        console.log("diferencia de salida:", diferencia);
+                        
                         // Calcular stock total basado en la diferencia exacta
                         const stockTotalActualizado = valores.stockTotalTexto - diferencia;
+                        
                         stockTotalElem.textContent = `Total: ${Math.max(0, stockTotalActualizado)}`;
                     }
                     
