@@ -395,10 +395,6 @@ class Producto {
                     // Actualizar stockTotal
                     if (stockTotalElem && stockTotalElem.textContent) {
                         console.log("diferencia de entrada:", diferencia);
-                        if(diferencia < 0){
-                            diferencia = 0;
-                        }
-                        console.log("diferencia de salida:", diferencia);
                         
                         // Calcular stock total basado en la diferencia exacta
                         const stockTotalActualizado = valores.stockTotalTexto - diferencia;
@@ -641,6 +637,7 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
             // Ajustar el total asegurando que no quede negativo
             let nuevoStockTotal = Math.max(0, stockTotalActual - diferenciaCantidad);
             stockTotalElem.textContent = `Total: ${nuevoStockTotal}`;
+            console.log("Nuevo stock total:", nuevoStockTotal);
         }, 50);
     });
     
