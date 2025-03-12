@@ -32,7 +32,8 @@ class Producto {
         }
     }
 
-    async actualizarStock(row) {
+    // Modifica el método actualizarStock para que no actualice stockTotal
+    async actualizarStock(row, actualizarStockTotal = true) {
         const stockData = await this.obtenerStock(this.productoCodigo);
 
         if (stockData) {
@@ -49,9 +50,11 @@ class Producto {
             // Calcular el stock total sumando solo las bodegas válidas
             const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock, 0);
 
-            // Mostrar el stock total
-            const stockTotalElem = row.querySelector('[name="stock_total"]');
-            stockTotalElem.textContent = `Total: ${stockTotal}`;
+            // Mostrar el stock total solo si se solicita
+            if (actualizarStockTotal) {
+                const stockTotalElem = row.querySelector('[name="stock_total"]');
+                stockTotalElem.textContent = `Total: ${stockTotal}`;
+            }
 
             // Obtener el value de la bodega seleccionada
             const selectBodega = row.querySelector('.form-select');
@@ -68,12 +71,13 @@ class Producto {
             stockBodegaElem.textContent = `Stock: ${stockBodega}`;
             stockBodegaElem.setAttribute('data-stock', stockBodega);  // Almacenar el valor en un atributo data-stock
 
-            console.log("Stock actualizado:", stockBodega); // Verifica que el stock se esté actualizando
+            console.log("Stock actualizado:", stockBodega);
+            
+            // Retornar el stock total calculado para uso externo
+            return stockTotal;
         }
+        return 0;
     }
-
-
-
 
     crearFila(contprod) {
         let newRow = document.createElement('tbody');
@@ -591,40 +595,41 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     newRow.querySelector('.form-select').addEventListener('change', function () {
         let stockBodegaElem = newRow.querySelector('[name="stock_bodega"]');
         let cantidadInput = newRow.querySelector('#calcular_cantidad');
-        let stockTotalElem = document.querySelector('[name="stock_total"]');
-    
+        let stockTotalElem = newRow.querySelector('[name="stock_total"]');
+        
         // Obtener valores antes del cambio
         let stockTotalActual = parseInt(stockTotalElem.textContent.replace('Total: ', '') || '0', 10);
         let cantidadActual = parseInt(cantidadInput.value || '0', 10);
-    
-        // Actualizar stock de la nueva bodega
-        producto.actualizarStock(newRow);
-    
+        
+        // Actualizar stock de la nueva bodega sin modificar el stock total
+        producto.actualizarStock(newRow, false); // Pasar false para evitar la actualización del total
+        
         setTimeout(() => { // Pequeño delay para asegurar que `actualizarStock` termine
             // Obtener el stock disponible de la NUEVA bodega seleccionada
             let stockDisponible = parseInt(stockBodegaElem.getAttribute('data-stock') || '0', 10);
             if (isNaN(stockDisponible) || stockDisponible < 0) stockDisponible = 0;
-    
+            
             // Establecer el nuevo máximo permitido
             cantidadInput.max = stockDisponible;
-    
+            
             // Verificar el stock y ajustar la cantidad
+            let nuevaCantidad = 0;
             if (stockDisponible > 0) {
-                cantidadInput.value = 1;
+                nuevaCantidad = 1;
+                cantidadInput.value = nuevaCantidad;
             } else {
                 cantidadInput.value = 0;
                 mostrarAlerta('No contamos con stock disponible para esta bodega.');
             }
-    
+            
             // Calcular la diferencia de cantidad y corregir el stock total
-            let nuevaCantidad = parseInt(cantidadInput.value || '0', 10);
             let diferenciaCantidad = nuevaCantidad - cantidadActual;
-    
+            
             // Actualizar el stock de la bodega actual basado en el stock disponible
             let stockBodegaActualizado = stockDisponible - nuevaCantidad;
             stockBodegaElem.textContent = `Stock: ${stockBodegaActualizado}`;
             console.log("Nuevo stock de bodega:", stockBodegaActualizado);
-    
+            
             // Ajustar el total asegurando que no quede negativo
             let nuevoStockTotal = Math.max(0, stockTotalActual - diferenciaCantidad);
             stockTotalElem.textContent = `Total: ${nuevoStockTotal}`;
