@@ -50,7 +50,7 @@ $(document).ready(function () {
                                       cantidad = 1;
                                   } 
 
-                                  if (tipoDoucmento == 'Cotización') {
+                                  if (tipoDoucmento == 'Cotización' || tipoDoucmento == 'Solicitud Devolución' || tipoDoucmento == 'Orden de Venta') {
                                     cantidad = 1;
                                     
                                     console.log('Cotización:', cantidad);

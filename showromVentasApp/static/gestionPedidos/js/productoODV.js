@@ -309,7 +309,9 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     let contprod = document.querySelectorAll('#productos tbody').length + 1; // Contador de productos
 
     // Crear instancia del producto
-    const producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, tipoEntrega2, fechaEntrega);
+
+    const cantidadFinal = cantidad !== undefined ? cantidad : 1;
+    const producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, tipoEntrega2, fechaEntrega);
     const newRow = producto.crearFila(contprod); // Crear la fila del producto
 
     document.getElementById('productos').appendChild(newRow); // Agregar la fila al tbody
