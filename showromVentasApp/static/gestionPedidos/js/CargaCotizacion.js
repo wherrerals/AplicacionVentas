@@ -144,8 +144,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
           // Iteración sobre `DocumentLines` para añadir cada producto
           const documentLines = data.DocumentLines;
+          console.log("Líneas de documento:", documentLines);
+          
+          documentLines.sort((a, b) => a.LineNum - b.LineNum);
+
           documentLines.forEach((line) => {
             console.log("Producto: ", line)
+            const linea_documento = line.LineNum;
             const productoCodigo = line.ItemCode;
             const nombre = line.ItemDescription;
             const imagen = line.imagen;
@@ -157,9 +162,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const sucursal = line.WarehouseCode;
             const comentario = line.FreeText;
 
+
             console.log("comentario: ", comentario);
 
             console.log("Agregando producto con datos:", {
+              linea_documento,
               productoCodigo,
               nombre,
               imagen,
@@ -171,7 +178,7 @@ document.addEventListener("DOMContentLoaded", function () {
               comentario
             });
 
-            agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado);
+            agregarProducto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado);
           });
         }
 

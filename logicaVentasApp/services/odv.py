@@ -2,12 +2,15 @@ import json
 from django.http import JsonResponse
 from requests import request
 from adapters.sl_client import APIClient
+from datosLsApp.models.stockbodegasdb import StockBodegasDB
 from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.productorepository import ProductoRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from logicaVentasApp.services.documento import Documento
 import logging
+
+from logicaVentasApp.services.stcokService import StockService
 logger = logging.getLogger(__name__)
 
 class OrdenVenta(Documento):
@@ -182,59 +185,168 @@ class OrdenVenta(Documento):
 
         return resultado
 
-    def actualizarDocumento(self,docnum, docentry, data):
-        
-        docentry = docentry
-
+    # En odv.py - Método actualizado para manejar múltiples líneas del mismo SKU/bodega
+    def actualizarDocumento(self, docnum, docentry, data):
         try:
-            docentry = int(docentry)
+            stock_service = StockService()
+            apiClient = APIClient()
+
+            # Obtener líneas del documento antes de actualizar stock
+            documents_lines = apiClient.detallesOrdenVentaLineas(docentry) 
+
+            # Almacenar el stock inicial por SKU y bodega, sumando todas las cantidades
+            stock_anterior = {}
+            # Almacenar cada línea individual para identificar líneas eliminadas específicas
+            lineas_anteriores = []
+
+            # Capturar el stock inicial de cada producto antes de hacer cambios
+            for item in documents_lines.get('value', []):  
+                document_line = item.get('Orders/DocumentLines', {})  
+                if document_line:
+                    sku = document_line.get('ItemCode')
+                    bodega_id = document_line.get('WarehouseCode')
+                    cantidad_anterior = document_line.get('Quantity')
+                    linea_id = document_line.get('LineNum')  # Identificador único de línea
+
+                    # Guardar cada línea individual para comparación posterior
+                    lineas_anteriores.append({
+                        'sku': sku,
+                        'bodega_id': bodega_id,
+                        'cantidad': cantidad_anterior,
+                        'linea_id': linea_id
+                    })
+
+                    # Sumar cantidades para el mismo par (sku, bodega_id)
+                    key = (sku, bodega_id)
+                    if key in stock_anterior:
+                        stock_anterior[key] += cantidad_anterior
+                    else:
+                        stock_anterior[key] = cantidad_anterior
+
+            # Obtener el stock actual de cada bodega
+            for (sku, bodega_id), cantidad_total in stock_anterior.items():
+                stock_actual = StockBodegasDB.objects.filter(
+                    idProducto__codigo=sku, idBodega=bodega_id
+                ).values_list('stock', flat=True).first() or 0
+                
+                # Capturar el stock actual en memoria para referencia
+                stock_service.capture_initial_stock(sku, bodega_id, stock_actual)
+                print(f"Stock inicial total para {sku} en bodega {bodega_id}: {cantidad_total} (DB: {stock_actual})")
+
+            # Procesar las nuevas líneas y calcular diferencias
+            stock_nuevo = {}
+            lineas_nuevas = []
+
+            # Primero, agrupar las nuevas líneas por (sku, bodega_id) y sumar cantidades
+            for idx, item in enumerate(data['DocumentLines']):
+                sku = item['ItemCode']
+                bodega_id = item['WarehouseCode']
+                nueva_cantidad = item['Quantity']
+                linea_id = item.get('LineNum', idx)  # Usar LineNum si existe, si no, usar el índice
+
+                # Guardar cada línea individual
+                lineas_nuevas.append({
+                    'sku': sku,
+                    'bodega_id': bodega_id,
+                    'cantidad': nueva_cantidad,
+                    'linea_id': linea_id
+                })
+
+                # Sumar cantidades para el mismo par (sku, bodega_id)
+                key = (sku, bodega_id)
+                if key in stock_nuevo:
+                    stock_nuevo[key] += nueva_cantidad
+                else:
+                    stock_nuevo[key] = nueva_cantidad
+
+            # Ahora procesar las diferencias por par (sku, bodega_id)
+            for (sku, bodega_id), nueva_cantidad_total in stock_nuevo.items():
+                # Obtener la cantidad anterior total (si existía)
+                cantidad_anterior_total = stock_anterior.get((sku, bodega_id), 0)
+                
+                # Calcular la diferencia neta entre totales
+                diferencia = nueva_cantidad_total - cantidad_anterior_total
+                
+                # Si es una línea nueva (no existía antes), verificamos si es negativa
+                if (sku, bodega_id) not in stock_anterior and nueva_cantidad_total > 0:
+                    # Es una línea nueva con valor positivo
+                    stock_actual = stock_service.get_initial_stock(sku, bodega_id)
+                    if stock_actual == 0:  # Si no teníamos registro previo, buscar en la DB
+                        stock_actual = StockBodegasDB.objects.filter(
+                            idProducto__codigo=sku, idBodega=bodega_id
+                        ).values_list('stock', flat=True).first() or 0
+                        stock_service.capture_initial_stock(sku, bodega_id, stock_actual)
+                    
+                    print(f"Nueva línea: SKU {sku} en bodega {bodega_id} con cantidad {nueva_cantidad_total}")
+                    # Restar del stock disponible (es una nueva venta)
+                    stock_service.actualizar_stock_por_diferencia(sku, bodega_id, -nueva_cantidad_total, stock_actual)
+                elif diferencia != 0:  # Si hay un cambio en la cantidad total
+                    stock_actual = stock_service.get_initial_stock(sku, bodega_id)
+                    print(f"Cambio en línea existente: SKU {sku} en bodega {bodega_id}, diferencia {diferencia}")
+                    # Si diferencia es positiva: se está pidiendo más, debemos restar al stock
+                    # Si diferencia es negativa: se está pidiendo menos, debemos sumar al stock
+                    stock_service.actualizar_stock_por_diferencia(sku, bodega_id, -diferencia, stock_actual)
+
+            # Verificar líneas eliminadas: devolver el stock a las bodegas
+            for (sku, bodega_id), cantidad_anterior_total in stock_anterior.items():
+                if (sku, bodega_id) not in stock_nuevo:
+                    print(f"SKU {sku} en bodega {bodega_id} fue eliminado, devolviendo {cantidad_anterior_total} unidades al stock.")
+                    stock_actual = stock_service.get_initial_stock(sku, bodega_id)
+                    
+                    # Como el producto fue eliminado, devolvemos la cantidad al stock (sumamos)
+                    stock_service.actualizar_stock_por_diferencia(sku, bodega_id, cantidad_anterior_total, stock_actual)
+
+            # Preparar JSON y actualizar documento en SAP
             jsonData = self.prepararJsonODV(data)
-            
             client = APIClient()
+            response = client.actualizarODVSL(int(docentry), jsonData)
 
-            response = client.actualizarODVSL(docentry, jsonData)
-
-            if 'success' in response:
+            # Verificar respuesta de la API
+            if response.get('success'):
                 return {
-                    'success': 'Orden Venta creada exitosamente',
+                    'success': 'Orden Venta actualizada exitosamente',
                     'docNum': docnum,
                     'docEntry': docentry
                 }
 
-        
         except Exception as e:
             logger.error(f"Error al actualizar la cotización: {str(e)}")
-            
             return {'error': str(e)}
 
 
+
     def crearDocumento(self, data):
-        """
-        Crea una nueva cotización y maneja las excepciones según el código de respuesta.
 
-        Args:
-            data (dict): Datos de la cotización.
-
-        Returns:
-            dict: Respuesta de la API.
-        """
         try:
-            # Verificar los datos antes de preparar el JSON
+            stock_service = StockService()
+            sl = APIClient()
             errores = self.validarDatosODV(data)
+            
             if errores:
                 return {'error': errores}
+            
+            stock_inicial = []  # Para rollback en caso de error
+
+            for item in data['DocumentLines']:
+                sku = item['ItemCode']
+                bodega_id = item['WarehouseCode']
+                cantidad = item['Quantity']
+
+                # Capturar el stock inicial antes de descontarlo
+                stock_actual = StockBodegasDB.objects.filter(idProducto__codigo=sku, idBodega=bodega_id).values_list('stock', flat=True).first() or 0
+
+                stock_inicial.append((sku, bodega_id, stock_actual))  # Guardar para rollback
+
+                # Descontar stock
+                stock_service.actualizar_stock(sku, bodega_id, -cantidad, stock_actual)
 
             # Preparar el JSON para la cotización
             jsonData = self.prepararJsonODV(data)
 
-            sl = APIClient()
-            
             # Realizar la solicitud a la API
             response = sl.crearODV(jsonData)
             
-            # Verificar si response es un diccionario
             if isinstance(response, dict):
-                # Si contiene DocEntry, es un éxito
                 if 'DocEntry' in response:
                     doc_num = response.get('DocNum')
                     doc_entry = response.get('DocEntry')
@@ -247,20 +359,23 @@ class OrdenVenta(Documento):
                         'salesPersonCode': salesPersonCode,
                         'salesPersonName': name_vendedor
                     }
-                
-                # Si contiene un mensaje de error, manejarlo
                 elif 'error' in response:
-                    error_message = response.get('error', 'Error desconocido')
-                    return {'error': f"Error: {error_message}"}
+                    return {'error': f"Error: {response.get('error', 'Error desconocido')}"}
                 else:
                     return {'error': 'Respuesta inesperada de la API.'}
-            
             else:
                 return {'error': 'La respuesta de la API no es válida.'}
-        
+
         except Exception as e:
-            # Manejo de excepciones generales
             logger.error(f"Error al crear la cotización: {str(e)}")
+
+            # Rollback del stock si algo falla
+            for sku, bodega_id, stock_original in stock_inicial:
+                StockBodegasDB.objects.filter(idProducto__codigo=sku, idBodega=bodega_id).update(stock=stock_original)
+
+            return {'error': str(e)}
+
+            
 
     def validarDatosODV(self, data):
         """

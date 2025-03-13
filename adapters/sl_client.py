@@ -248,9 +248,6 @@ class APIClient:
 
             response = self.session.post(url, json=data, headers=headers, verify=False)
             response.raise_for_status()
-
-            print(f"Respuesta de la API: {response.json()}")
-            print(f"Estado de la respuesta: {response.status_code}")
             
             return response.json()
 

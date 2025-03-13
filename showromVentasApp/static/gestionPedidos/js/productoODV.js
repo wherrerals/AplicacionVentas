@@ -32,7 +32,8 @@ class Producto {
         }
     }
 
-    async actualizarStock(row) {
+
+    async actualizarStock(row, actualizarStockTotal = true) {
         const stockData = await this.obtenerStock(this.productoCodigo);
 
         if (stockData) {
@@ -49,9 +50,12 @@ class Producto {
             // Calcular el stock total sumando solo las bodegas válidas
             const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock, 0);
 
-            // Mostrar el stock total
-            const stockTotalElem = row.querySelector('[name="stock_total"]');
-            stockTotalElem.textContent = `Total: ${stockTotal}`;
+            // Mostrar el stock total solo si se solicita
+            if (actualizarStockTotal) {
+                const stockTotalElem = row.querySelector('[name="stock_total"]');
+                console.log("Stock total actualizado en actualizar Stock:", stockTotal);
+                stockTotalElem.textContent = `Total: ${stockTotal}`;
+            }
 
             // Obtener el value de la bodega seleccionada
             const selectBodega = row.querySelector('.form-select');
@@ -66,7 +70,14 @@ class Producto {
             // Mostrar el stock de la bodega seleccionada
             const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
             stockBodegaElem.textContent = `Stock: ${stockBodega}`;
+            stockBodegaElem.setAttribute('data-stock', stockBodega);  // Almacenar el valor en un atributo data-stock
+
+            console.log("Stock actualizado:", stockBodega);
+            
+            // Retornar el stock total calculado para uso externo
+            return stockTotal;
         }
+        return 0;
     }
 
 

@@ -1,10 +1,11 @@
 class Producto {
-    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado) {
+    constructor(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado) {
         
+        this.linea_documento = linea_documento;
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
         this.imagen = imagen;
-        this.precioVenta = Math.round(precioVenta);
+        this.precioVenta = precioVenta;
         this.stockTotal = stockTotal;
         this.precioLista = Math.round(precioLista);
         this.precioDescuento = Math.round(precioDescuento);
@@ -80,7 +81,7 @@ class Producto {
                 <td style="font-size: 12px; background: transparent; border-style: none; padding-bottom: 0px;" rowspan="2">
                     <div class="row">
                         <div class="col-md-11 col-xxl-6" style="font-size: 14px; font-weight: bold;">
-                        <small id="indixe_producto">${contprod})</small><small>&nbsp;&nbsp;</small><small style="font-weight-bold" name="sku_producto">${this.productoCodigo}</small>
+                        <small id="indixe_producto">${this?.linea_documento ?? contprod})</small><small>&nbsp;&nbsp;</small><small style="font-weight-bold" name="sku_producto">${this.productoCodigo}</small>
                         </div>
                         <div class="col-md-11 col-xxl-7" style="text-align: center;">
                             <img src="${this.imagen}" width="50" height="50" style="width: 50px;height: 50px;" name="img_producto" id="img_productox">
@@ -231,7 +232,7 @@ class Producto {
 }
 
 // Función global para manejar la adición de productos
-function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, descuentoAplcado = 1 - 1) {
+function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, descuentoAplcado = 1 - 1) {
     // Contador de productos
     console.log("cantidad: ", cantidad);
     console.log("sucursal: ", sucursal);
@@ -239,7 +240,7 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     let contprod = document.querySelectorAll('#productos tbody').length + 1;
 
     // Crear una instancia de Producto
-    let producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado);
+    let producto = new Producto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado);
 
     let newRow = producto.crearFila(contprod);
 
