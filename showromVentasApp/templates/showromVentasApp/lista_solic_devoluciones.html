@@ -110,7 +110,7 @@
                             {% endif %}
                           {% endif %}
                           {% if 'Administrador' in grupos_usuario %}
-                          <option value="" selected="">Todos</option>
+                          <option value="">Todos</option>
                           {% endif %}
                         </optgroup>
                       </select></div>
@@ -124,7 +124,8 @@
                     <div><span>Estado</span></div>
                     <div><select class="form-select" id="filtro_estado" name="DocumentStatus" style="width: 100px;font-size: 12px;">
                         <optgroup label="Estado">
-                          <option value="12" selected="">Abierto</option>
+                          <option value="" selected="">Todos</option>
+                          <option value="12" >Abierto</option>
                           <option value="13">Cerrado</option>
                           <option value="14">Cancelado</option>
                         </optgroup>

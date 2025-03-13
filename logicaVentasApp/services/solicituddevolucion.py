@@ -1,3 +1,4 @@
+from datosLsApp.repositories.productorepository import ProductoRepository
 from logicaVentasApp.services.documento import Documento
 
 
@@ -69,3 +70,132 @@ class SolicitudesDevolucion(Documento):
         filters = {k: v for k, v in filters.items() if v and v != "''"}
 
         return filters
+    
+    def detallesOrdenVentaLineas(self, docEntry):
+        """
+        https://182.160.29.24:50003/b1s/v1/$crossjoin(ReturnRequest,ReturnRequest/DocumentLines,Items/ItemWarehouseInfoCollection)?$expand=ReturnRequest/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)
+        &$filter=ReturnRequest/DocEntry eq 201882 and ReturnRequest/DocumentLines/DocEntry eq ReturnRequest/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq ReturnRequest/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq ReturnRequest/DocumentLines/WarehouseCode
+        """
+
+        crossJoin = (
+            "ReturnRequest,ReturnRequest/DocumentLines,Items/ItemWarehouseInfoCollection"
+            )
+        
+        expand = "ReturnRequest/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
+        filter = f"ReturnRequest/DocEntry eq {docEntry} and ReturnRequest/DocumentLines/DocEntry eq ReturnRequest/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq ReturnRequest/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq ReturnRequest/DocumentLines/WarehouseCode"
+
+        base_url = self.base_url # Asegura que no haya doble "/"
+        url = f"{base_url}/$crossjoin({crossJoin})?$expand={expand}&$filter={filter}"
+
+        all_data = []  # Lista para almacenar todos los valores
+
+        while url:
+            response = self.session.get(url, verify=False)
+            response.raise_for_status()
+            data = response.json()
+
+            # Agregar los resultados actuales a la lista acumulada
+            all_data.extend(data.get("value", []))
+
+            # Obtener el próximo enlace si existe
+            next_link = data.get("odata.nextLink")
+            url = f"{base_url}/{next_link}" if next_link else None  # Agregar base_url si es necesario
+
+        return {"value": all_data}
+    
+    def formatearDatos(self, json_data):
+        # Extraer y limpiar la información del cliente
+
+        print(f"DATOS: {json_data}")
+
+        client_info = json_data["Client"]["value"][0]
+        quotations = client_info.get("ReturnRequest", {})
+        salesperson = client_info.get("SalesPersons", {})
+        contact_employee = client_info.get("BusinessPartners/ContactEmployees", {})
+
+        # Formatear los datos de cliente
+        cliente = {
+            "ReturnRequest": {
+                "DocEntry": quotations.get("DocEntry"),
+                "DocNum": quotations.get("DocNum"),
+                "CardCode": quotations.get("CardCode"),
+                "CardName": quotations.get("CardName"),
+                "TransportationCode": quotations.get("TransportationCode"),
+                "Address": quotations.get("Address"),
+                "Address2": quotations.get("Address2"),
+                "DocDate": quotations.get("DocDate"),
+                "DocDueDate": quotations.get("DocDueDate"),
+                "Comments": quotations.get("Comments"),
+                "DocumentStatus": quotations.get("DocumentStatus"),
+                "Cancelled": quotations.get("Cancelled"),
+                "U_LED_TIPVTA": quotations.get("U_LED_TIPVTA"),
+                "U_LED_TIPDOC": quotations.get("U_LED_TIPDOC"),
+                "U_LED_NROPSH": quotations.get("U_LED_NROPSH"),
+                "NumAtCard": quotations.get("NumAtCard"),
+                "VatSum": quotations.get("VatSum"),
+                "DocTotal": quotations.get("DocTotal"),
+                "DocTotalNeto": quotations.get("DocTotalNeto"),
+            },
+            "SalesPersons": {
+                "SalesEmployeeCode": salesperson.get("SalesEmployeeCode"),
+                "SalesEmployeeName": salesperson.get("SalesEmployeeName"),
+                "U_LED_SUCURS": salesperson.get("U_LED_SUCURS"),
+            },
+            "ContactEmployee": {
+                "InternalCode": contact_employee.get("InternalCode"),
+                "FirstName": contact_employee.get("FirstName"),
+            }
+        }
+
+        # Extraer y limpiar la información de líneas de documento
+        document_lines = []
+        for line_info in json_data["DocumentLine"]["value"]:
+            line = line_info.get("ReturnRequest/DocumentLines", {})
+            warehouse_info = line_info.get("Items/ItemWarehouseInfoCollection", {})
+            
+            sku = line.get("ItemCode")
+            
+            imagen = ProductoRepository.obtenerImagenProducto(sku)
+            
+            document_line = {
+                "DocEntry": line.get("DocEntry"),
+                "LineNum": line.get("LineNum"),
+                "imagen": imagen,
+                "ItemCode": line.get("ItemCode"),
+                "ItemDescription": line.get("ItemDescription"),
+                "WarehouseCode": line.get("WarehouseCode"),
+                "Quantity": line.get("Quantity"),
+                "UnitPrice": line.get("UnitPrice"),
+                "GrossPrice": line.get("GrossPrice"),
+                "DiscountPercent": line.get("DiscountPercent"),
+                "Price": line.get("Price"),
+                "PriceAfterVAT": line.get("PriceAfterVAT"),
+                "LineTotal": line.get("LineTotal"),
+                "GrossTotal": line.get("GrossTotal"),
+                "ShipDate": str(line.get("ShipDate")),
+                "Address": line.get("Address"),
+                "ShippingMethod": line.get("ShippingMethod"),
+                "FreeText": line.get("FreeText"),
+                "BaseType": line.get("BaseType"),
+                "GrossBuyPrice": line.get("GrossBuyPrice"),
+                "BaseEntry": line.get("BaseEntry"),
+                "BaseLine": line.get("BaseLine"),
+                "LineStatus": line.get("LineStatus"),
+                "WarehouseInfo": {
+                    "WarehouseCode": warehouse_info.get("WarehouseCode"),
+                    "InStock": warehouse_info.get("InStock"),
+                    "Committed": warehouse_info.get("Committed"),
+                    "SalesStock": warehouse_info.get("SalesStock"),
+                }
+            }
+            document_lines.append(document_line)
+
+        # Formar el diccionario final
+        resultado = {
+            "Cliente": cliente,
+            "DocumentLines": document_lines
+        }
+
+        print(f"RESULTADO: {resultado}")
+
+        return resultado

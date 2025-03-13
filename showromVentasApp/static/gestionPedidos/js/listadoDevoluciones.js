@@ -145,7 +145,7 @@ showLoadingOverlay();
                 else return 'Activo';
             };
             const status = getStatus(quotation);
-            let urlModel = `/ventas/detalles_cotizacion/?docentry=${quotation.DocEntry}`;
+            let urlModel = `/ventas/detalles_devolucion/?docentry=${quotation.DocEntry}`;
 
             date = quotation.DocDate
             let partesFecha = date.split("-");

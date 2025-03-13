@@ -67,11 +67,14 @@ class ReturnsView(View):
     def get_route_map(self):
         return {
             '/': self.filtrarCotizaciones,
+            '/ventas/detalles_devolucion': self.detallesDevolucion,
+
         }
 
     def post_route_map(self):
         return {
             '/ventas/listado_solicitudes_devolucion': self.filtrarCotizaciones,
+
         }
     
     def handle_invalid_route(self, request):
@@ -97,7 +100,6 @@ class ReturnsView(View):
 
         try:
             data = json.loads(request.body)
-            print(f"datos datos datos: {data}")
         except json.JSONDecodeError as e:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
@@ -113,9 +115,47 @@ class ReturnsView(View):
 
         # Manejar la solicitud de datos
         try:
+            print(f"Filters: {filters}")
             data = client.getData(endpoint=self.get_endpoint(), top=top, skip=skip, filters=filters)
-            print(f"datos datos datos: {data}")
             return JsonResponse({'data': data}, safe=False)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
-            
+
+    def detallesDevolucion(self, request):
+        # Obtener el parámetro 'docentry' de la solicitud
+        docentry = request.GET.get('docentry')
+        client = APIClient()
+
+        # Llamar al método para obtener los detalles del cliente
+        documentClient = client.detallesRR(docentry)
+
+        if documentClient.get("odata.metadata") == "$metadata#Collection(Edm.ComplexType)" and not documentClient.get("value"):
+            documentClient = client.detallesRR2(docentry)
+
+        documentLine = client.detallesRRlineas(docentry)
+
+        # Extraer los datos de la clave 'value', asegurándose de manejar la estructura correctamente
+        quotations_data = documentClient.get('value', [{}])[0].get('ReturnRequest', {})
+        cardCode = quotations_data.get('CardCode')
+        rut = quotations_data.get('FederalTaxID')
+
+        sn = SocioNegocio(request)
+        
+        # Preparar la estructura de datos para enviar como respuesta
+        data = {
+            "Client": documentClient,
+            "DocumentLine": documentLine
+        }
+
+        # Verificar si el socio de negocio ya existe en la base de datos
+        if sn.verificarSocioDB(cardCode):
+            rr = SolicitudesDevolucion()
+            lines_data = rr.formatearDatos(data)
+
+            return JsonResponse(lines_data, safe=False)
+        else:
+            # Crear el cliente en caso de que no exista y responder
+            sn.crearYresponderCliente(cardCode, rut)
+            rr = SolicitudesDevolucion()
+            lines_data = rr.formatearDatos(data)
+            return JsonResponse(lines_data, safe=False)

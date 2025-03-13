@@ -112,6 +112,8 @@ class APIClient:
         query_url = f"$crossjoin({crossjoin})?$expand={expand}&$orderby={order_by}&$filter={filter_condition}&$top={top}&$skip={skip}"
         url = f"{self.base_url}{query_url}"
 
+        print(f"esta es la url generada: {url}")
+
         response = self.session.get(url, headers=headers, verify=False)
         response.raise_for_status()
         return response.json()
@@ -246,6 +248,10 @@ class APIClient:
 
             response = self.session.post(url, json=data, headers=headers, verify=False)
             response.raise_for_status()
+
+            print(f"Respuesta de la API: {response.json()}")
+            print(f"Estado de la respuesta: {response.status_code}")
+            
             return response.json()
 
         except requests.exceptions.RequestException as e:
@@ -455,7 +461,24 @@ class APIClient:
         response = self.session.get(url, verify=False)
         response.raise_for_status()
         return response.json()
+    
 
+    def detallesOrdenVentaCliente(self, docEntry):
+        """
+        https://182.160.29.24:50003/b1s/v1/$crossjoin(Quotations,SalesPersons,BusinessPartners/ContactEmployees)?$expand=Quotations($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address, Address2,DocDate,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)
+        &$filter=Quotations/DocEntry eq 165332 and Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Quotations/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode
+        """
+        crossjoin = "Orders,SalesPersons,BusinessPartners/ContactEmployees"
+        expand = "Orders($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address,Address2,DocDate,DocDueDate,Comments,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
+        filter = f"Orders/DocEntry eq {docEntry} and Orders/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Orders/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode"
+        url = (
+            f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
+        )
+
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        return response.json()
+    
     def detallesOrdenVentaLineas(self, docEntry):
         """
         https://182.160.29.24:50003/b1s/v1/$crossjoin(Orders,Orders/DocumentLines,Items/ItemWarehouseInfoCollection)?$expand=Orders/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)
@@ -468,6 +491,71 @@ class APIClient:
         
         expand = "Orders/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
         filter = f"Orders/DocEntry eq {docEntry} and Orders/DocumentLines/DocEntry eq Orders/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq Orders/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq Orders/DocumentLines/WarehouseCode"
+
+        base_url = self.base_url # Asegura que no haya doble "/"
+        url = f"{base_url}/$crossjoin({crossJoin})?$expand={expand}&$filter={filter}"
+
+        all_data = []  # Lista para almacenar todos los valores
+
+        while url:
+            response = self.session.get(url, verify=False)
+            response.raise_for_status()
+            data = response.json()
+
+            # Agregar los resultados actuales a la lista acumulada
+            all_data.extend(data.get("value", []))
+
+            # Obtener el próximo enlace si existe
+            next_link = data.get("odata.nextLink")
+            url = f"{base_url}/{next_link}" if next_link else None  # Agregar base_url si es necesario
+
+        return {"value": all_data}
+    
+    # solucion temporal 
+    def detallesRR(self, docEntry):
+        """
+        https://182.160.29.24:50003/b1s/v1/$crossjoin(Quotations,SalesPersons,BusinessPartners/ContactEmployees)?$expand=Quotations($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address, Address2,DocDate,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)
+        &$filter=Quotations/DocEntry eq 165332 and Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Quotations/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode
+        """
+        crossjoin = "ReturnRequest,SalesPersons,BusinessPartners/ContactEmployees"
+        expand = "ReturnRequest($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address,Address2,DocDate,DocDueDate,Comments,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
+        filter = f"ReturnRequest/DocEntry eq {docEntry} and ReturnRequest/SalesPersonCode eq SalesPersons/SalesEmployeeCode and ReturnRequest/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode"
+        url = (
+            f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
+        )
+
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        return response.json()
+    
+    def detallesRR2(self, docEntry):
+        """
+        https://182.160.29.24:50003/b1s/v1/$crossjoin(Quotations,SalesPersons,BusinessPartners/ContactEmployees)?$expand=Quotations($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address, Address2,DocDate,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)
+        &$filter=Quotations/DocEntry eq 165332 and Quotations/SalesPersonCode eq SalesPersons/SalesEmployeeCode and Quotations/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode
+        """
+        crossjoin = "ReturnRequest,SalesPersons,BusinessPartners/ContactEmployees"
+        expand = "ReturnRequest($select=DocEntry,DocNum,CardCode,CardName,TransportationCode,Address,Address2,DocDate,DocDueDate,Comments,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
+        filter = f"ReturnRequest/DocEntry eq {docEntry} and ReturnRequest/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
+        url = (
+            f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}"
+        )
+
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        return response.json()
+
+    def detallesRRlineas(self, docEntry):
+        """
+        https://182.160.29.24:50003/b1s/v1/$crossjoin(ReturnRequest,ReturnRequest/DocumentLines,Items/ItemWarehouseInfoCollection)?$expand=ReturnRequest/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)
+        &$filter=ReturnRequest/DocEntry eq 201882 and ReturnRequest/DocumentLines/DocEntry eq ReturnRequest/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq ReturnRequest/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq ReturnRequest/DocumentLines/WarehouseCode
+        """
+
+        crossJoin = (
+            "ReturnRequest,ReturnRequest/DocumentLines,Items/ItemWarehouseInfoCollection"
+            )
+        
+        expand = "ReturnRequest/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
+        filter = f"ReturnRequest/DocEntry eq {docEntry} and ReturnRequest/DocumentLines/DocEntry eq ReturnRequest/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq ReturnRequest/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq ReturnRequest/DocumentLines/WarehouseCode"
 
         base_url = self.base_url # Asegura que no haya doble "/"
         url = f"{base_url}/$crossjoin({crossJoin})?$expand={expand}&$filter={filter}"
