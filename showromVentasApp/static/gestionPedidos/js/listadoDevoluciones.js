@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(data => {
             document.querySelector('#listadoCotizaciones').innerHTML = '';
             if (data && data.data && Array.isArray(data.data.value)) {
-                displayQuotations(data.data.value);
+                displayReturnRequest(data.data.value);
 
                 // Si el backend devuelve el número total de registros
                 if (data.totalRecords) {
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 hideLoader();
             } else {
                 console.error('Error: Expected data.data.value to be an array');
-                displayQuotations([]);
+                displayReturnRequest([]);
                 hideLoader();
             }
         })
@@ -111,13 +111,13 @@ document.querySelector('#lupa-busqueda').addEventListener('click', function() {
 
 showLoadingOverlay();
 
-    const displayQuotations = (quotations) => {
+    const displayReturnRequest = (returnrequest) => {
         const tbody = document.querySelector('#listadoCotizaciones');
         tbody.innerHTML = '';
     
         showLoadingOverlay();
-        quotations.forEach(entry => {
-            const quotation = entry.Quotations || {};
+        returnrequest.forEach(entry => {
+            const quotation = entry.ReturnRequest || {};
             const salesPerson = entry.SalesPersons || {};
             function formatCurrency(value) {
                 // Convertimos el valor a número entero
@@ -174,7 +174,7 @@ showLoadingOverlay();
             if (docEntry) {
                 showLoadingOverlay();
                 // Redirige a la página de generación de cotización con docentry en la URL
-                window.location.href = `/ventas/generar_cotizacion/?docentry=${docEntry}`;
+                window.location.href = `/ventas/solicitudes_devolucion/?docentry=${docEntry}`;
             } else {
                 hideLoadingOverlay();
                 alert("No se pudo obtener el DocEntry de la cotización.");
