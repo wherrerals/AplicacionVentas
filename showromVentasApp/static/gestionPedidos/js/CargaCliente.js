@@ -120,7 +120,7 @@ function cargarContactos() {
           data: { 'numero': clienteRut },
           dataType: 'json',
           success: function(data) {
-              $('#cont').empty();
+              $('#listaContactos').empty();
               if (data.resultadosClientes && data.resultadosClientes.length > 0) {
                   const cliente = data.resultadosClientes[0];
                   const contactos = cliente.contactos;
@@ -181,7 +181,7 @@ function cargarContactos() {
                       </div>
                       `;
   
-                      $('#cont').append(contactoElemento);
+                      $('#listaContactos').append(contactoElemento);
   
                       // Evento para habilitar la edición
                       $(`#editar_contacto_${index}`).on('click', function() {
@@ -207,15 +207,15 @@ function cargarContactos() {
                       });
                   });
               } else {
-                  $('#cont').html('<p>No hay contactos disponibles para este cliente.</p>');
+                  $('#listaContactos').html('<p>No hay contactos disponibles para este cliente.</p>');
               }
           },
           error: function(xhr, status, error) {
-              $('#cont').html('<p>Error al cargar contactos.</p>');
+              $('#listaContactos').html('<p>Error al cargar contactos.</p>');
           }
       });
   } else {
-      $('#cont').html('<p>No se ha seleccionado un cliente.</p>');
+      $('#listaContactos').html('<p>No se ha seleccionado un cliente.</p>');
   }
 }
 
@@ -232,7 +232,8 @@ function cargarDirecciones() {
           data: { 'numero': clienteRut },
           dataType: 'json',
           success: function(data) {
-              $('#dir').empty(); // Limpiar el contenido previo
+              $('#listaDireccionDespacho').empty(); // Limpiar lista de despacho
+              $('#listaDireccionFacturacion').empty(); // Limpiar lista de facturación
 
               if (data.resultadosClientes && data.resultadosClientes.length > 0) {
                   const cliente = data.resultadosClientes[0];
@@ -240,6 +241,7 @@ function cargarDirecciones() {
 
                   direcciones.forEach((direccion, index) => {
                       console.log("tipoDireccion", direccion.tipoDireccion);
+                      
                       let direccionElemento = `
 
                            <div class="col-sm-5" style="font-size: 12px;background: #f0f2f5;width: 230px; margin-right: 10px;">
@@ -366,7 +368,11 @@ function cargarDirecciones() {
                       `;
 
 
-                      $('#dir').append(direccionElemento);
+                      if (direccion.tipoDireccion == 12) {
+                        $('#listaDireccionDespacho').append(direccionElemento);
+                    } else if (direccion.tipoDireccion == 13) {
+                        $('#listaDireccionFacturacion').append(direccionElemento);
+                    }
 
                       const regionSelect = $(`#region_${index}`);
                       const comunaSelect = $(`#comuna_${index}`);
@@ -407,15 +413,21 @@ function cargarDirecciones() {
                       
                     });
               } else {
-                  $('#dir').html('<p>No hay direcciones disponibles para este cliente.</p>');
+                  $('#listaDireccionDespacho').html('<p>No hay direcciones disponibles para este cliente.</p>');
+                  $('#listaDireccionFacturacion').html('<p>No hay direcciones disponibles para este cliente.</p>');
+
               }
           },
           error: function(xhr, status, error) {
-              $('#dir').html('<p>Error al cargar direcciones.</p>');
+              $('#listaDireccionDespacho').html('<p>Error al cargar direcciones.</p>');
+              $('#listaDireccionFacturacion').html('<p>Error al cargar direcciones.</p>');
+
           }
       });
   } else {
-      $('#dir').html('<p>No se ha seleccionado un cliente.</p>');
+      $('#listaDireccionDespacho').html('<p>No se ha seleccionado un cliente.</p>');
+      $('#listaDireccionFacturacion').html('<p>No se ha seleccionado un cliente.</p>');
+
   }
 }
 
