@@ -36,7 +36,12 @@ class Producto {
 
 
     async actualizarStock(row, actualizarStockTotal = true) {
+        
+        console.log("Producto a actualizar:", this.productoCodigo);
+
         const stockData = await this.obtenerStock(this.productoCodigo);
+        
+        console.log("Stock data en actualizar Stock:", stockData);
 
         if (stockData) {
             // Mapear las bodegas válidas (excluyendo GR)
@@ -48,6 +53,8 @@ class Producto {
 
             // Filtrar los datos de stock excluyendo la bodega "GR"
             const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
+
+            console.log("Stock filtrado en actualizar Stock:", stockFiltrado);
 
             // Calcular el stock total sumando solo las bodegas válidas
             const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock, 0);

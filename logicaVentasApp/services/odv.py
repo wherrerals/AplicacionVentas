@@ -329,6 +329,8 @@ class OrdenVenta(Documento):
 
         try:
 
+            print(f"DATA: {data}")
+            
             errores = self.validarDatosODV(data)
             
             if errores:

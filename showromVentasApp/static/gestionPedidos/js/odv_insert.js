@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", function () {
               const productRows = document.querySelectorAll(".product-row"); 
               productRows.forEach((row) => {
                   const productoCodigo = row.querySelector("[name='sku_producto']").innerText;
-                  const producto = new Producto(productoCodigo); // Crear instancia de Producto
+                  const producto = new Producto(linea_documento = null, productoCodigo); // Crear instancia de Producto
                   producto.actualizarStock(row); // Llamar la función para actualizar stock
                   console.log("Stock actualizado para:", productoCodigo);
               });
