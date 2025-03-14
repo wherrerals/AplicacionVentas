@@ -212,6 +212,8 @@ class APIClient:
             si la respuesta de la API contiene un error de estado retorna un diccionario con un mensaje de error.
             si se produce un error al analizar JSON retorna un diccionario con un mensaje de error.
         """
+        print("Creando cotizacion")
+        print(f"DATOS PARA LA COTIZACION: {data}")
         self.__login()
         url = f"{self.base_url}{endpoint}"
         try:
