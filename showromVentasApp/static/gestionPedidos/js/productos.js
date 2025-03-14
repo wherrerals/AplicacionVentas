@@ -8,7 +8,7 @@ class Producto {
         this.precioVenta = precioVenta;
         this.stockTotal = stockTotal;
         this.precioLista = precioLista;
-        this.precioDescuento = precioDescuento;
+        this.precioDescuento = Math.round(precioDescuento);
         this.precioSinDescuento = 0;
         this.totalProducto = precioVenta * cantidad;
         this.cantidad = cantidad;
