@@ -1,5 +1,7 @@
 class Producto {
-    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, cantidadCoti, precioCoti,  tipoentrega2, fechaEntrega = new Date().toISOString().split('T')[0]) {
+    constructor(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, cantidadCoti, precioCoti,  tipoentrega2, fechaEntrega = new Date().toISOString().split('T')[0]) {
+        
+        this.linea_documento = linea_documento;
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
         this.imagen = imagen;
@@ -91,7 +93,7 @@ class Producto {
                 <td style="font-size: 12px;background: transparent;border-style: none;padding-bottom: 0px;"rowspan="2">
                     <div class="row">
                         <div class="col-md-11 col-xxl-6" style="font-size: 14px;font-weight: bold;"><small style="font-weight: bold;">
-                        <small id="indixe_producto">${contprod})</small><small>&nbsp;&nbsp;</small><small name="sku_producto">${this.productoCodigo}</small></div>
+                        <small id="indixe_producto" data-lineNum="${this?.linea_documento}">${contprod})</small><small>&nbsp;&nbsp;</small><small name="sku_producto">${this.productoCodigo}</small></div>
                         <div class="col-md-11 col-xxl-7" style="text-align: center;"><img src="${this.imagen}" width="50" height="50" style="width: 50px;height: 50px;" name="img_producto" id="img_productox"></div>
                     </div>
                 </td>
@@ -313,7 +315,7 @@ class Producto {
 }
 
 
-function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, tipoEntrega2, fechaEntrega) {
+function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, tipoEntrega2, fechaEntrega) {
     
     console.log("TIPO DE ENTREGA RECIBIDA: ", tipoEntrega2);
 
@@ -322,7 +324,7 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     // Crear instancia del producto
 
     const cantidadFinal = cantidad !== undefined ? cantidad : 1;
-    const producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, tipoEntrega2, fechaEntrega);
+    const producto = new Producto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, tipoEntrega2, fechaEntrega);
     const newRow = producto.crearFila(contprod); // Crear la fila del producto
 
     document.getElementById('productos').appendChild(newRow); // Agregar la fila al tbody

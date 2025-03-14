@@ -125,10 +125,16 @@ document.addEventListener("DOMContentLoaded", function () {
             }
   
             traerInformacionCliente(cardCode);
-  
+
             // Iteración sobre `DocumentLines` para añadir cada producto
             const documentLines = data.DocumentLines;
+
+            console.log("Líneas de documento:", documentLines);
+          
+            documentLines.sort((a, b) => a.LineNum - b.LineNum);
+
             documentLines.forEach((line) => {
+              const linea_documento = line.LineNum;
               const productoCodigo = line.ItemCode;
               const nombre = line.ItemDescription;
               const imagen = line.imagen;
@@ -141,8 +147,23 @@ document.addEventListener("DOMContentLoaded", function () {
               const fechaEntrega = line.ShipDate;
               const tipoentrega2 = line.ShippingMethod;
 
+              let linea_documento_real = parseInt(linea_documento);
+
+              console.log("Agregando producto con datos:", {
+                linea_documento,
+                productoCodigo,
+                nombre,
+                imagen,
+                precioVenta,
+                stockTotal,
+                precioLista,
+                precioDescuento,
+                sucursal,
+                comentario
+              });
+
   
-              agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, tipoentrega2, fechaEntrega);
+              agregarProducto(linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, tipoentrega2, fechaEntrega);
             });
           }
 

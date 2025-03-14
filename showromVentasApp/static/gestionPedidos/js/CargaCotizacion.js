@@ -162,6 +162,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const sucursal = line.WarehouseCode;
             const comentario = line.FreeText;
 
+            let linea_documento_real = parseInt(linea_documento);
+
 
             console.log("comentario: ", comentario);
 
@@ -178,7 +180,7 @@ document.addEventListener("DOMContentLoaded", function () {
               comentario
             });
 
-            agregarProducto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado);
+            agregarProducto(linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado);
           });
         }
 
