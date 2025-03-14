@@ -7,10 +7,10 @@ class Producto {
         this.imagen = imagen;
         this.precioVenta = precioVenta;
         this.stockTotal = stockTotal;
-        this.precioLista = Math.round(precioLista);
-        this.precioDescuento = Math.round(precioDescuento);
+        this.precioLista = precioLista;
+        this.precioDescuento = precioDescuento;
         this.precioSinDescuento = 0;
-        this.totalProducto = Math.round(precioVenta * cantidad);
+        this.totalProducto = precioVenta * cantidad;
         this.cantidad = cantidad;
         this.sucursal = sucursal;
         this.comentario = comentario;
@@ -157,7 +157,7 @@ class Producto {
 
         function formatCurrency(value) {
             // Convertimos el valor a número entero
-            const integerValue = Math.floor(value);
+            const integerValue = value;
             let formattedValue = integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
         
             // Si el valor tiene 4 dígitos y no incluye un punto, lo añadimos manualmente

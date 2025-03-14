@@ -66,11 +66,16 @@ function agregarInteractividad(newRow, codigoProducto) {
         var precioFinal = descuento === 0 ? precioTotal : precioTotal - (precioTotal * (descuento / 100));
         var precioConDescuento = descuento === 0 ? 0 : precioUnitario * (1 - (descuento / 100));
 
+        console.log('Precio final:', precioFinal, 'Precio con descuento:', precioConDescuento);
+
+        let precioFinaldefinido = Math.round(precioFinal);
+        let precioConDescuentodefinido = Math.round(precioConDescuento);
+
         // Actualizar el producto en la lista
         producto.modificarPrecioFinal(precioFinal);
 
-        tdPrecioVenta.textContent = formatCurrency(precioFinal);
-        tdPrecioDescuento.textContent = formatCurrency(precioConDescuento);
+        tdPrecioVenta.textContent = formatCurrency(precioFinaldefinido);
+        tdPrecioDescuento.textContent = formatCurrency(precioConDescuentodefinido);
 
         actualizarValores();
     }
@@ -82,19 +87,15 @@ function agregarInteractividad(newRow, codigoProducto) {
 
     document.addEventListener('productoEliminado', function (event) {
         const codigoProducto = event.detail.codigoProducto;
-        console.log('Producto eliminado:', codigoProducto);
 
         // Buscar el índice del producto a eliminar
         const index = productos.findIndex(producto => producto.codigoProducto === codigoProducto);
-        console.log('Índice encontrado:', index);
 
         if (index > -1) {
             productos.splice(index, 1);
         }
 
-        // Imprimir el estado actual del array productos después de la eliminación
-        console.log('Estado actual del array productos:', productos);
-
+        // Imprimir el estado actual del array productos después de la eliminació
         // Actualizar los valores totales
         actualizarValores();
     });
@@ -110,20 +111,25 @@ function agregarInteractividad(newRow, codigoProducto) {
             totalIva += valores.iva;
             totalBruto += valores.bruto;
             totalNeto += valores.neto;
+            console.log('totalIva:', totalIva, 'totalBruto:', totalBruto, 'totalNeto:', totalNeto);
         });
-    
+
+
+        //asignar valor a data-total-neto para enviarlo al backend
+        document.querySelector('#total_neto').setAttribute('data-total-neto', totalNeto);
+        document.querySelector('#total_bruto').setAttribute('data-total-bruto', totalBruto);
+
         // Redondear los totales al final
         totalIva = Math.round(totalIva);
         totalBruto = Math.round(totalBruto);
         totalNeto = Math.round(totalNeto);
-    
-        console.log('Total IVA:', formatCurrency(totalIva), 
-                    'Total Bruto:', formatCurrency(totalBruto), 
-                    'Total Neto:', formatCurrency(totalNeto));
+
     
         document.querySelector('#iva').textContent = formatCurrency(totalIva);
         document.querySelector('#total_bruto').textContent = formatCurrency(totalBruto);
         document.querySelector('#total_neto').textContent = formatCurrency(totalNeto);
+
+
     }
 
 }
