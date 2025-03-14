@@ -773,7 +773,9 @@ class APIClient:
         url = f"{self.base_url}BusinessPartners('{cardCode}')"
 
         headers = {
+            "B1S-ReplaceCollectionsOnPatch": "true",  # Encabezado adicional
             "Content-Type": "application/json",  # Asegúrate de incluir este encabezado si es necesario
+            
         }
         try:
             response = self.session.patch(url, json=data, headers=headers, verify=False)

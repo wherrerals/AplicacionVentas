@@ -104,17 +104,19 @@ $(document).ready(function () {
                         $('#resultadosClientes').append(clientesElemento);
                     });
                 } else {
-                    $('#resultadosClientes').html('No se encontraron resultados');
-                    $('#resultadosClientes').append('<br><a href="#" class="cliente-link">Traer Cliente de SAP</a>');                    
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error('Error en la solicitud AJAX:', error);
-            }
-        });
-    }
 
-            // Agrega el evento click a todos los enlaces de clientes después de añadir las filas
+                    const cardcode = (inputValue || '').toString().trim().replace(/\./g, '').split('-')[0];
+
+                    $('#resultadosClientes').html('No se encontraron resultados');
+
+                    const moduloClientes = document.querySelector('#crearClientes');
+
+                    if (moduloClientes) {
+                        $('#resultadosClientes').append('<br><a href="#" class="cliente-link" data-cadcode="' + cardcode + '">Crear desde SAP</a>');
+                    }
+                }
+
+                            // Agrega el evento click a todos los enlaces de clientes después de añadir las filas
             document.querySelectorAll('.cliente-link').forEach(link => {
                 link.addEventListener('click', (event) => {
                     event.preventDefault();
@@ -149,6 +151,15 @@ $(document).ready(function () {
                     }
                 });
             });
+
+            },
+            error: function (xhr, status, error) {
+                console.error('Error en la solicitud AJAX:', error);
+            }
+        });
+    }
+
+
 
 
     function limpiarInformacionCliente() {
