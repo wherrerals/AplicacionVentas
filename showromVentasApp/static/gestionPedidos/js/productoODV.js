@@ -1,16 +1,16 @@
 class Producto {
-    constructor(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, cantidadCoti, precioCoti,  tipoentrega2, fechaEntrega = new Date().toISOString().split('T')[0]) {
+    constructor(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado, cantidadCoti, precioCoti,  tipoentrega2, fechaEntrega = new Date().toISOString().split('T')[0]) {
         
         this.linea_documento = linea_documento;
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
         this.imagen = imagen;
-        this.precioVenta = Math.round(precioVenta);
+        this.precioVenta = precioVenta;
         this.stockTotal = stockTotal;
-        this.precioLista = Math.round(precioLista);
+        this.precioLista = precioLista;
         this.precioDescuento = Math.round(precioDescuento);
         this.precioSinDescuento = 0;
-        this.totalProducto = Math.round(precioVenta * cantidad);
+        this.totalProducto = precioVenta * cantidad;
         this.cantidad = cantidad;
         this.sucursal = sucursal;
         this.cantidadCoti = cantidadCoti;
@@ -18,6 +18,11 @@ class Producto {
         this.comentario = comentario;
         this.tipoEntrega2 = tipoentrega2;
         this.fechaEntrega = fechaEntrega;
+        this.descuentoAplcado = descuentoAplcado;
+
+        console.log("Producto descuentoAplcado:", this.descuentoAplcado);
+
+
     }
 
     async obtenerStock(codigoProducto) {
@@ -144,7 +149,7 @@ class Producto {
 
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <div>
-                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="0">
+                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="${this.descuentoAplcado ?? 0}">
                     </div>
                 </td>
                    
@@ -264,7 +269,8 @@ class Producto {
         let inputDescuento = row.querySelector('#agg_descuento');
         inputDescuento.max = descuentoMax;
 
-        inputDescuento.value = 0;
+        inputDescuento.value = this.descuentoAplcado;  // Cambié de 0 a this.descuentoAplcado
+
         inputDescuento.addEventListener('input', function () {
             let valor = parseFloat(inputDescuento.value);
             if (valor > descuentoMax) {
@@ -322,7 +328,7 @@ class Producto {
 }
 
 
-function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, tipoEntrega2, fechaEntrega) {
+function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, tipoEntrega2, fechaEntrega, descuentoAplcado = 1 - 1) {
     
     console.log("TIPO DE ENTREGA RECIBIDA: ", tipoEntrega2);
 
@@ -331,7 +337,7 @@ function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precio
     // Crear instancia del producto
 
     const cantidadFinal = cantidad !== undefined ? cantidad : 1;
-    const producto = new Producto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, tipoEntrega2, fechaEntrega);
+    const producto = new Producto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, tipoEntrega2, fechaEntrega, descuentoAplcado);
     const newRow = producto.crearFila(contprod); // Crear la fila del producto
 
     document.getElementById('productos').appendChild(newRow); // Agregar la fila al tbody

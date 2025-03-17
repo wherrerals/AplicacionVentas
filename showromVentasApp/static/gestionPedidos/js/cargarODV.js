@@ -138,11 +138,12 @@ document.addEventListener("DOMContentLoaded", function () {
               const productoCodigo = line.ItemCode;
               const nombre = line.ItemDescription;
               const imagen = line.imagen;
-              const precioVenta = line.PriceAfterVAT;
+              const precioVenta = line.GrossPrice;
               const stockTotal = 0;
-              const precioLista = line.GrossPrice;
-              const precioDescuento = line.DiscountPercent;
+              const precioLista = line.PriceList;
+              const precioDescuento = line.DescuentoMax;
               const sucursal = line.WarehouseCode;
+              const descuentoAplcado = line.DiscountPercent;
               const comentario = line.FreeText;
               const fechaEntrega = line.ShipDate;
               const tipoentrega2 = line.ShippingMethod;
@@ -159,11 +160,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 precioLista,
                 precioDescuento,
                 sucursal,
-                comentario
+                comentario,
+                descuentoAplcado
               });
 
   
-              agregarProducto(linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, tipoentrega2, fechaEntrega);
+              agregarProducto(linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado,  tipoentrega2, fechaEntrega);
             });
           }
 

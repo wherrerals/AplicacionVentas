@@ -1,4 +1,5 @@
 import json
+import math
 from django.http import JsonResponse
 from requests import request
 from adapters.sl_client import APIClient
@@ -6,6 +7,7 @@ from datosLsApp.models.stockbodegasdb import StockBodegasDB
 from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.productorepository import ProductoRepository
+from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from logicaVentasApp.services.documento import Documento
 import logging
@@ -91,14 +93,15 @@ class OrdenVenta(Documento):
         return filters
 
     def formatearDatos(self, json_data):
-        # Extraer y limpiar la información del cliente
-
-        print(f"DATOS: {json_data}")
+        # Extraer y limpiar la información del cliente        
 
         client_info = json_data["Client"]["value"][0]
         quotations = client_info.get("Orders", {})
         salesperson = client_info.get("SalesPersons", {})
         contact_employee = client_info.get("BusinessPartners/ContactEmployees", {})
+        vendedor_repo = VendedorRepository()
+        tipo_vendedor = vendedor_repo.obtenerTipoVendedor(salesperson.get("SalesEmployeeCode"))
+        print(f"TIPO VENDEDOR: {tipo_vendedor}")
 
         # Formatear los datos de cliente
         cliente = {
@@ -112,7 +115,7 @@ class OrdenVenta(Documento):
                 "Address2": quotations.get("Address2"),
                 "DocDate": quotations.get("DocDate"),
                 "DocDueDate": quotations.get("DocDueDate"),
-                "Comments": quotations.get("Comments"),
+                "Comments": quotations.get("Comments") if quotations.get("Comments") else "",
                 "DocumentStatus": quotations.get("DocumentStatus"),
                 "Cancelled": quotations.get("Cancelled"),
                 "U_LED_TIPVTA": quotations.get("U_LED_TIPVTA"),
@@ -143,7 +146,26 @@ class OrdenVenta(Documento):
             sku = line.get("ItemCode")
             
             imagen = ProductoRepository.obtenerImagenProducto(sku)
-            
+            bodega = line.get("WarehouseCode")
+
+            imagen = ProductoRepository.obtenerImagenProducto(sku)
+            marca = ProductoRepository.obtenerMarcaProducto(sku)
+            descuentoMax = ProductoRepository.descuentoMax(sku)
+            priceList = ProductoRepository.obtenerPrecioLista(sku)
+
+            stock_bodega = StockBodegasRepository.consultarStockPorBodega(sku, bodega)
+
+            if tipo_vendedor == 'P':
+                if marca == "LST":
+                    descuentoMax =  math.floor(min(descuentoMax * 100, 25))
+                else:
+                    descuentoMax = math.floor(min(descuentoMax * 100, 15))
+            else:
+                if marca == "LST":
+                    descuentoMax = math.floor(min(descuentoMax * 100, 15))
+                else:
+                    descuentoMax = math.floor(min(descuentoMax * 100, 10))
+
             document_line = {
                 "DocEntry": line.get("DocEntry"),
                 "LineNum": line.get("LineNum"),
@@ -168,6 +190,9 @@ class OrdenVenta(Documento):
                 "BaseEntry": line.get("BaseEntry"),
                 "BaseLine": line.get("BaseLine"),
                 "LineStatus": line.get("LineStatus"),
+                "DescuentoMax": descuentoMax,
+                "PriceList": priceList,
+                "StockBodega": stock_bodega,
                 "WarehouseInfo": {
                     "WarehouseCode": warehouse_info.get("WarehouseCode"),
                     "InStock": warehouse_info.get("InStock"),
@@ -514,7 +539,7 @@ class OrdenVenta(Documento):
             'DocDate': jsonData.get('DocDate'),
             'DocDueDate': jsonData.get('DocDueDate'),
             'TaxDate': jsonData.get('TaxDate'),
-            'ContactPersonCode': numerocontactoSAp,
+            #'ContactPersonCode': numerocontactoSAp,
             'Address': addresmodif,
             'Address2': addresmodif2,
             'CardCode': jsonData.get('CardCode'),

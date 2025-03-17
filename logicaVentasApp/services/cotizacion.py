@@ -1,4 +1,5 @@
 import json
+import math
 from django.http import JsonResponse
 from requests import request
 from adapters.sl_client import APIClient
@@ -339,7 +340,7 @@ class Cotizacion(Documento):
             'DocDate': jsonData.get('DocDate'),
             'DocDueDate': jsonData.get('DocDueDate'),
             'TaxDate': jsonData.get('TaxDate'),
-            'ContactPersonCode': numerocontactoSAp,
+            #'ContactPersonCode': numerocontactoSAp,
             'Address': addresmodif,
             'Address2': addresmodif2,
             'CardCode': jsonData.get('CardCode'),
@@ -537,6 +538,9 @@ class Cotizacion(Documento):
         quotations = client_info.get("Quotations", {})
         salesperson = client_info.get("SalesPersons", {})
         contact_employee = client_info.get("BusinessPartners/ContactEmployees", {})
+        vendedor_repo = VendedorRepository()
+        tipo_vendedor = vendedor_repo.obtenerTipoVendedor(salesperson.get("SalesEmployeeCode"))
+        print(f"TIPO VENDEDOR: {tipo_vendedor}")
 
         # Formatear los datos de cliente
         cliente = {
@@ -590,10 +594,16 @@ class Cotizacion(Documento):
 
             stock_bodega = StockBodegasRepository.consultarStockPorBodega(sku, bodega)
             
-            if marca == "LST":
-                descuentoMax = min(descuentoMax * 100, 15)
+            if tipo_vendedor == 'P':
+                if marca == "LST":
+                    descuentoMax =  math.floor(min(descuentoMax * 100, 25))
+                else:
+                    descuentoMax = math.floor(min(descuentoMax * 100, 15))
             else:
-                descuentoMax = min(descuentoMax * 100, 10)
+                if marca == "LST":
+                    descuentoMax = math.floor(min(descuentoMax * 100, 15))
+                else:
+                    descuentoMax = math.floor(min(descuentoMax * 100, 10))
             
             # Construye la línea
             document_line = {
