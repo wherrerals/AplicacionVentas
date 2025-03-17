@@ -223,8 +223,10 @@ $(document).ready(function () {
         let clienteRut = $('#inputCliente').data('rut');
         console.log('Cliente RUT capturado:', clienteRut);
 
-        const rutCliente = document.getElementById("inputCliente").getAttribute("data-codigoSN");
-
+        const rutCliente = (document.getElementById("inputCliente")?.getAttribute("data-codigoSN")) || 
+        (document.getElementById("rutSN")?.getAttribute("data-rut")) || 
+        "";
+        
         // URL para guardar direcciones
         let urlguardarDir = `/ventas/guardar_direcciones/${rutCliente}/`;
 
