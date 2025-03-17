@@ -293,24 +293,18 @@ $(document).ready(function () {
     window.direccionesAlmacenadas = direccionesAlmacenadas;
 });
 
-// Manejador de eventos para cuando se elimina una dirección
-document.addEventListener('direccionEliminada', function (event) {
+document.addEventListener("direccionEliminada", function (event) {
     const direccionId = event.detail.direccionId;
-    console.log('Dirección eliminada:', direccionId);
-
-    // Verificar que direccionesAlmacenadas exista en el scope global
-    if (typeof window.direccionesAlmacenadas !== 'undefined') {
-        // Buscar el índice de la dirección a eliminar
-        const index = window.direccionesAlmacenadas.findIndex(dir => dir.direccionId === direccionId);
-        console.log('Índice encontrado:', index);
-
-        if (index > -1) {
-            window.direccionesAlmacenadas.splice(index, 1);
-        }
-
-        // Imprimir el estado actual del array de direcciones después de la eliminación
-        console.log('Estado actual del array de direcciones:', window.direccionesAlmacenadas);
+  
+    console.log("Dirección eliminada:", direccionId);
+  
+    if (Array.isArray(window.direccionesAlmacenadas)) {
+      window.direccionesAlmacenadas = window.direccionesAlmacenadas.filter(
+        (dir) => dir.direccionId !== direccionId
+      );
+      console.log("Direcciones después de eliminar:", window.direccionesAlmacenadas);
     } else {
-        console.error('La variable direccionesAlmacenadas no está disponible en el scope global');
+      console.error("No se pudo actualizar direccionesAlmacenadas.");
     }
-});
+  });
+  

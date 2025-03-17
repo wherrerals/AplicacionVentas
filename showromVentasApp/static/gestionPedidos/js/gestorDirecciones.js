@@ -523,21 +523,27 @@ function cargarDirecciones(clienteRut, tipoDireccion, listaSelector) {
           });
           
 
-            // Evento para eliminar dirección
-            $(document).on("click", `[id^="eliminar_dir_"]`, function () {
-              if (
-                confirm("¿Estás seguro que deseas eliminar esta dirección?")
-              ) {
-                $(this).closest(".col-sm-5").remove();
-
-                // Reindexar direcciones
-                $(".col-sm-5").each(function (newIndex) {
-                  $(this)
-                    .find("#direcciones_indice")
-                    .text(`Dirección Nº${newIndex + 1}`);
+          $(document).on("click", `[id^="eliminar_dir_"]`, function () {
+            let direccionElemento = $(this).closest(".col-sm-5");
+            let modalContainer = direccionElemento.closest("#listaDireccionDespacho, #listaDireccionFacturacion"); // Detecta en qué modal está
+          
+            let direccionId = direccionElemento.find('input[name="direccionid[]"]').val();
+          
+            if (confirm("¿Estás seguro que deseas eliminar esta dirección?")) {
+              direccionElemento.fadeOut(300, function () {
+                $(this).remove();
+          
+                // Disparar evento para actualizar el almacenamiento de direcciones
+                document.dispatchEvent(new CustomEvent("direccionEliminada", { detail: { direccionId } }));
+          
+                // Reindexar SOLO las direcciones dentro del modal correspondiente
+                modalContainer.find(".col-sm-5:visible").each(function (newIndex) {
+                  $(this).find("#direcciones_indice").text(`Dirección Nº${newIndex + 1}`);
                 });
-              }
-            });
+              });
+            }
+          });
+          
           });
         } else {
           console.log(
