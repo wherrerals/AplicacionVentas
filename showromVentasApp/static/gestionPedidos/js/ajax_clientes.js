@@ -104,14 +104,62 @@ $(document).ready(function () {
                         $('#resultadosClientes').append(clientesElemento);
                     });
                 } else {
+
+                    const cardcode = (inputValue || '').toString().trim().replace(/\./g, '').split('-')[0];
+
                     $('#resultadosClientes').html('No se encontraron resultados');
+
+                    const moduloClientes = document.querySelector('#crearClientes');
+
+                    if (moduloClientes) {
+                        $('#resultadosClientes').append('<br><a href="#" class="cliente-link" data-cadcode="' + cardcode + '">Crear desde SAP</a>');
+                    }
                 }
+
+                            // Agrega el evento click a todos los enlaces de clientes después de añadir las filas
+            document.querySelectorAll('.cliente-link').forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    let cadCode = event.target.getAttribute('data-cadcode');
+            
+                    // Eliminar la "C" final si está presente
+                    if (cadCode && cadCode.endsWith("C")) {
+                        cadCode = cadCode.slice(0, -1);
+                    }
+            
+                    if (cadCode) {
+                        showLoadingOverlay();
+                        // Realiza la solicitud AJAX al backend para obtener la información del cliente
+                        fetch(`/ventas/informacion_cliente/?rut=${cadCode}`)
+                            .then(response => {
+                                if (!response.ok) throw new Error('Error al obtener la información del cliente');
+                                return response.json();
+                            })
+                            .then(data => {
+                                console.log('Información del cliente:', data);
+            
+                                // Redirige a la página de creación de cliente después de obtener los datos
+                                window.location.href = `/ventas/creacion_clientes/?rut=${cadCode}`;
+                            })
+                            .catch(error => {
+                                hideLoadingOverlay();
+                                console.error('Error en la solicitud AJAX:', error);
+                            });
+                    } else {
+                        hideLoadingOverlay();
+                        alert("No se pudo obtener el RUT del cliente.");
+                    }
+                });
+            });
+
             },
             error: function (xhr, status, error) {
                 console.error('Error en la solicitud AJAX:', error);
             }
         });
     }
+
+
 
 
     function limpiarInformacionCliente() {

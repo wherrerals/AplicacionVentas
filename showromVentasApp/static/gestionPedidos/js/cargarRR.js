@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Manejo de docEntry
     const docEntry = getQueryParam('docentry');
     if (docEntry) {
-      const vendedorDataElement = document.getElementById("vendedor_data");
+      const vendedorDataElement = document.querySelector("#vendedor_data");
       const showroomElement = document.getElementById("sucursal");
       const estadoElement = document.getElementById('estado');
   
@@ -17,68 +17,44 @@ document.addEventListener("DOMContentLoaded", function () {
         showroomElement.innerText = "Cargando...";
         estadoElement.innerText = "Cargando...";
       }
-
+  
       showLoadingOverlay();
-
-      fetch(`/ventas/detalles_ODV/?docentry=${docEntry}`)
+  
+  
+      fetch(`/ventas/detalles_devolucion/?docentry=${docEntry}`)
         .then(response => {
           if (!response.ok) throw new Error('Error al obtener la información de la cotización');
           return response.json();
         })
         .then(data => {
           if (data.Cliente && data.Cliente.SalesPersons) {
+            console.log("Datos de la cotización:", data);
   
             // Extracción de datos principales
             const salesEmployeeName = data.Cliente.SalesPersons.SalesEmployeeName;
             const salesPersonCode = data.Cliente.SalesPersons.SalesEmployeeCode;
             const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
-            const numCotizacion = data.Cliente.Orders.DocNum;
-            const docDate = data.Cliente.Orders.DocDueDate;
-            const canceled = data.Cliente.Orders.Cancelled;
-            let cardCode = data.Cliente.Orders.CardCode;
-            const DocumentStatus = data.Cliente.Orders.DocumentStatus;
-            const docEntry = data.Cliente.Orders.DocEntry;
-            const tipoFactura = data.Cliente.Orders.U_LED_TIPDOC;
-            const referencia = data.Cliente.Orders.NumAtCard;
-            const comentarios = data.Cliente.Orders.Comments;
-            const tipoentrega = data.Cliente.Orders.TransportationCode;
-
-            const tipoDocRadios = document.getElementsByName("tipoDocTributario");
-
-          // Iterar sobre los radios para seleccionar el correspondiente
-          tipoDocRadios.forEach(radio => {
-            if (radio.value === tipoFactura) {
-              radio.checked = true; // Seleccionar el radio cuyo valor coincide con tipoFactura
-            }
-          });
-
-          if (referencia) {
-            const referenciaInput = document.getElementById("referencia");
-            if (referenciaInput) {
-              referenciaInput.value = referencia; // Asigna el valor capturado al input
-            } else {
-              console.warn("No se encontró el elemento con id 'referencia'.");
-            }
-          }
-
-          if (comentarios) {
-            const comentariotxt = document.getElementById("Observaciones-1");
-            if (comentariotxt) {
-              comentariotxt.value = comentarios; // Asigna el valor capturado al input
-            } else {
-              console.warn("No se encontró el elemento con id 'comentariotxt'.");
-            }
-          }
-
-          // Capturar el elemento del select
-          const tipoEntregaSelect = document.getElementById("tipoEntrega-1");
-
-          // Verificar si el elemento existe
-          if (tipoEntregaSelect) {
-            // Ajustar el valor del select al tipo de entrega obtenido
-            tipoEntregaSelect.value = tipoentrega;
-          }
+            const numCotizacion = data.Cliente.ReturnRequest.DocNum;
+            const docDate = data.Cliente.ReturnRequest.DocDate;
+            const canceled = data.Cliente.ReturnRequest.Cancelled;
+            let cardCode = data.Cliente.ReturnRequest.CardCode;
+            const DocumentStatus = data.Cliente.ReturnRequest.DocumentStatus;
+            const docEntry = data.Cliente.ReturnRequest.DocEntry;
+            const razonSocial = data.Cliente.ReturnRequest.CardName;
+            const tipoentrega = data.Cliente.ReturnRequest.TransportationCode;
+            const tipoFactura = data.Cliente.ReturnRequest.U_LED_TIPDOC;
+            const referencia = data.Cliente.ReturnRequest.NumAtCard;
+            const comentarios = data.Cliente.ReturnRequest.Comments;
+            
   
+            const contactos = data.Cliente.ContactEmployee.Contactos;
+  
+  
+            console.log("Tipo de comentarios: ", referencia);
+            console.log("Tipo de comentarios: ", comentarios);
+            console.log("Tipo de tipoEntrega: ", tipoentrega);
+            
+            
             if (cardCode.endsWith("C")) {
               cardCode = cardCode.slice(0, -1);
             }
@@ -91,17 +67,59 @@ document.addEventListener("DOMContentLoaded", function () {
               vendedorDataElement.setAttribute("data-codeven", salesPersonCode);
             }
   
+            
+  
             const showroomElement = document.getElementById("sucursal");
             if (showroomElement) {
               showroomElement.innerText = sucursal;
             }
-
-            const docEntryElement = document.getElementById("numero_orden");
+  
+            //capturando referencia
+  
+            if (referencia) {
+              const referenciaInput = document.getElementById("referencia");
+              if (referenciaInput) {
+                referenciaInput.value = referencia; // Asigna el valor capturado al input
+              } else {
+                console.warn("No se encontró el elemento con id 'referencia'.");
+              }
+            }
+  
+            // Capturando comentarios
+  
+            if (comentarios) {
+              const comentariotxt = document.getElementById("Observaciones-1");
+              if (comentariotxt) {
+                comentariotxt.value = comentarios; // Asigna el valor capturado al input
+              } else {
+                console.warn("No se encontró el elemento con id 'comentariotxt'.");
+              }
+            }
+  
+            // Capturar el elemento del select
+            const tipoEntregaSelect = document.getElementById("tipoEntrega-1");
+  
+            // Verificar si el elemento existe
+            if (tipoEntregaSelect) {
+              // Ajustar el valor del select al tipo de entrega obtenido
+              tipoEntregaSelect.value = tipoentrega;
+            }
+  
+            const tipoDocRadios = document.getElementsByName("tipoDocTributario");
+  
+            // Iterar sobre los radios para seleccionar el correspondiente
+            tipoDocRadios.forEach(radio => {
+              if (radio.value === tipoFactura) {
+                radio.checked = true; // Seleccionar el radio cuyo valor coincide con tipoFactura
+              }
+            });
+  
+            const docEntryElement = document.getElementById("numero_cotizacion");
             if (docEntryElement) {
               docEntryElement.setAttribute("data-docEntry", docEntry);
             }
   
-            const numeroCotizacionElement = document.getElementById("numero_orden");            
+            const numeroCotizacionElement = document.getElementById("numero_cotizacion");
             if (numeroCotizacionElement) {
               numeroCotizacionElement.textContent = `${numCotizacion}`;
             }
@@ -125,33 +143,35 @@ document.addEventListener("DOMContentLoaded", function () {
             }
   
             traerInformacionCliente(cardCode);
-
+  
             // Iteración sobre `DocumentLines` para añadir cada producto
             const documentLines = data.DocumentLines;
 
-            console.log("Líneas de documento:", documentLines);
-          
             documentLines.sort((a, b) => a.LineNum - b.LineNum);
 
+
             documentLines.forEach((line) => {
-              const linea_documento = line.LineNum;
-              const productoCodigo = line.ItemCode;
-              const nombre = line.ItemDescription;
-              const imagen = line.imagen;
-              const precioVenta = line.GrossPrice;
-              const stockTotal = 0;
-              const precioLista = line.PriceList;
-              const precioDescuento = line.DescuentoMax;
-              const sucursal = line.WarehouseCode;
-              const descuentoAplcado = line.DiscountPercent;
-              const comentario = line.FreeText;
-              const fechaEntrega = line.ShipDate;
-              const tipoentrega2 = line.ShippingMethod;
 
-              let linea_documento_real = parseInt(linea_documento);
+                const linea_documento = line.LineNum;
+                const productoCodigo = line.ItemCode;
+                const nombre = line.ItemDescription;
+                const imagen = line.imagen;
+                const precioVenta = line.PriceAfterVAT;
+                const stockTotal = 0;
+                const precioLista = line.GrossPrice;
+                const precioDescuento = line.DiscountPercent;
+                const sucursal = line.WarehouseCode;
+                const comentario = line.FreeText;
+                const tipoentrega2 = line.ShippingMethod;
+                const fechaEntrega = line.ShipDate;
 
+                let linea_documento_real = parseInt(linea_documento);
+
+
+
+              console.log("comentario: ", comentario);
+  
               console.log("Agregando producto con datos:", {
-                linea_documento,
                 productoCodigo,
                 nombre,
                 imagen,
@@ -160,26 +180,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 precioLista,
                 precioDescuento,
                 sucursal,
-                comentario,
-                descuentoAplcado
+                comentario
               });
-
   
-              agregarProducto(linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado,  tipoentrega2, fechaEntrega);
+              agregarProducto(linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, tipoentrega2, fechaEntrega);
             });
           }
-
+  
           hideLoadingOverlay();
         })
+        
         .catch(error => {
           console.error('Error en la solicitud AJAX:', error);
           if (vendedorDataElement) {
             vendedorDataElement.innerText = "Error al cargar datos";
           }
           hideLoadingOverlay();
-
+  
         });
-        
     } else {
       console.log("No se ha proporcionado un DocEntry en la URL.");
       hideLoadingOverlay();
@@ -193,8 +211,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const giroCliente = getQueryParam("giroSN");
     const telefonoCliente = getQueryParam("telefonoSN");
     const emailCliente = getQueryParam("emailSN");
-
-
+  
+  
+  
     if (rutCliente) {
       //console.log("RUT recibido en la página de destino:", rutCliente);
       //console.log("Nombre recibido en la página de destino:", nombreCliente);
@@ -204,28 +223,42 @@ document.addEventListener("DOMContentLoaded", function () {
       //console.log("Teléfono recibido en la página de destino:", telefonoCliente);
       //console.log("Email recibido en la página de destino:", emailCliente);
       traerInformacionCliente(rutCliente); // Llama a la función con el RUT
-
-      if (grupoSN) {
-        document.querySelector(`input[name="grupoSN"][value="${grupoSN}"]`).checked = true;
-    }
-    if (nombreSN) {
+  
+      // Selecciona el radio correspondiente basado en `grupoSN`.
+      const radioInput = document.querySelector(`input[name="grupoSN"][value="${grupoSN}"]`);
+      if (radioInput) {
+        radioInput.checked = true;
+        console.log("Grupo seleccionado:", grupoSN);
+        // Ejecuta la función cambiarLabel con la opción seleccionada.
+        cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow');
+      } else {
+        console.warn("No se encontró el input con el valor:", grupoSN);
+      }
+  
+      // Agregar evento onchange para que funcione dinámicamente al cambiar la selección.
+      document.getElementsByName('grupoSN').forEach(radio => {
+        radio.addEventListener('change', () => {
+          cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow');
+        });
+      });
+      if (nombreSN) {
         document.getElementById("nombreSN").value = nombreCliente;
-    }
-    if (apellidoSN) {
+      }
+      if (apellidoSN) {
         document.getElementById("apellidoSN").value = apellidoCliente;
-    }
-    if (rutCliente) {
+      }
+      if (rutCliente) {
         document.getElementById("rutSN").value = rutCliente;
-    }
-    if (giroSN) {
+      }
+      if (giroSN) {
         document.getElementById("giroSN").value = giroCliente;
-    }
-    if (telefonoSN) {
+      }
+      if (telefonoSN) {
         document.getElementById("telefonoSN").value = telefonoCliente;
-    }
-    if (emailSN) {
+      }
+      if (emailSN) {
         document.getElementById("emailSN").value = emailCliente;
-    }
+      }
     } else {
       console.log("No se proporcionó un RUT válido en la URL.");
     }

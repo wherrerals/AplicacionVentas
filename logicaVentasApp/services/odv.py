@@ -1,4 +1,5 @@
 import json
+import math
 from django.http import JsonResponse
 from requests import request
 from adapters.sl_client import APIClient
@@ -6,6 +7,7 @@ from datosLsApp.models.stockbodegasdb import StockBodegasDB
 from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.productorepository import ProductoRepository
+from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from logicaVentasApp.services.documento import Documento
 import logging
@@ -91,14 +93,15 @@ class OrdenVenta(Documento):
         return filters
 
     def formatearDatos(self, json_data):
-        # Extraer y limpiar la información del cliente
-
-        print(f"DATOS: {json_data}")
+        # Extraer y limpiar la información del cliente        
 
         client_info = json_data["Client"]["value"][0]
         quotations = client_info.get("Orders", {})
         salesperson = client_info.get("SalesPersons", {})
         contact_employee = client_info.get("BusinessPartners/ContactEmployees", {})
+        vendedor_repo = VendedorRepository()
+        tipo_vendedor = vendedor_repo.obtenerTipoVendedor(salesperson.get("SalesEmployeeCode"))
+        print(f"TIPO VENDEDOR: {tipo_vendedor}")
 
         # Formatear los datos de cliente
         cliente = {
@@ -112,7 +115,7 @@ class OrdenVenta(Documento):
                 "Address2": quotations.get("Address2"),
                 "DocDate": quotations.get("DocDate"),
                 "DocDueDate": quotations.get("DocDueDate"),
-                "Comments": quotations.get("Comments"),
+                "Comments": quotations.get("Comments") if quotations.get("Comments") else "",
                 "DocumentStatus": quotations.get("DocumentStatus"),
                 "Cancelled": quotations.get("Cancelled"),
                 "U_LED_TIPVTA": quotations.get("U_LED_TIPVTA"),
@@ -143,7 +146,26 @@ class OrdenVenta(Documento):
             sku = line.get("ItemCode")
             
             imagen = ProductoRepository.obtenerImagenProducto(sku)
-            
+            bodega = line.get("WarehouseCode")
+
+            imagen = ProductoRepository.obtenerImagenProducto(sku)
+            marca = ProductoRepository.obtenerMarcaProducto(sku)
+            descuentoMax = ProductoRepository.descuentoMax(sku)
+            priceList = ProductoRepository.obtenerPrecioLista(sku)
+
+            stock_bodega = StockBodegasRepository.consultarStockPorBodega(sku, bodega)
+
+            if tipo_vendedor == 'P':
+                if marca == "LST":
+                    descuentoMax =  math.floor(min(descuentoMax * 100, 25))
+                else:
+                    descuentoMax = math.floor(min(descuentoMax * 100, 15))
+            else:
+                if marca == "LST":
+                    descuentoMax = math.floor(min(descuentoMax * 100, 15))
+                else:
+                    descuentoMax = math.floor(min(descuentoMax * 100, 10))
+
             document_line = {
                 "DocEntry": line.get("DocEntry"),
                 "LineNum": line.get("LineNum"),
@@ -168,6 +190,9 @@ class OrdenVenta(Documento):
                 "BaseEntry": line.get("BaseEntry"),
                 "BaseLine": line.get("BaseLine"),
                 "LineStatus": line.get("LineStatus"),
+                "DescuentoMax": descuentoMax,
+                "PriceList": priceList,
+                "StockBodega": stock_bodega,
                 "WarehouseInfo": {
                     "WarehouseCode": warehouse_info.get("WarehouseCode"),
                     "InStock": warehouse_info.get("InStock"),
@@ -187,7 +212,17 @@ class OrdenVenta(Documento):
 
     # En odv.py - Método actualizado para manejar múltiples líneas del mismo SKU/bodega
     def actualizarDocumento(self, docnum, docentry, data):
+
+        print(f"DATA: {data}")
+
         try:
+
+
+            errores = self.validarDatosODV(data)
+            
+            if errores:
+                return {'error': errores}
+
             stock_service = StockService()
             apiClient = APIClient()
 
@@ -318,8 +353,9 @@ class OrdenVenta(Documento):
     def crearDocumento(self, data):
 
         try:
-            stock_service = StockService()
-            sl = APIClient()
+
+            print(f"DATA: {data}")
+            
             errores = self.validarDatosODV(data)
             
             if errores:
@@ -340,11 +376,35 @@ class OrdenVenta(Documento):
                 # Descontar stock
                 stock_service.actualizar_stock(sku, bodega_id, -cantidad, stock_actual)
 
+
+            stock_service = StockService()
+            sl = APIClient()
+
+            
+            stock_inicial = []  # Para rollback en caso de error
+
+            for item in data['DocumentLines']:
+                sku = item['ItemCode']
+                bodega_id = item['WarehouseCode']
+                cantidad = item['Quantity']
+
+                # Capturar el stock inicial antes de descontarlo
+                stock_actual = StockBodegasDB.objects.filter(idProducto__codigo=sku, idBodega=bodega_id).values_list('stock', flat=True).first() or 0
+
+                stock_inicial.append((sku, bodega_id, stock_actual))  # Guardar para rollback
+
+                # Descontar stock
+                stock_service.actualizar_stock(sku, bodega_id, -cantidad, stock_actual)
+
             # Preparar el JSON para la cotización
             jsonData = self.prepararJsonODV(data)
 
+            print(f"previo a la creacion de la cotizacion")
+
             # Realizar la solicitud a la API
             response = sl.crearODV(jsonData)
+
+            print(f"RESPONSE: {response}")
             
             if isinstance(response, dict):
                 if 'DocEntry' in response:
@@ -408,9 +468,57 @@ class OrdenVenta(Documento):
 
         if not data.get('DocDueDate'):
             errores.append("La fecha de vencimiento es obligatoria.")
+    
+        if not errores:
+            resultado_stock = self.validar_stock_total_por_bodega(data)
+            if isinstance(resultado_stock, list):  # Si hay errores de stock
+                errores.extend(resultado_stock)
 
         # Si hay errores, retornarlos como una cadena
         return ' '.join(errores)
+
+    @staticmethod
+    def validar_stock_total_por_bodega(data):
+        """
+        Verifica que el stock total del código en la cotización no supere el stock disponible en bodega.
+        """
+        print("Validando stock total por bodega...")
+
+        stock_validado = {}  # Almacena el stock disponible en bodega
+        suma_por_clave = {}  # Almacena la suma total de cada (SKU, Bodega)
+        errores = []
+
+        # Primera pasada: sumar las cantidades por (SKU, Bodega)
+        for linea in data.get("DocumentLines", []):
+            item_code = linea["ItemCode"]
+            warehouse_code = linea["WarehouseCode"]
+            quantity = linea["Quantity"]
+            clave = (item_code, warehouse_code)
+
+            # Acumular la cantidad de productos solicitados por (SKU, Bodega)
+            suma_por_clave[clave] = suma_por_clave.get(clave, 0) + quantity
+
+        # Segunda pasada: validar stock
+        for (item_code, warehouse_code), total_quantity in suma_por_clave.items():
+            # Obtener stock disponible en bodega si no está en el diccionario de stock_validado
+            if (item_code, warehouse_code) not in stock_validado:
+                stock_en_bodega = StockBodegasDB.objects.filter(
+                    idProducto__codigo=item_code, idBodega=warehouse_code
+                ).values_list("stock", flat=True).first() or 0
+
+                print(f"Stock en bodega {warehouse_code} para {item_code}: {stock_en_bodega}")
+                stock_validado[(item_code, warehouse_code)] = stock_en_bodega
+
+            # Validar si la cantidad total supera el stock disponible
+            if total_quantity > stock_validado[(item_code, warehouse_code)]:
+                errores.append(f"El total solicitado del producto {item_code} en la bodega {warehouse_code} supera el stock disponible ({stock_validado[(item_code, warehouse_code)]} unidades).")
+
+        return errores if errores else "Stock validado correctamente."
+
+
+            
+
+
     
     def prepararJsonODV(self, jsonData):
 
@@ -446,7 +554,7 @@ class OrdenVenta(Documento):
             'DocDate': jsonData.get('DocDate'),
             'DocDueDate': jsonData.get('DocDueDate'),
             'TaxDate': jsonData.get('TaxDate'),
-            'ContactPersonCode': numerocontactoSAp,
+            #'ContactPersonCode': numerocontactoSAp,
             'Address': addresmodif,
             'Address2': addresmodif2,
             'CardCode': jsonData.get('CardCode'),

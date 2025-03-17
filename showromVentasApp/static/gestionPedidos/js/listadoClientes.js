@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const getSkip = (page) => (page - 1) * recordsPerPage;
 
+    showLoadingOverlay();
 
     const getFilterData = () => {
         // Captura el valor seleccionado en el filtro tipoSN
@@ -39,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Mostrar el loader después de iniciar el desplazamiento
         setTimeout(() => {
-            showLoader();
+            showLoadingOverlay();
 
             const skip = getSkip(page);
             const filters = getFilterData(); // Captura los filtros
@@ -82,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     console.error('Error al obtener los datos:', error);
                 })
                 .finally(() => {
-                    hideLoader();
+                    hideLoadingOverlay();
                 });
         }, 300); // Tiempo para garantizar que el desplazamiento se vea antes del loader
     };
@@ -150,13 +151,52 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><a href="/ventas/creacion_clientes/?rut=${cardCodeClean}" class="client-link">${cardCodeClean}</a></td>
+                <td><a href="#" class="cliente-link" data-cadcode="${client.CardCode}">${client.CardCode}</a></td>
                 <td>${client.CardName || 'Desconocido'}</td>
                 <td>${groupType}</td>
                 <td>${client.Phone1 || 'No disponible'}</td>
                 <td>${client.EmailAddress || 'no disponible'}</td>
             `;
             tbody.appendChild(tr);
+        });
+
+        hideLoadingOverlay();
+
+
+        // Agrega el evento click a todos los enlaces de clientes después de añadir las filas
+        document.querySelectorAll('.cliente-link').forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                let cadCode = event.target.getAttribute('data-cadcode');
+        
+                // Eliminar la "C" final si está presente
+                if (cadCode && cadCode.endsWith("C")) {
+                    cadCode = cadCode.slice(0, -1);
+                }
+        
+                if (cadCode) {
+                    showLoadingOverlay();
+                    // Realiza la solicitud AJAX al backend para obtener la información del cliente
+                    fetch(`/ventas/informacion_cliente/?rut=${cadCode}`)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Error al obtener la información del cliente');
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Información del cliente:', data);
+        
+                            // Redirige a la página de creación de cliente después de obtener los datos
+                            window.location.href = `/ventas/creacion_clientes/?rut=${cadCode}`;
+                        })
+                        .catch(error => {
+                            hideLoadingOverlay();
+                            console.error('Error en la solicitud AJAX:', error);
+                        });
+                } else {
+                    hideLoadingOverlay();
+                    alert("No se pudo obtener el RUT del cliente.");
+                }
+            });
         });
     };
 

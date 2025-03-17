@@ -1,14 +1,16 @@
 class Producto {
-    constructor(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, cantidadCoti, precioCoti,  tipoentrega2, fechaEntrega = new Date().toISOString().split('T')[0]) {
+    constructor(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado, cantidadCoti, precioCoti,  tipoentrega2, fechaEntrega = new Date().toISOString().split('T')[0]) {
+        
+        this.linea_documento = linea_documento;
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
         this.imagen = imagen;
-        this.precioVenta = Math.round(precioVenta);
+        this.precioVenta = precioVenta;
         this.stockTotal = stockTotal;
-        this.precioLista = Math.round(precioLista);
+        this.precioLista = precioLista;
         this.precioDescuento = Math.round(precioDescuento);
         this.precioSinDescuento = 0;
-        this.totalProducto = Math.round(precioVenta * cantidad);
+        this.totalProducto = precioVenta * cantidad;
         this.cantidad = cantidad;
         this.sucursal = sucursal;
         this.cantidadCoti = cantidadCoti;
@@ -16,6 +18,11 @@ class Producto {
         this.comentario = comentario;
         this.tipoEntrega2 = tipoentrega2;
         this.fechaEntrega = fechaEntrega;
+        this.descuentoAplcado = descuentoAplcado;
+
+        console.log("Producto descuentoAplcado:", this.descuentoAplcado);
+
+
     }
 
     async obtenerStock(codigoProducto) {
@@ -32,9 +39,14 @@ class Producto {
         }
     }
 
-    // Modifica el método actualizarStock para que no actualice stockTotal
+
     async actualizarStock(row, actualizarStockTotal = true) {
+        
+        console.log("Producto a actualizar:", this.productoCodigo);
+
         const stockData = await this.obtenerStock(this.productoCodigo);
+        
+        console.log("Stock data en actualizar Stock:", stockData);
 
         if (stockData) {
             // Mapear las bodegas válidas (excluyendo GR)
@@ -46,6 +58,8 @@ class Producto {
 
             // Filtrar los datos de stock excluyendo la bodega "GR"
             const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
+
+            console.log("Stock filtrado en actualizar Stock:", stockFiltrado);
 
             // Calcular el stock total sumando solo las bodegas válidas
             const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock, 0);
@@ -88,7 +102,7 @@ class Producto {
                 <td style="font-size: 12px;background: transparent;border-style: none;padding-bottom: 0px;"rowspan="2">
                     <div class="row">
                         <div class="col-md-11 col-xxl-6" style="font-size: 14px;font-weight: bold;"><small style="font-weight: bold;">
-                        <small id="indixe_producto">${contprod})</small><small>&nbsp;&nbsp;</small><small name="sku_producto">${this.productoCodigo}</small></div>
+                        <small id="indixe_producto" data-lineNum="${this?.linea_documento}">${contprod})</small><small>&nbsp;&nbsp;</small><small name="sku_producto">${this.productoCodigo}</small></div>
                         <div class="col-md-11 col-xxl-7" style="text-align: center;"><img src="${this.imagen}" width="50" height="50" style="width: 50px;height: 50px;" name="img_producto" id="img_productox"></div>
                     </div>
                 </td>
@@ -132,7 +146,7 @@ class Producto {
 
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <div>
-                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="0">
+                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="${this.descuentoAplcado ?? 0}">
                     </div>
                 </td>
                    
@@ -252,7 +266,8 @@ class Producto {
         let inputDescuento = row.querySelector('#agg_descuento');
         inputDescuento.max = descuentoMax;
 
-        inputDescuento.value = 0;
+        inputDescuento.value = this.descuentoAplcado;  // Cambié de 0 a this.descuentoAplcado
+
         inputDescuento.addEventListener('input', function () {
             let valor = parseFloat(inputDescuento.value);
             if (valor > descuentoMax) {
@@ -538,7 +553,7 @@ class Producto {
 let lineasDocumento = {}; // Objeto para almacenar las líneas por producto
 
 
-function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, tipoEntrega2, fechaEntrega) {
+function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, tipoEntrega2, fechaEntrega, descuentoAplcado = 1 - 1) {
     
     
     lineasDocumento[productoCodigo] = {
@@ -552,11 +567,9 @@ function agregarProducto(productoCodigo, nombre, imagen, precioVenta, stockTotal
     let contprod = document.querySelectorAll('#productos tbody').length + 1; // Contador de productos
 
     // Crear instancia del producto
+
     const cantidadFinal = cantidad !== undefined ? cantidad : 1;
-    const producto = new Producto(productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, tipoEntrega2, fechaEntrega);
-
-    console.log("Cantidad recibida en agregarProducto:", cantidad);
-
+    const producto = new Producto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, tipoEntrega2, fechaEntrega, descuentoAplcado);
     const newRow = producto.crearFila(contprod); // Crear la fila del producto
 
     document.getElementById('productos').appendChild(newRow); // Agregar la fila al tbody

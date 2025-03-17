@@ -56,9 +56,9 @@ $(document).ready(function () {
                                     console.log('Cotización:', cantidad);
                                     }
 
-                                console.log('Producto seleccionado:', codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento);
+                                console.log('Producto seleccionado:',lineaDocumento=null, codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento);
                                 
-                                agregarProducto(codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal); // Ejecuta la función agregar producto
+                                agregarProducto(lineaDocumento=null, codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal); // Ejecuta la función agregar producto
 
                                 // Limpia el input #inputNumero al seleccionar un producto
                                 $('#inputNumero').val('');

@@ -343,8 +343,25 @@ def lista_solic_devoluciones(request):
     Returns:
         HttpResponse: renderiza el template 'lista_solic_devoluciones.html'
     """
+    if request.user.is_authenticated:
+        username = request.user.username
 
-    return render(request, "lista_solic_devoluciones.html")
+        try:
+            usuario = UsuarioDB.objects.get(usuarios=request.user)
+            nombreUser = usuario.nombre
+
+
+        except UsuarioDB.DoesNotExist:
+            return JsonResponse({'error': 'No se encontró el usuario relacionado con el usuario autenticado'}, status=404)
+        
+
+        
+        context = {
+            'username': username,
+            'nombreuser': nombreUser,
+        }
+
+    return render(request, "lista_solic_devoluciones.html", context)
 
 @login_required
 def lista_clientes(request):
@@ -1115,18 +1132,21 @@ def generar_cotizacion_pdf(request, cotizacion_id):
                 direcciones = DireccionRepository.obtenerDireccionesID(id_direrccion)
                 address = f"{direcciones.calleNumero}, {direcciones.comuna.nombre}"
 
-            
-            contactos = ContactoRepository.obtenerContacto(data.get('contacto'))
+            if data.get('contacto') == 'No hay contactos disponibles':
+                contactos = ''
+            else:
+                contactos = ContactoRepository.obtenerContacto(data.get('contacto'))
+                if contactos.nombre != "1":
+                    contactos = contactos.nombreCompleto
+                else:
+                    contactos = datossocio.nombre
+
             sucursal = data.get('sucursal')
             datossocio = snrepo.obtenerPorCodigoSN(codigoSn)
 
             detalle_sucursal = SucursalDB.objects.filter(codigo=sucursal).first()
 
-            
-            if contactos.nombre != "1":
-                contactos = contactos.nombreCompleto
-            else:
-                contactos = datossocio.nombre
+
 
             if datossocio.grupoSN.codigo == "105":
                 name_user = datossocio.nombre

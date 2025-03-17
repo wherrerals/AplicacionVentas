@@ -188,8 +188,6 @@ class DireccionManager {
     container.style.flexDirection = "row";
     container.style.overflowX = "auto"; // Permitir desplazamiento horizontal
     container.appendChild(newRow);
-
-    container.appendChild(newRow);
     newRow
       .querySelector("#eliminar_dir")
       .addEventListener("click", () => newRow.remove());

@@ -142,6 +142,8 @@ class OdvView(View):
     def crearOActualizarODV(self, request):
         try:
             data = json.loads(request.body)
+
+            print(f"Data: {data}")
             users_data = self.user_data(request)
             docEntry = data.get("DocEntry")
             docnum = data.get("DocNum")
