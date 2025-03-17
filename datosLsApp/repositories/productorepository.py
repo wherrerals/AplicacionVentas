@@ -346,4 +346,5 @@ class ProductoRepository:
         
         producto = ProductoDB.objects.get(codigo=sku)
         precioventaunitario = producto.precioVenta
-        return precioventaunitario / 1.19
+        #return precioventaunitario / 1.19
+        return precioventaunitario

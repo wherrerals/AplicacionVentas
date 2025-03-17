@@ -1,8 +1,9 @@
 // Dependencias: valorTributario.js
 class valorTributario {
-    constructor(codigoProducto, precioFinal) {
+    constructor(codigoProducto, precioFinal, indiceProducto) {
         this.codigoProducto = codigoProducto;
         this.precioFinal = precioFinal;
+        this.indiceProducto = indiceProducto;
     }
 
     // Metodo para modificar el precio final
@@ -27,7 +28,7 @@ class valorTributario {
 // Array global para almacenar las instancias de valorTributario
 const productos = [];
 
-function agregarInteractividad(newRow, codigoProducto) {
+function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
     // Obtener referencias a los elementos dentro de la fila
     var inputCantidad = newRow.querySelector('#calcular_cantidad');
     var inputDescuento = newRow.querySelector('#agg_descuento');
@@ -41,7 +42,7 @@ function agregarInteractividad(newRow, codigoProducto) {
     var valorNeto = document.querySelector('#total_neto small');
 
     // Crear instancia de valorTributario y agregarla al array
-    var producto = new valorTributario(codigoProducto, 0);
+    var producto = new valorTributario(codigoProducto, 0, indiceProducto);
     productos.push(producto);
 
     console.log('Producto agregado:', producto);
@@ -86,19 +87,24 @@ function agregarInteractividad(newRow, codigoProducto) {
     }
 
     document.addEventListener('productoEliminado', function (event) {
-        const codigoProducto = event.detail.codigoProducto;
-
-        // Buscar el índice del producto a eliminar
-        const index = productos.findIndex(producto => producto.codigoProducto === codigoProducto);
-
+        const { codigoProducto, indiceProducto } = event.detail;
+    
+        console.log(`Producto eliminado: ${codigoProducto}, Índice: ${indiceProducto}`);
+    
+        // Eliminar solo el producto con el índice específico
+        const index = productos.findIndex(producto => 
+            producto.codigoProducto === codigoProducto && producto.indiceProducto == indiceProducto
+        );
+    
         if (index > -1) {
             productos.splice(index, 1);
         }
 
-        // Imprimir el estado actual del array productos después de la eliminació
+    
         // Actualizar los valores totales
         actualizarValores();
     });
+    
 
     // Función para actualizar los valores de IVA, bruto y neto sumando todos los productos
     function actualizarValores() {

@@ -105,7 +105,7 @@ class Producto {
                 <td style="font-size: 12px;background: transparent;border-style: none;padding-bottom: 0px;"rowspan="2">
                     <div class="row">
                         <div class="col-md-11 col-xxl-6" style="font-size: 14px;font-weight: bold;"><small style="font-weight: bold;">
-                        <small id="indixe_producto" data-lineNum="${this?.linea_documento}">${contprod})</small><small>&nbsp;&nbsp;</small><small name="sku_producto">${this.productoCodigo}</small></div>
+                        <small id="indixe_producto" data-lineNum="${this?.linea_documento}" data-indice="${contprod}">${contprod})</small><small>&nbsp;&nbsp;</small><small name="sku_producto">${this.productoCodigo}</small></div>
                         <div class="col-md-11 col-xxl-7" style="text-align: center;"><img src="${this.imagen}" width="50" height="50" style="width: 50px;height: 50px;" name="img_producto" id="img_productox"></div>
                     </div>
                 </td>
@@ -342,26 +342,37 @@ function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precio
 
     document.getElementById('productos').appendChild(newRow); // Agregar la fila al tbody
 
+    const indiceProducto = newRow.querySelector('#indixe_producto').getAttribute('data-indice'); 
+
 
     newRow.querySelector('#mostrar-descuento').addEventListener('click', function () {
         producto.alternarMaxDescuento(newRow);
     });
 
     newRow.querySelector('#eliminarp').addEventListener('click', function () {
+        // Obtener el índice del producto dentro de la tabla
+        const indiceProducto = newRow.querySelector('#indixe_producto').getAttribute('data-indice'); 
+
+        console.log('indide producto:', indiceProducto);
+    
         // Eliminar la fila del DOM
         newRow.remove();
     
-        // Emitir un evento personalizado pasando el código del producto
+        // Emitir el evento con código del producto e índice
         const event = new CustomEvent('productoEliminado', {
-            detail: { codigoProducto: productoCodigo }
+            detail: { 
+                codigoProducto: productoCodigo,
+                indiceProducto: indiceProducto // Pasar el índice específico
+            }
         });
+    
         console.log('Evento emitido:', event);
         document.dispatchEvent(event);
     
         // Actualizar los índices de los productos visibles
         actualizarIndicesProductos();
-        
     });
+    
     
     function actualizarIndicesProductos() {
         // Seleccionar todas las filas de los productos
@@ -395,6 +406,6 @@ function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precio
     const inputNumero = document.getElementById("inputNumero");
 
     // Llamar a la función agregarInteractividad si es necesario
-    agregarInteractividad(newRow, productoCodigo);
+    agregarInteractividad(newRow, productoCodigo, indiceProducto);
 
 }
