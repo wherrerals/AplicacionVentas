@@ -270,8 +270,11 @@ $(document).ready(function () {
                                 inputCliente.value = rutCliente;
                             }
 
-                            $('#resultadosClientes').empty(); // Limpiar los resultados de la búsqueda 
+                            $('#resultadosClientes').empty(); // Limpiar los resultados de la búsqueda
                             traerInformacionCliente(rutCliente); // Traer la información del cliente
+                            cargarDirecciones(rutCliente); // Cargar las direcciones del cliente
+                            cargarContactos(rutCliente); // Cargar los contactos del cliente
+ 
                         }
                     }, 500); // Esperar 500ms para que termine la animación
                 } else {

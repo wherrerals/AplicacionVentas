@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const fechaSolo = new Date().toISOString().split("T")[0]; // Salida en formato YYYY-MM-DD
       const docNum = document.getElementById("numero_orden").textContent;
       const docEntry = document.getElementById("numero_orden").getAttribute("data-docEntry");
+      const docTotal = document.getElementById("total_bruto").getAttribute("data-total-bruto");
       const docDate = fechaSolo;
       const fechaentrega = document.getElementById("fecha_entrega").value;
       const taxDate = fechaSolo;
@@ -78,6 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
         DocNum: docNum,
         DocEntry: docEntry,
         DocDate: docDate,
+        DocTotal: docTotal,
         NumAtCard: referencia,
         DocDueDate: fechaentrega,
         Comments: observaciones,

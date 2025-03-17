@@ -689,6 +689,7 @@ class SocioNegocio:
         
     def procesarContactos(data, socio):
             try:
+                print("Procesando contactos...")
                 contactos_json = data.get('contactos')
 
                 if not contactos_json:

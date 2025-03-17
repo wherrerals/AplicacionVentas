@@ -38,6 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
                   document.getElementById("rutSN").setAttribute("data-rut", data[0].rut || '');
                   document.getElementById("rutSN").readOnly = true;
 
+                  document.getElementById("inputCliente").setAttribute("data-codigoSN", data[0].codigoSN || '');
+
                   console.log("Valor de data[0].grupoSN:", data[0].grupoSN);
 
                     // Lógica para seleccionar "Empresa" o "Persona"

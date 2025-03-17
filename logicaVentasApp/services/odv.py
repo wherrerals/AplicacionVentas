@@ -93,7 +93,8 @@ class OrdenVenta(Documento):
         return filters
 
     def formatearDatos(self, json_data):
-        # Extraer y limpiar la información del cliente        
+        # Extraer y limpiar la información del cliente  
+        print(f"JSON_DATA: {json_data}")      
 
         client_info = json_data["Client"]["value"][0]
         quotations = client_info.get("Orders", {})
@@ -208,6 +209,7 @@ class OrdenVenta(Documento):
             "DocumentLines": document_lines
         }
 
+        print(f"RESULTADO_cotizacion: {document_lines}")
         return resultado
 
     # En odv.py - Método actualizado para manejar múltiples líneas del mismo SKU/bodega
@@ -539,6 +541,7 @@ class OrdenVenta(Documento):
             'DocDate': jsonData.get('DocDate'),
             'DocDueDate': jsonData.get('DocDueDate'),
             'TaxDate': jsonData.get('TaxDate'),
+            'DocTotal': jsonData.get('DocTotal'),
             #'ContactPersonCode': numerocontactoSAp,
             'Address': addresmodif,
             'Address2': addresmodif2,
@@ -579,6 +582,13 @@ class OrdenVenta(Documento):
             }
             for linea in lineas
         ]
+
+        dic = {
+            **cabecera,
+            'DocumentLines': lineas_json,
+        }
+
+        print(dic)
 
         return {
             **cabecera,

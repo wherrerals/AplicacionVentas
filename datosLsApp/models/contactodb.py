@@ -13,8 +13,8 @@ class ContactoDB(models.Model):
     nombre = models.CharField(max_length=255)
     apellido = models.CharField(max_length=255)
     telefono = models.CharField(max_length=20)
-    celular = models.CharField(max_length=20,null = False)
-    email = models.EmailField(null = False)
+    celular = models.CharField(max_length=20)
+    email = models.EmailField()
     SocioNegocio = models.ForeignKey(SocioNegocioDB, on_delete=models.CASCADE, default=1, null=True)
 
     def __str__(self):

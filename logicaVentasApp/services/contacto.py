@@ -33,9 +33,11 @@ class Contacto:
                 for contacto in contactos_api
             ]
 
+            print(f"Contactos transformados: {contactos}")
             # Convertir al formato JSON string que espera el método original
             contactos_json = json.dumps(contactos)
 
+            print(f"Contactos JSON: {contactos_json}")
             # Simular el request con getlist('contactos')
             request_data = {"contactos": [contactos_json]}
 

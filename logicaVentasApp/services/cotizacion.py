@@ -340,6 +340,7 @@ class Cotizacion(Documento):
             'DocDate': jsonData.get('DocDate'),
             'DocDueDate': jsonData.get('DocDueDate'),
             'TaxDate': jsonData.get('TaxDate'),
+            'DocTotal': jsonData.get('DocTotal'),
             #'ContactPersonCode': numerocontactoSAp,
             'Address': addresmodif,
             'Address2': addresmodif2,
@@ -369,8 +370,11 @@ class Cotizacion(Documento):
                 'lineNum': linea.get('LineNum'),
                 'ItemCode': linea.get('ItemCode'),
                 'Quantity': linea.get('Quantity'),
-                'GrossPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
-                #'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
+                #'PriceAfVAT': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
+                #'GrossPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
+                'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
+                #'NetTaxAmount': repo_producto.obtener_precio_unitario_bruto(linea.get('ItemCode')) * linea.get('Quantity') - repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')) * linea.get('Quantity'),
+                #'TaxTotal': repo_producto.obtener_precio_unitario_bruto(linea.get('ItemCode')) * linea.get('Quantity') - repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')) * linea.get('Quantity'),
                 'ShipDate': linea.get('ShipDate'),
                 'FreeText': linea.get('FreeText'),
                 'DiscountPercent': linea.get('DiscountPercent'),
@@ -386,7 +390,13 @@ class Cotizacion(Documento):
             for linea in lineas
         ]
 
-        print(f"LINEAS JSON: {lineas_json}")
+        dic = {
+            **cabecera,
+            'DocumentLines': lineas_json,
+        }
+
+        print(dic)
+        
         return {
             **cabecera,
             'DocumentLines': lineas_json,

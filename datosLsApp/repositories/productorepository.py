@@ -346,5 +346,22 @@ class ProductoRepository:
         
         producto = ProductoDB.objects.get(codigo=sku)
         precioventaunitario = producto.precioVenta
-        #return precioventaunitario / 1.19
+        return round(precioventaunitario / 1.19, 4)
+        #return precioventaunitario
+
+    def obtener_precio_unitario_bruto(self, sku):
+        """
+        Obtiene el precio neto de un producto, considerando el precio de lista y el descuento máximo.
+        
+        Args:
+            sku (str): Código del producto.
+        
+        Returns:
+            float: Precio neto del producto.
+        """
+
+        print(f"sku: {sku}")
+        
+        producto = ProductoDB.objects.get(codigo=sku)
+        precioventaunitario = producto.precioVenta
         return precioventaunitario

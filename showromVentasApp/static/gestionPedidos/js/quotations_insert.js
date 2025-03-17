@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const docNum = document.getElementById("numero_cotizacion").textContent; //listo
         const docEntry = document.getElementById("numero_cotizacion").getAttribute("data-docEntry")
+        const docTotal = document.getElementById("total_bruto").getAttribute("data-total-bruto");
         const docDate = fechaSolo; //listo 
         const docDueDate = document.getElementById("docDueDate").textContent; //listo
         const taxDate = fechaSolo; // listo
@@ -102,6 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "DocNum": docNum,
             "DocEntry": docEntry,
             "DocDate": docDate,
+            'DocTotal': docTotal,
             "NumAtCard": referencia,
             "DocDueDate": docDueDate,
             "Comments": observaciones,
