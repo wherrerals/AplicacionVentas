@@ -330,3 +330,20 @@ class ProductoRepository:
             cursor.execute(query, params)
             result = cursor.fetchone()
             return result[0] if result else 0
+        
+    def obtener_precio_unitario_neto(self, sku):
+        """
+        Obtiene el precio neto de un producto, considerando el precio de lista y el descuento máximo.
+        
+        Args:
+            sku (str): Código del producto.
+        
+        Returns:
+            float: Precio neto del producto.
+        """
+
+        print(f"sku: {sku}")
+        
+        producto = ProductoDB.objects.get(codigo=sku)
+        precioventaunitario = producto.precioVenta
+        return precioventaunitario / 1.19

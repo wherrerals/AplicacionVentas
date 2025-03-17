@@ -556,6 +556,9 @@ class OrdenVenta(Documento):
 
         # Datos de las líneas
         lineas = jsonData.get('DocumentLines', [])
+
+        repo_producto = ProductoRepository()
+
         
         #lineas = self.ajustarShippingMethod(lineas)
         lineas_json = [
@@ -563,6 +566,7 @@ class OrdenVenta(Documento):
                 'lineNum': linea.get('LineNum'),
                 'ItemCode': linea.get('ItemCode'),
                 'Quantity': linea.get('Quantity'),
+                'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
                 'ShipDate': linea.get('ShipDate'),
                 'FreeText': linea.get('FreeText'),
                 'DiscountPercent': linea.get('DiscountPercent'),

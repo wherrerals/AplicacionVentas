@@ -357,11 +357,19 @@ class Cotizacion(Documento):
 
         # Datos de las líneas
         lineas = jsonData.get('DocumentLines', [])
+
+        repo_producto = ProductoRepository()
+        
+        #maper item code
+
+
         lineas_json = [
+            
             {
                 'lineNum': linea.get('LineNum'),
                 'ItemCode': linea.get('ItemCode'),
                 'Quantity': linea.get('Quantity'),
+                'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
                 'ShipDate': linea.get('ShipDate'),
                 'FreeText': linea.get('FreeText'),
                 'DiscountPercent': linea.get('DiscountPercent'),
@@ -372,9 +380,12 @@ class Cotizacion(Documento):
                 'CostingCode2': linea.get('CostingCode2'),
                 'COGSCostingCode2': linea.get('COGSCostingCode2'),
             }
+
+            
             for linea in lineas
         ]
 
+        print(f"LINEAS JSON: {lineas_json}")
         return {
             **cabecera,
             'DocumentLines': lineas_json,
