@@ -58,7 +58,7 @@ $(document).ready(function () {
 
                                 console.log('Producto seleccionado:',lineaDocumento=null, codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento);
                                 
-                                agregarProducto(lineaDocumento=null, codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal); // Ejecuta la función agregar producto
+                                agregarProducto(docEntry_linea='null', lineaDocumento=null, codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal); // Ejecuta la función agregar producto
 
                                 // Limpia el input #inputNumero al seleccionar un producto
                                 $('#inputNumero').val('');

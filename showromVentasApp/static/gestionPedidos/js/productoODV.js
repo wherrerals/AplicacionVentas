@@ -1,6 +1,7 @@
 class Producto {
-    constructor(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado, cantidadCoti, precioCoti,  tipoentrega2, fechaEntrega = new Date().toISOString().split('T')[0]) {
+    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado, cantidadCoti, precioCoti,  tipoentrega2, fechaEntrega = new Date().toISOString().split('T')[0]) {
         
+        this.docEntry_linea = docEntry_linea;
         this.linea_documento = linea_documento;
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
@@ -18,9 +19,11 @@ class Producto {
         this.comentario = comentario;
         this.tipoEntrega2 = tipoentrega2;
         this.fechaEntrega = fechaEntrega;
-        this.descuentoAplcado = descuentoAplcado;
+        this.descuentoAplcado = descuentoAplcado ?? 0;
 
         console.log("Producto descuentoAplcado:", this.descuentoAplcado);
+        console.log("Producto descuentoAplcado:", this.descuentoAplcado);
+
 
 
     }
@@ -41,13 +44,12 @@ class Producto {
 
 
     async actualizarStock(row, actualizarStockTotal = true) {
-        
         console.log("Producto a actualizar:", this.productoCodigo);
-
+    
         const stockData = await this.obtenerStock(this.productoCodigo);
         
         console.log("Stock data en actualizar Stock:", stockData);
-
+    
         if (stockData) {
             // Mapear las bodegas válidas (excluyendo GR)
             const bodegaMap = {
@@ -55,38 +57,51 @@ class Producto {
                 "PH": "PH",
                 "ME": "ME"
             };
-
+    
             // Filtrar los datos de stock excluyendo la bodega "GR"
             const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
-
+    
             console.log("Stock filtrado en actualizar Stock:", stockFiltrado);
-
+    
             // Calcular el stock total sumando solo las bodegas válidas
             const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock, 0);
-
+    
             // Mostrar el stock total solo si se solicita
             if (actualizarStockTotal) {
                 const stockTotalElem = row.querySelector('[name="stock_total"]');
                 console.log("Stock total actualizado en actualizar Stock:", stockTotal);
                 stockTotalElem.textContent = `Total: ${stockTotal}`;
             }
-
+    
             // Obtener el value de la bodega seleccionada
             const selectBodega = row.querySelector('.form-select');
             const valueSeleccionado = selectBodega.value;
-
+    
             // Usar el mapa para obtener el código correspondiente
             const bodegaSeleccionada = bodegaMap[valueSeleccionado];
-
+    
             // Encontrar el stock de la bodega seleccionada
             const stockBodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock || 0;
-
+            const name_bodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.bodega || 0;
+    
+            console.log("Bodega seleccionada zzzzz:", name_bodega);
+    
             // Mostrar el stock de la bodega seleccionada
             const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
             stockBodegaElem.textContent = `Stock: ${stockBodega}`;
             stockBodegaElem.setAttribute('data-stock', stockBodega);  // Almacenar el valor en un atributo data-stock
-
+    
             console.log("Stock actualizado:", stockBodega);
+            
+            // NUEVO: Asignar stock a cada option del select
+            for (const bodega of stockFiltrado) {
+                const optionElement = selectBodega.querySelector(`option[id="${bodega.bodega}"]`);
+                if (optionElement) {
+                    optionElement.setAttribute('data-stock', bodega.stock);
+                    // Opcionalmente, puedes mostrar el stock en el texto del option
+                    // optionElement.textContent = `${bodega.bodega} (${bodega.stock})`;
+                }
+            }
             
             // Retornar el stock total calculado para uso externo
             return stockTotal;
@@ -97,6 +112,10 @@ class Producto {
     crearFila(contprod) {
         let newRow = document.createElement('tbody');
         newRow.className = 'product-row';
+        //aggregar id a la fila
+        newRow.setAttribute('id', contprod);
+        newRow.setAttribute('data-docentryLinea', this.docEntry_linea);
+        newRow.setAttribute('data-itemcode', this.productoCodigo);
         newRow.innerHTML = `
             <tr>
                 <td style="font-size: 12px;background: transparent;border-style: none;padding-bottom: 0px;"rowspan="2">
@@ -111,14 +130,14 @@ class Producto {
                     <div class="col-sm-12 col-lg-12 col-xl-11 col-xxl-10">
                         <select class="form-select bodega-select" style="font-size: 11px;">
                           <optgroup label="Bodega">
-                            <option value="LC" ${this.sucursal === 'LC' ? 'selected' : ''}>LC</option>
-                            <option value="ME" ${this.sucursal === 'ME' ? 'selected' : ''}>ME</option>
-                            <option value="PH" ${this.sucursal === 'PH' ? 'selected' : ''}>PH</option>
+                            <option id="LC" data-stock="" value="LC" ${this.sucursal === 'LC' ? 'selected' : '' } data-cantidadInicialSAP="${this.sucursal === 'LC' && this.cantidad !== undefined ? this.cantidad : 0}">LC</option>
+                            <option id="ME" data-stock="" value="ME" ${this.sucursal === 'ME' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'ME' && this.cantidad !== undefined ? this.cantidad : 0}">ME</option>
+                            <option id="PH" data-stock="" value="PH" ${this.sucursal === 'PH' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'PH' && this.cantidad !== undefined ? this.cantidad : 0}">PH</option>
                             </optgroup>
                         </select>
                     </div>
                     <div class="col" style="text-align: center;">
-                        <small style="font-size: 12px;" name="stock_bodega" id="stock_bodega" data-stock="">Stock: </small>
+                        <small style="font-size: 12px;" name="stock_bodega" id="stock_bodega">Stock: </small>
                         <small name="stock_total" id="stock_total">Total: </small>
                     </div>
                     </div>
@@ -153,7 +172,7 @@ class Producto {
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${this.precioSinDescuento}</td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <div>
-                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="calcular_cantidad" data-cantidadInicialSAP="${this.cantidad !== undefined ? this.cantidad : 0}" name="cantidad" min="1" max="1000" value="${this.cantidad !== undefined ? this.cantidad : 0}">
+                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad !== undefined ? this.cantidad : 0}">
                     </div>
                     <div class="valorCotizacion" data-itemcode=${this.productoCodigo} hidden>
                         <b><small style="color: rgb(255,0,0);" id="valorCotizacion">Cotiz: ${this.cantidadCoti}</small></b>
@@ -309,8 +328,17 @@ class Producto {
     
     limitarCantidad(row) {
         // Obtener el elemento #numero_orden
-        const numeroOrdenElem = document.getElementById('numero_orden');
-        const docEntry = numeroOrdenElem?.getAttribute('data-docentry');
+        const numeroOrdenElem = row.closest('.product-row') || row.querySelector('.product-row');
+
+        if (!numeroOrdenElem) {
+            console.error("Error: No se encontró el elemento con la clase .product-row en:", row);
+        } else {
+            console.log("Elemento encontrado:", numeroOrdenElem);
+            console.log("DocEntry en limitarCantidad:", numeroOrdenElem.getAttribute('data-docentryLinea'));
+        }
+        
+        const docEntry = numeroOrdenElem?.getAttribute('data-docentryLinea');
+        
     
         // Referencias a elementos DOM
         const cantidadInput = row.querySelector('#calcular_cantidad');
@@ -334,36 +362,71 @@ class Producto {
             console.log("Cantidad inicial:", cantidadInput.value);
         }
         
-        // Ocultar las flechas nativas del input de tipo number
-        cantidadInput.style.appearance = 'none';
-        cantidadInput.style.MozAppearance = 'textfield'; // Firefox
+        const cantidadInputs = row.querySelectorAll('.calcular_cantidad');
+        cantidadInputs.forEach(cantidadInput => {
+            //cantidadInput.style.appearance = 'none';
+            //cantidadInput.style.MozAppearance = 'textfield'; // Firefox
+        });
+        
+        
         
         // Crear los botones de incremento y decremento
         const { incrementButton, decrementButton } = this.botonesCantidad(row);
-    
-        // Función unificada para obtener valores actuales
-        const obtenerValores = () => {
-            return {
-                stockBodega2: parseInt(stockBodegaElem.getAttribute('data-stock') || '0', 10),
-                cantidadActual: parseInt(cantidadInput.value || '0', 10),
-                cantidadInicial: parseInt(cantidadInput.getAttribute('data-initial-value') || '0', 10),
-                stockBodegaTexto: parseInt(stockBodegaElem.textContent.replace('Stock: ', '') || '0', 10),
-                stockTotalTexto: parseInt(stockTotalElem.textContent.replace('Total: ', '') || '0', 10)
-            };
-        };
         
-        // Función para calcular la cantidad máxima permitida
         const calcularCantidadMaxima = (valores) => {
-            if (docEntry) {
-
-                console.log("Cantidad inicial en calcularCantidadMaxima:", valores.cantidadInicial);
-                console.log("Stock bodega 2 en calcularCantidadMaxima:", valores.stockBodega2);
+            if (docEntry !== 'null') {
                 return valores.cantidadInicial + valores.stockBodega2;
             } else {
                 console.log("Stock bodega 2 en calcularCantidadMaxima:", valores.stockBodega2);
                 return valores.stockBodega2;
             }
         };
+
+        // Evento para cuando cambia la selección de bodega
+        const bodegaSelect = row.querySelector('.form-select.bodega-select');
+        bodegaSelect.addEventListener('change', () => {
+            // Obtener la opción seleccionada
+            const opcionSeleccionada = bodegaSelect.options[bodegaSelect.selectedIndex];
+            
+            // Obtener el valor de stock de la opción seleccionada
+            const stockBodegaSeleccionada = parseInt(opcionSeleccionada.getAttribute('data-stock') || '0', 10);
+            
+            // Obtener la cantidad inicial de la opción seleccionada
+            const cantidadInicialSAP = parseInt(opcionSeleccionada.getAttribute('data-cantidadInicialSAP') || '0', 10);
+
+            // Actualizar el texto y el atributo data-stock del elemento stockBodegaElem
+            stockBodegaElem.textContent = `Stock: ${stockBodegaSeleccionada}`;
+            stockBodegaElem.setAttribute('data-stock', stockBodegaSeleccionada);
+
+            // Validar la cantidad actual contra el nuevo stock si es necesario
+            const valores = obtenerValores();
+            const cantidadMaxima = calcularCantidadMaxima(valores);
+
+            if (valores.cantidadActual > cantidadMaxima) {
+                cantidadInput.value = cantidadMaxima;
+                lastValidatedQuantity = cantidadMaxima;
+            }
+        });
+
+    const obtenerValores = () => {
+        // Obtener el select de bodega
+        const bodegaSelect = row.querySelector('.form-select.bodega-select');
+        // Obtener la opción seleccionada
+        const opcionSeleccionada = bodegaSelect.options[bodegaSelect.selectedIndex];
+        // Obtener el valor de data-cantidadInicialSAP de la opción seleccionada
+        const cantidadInicialSAP = parseInt(opcionSeleccionada.getAttribute('data-cantidadInicialSAP') || '0', 10);
+        // Obtener el valor de data-stock de la opción seleccionada
+        const stockBodegaSeleccionada = parseInt(opcionSeleccionada.getAttribute('data-stock') || '0', 10);
+
+        return {
+            stockBodega2: stockBodegaSeleccionada, // Ahora viene directamente de la opción seleccionada
+            nombreBodega: opcionSeleccionada.value,
+            cantidadActual: parseInt(cantidadInput.value || '0', 10),
+            cantidadInicial: cantidadInicialSAP, // Usamos cantidadInicialSAP en lugar de cantidad inicial de input
+            stockBodegaTexto: parseInt(stockBodegaElem.textContent.replace('Stock: ', '') || '0', 10),
+            stockTotalTexto: parseInt(stockTotalElem.textContent.replace('Total: ', '') || '0', 10)
+        };
+    };
         
         // Función centralizada para cambiar la cantidad
         const cambiarCantidad = (nuevaCantidad) => {
@@ -400,7 +463,7 @@ class Producto {
                 if (diferencia !== 0) {
                     // Actualizar stockBodega
                     let stockBodegaActualizado;
-                    if (docEntry) {
+                    if (docEntry !== 'null') {
                         stockBodegaActualizado = valores.stockBodega2 - (cantidadValidada - valores.cantidadInicial);
                     } else {
                         stockBodegaActualizado = valores.stockBodega2 - cantidadValidada;
@@ -704,7 +767,7 @@ document.addEventListener('productoEliminado', function(event) {
 
         // Restaurar stock sumando la cantidad eliminada
         //stockBodegaElem.textContent = `Stock: ${stockBodegaActual + cantidadEliminada}`;
-        //stockBodegaElem.setAttribute('data-stock', stockBodegaActual + cantidadEliminada);
+        stockBodegaElem.setAttribute('data-stock', stockBodegaActual + cantidadEliminada);
         //stockTotalElem.textContent = `Total: ${stockTotalActual + cantidadEliminada}`;
 
         // Eliminar el producto de la memoria
