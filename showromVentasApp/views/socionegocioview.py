@@ -98,6 +98,8 @@ class SocioNegocioView(FormView):
             try:
                 socioNegoService = SocioNegocio(request)
 
+                print(f"request{request}")
+
                 response = socioNegoService.crearOActualizarCliente()
 
                 response_data = json.loads(response.content)

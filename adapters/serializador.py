@@ -39,9 +39,11 @@ class Serializador:
         return {
             'CardCode': cardCode,
             'CardName': nombre_completo,
-            'Notes': "Persona",
+            'Notes': datos['giroSN'],
             'FederalTaxID': datos['rutSN'],
             'Phone2': datos['telefonoSN'],
+            "Phone1": datos['telefonoSN'],
+            "Cellular": datos['telefonoSN'],
             'GroupCode': datos['tipoSN'],
             'EmailAddress': datos['emailSN'],
         }

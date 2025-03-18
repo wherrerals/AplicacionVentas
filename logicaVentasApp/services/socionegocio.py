@@ -1075,6 +1075,8 @@ class SocioNegocio:
         # Obtener los datos del request
         dataSN = self.request
 
+        print(f"DATOS DE CLIENTE PARA ACTUALIZAR O CREAR: {dataSN}")
+
         # Validar el RUT
         if not self.verificarRutValido(self.rut):
             return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)        
