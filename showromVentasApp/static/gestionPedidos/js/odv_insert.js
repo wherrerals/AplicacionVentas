@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const warehouseCode = bodegaSelect ? bodegaSelect.value : null;
         const comentarios = row.querySelector("#comentarios-1").value;
         const tipoEntregaLineas = row.querySelector("#tipoEntrega").value;
+        const cantidadInicialSAP = row.querySelector("#calcular_cantidad").getAttribute("data-cantidadInicialSAP"); 
         const costingCode = warehouseCode;
         const cogsCostingCode = warehouseCode;
         const costingCode2 = "AV";
@@ -70,7 +71,9 @@ document.addEventListener("DOMContentLoaded", function () {
           COGSCostingCode: cogsCostingCode,
           CostingCode2: costingCode2,
           COGSCostingCode2: cogsCostingCode2,
+          CantidadInicialSAP: cantidadInicialSAP,
         };
+        
         lines.push(line);
       });
   
@@ -99,83 +102,95 @@ document.addEventListener("DOMContentLoaded", function () {
       // Convertir a JSON
       const jsonData = JSON.stringify(documentData);
   
-      // Enviar los datos al backend usando fetch
-      fetch("/ventas/crear_odv/", {
-        method: "POST", // Método POST para enviar datos
-        headers: {
-          "Content-Type": "application/json", // Indica que el cuerpo es JSON
-          "X-CSRFToken": getCSRFToken(), // Obtener el token CSRF si es necesario en Django
-        },
-        body: jsonData, // Datos en formato JSON
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json(); // Procesar respuesta si es exitosa
-          } else {
-            throw new Error("Error en la creación del documento");
-          }
-        })
-  
-        .then((data) => {
-          console.log("Documento creado exitosamente:", data);
-      
-          const numeroCotizacion = document.getElementById("numero_orden");
-          const esActualizacion =numeroCotizacion && numeroCotizacion.getAttribute("data-docentry");
-          const vendedor = document.getElementById("vendedor_data");
-      
-          // Determinar si es creación o actualización
-          const titulo = esActualizacion ? "Orden Venta actualizada": "Orden Venta creada";
-          const mensaje = esActualizacion ? `La Orden Venta fue actualizada exitosamente. N°: ${data.docNum}` : `La Orden Venta fue creada exitosamente. N°: ${data.docNum}`;
-      
-          if (data.success) {
-              Swal.fire({
-                  icon: "success",
-                  title: titulo,
-                  text: mensaje,
-                  confirmButtonText: "Aceptar",
-              });
-      
-              if (numeroCotizacion) {
-                  numeroCotizacion.textContent = `${data.docNum}`;
-                  numeroCotizacion.setAttribute("data-docEntry", `${data.docEntry}`);
-              }
-      
-              if (data.salesPersonCode != undefined) {
-                  vendedor.textContent = `${data.salesPersonName}`;
-                  vendedor.setAttribute("data-codeVen", `${data.salesPersonCode}`);
-              }
-          
-              // 🔥 Nueva funcionalidad: Actualizar stock después de la ODV
-              const productRows = document.querySelectorAll(".product-row"); 
-              productRows.forEach((row) => {
-                  const productoCodigo = row.querySelector("[name='sku_producto']").innerText;
-                  const producto = new Producto(linea_documento = null, productoCodigo); // Crear instancia de Producto
-                  producto.actualizarStock(row); // Llamar la función para actualizar stock
-                  console.log("Stock actualizado para:", productoCodigo);
-              });
-      
-          } else {
-              Swal.fire({
-                  icon: "error",
-                  title: "Error",
-                  text: `Error al crear la Orden Venta: ${data.error}`,
-                  confirmButtonText: "Aceptar",
-              });
-          }
-      })
-      
-        .catch((error) => {
-          console.error("Hubo un error al crear el documento:", error);
-        })
-  
-        .finally(() => {
-          // Ocultar el overlay en cualquier caso
-          hideLoadingOverlay();
-        });
+// Enviar los datos al backend usando fetch
+fetch("/ventas/crear_odv/", {
+  method: "POST", // Método POST para enviar datos
+  headers: {
+    "Content-Type": "application/json", // Indica que el cuerpo es JSON
+    "X-CSRFToken": getCSRFToken(), // Obtener el token CSRF si es necesario en Django
+  },
+  body: jsonData, // Datos en formato JSON
+})
+  .then((response) => {
+    if (response.ok) {
+      return response.json(); // Procesar respuesta si es exitosa
+    } else {
+      throw new Error("Error en la creación del documento");
     }
-  
-    // Función para obtener el token CSRF (si usas Django)
-    function getCSRFToken() {
-      return document.querySelector("[name=csrfmiddlewaretoken]").value;
+  })
+  .then((data) => {
+    console.log("Documento creado exitosamente:", data);
+
+    const numeroCotizacion = document.getElementById("numero_orden");
+    const esActualizacion =
+      numeroCotizacion && numeroCotizacion.getAttribute("data-docentry");
+    const vendedor = document.getElementById("vendedor_data");
+
+    // Determinar si es creación o actualización
+    const titulo = esActualizacion
+      ? "Orden Venta actualizada"
+      : "Orden Venta creada";
+    const mensaje = esActualizacion
+      ? `La Orden Venta fue actualizada exitosamente. N°: ${data.docNum}`
+      : `La Orden Venta fue creada exitosamente. N°: ${data.docNum}`;
+
+    if (data.success) {
+      Swal.fire({
+        icon: "success",
+        title: titulo,
+        text: mensaje,
+        confirmButtonText: "Aceptar",
+      }).then(() => {
+        // Redirigir solo después de aceptar la alerta
+        window.location.href = `/ventas/ordenesVentas/?docentry=${data.docEntry}`;
+      });
+
+      if (numeroCotizacion) {
+        numeroCotizacion.textContent = `${data.docNum}`;
+        numeroCotizacion.setAttribute("data-docEntry", `${data.docEntry}`);
+      }
+
+      if (data.salesPersonCode !== undefined) {
+        vendedor.textContent = `${data.salesPersonName}`;
+        vendedor.setAttribute("data-codeVen", `${data.salesPersonCode}`);
+      }
+
+      // 🔥 Nueva funcionalidad: Actualizar stock después de la ODV
+      const productRows = document.querySelectorAll(".product-row");
+      productRows.forEach((row) => {
+        const productoCodigo = row.querySelector("[name='sku_producto']").innerText;
+        const producto = new Producto(null, productoCodigo); // Crear instancia de Producto
+        producto.actualizarStock(row); // Llamar la función para actualizar stock
+        console.log("Stock actualizado para:", productoCodigo);
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: `Error al crear la Orden Venta: ${data.error}`,
+        confirmButtonText: "Aceptar",
+      });
     }
+  })
+  .catch((error) => {
+    console.error("Hubo un error al crear el documento:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "Hubo un problema en el proceso. Inténtalo de nuevo.",
+      confirmButtonText: "Aceptar",
+    });
+  })
+  .finally(() => {
+    // Ocultar el overlay en cualquier caso
+    hideLoadingOverlay();
   });
+
+// Función para obtener el token CSRF (si usas Django)
+function getCSRFToken() {
+  return document.querySelector("[name=csrfmiddlewaretoken]").value;
+}
+    }
+ 
+  });
+  

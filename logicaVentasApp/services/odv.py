@@ -470,6 +470,9 @@ class OrdenVenta(Documento):
         Verifica que el stock total del código en la cotización no supere el stock disponible en bodega.
         """
         print("Validando stock total por bodega...")
+        print(data)
+
+        doc_entry = data.get("DocEntry")
 
         stock_validado = {}  # Almacena el stock disponible en bodega
         suma_por_clave = {}  # Almacena la suma total de cada (SKU, Bodega)
@@ -480,6 +483,9 @@ class OrdenVenta(Documento):
             item_code = linea["ItemCode"]
             warehouse_code = linea["WarehouseCode"]
             quantity = linea["Quantity"]
+
+            print(f"doc_entry: {doc_entry}")
+            cantidad_inicial_sap = int(linea.get("CantidadInicialSAP", 0))  # Obtener CantidadInicialSAP, si no existe, es 0
             clave = (item_code, warehouse_code)
 
             # Acumular la cantidad de productos solicitados por (SKU, Bodega)
@@ -494,11 +500,18 @@ class OrdenVenta(Documento):
                 ).values_list("stock", flat=True).first() or 0
 
                 print(f"Stock en bodega {warehouse_code} para {item_code}: {stock_en_bodega}")
+
+                # Ajustar stock disponible si DocEntry tiene un valor
+                if doc_entry:  
+                    stock_en_bodega += cantidad_inicial_sap
+
                 stock_validado[(item_code, warehouse_code)] = stock_en_bodega
 
-            # Validar si la cantidad total supera el stock disponible
+            # Validar si la cantidad total supera el stock disponible (ajustado)
             if total_quantity > stock_validado[(item_code, warehouse_code)]:
-                errores.append(f"El total solicitado del producto {item_code} en la bodega {warehouse_code} supera el stock disponible ({stock_validado[(item_code, warehouse_code)]} unidades).")
+                errores.append(
+                    f"El total solicitado del producto {item_code} en la bodega {warehouse_code} supera el stock disponible ({stock_validado[(item_code, warehouse_code)]} unidades)."
+                )
 
         return errores if errores else "Stock validado correctamente."
 

@@ -153,7 +153,7 @@ class Producto {
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${this.precioSinDescuento}</td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <div>
-                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad !== undefined ? this.cantidad : 0}">
+                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="calcular_cantidad" data-cantidadInicialSAP="${this.cantidad !== undefined ? this.cantidad : 0}" name="cantidad" min="1" max="1000" value="${this.cantidad !== undefined ? this.cantidad : 0}">
                     </div>
                     <div class="valorCotizacion" data-itemcode=${this.productoCodigo} hidden>
                         <b><small style="color: rgb(255,0,0);" id="valorCotizacion">Cotiz: ${this.cantidadCoti}</small></b>
@@ -330,6 +330,8 @@ class Producto {
         // Almacenar la cantidad inicial cuando carga el documento
         if (!cantidadInput.hasAttribute('data-initial-value') && docEntry) {
             cantidadInput.setAttribute('data-initial-value', cantidadInput.value || '0');
+
+            console.log("Cantidad inicial:", cantidadInput.value);
         }
         
         // Ocultar las flechas nativas del input de tipo number
@@ -353,8 +355,12 @@ class Producto {
         // Función para calcular la cantidad máxima permitida
         const calcularCantidadMaxima = (valores) => {
             if (docEntry) {
+
+                console.log("Cantidad inicial en calcularCantidadMaxima:", valores.cantidadInicial);
+                console.log("Stock bodega 2 en calcularCantidadMaxima:", valores.stockBodega2);
                 return valores.cantidadInicial + valores.stockBodega2;
             } else {
+                console.log("Stock bodega 2 en calcularCantidadMaxima:", valores.stockBodega2);
                 return valores.stockBodega2;
             }
         };
@@ -405,7 +411,7 @@ class Producto {
                     if (stockObserver) stockObserver.disconnect();
                     
                     // Actualizar stockBodega
-                    stockBodegaElem.textContent = `Stock: ${Math.max(0, stockBodegaActualizado)}`;
+                    //stockBodegaElem.textContent = `Stock: ${Math.max(0, stockBodegaActualizado)}`;
                     
                     // Actualizar stockTotal
                     if (stockTotalElem && stockTotalElem.textContent) {
@@ -414,7 +420,7 @@ class Producto {
                         // Calcular stock total basado en la diferencia exacta
                         const stockTotalActualizado = valores.stockTotalTexto - diferencia;
                         
-                        stockTotalElem.textContent = `Total: ${Math.max(0, stockTotalActualizado)}`;
+                        //stockTotalElem.textContent = `Total: ${Math.max(0, stockTotalActualizado)}`;
                     }
                     
                     // Reconectar observers
@@ -644,12 +650,12 @@ function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precio
             
             // Actualizar el stock de la bodega actual basado en el stock disponible
             let stockBodegaActualizado = stockDisponible - nuevaCantidad;
-            stockBodegaElem.textContent = `Stock: ${stockBodegaActualizado}`;
+            //stockBodegaElem.textContent = `Stock: ${stockBodegaActualizado}`;
             console.log("Nuevo stock de bodega:", stockBodegaActualizado);
             
             // Ajustar el total asegurando que no quede negativo
             let nuevoStockTotal = Math.max(0, stockTotalActual - diferenciaCantidad);
-            stockTotalElem.textContent = `Total: ${nuevoStockTotal}`;
+            //stockTotalElem.textContent = `Total: ${nuevoStockTotal}`;
             console.log("Nuevo stock total:", nuevoStockTotal);
         }, 50);
     });
@@ -697,9 +703,9 @@ document.addEventListener('productoEliminado', function(event) {
         let stockTotalActual = parseInt(stockTotalElem.textContent.replace('Total: ', '') || '0', 10);
 
         // Restaurar stock sumando la cantidad eliminada
-        stockBodegaElem.textContent = `Stock: ${stockBodegaActual + cantidadEliminada}`;
-        stockBodegaElem.setAttribute('data-stock', stockBodegaActual + cantidadEliminada);
-        stockTotalElem.textContent = `Total: ${stockTotalActual + cantidadEliminada}`;
+        //stockBodegaElem.textContent = `Stock: ${stockBodegaActual + cantidadEliminada}`;
+        //stockBodegaElem.setAttribute('data-stock', stockBodegaActual + cantidadEliminada);
+        //stockTotalElem.textContent = `Total: ${stockTotalActual + cantidadEliminada}`;
 
         // Eliminar el producto de la memoria
         delete lineasDocumento[codigoProducto];
