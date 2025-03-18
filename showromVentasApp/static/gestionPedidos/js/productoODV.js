@@ -309,10 +309,17 @@ class Producto {
             let maxStock = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
             let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
     
-            if (cantidadActual > maxStock) {
-                cantidadInput.value = maxStock;
-            } else if (cantidadActual < 1) {
-                cantidadInput.value = 0;
+            if (docEntry) {
+                validarCantidadesODV();
+                let nuevoLimite = cantidadActual + maxStock;
+                cantidadInput.value = Math.min(cantidadActual, nuevoLimite);
+                console.log("Cantidad actualizada:", cantidadInput.value);
+            } else {
+                if (cantidadActual > maxStock) {
+                    cantidadInput.value = maxStock;
+                } else if (cantidadActual < 1) {
+                    cantidadInput.value = 0;
+                }
             }
         };
 
@@ -325,6 +332,33 @@ class Producto {
         stockBodegaObserver.observe(stockBodegaElem, { childList: true, subtree: true });
     }
 
+}
+
+function validarCantidadesODV() {
+    const productRows = document.querySelectorAll(".product-row");
+    const docEntry = document.getElementById('numero_orden')?.getAttribute('data-docentry');
+
+    console.log("Validar cantidades ODV");
+
+    productRows.forEach((row) => {
+        const cantidadInput = row.querySelector('#calcular_cantidad');
+        const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
+
+        let maxStock = parseInt(stockBodegaElem.textContent.replace('Stock: ', ''), 10) || 0;
+        let cantidadActual = parseInt(cantidadInput.value, 10) || 0;
+
+        if (docEntry) {
+            // Guardar el límite fijo si no está almacenado
+            if (!cantidadInput.dataset.limiteFijo) {
+                cantidadInput.dataset.limiteFijo = cantidadActual; 
+            }
+            let limiteFijo = parseInt(cantidadInput.dataset.limiteFijo, 10);
+
+            cantidadInput.value = Math.max(1, Math.min(cantidadActual, limiteFijo)); // Mantener la cantidad dentro del límite
+        } else {
+            cantidadInput.value = Math.max(1, Math.min(cantidadActual, maxStock)); // Evita valores en 0 y supera el stock
+        }
+    });
 }
 
 
