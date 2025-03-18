@@ -144,13 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   vendedor.textContent = `${data.salesPersonName}`;
                   vendedor.setAttribute("data-codeVen", `${data.salesPersonCode}`);
               }
-              
-              if (numeroCotizacion && numeroCotizacion.getAttribute("data-docEntry")) {
-                setTimeout(() => {
-                  validarCantidadesODV();
-              }, 50);
-                }
-                
+          
               // 🔥 Nueva funcionalidad: Actualizar stock después de la ODV
               const productRows = document.querySelectorAll(".product-row"); 
               productRows.forEach((row) => {
