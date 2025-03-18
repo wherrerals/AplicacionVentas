@@ -2,6 +2,8 @@ $(document).ready(function () {
     $('#btn-grabar-cont').on('click', function (e) {
         e.preventDefault(); // Evitar comportamiento por defecto del botón
 
+        console.log("Número de contactos detectados:", $('#listaContactos .col-sm-5').length);
+
         // Capturar todos los contactos en un array
         let contactos = [];
 
