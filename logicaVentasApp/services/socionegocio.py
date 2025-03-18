@@ -120,8 +120,22 @@ class SocioNegocio:
                 response = conexionSL.actualizarSocioNegocioSL(cardcode, datosSerializados)
                 
                 return repo.actualizarCliente(cardcode, datos)
+            
             else:
                 logger.info("Actualizando cliente empresa...")
+
+                conexionSL = APIClient()
+
+                serializer = Serializador(formato='json')
+
+                datosSerializados = serializer.serializar(datos, cardcode)
+
+                logger.info(f"Datos serializados para la API: {datosSerializados}")
+
+                response = conexionSL.actualizarSocioNegocioSL(cardcode, datosSerializados)
+
+                print(f"response dada {response}")
+
                 return repo.actualizarClienteEmpresa(cardcode, datos)
 
         except ValueError as ve:
