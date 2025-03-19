@@ -88,8 +88,8 @@ services:
   celery-worker-pdf:
     build:
       context: .
-      dockerfile: dockerfile.app2  # Asegúrate de que este Dockerfile esté configurado correctamente
-    command: sh -c "./wait-for-rabbitmq.sh rabbitmq 5672 && celery -A config worker -Q q_pdf_generation -l info"
+      dockerfile: dockerfile.app2
+    command: sh -c "./wait-for-rabbitmq.sh rabbitmq 5672 && celery -A config worker -Q q_pdf_generation -l info -E"
     depends_on:
       - rabbitmq
       - db
@@ -97,6 +97,7 @@ services:
       - .:/app
     environment:
       CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+
 
 volumes:
   mysql_data:

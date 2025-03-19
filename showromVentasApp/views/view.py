@@ -43,6 +43,12 @@ from celery.exceptions import TimeoutError
 from celery.result import AsyncResult
 from django.core.files.storage import default_storage
 
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+
 #Inicio vistas Renderizadoras
 
 """
@@ -1246,94 +1252,61 @@ def prueba(request):
     return JsonResponse(coteodata, safe=False)
 
 @csrf_exempt
+@require_POST
 def generar_cotizacion_pdf(request, cotizacion_id):
-    print("PASO 1")
-
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Método no permitido'}, status=405)
-
     try:
-        # Intentar leer el cuerpo de la solicitud
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError as e:
-            return JsonResponse({'error': f'Error en el formato JSON: {str(e)}'}, status=400)
+        # Parsear JSON de la solicitud
+        data = json.loads(request.body)
+        logger.info(f"Data recibida para PDF: {data}")
 
-        print(f"Data recibida para PDF: {data}")
-
-        # Validar que los datos esenciales están presentes
+        # Obtener datos del cliente
         codigoSn = data.get('rut')
-        if not codigoSn:
-            return JsonResponse({'error': 'Falta el campo rut'}, status=400)
-
-        id_direccion = data.get('direccion')
-        sucursal = data.get('sucursal')
-        vendedor = data.get('vendedor')
-
-        if not sucursal:
-            return JsonResponse({'error': 'Falta el campo sucursal'}, status=400)
-
-        if not vendedor:
-            return JsonResponse({'error': 'Falta el campo vendedor'}, status=400)
-
-        # Instanciar repositorios
         snrepo = SocioNegocioRepository()
         datossocio = snrepo.obtenerPorCodigoSN(codigoSn)
 
-        if not datossocio:
-            return JsonResponse({'error': f'No se encontró socio con RUT {codigoSn}'}, status=400)
-
-        # Obtener la dirección
-        if id_direccion == 'No hay direcciones disponibles':
-            address = ''
-        else:
+        # Obtener dirección
+        id_direccion = data.get('direccion')
+        address = ''
+        if id_direccion and id_direccion != 'No hay direcciones disponibles':
             direcciones = DireccionRepository.obtenerDireccionesID(id_direccion)
-            if not direcciones:
-                return JsonResponse({'error': 'Dirección no encontrada'}, status=400)
             address = f"{direcciones.calleNumero}, {direcciones.comuna.nombre}"
 
         # Obtener contacto
         contacto_id = data.get('contacto')
-        if contacto_id == 'No hay contactos disponibles':
-            contactos = ''
-        else:
-            contactos = ContactoRepository.obtenerContacto(contacto_id)
-            if not contactos:
-                return JsonResponse({'error': 'Contacto no encontrado'}, status=400)
-            contactos = contactos.nombreCompleto if contactos.nombre != "1" else datossocio.nombre
+        contactos = ''
+        if contacto_id and contacto_id != 'No hay contactos disponibles':
+            contacto = ContactoRepository.obtenerContacto(contacto_id)
+            contactos = contacto.nombreCompleto if contacto.nombre != "1" else datossocio.nombre
 
         # Obtener sucursal
+        sucursal = data.get('sucursal')
         detalle_sucursal = SucursalDB.objects.filter(codigo=sucursal).first()
-        if not detalle_sucursal:
-            return JsonResponse({'error': f'No se encontró la sucursal {sucursal}'}, status=400)
 
-        # Obtener usuario
-        try:
-            usuarios = UsuarioDB.objects.get(vendedor__codigo=vendedor)
-        except UsuarioDB.DoesNotExist:
-            return JsonResponse({'error': f'No se encontró usuario con código de vendedor {vendedor}'}, status=400)
+        # Obtener nombre del cliente
+        name = f"{datossocio.nombre} {datossocio.apellido}" if datossocio.grupoSN.codigo == "105" else datossocio.razonSocial
 
-        # Manejo de fecha
+        # Obtener datos del vendedor
+        vendedor_codigo = data.get('vendedor')
+        usuarios = UsuarioDB.objects.get(vendedor__codigo=vendedor_codigo)
+
+        # Formatear fecha
         fecha = data.get('valido_hasta')
         if fecha:
-            try:
-                fecha = fecha.split("-")
-                fecha = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
-            except Exception:
-                return JsonResponse({'error': 'Formato de fecha inválido'}, status=400)
+            fecha = fecha.split("-")
+            fecha = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
         else:
             today = date.today()
             fecha = f"{today.day}-{today.month}-{today.year}"
 
-        # Construcción del diccionario de cotización
+        # Construir diccionario de cotización
         cotizacion = {
             'numero': data.get('numero'),
             'fecha': fecha,
             'validez': fecha,
-            'totalNeto': data.get('totalNeto', 0),
-            'iva': data.get('iva', 0),
-            'totalbruto': data.get('totalbruto', 0),
-            'observaciones': data.get('observaciones', ''),
+            'totalNeto': data.get('totalNeto'),
+            'iva': data.get('iva'),
+            'totalbruto': data.get('totalbruto'),
+            'observaciones': data.get('observaciones'),
             'vendedor': {
                 'nombre': usuarios.nombre,
                 'email': usuarios.email,
@@ -1341,7 +1314,7 @@ def generar_cotizacion_pdf(request, cotizacion_id):
             },
             'cliente': {
                 'rut': datossocio.rut,
-                'nombre': datossocio.nombre if datossocio.grupoSN.codigo == "105" else datossocio.razonSocial,
+                'nombre': name,
                 'razonSocial': datossocio.razonSocial,
                 'giro': datossocio.giro,
                 'telefono': datossocio.telefono,
@@ -1349,39 +1322,34 @@ def generar_cotizacion_pdf(request, cotizacion_id):
                 'email': datossocio.email,
                 'direccion': address,
                 'contacto': contactos,
-                'sucursal': detalle_sucursal.ubicacion,
+                'sucursal': detalle_sucursal.ubicacion if detalle_sucursal else '',
             },
             'productos': data.get('DocumentLines', []),
-            'descuento_por_producto': [int(item.get('porcentaje_descuento', 0)) for item in data.get('DocumentLines', [])],
         }
 
         # Calcular totales
         calculadora = CalculadoraTotales(data)
-        totales = calculadora.calcular_totales()
-        cotizacion["totales"] = totales
-        cotizacion["tiene_descuento"] = any(cotizacion["descuento_por_producto"])
+        cotizacion["totales"] = calculadora.calcular_totales()
+        cotizacion["tiene_descuento"] = any(int(item.get('porcentaje_descuento', 0)) for item in data.get('DocumentLines', []))
 
-        # Obtener la URL absoluta
+        # Obtener URL absoluta
         absolute_uri = request.build_absolute_uri()
-        print("PASO 2")
 
-        # Iniciar la tarea asíncrona
+        # Validar número de cotización
         idCoti = data.get("numero")
         if not idCoti or not str(idCoti).isdigit():
-            return JsonResponse({"error": "El número de cotización es inválido o está vacío."}, status=400)
-        
-        task = generar_pdf_async.delay(idCoti, cotizacion, request.build_absolute_uri('/'))
+            return JsonResponse({"error": "Número de cotización inválido."}, status=400)
 
-        print(f"task {task.id}")
-        print("PASO 3")
+        # Iniciar tarea asíncrona
+        task = generar_pdf_async.delay(idCoti, cotizacion, absolute_uri)
+        logger.info(f"Tarea de generación de PDF iniciada: {task.id}")
 
-        return JsonResponse({'task_id': task.id, 'status': 'La generación del PDF ha comenzado.'})
+        return JsonResponse({'task_id': task.id, 'status': 'Generación del PDF en proceso.'})
 
     except Exception as e:
-        print(f"Error inesperado: {str(e)}")
-        return JsonResponse({'error': str(e)}, status=400)
+        logger.error(f"Error inesperado: {str(e)}")
+        return JsonResponse({'error': "Error interno del servidor."}, status=500)
 
-    
 
 
 @csrf_exempt

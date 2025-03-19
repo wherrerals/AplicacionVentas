@@ -23,11 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("Código del vendedor:", codigoVendedor);
 
         const totalNeto = document.querySelector("#total_neto").textContent;
-
-
         const ivaGeneral = document.querySelector("#iva").textContent;
-
-
         const totalbruto = document.querySelector("#total_bruto").textContent;
 
         const selectElement = document.getElementById("direcciones_despacho");
@@ -36,8 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const contactoCliente = document.getElementById("contactos_cliete");
         const contacto = contactoCliente.value;
         const sucursal = document.getElementById("sucursal").textContent.trim();
-        const observaciones = document.getElementById("Observaciones-1").value; //selecionando observaciones por fila de producto por medio de id
-
+        const observaciones = document.getElementById("Observaciones-1").value;
 
         // Construir líneas del documento
         const lines = [];
@@ -52,11 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const porcentaje_descuento = row.querySelector("#agg_descuento").value.trim();
             const discountspan = row.querySelector("#Precio_Descuento").textContent;
             const totalspan = row.querySelector("#precio_Venta").textContent;
-            const comentarios = row.querySelector("#comentarios-1").value; //selecionando comentarios por fila de producto por medio de id
-                    // Obtener el elemento <select>
-
-            
-            // capturar imagen de etiqueta imagen con id img_productox
+            const comentarios = row.querySelector("#comentarios-1").value;
             const img = row.querySelector("#img_productox").src;
 
             const total = totalspan;
@@ -103,7 +94,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const id = 1; // Ajusta según tu lógica para el ID de cotización
 
-
         fetch(`/ventas/generar_cotizacion_pdf/${id}/pdf/`, {
             method: 'POST',
             headers: {
@@ -119,35 +109,54 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const interval = setInterval(() => {
                 fetch(`/ventas/verificar_estado_pdf/${taskId}/`)
-                    .then(response => response.json())
-                    .then(status => {
-                        if (status.status === 'pending') {
-                            console.log("PDF aún en proceso...");
-                        } else {
+                    .then(response => {
+                        // Comprobar el tipo de contenido antes de procesar la respuesta
+                        const contentType = response.headers.get("content-type");
+                        if (contentType && contentType.includes("application/pdf")) {
+                            // Es un PDF, detener el intervalo y procesarlo
                             clearInterval(interval);
                             hideLoadingOverlay();
-
-                            fetch(`/ventas/verificar_estado_pdf/${taskId}/`)
-                                .then(response => response.blob())
-                                .then(blob => {
-                                    const url = window.URL.createObjectURL(blob);
-                                    const a = document.createElement("a");
-                                    a.href = url;
-                                    a.download = "cotizacion.pdf";
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    window.URL.revokeObjectURL(url);
-                                })
-                                .catch(error => {
-                                    console.error('Error al descargar el PDF:', error);
-                                });
+                            return response.blob();
+                        } else if (contentType && contentType.includes("application/json")) {
+                            // Es un JSON, procesarlo como antes
+                            return response.json();
+                        } else {
+                            // Tipo de contenido desconocido, intentar como JSON primero
+                            return response.json().catch(() => response.blob());
+                        }
+                    })
+                    .then(data => {
+                        if (data instanceof Blob) {
+                            // Es un PDF, proceder a la descarga
+                            const url = window.URL.createObjectURL(data);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = `cotizacion_${docNum}.pdf`;
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            clearInterval(interval);
+                            hideLoadingOverlay();
+                            console.log("PDF generado y descargado con éxito.");
+                        } else if (data.status === 'pending') {
+                            // Tarea aún en proceso
+                            console.log("PDF aún en proceso...");
+                        } else if (data.status === 'failed') {
+                            // La tarea falló
+                            clearInterval(interval);
+                            hideLoadingOverlay();
+                            console.error("Error en la generación del PDF:", data.error);
+                            alert('Hubo un error al generar el PDF: ' + data.error);
+                        } else {
+                            // Otro estado, posiblemente completado pero no es un PDF directo
+                            console.log("Estado de la tarea:", data.status);
                         }
                     })
                     .catch(error => {
-                        console.error('Error al verificar el estado:', error);
+                        console.error('Error al verificar el estado o descargar el PDF:', error);
                         clearInterval(interval);
                         hideLoadingOverlay();
-                        alert('Hubo un error al verificar el estado del PDF.');
+                        alert('Hubo un error al procesar la respuesta del servidor.');
                     });
             }, 2000);
         })

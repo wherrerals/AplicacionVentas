@@ -69,7 +69,7 @@ def syncUser(self):
 
 
 
-@shared_task(bind=True, queue='q_pdf_generation')
+@shared_task(queue='q_pdf_generation')
 def generar_pdf_async(cotizacion_id, cotizacion_data, absolute_uri):
 
     print(cotizacion_id, cotizacion_data, absolute_uri)
