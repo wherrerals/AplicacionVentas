@@ -364,6 +364,9 @@ class Producto {
         // Referencias a elementos DOM
         const cantidadInput = row.querySelector('#calcular_cantidad');
         const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
+
+        console.log("Stock bodega en limitarCantidad:", stockBodegaElem.textContent);
+
         const stockTotalElem = row.querySelector('[name="stock_total"]') || { textContent: '0' };
         const skuElem = row.querySelector('[name="sku_producto"]');
         
@@ -383,10 +386,10 @@ class Producto {
             console.log("Cantidad inicial:", cantidadInput.value);
         }
         
-        const cantidadInputs = row.querySelectorAll('.calcular_cantidad');
+        const cantidadInputs = row.querySelectorAll('#calcular_cantidad');
         cantidadInputs.forEach(cantidadInput => {
-            //cantidadInput.style.appearance = 'none';
-            //cantidadInput.style.MozAppearance = 'textfield'; // Firefox
+            cantidadInput.style.appearance = 'none';
+            cantidadInput.style.MozAppearance = 'textfield'; // Firefox
         });
         
         
@@ -483,7 +486,8 @@ class Producto {
                 // Solo continuar si hay un cambio real
                 if (diferencia !== 0) {
                     // Actualizar stockBodega
-                    let stockBodegaActualizado;
+                    
+                let stockBodegaActualizado;
                     if (docEntry !== 'null') {
                         stockBodegaActualizado = valores.stockBodega2 - (cantidadValidada - valores.cantidadInicial);
                     } else {
@@ -643,7 +647,7 @@ class Producto {
 let lineasDocumento = {}; // Objeto para almacenar las líneas por producto
 
 
-function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, precioCoti, tipoEntrega2, fechaEntrega, descuentoAplcado = 1 - 1) {
+function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, precioCoti, tipoEntrega2, fechaEntrega, descuentoAplcado = 1 - 1) {
     
     
     lineasDocumento[productoCodigo] = {
@@ -659,7 +663,7 @@ function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precio
     // Crear instancia del producto
 
     const cantidadFinal = cantidad !== undefined ? cantidad : 1;
-    const producto = new Producto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, precioCoti, tipoEntrega2, fechaEntrega, descuentoAplcado);
+    const producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, precioCoti, tipoEntrega2, fechaEntrega, descuentoAplcado);
     const newRow = producto.crearFila(contprod); // Crear la fila del producto
 
     document.getElementById('productos').appendChild(newRow); // Agregar la fila al tbody
@@ -675,7 +679,10 @@ function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precio
     
         // Emitir un evento personalizado pasando el código del producto
         const event = new CustomEvent('productoEliminado', {
-            detail: { codigoProducto: productoCodigo }
+            detail: { codigoProducto: productoCodigo,
+                indiceProducto: contprod
+
+            }
         });
         console.log('Evento emitido:', event);
         document.dispatchEvent(event);
@@ -703,10 +710,16 @@ function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precio
         let stockBodegaElem = newRow.querySelector('[name="stock_bodega"]');
         let cantidadInput = newRow.querySelector('#calcular_cantidad');
         let stockTotalElem = newRow.querySelector('[name="stock_total"]');
+
+        console.log("Stock bodega actual:", stockBodegaElem.textContent);
+        console.log("Stock total actual:", stockTotalElem.textContent);
+        console.log("Cantidad actual:", cantidadInput.value);
         
         // Obtener valores antes del cambio
         let stockTotalActual = parseInt(stockTotalElem.textContent.replace('Total: ', '') || '0', 10);
         let cantidadActual = parseInt(cantidadInput.value || '0', 10);
+
+        
         
         // Actualizar stock de la nueva bodega sin modificar el stock total
         producto.actualizarStock(newRow, false); // Pasar false para evitar la actualización del total
@@ -721,6 +734,10 @@ function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precio
             
             // Verificar el stock y ajustar la cantidad
             let nuevaCantidad = 0;
+    
+             // **Disparar evento manualmente para forzar actualización**
+            cantidadInput.dispatchEvent(new Event('input', { bubbles: true }));
+
             if (stockDisponible > 0) {
                 nuevaCantidad = 1;
                 cantidadInput.value = nuevaCantidad;
@@ -742,6 +759,7 @@ function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precio
             //stockTotalElem.textContent = `Total: ${nuevoStockTotal}`;
             console.log("Nuevo stock total:", nuevoStockTotal);
         }, 50);
+        
     });
     
     // Función para mostrar la alerta con Bootstrap
@@ -765,7 +783,7 @@ function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precio
     const inputNumero = document.getElementById("inputNumero");
 
     // Llamar a la función agregarInteractividad si es necesario
-    agregarInteractividad(newRow, productoCodigo);
+    agregarInteractividad(newRow, productoCodigo, contprod);
 
 }
 
