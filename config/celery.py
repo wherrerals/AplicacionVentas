@@ -41,4 +41,3 @@ app.conf.beat_schedule = {
         "schedule": timedelta(seconds=10),  # Ejecutar cada 10 segundos
     },
 }
-

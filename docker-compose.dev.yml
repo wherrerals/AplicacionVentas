@@ -42,6 +42,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   celery-beat:
     build:
@@ -72,6 +77,19 @@ services:
       context: .
       dockerfile: dockerfile.app
     command: celery -A config worker --loglevel=info --concurrency=2 -Q q_clients_in
+    depends_on:
+      - rabbitmq
+      - db
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+
+  celery-worker-pdf:
+    build:
+      context: .
+      dockerfile: dockerfile.app2  # Asegúrate de que este Dockerfile esté configurado correctamente
+    command: sh -c "./wait-for-rabbitmq.sh rabbitmq 5672 && celery -A config worker -Q q_pdf_generation -l info"
     depends_on:
       - rabbitmq
       - db

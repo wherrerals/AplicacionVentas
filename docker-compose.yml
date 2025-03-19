@@ -85,5 +85,18 @@ services:
     environment:
       CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
 
+  celery-worker-pdf:
+    build:
+      context: .
+      dockerfile: dockerfile.app  # Asegúrate de que este Dockerfile esté configurado correctamente
+    command: celery -A config worker --loglevel=info --concurrency=2 -Q q_pdf_generation
+    depends_on:
+      - rabbitmq
+      - db
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+
 volumes:
   mysql_data:

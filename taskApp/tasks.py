@@ -5,6 +5,12 @@ from logicaVentasApp.services.socionegocio import SocioNegocio
 from taskApp.models import CeleryTask
 from logicaVentasApp.services.producto import Producto
 
+# tasks.py
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+
 @shared_task(bind=True)
 def sync_products(self):
     # Registrar la tarea en la base de datos al iniciar
@@ -60,3 +66,25 @@ def syncUser(self):
     finally:
         task2.save()
         
+
+
+
+@shared_task(bind=True, queue='q_pdf_generation')
+def generar_pdf_async(cotizacion_id, cotizacion_data, absolute_uri):
+
+    print(cotizacion_id, cotizacion_data, absolute_uri)
+    # Renderizar el HTML
+    print("PASO 2")
+    html_string = render_to_string('cotizacion_template2.html', {'cotizacion': cotizacion_data})
+    
+    print("PASO 3")
+    # Generar el PDF
+    pdf_file = HTML(string=html_string, base_url=absolute_uri).write_pdf()
+    
+    print("PASO 4")
+    # Guardar el PDF en un almacenamiento (por ejemplo, S3 o sistema de archivos)
+    file_name = f"cotizacion_{cotizacion_id}.pdf"
+    default_storage.save(file_name, ContentFile(pdf_file))
+    
+    print("PASO FINAL GENERACION")
+    return file_name  # Retorna el nombre del archivo para su descarga

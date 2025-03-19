@@ -37,8 +37,11 @@ from datetime import date
 
 from logicaVentasApp.services.comuna import Comuna
 from datosLsApp.models.stockbodegasdb import StockBodegasDB
-from taskApp.tasks import sync_products, syncUser
+from taskApp.tasks import generar_pdf_async, sync_products, syncUser
 from celery.exceptions import TimeoutError
+
+from celery.result import AsyncResult
+from django.core.files.storage import default_storage
 
 #Inicio vistas Renderizadoras
 
@@ -1110,7 +1113,7 @@ def onbtenerImgProducto(request):
 #ignorar crf token
 
 @csrf_exempt
-def generar_cotizacion_pdf(request, cotizacion_id):
+def generar_cotizacion_pdf_2(request, cotizacion_id):
     if request.method == 'POST':
         # Parsear datos JSON recibidos
         print("Estamos en la vista")
@@ -1241,4 +1244,177 @@ def prueba(request):
         print(cont.get('ItemsCount'))
     
     return JsonResponse(coteodata, safe=False)
+
+@csrf_exempt
+def generar_cotizacion_pdf(request, cotizacion_id):
+    print("PASO 1")
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+    try:
+        # Intentar leer el cuerpo de la solicitud
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError as e:
+            return JsonResponse({'error': f'Error en el formato JSON: {str(e)}'}, status=400)
+
+        print(f"Data recibida para PDF: {data}")
+
+        # Validar que los datos esenciales están presentes
+        codigoSn = data.get('rut')
+        if not codigoSn:
+            return JsonResponse({'error': 'Falta el campo rut'}, status=400)
+
+        id_direccion = data.get('direccion')
+        sucursal = data.get('sucursal')
+        vendedor = data.get('vendedor')
+
+        if not sucursal:
+            return JsonResponse({'error': 'Falta el campo sucursal'}, status=400)
+
+        if not vendedor:
+            return JsonResponse({'error': 'Falta el campo vendedor'}, status=400)
+
+        # Instanciar repositorios
+        snrepo = SocioNegocioRepository()
+        datossocio = snrepo.obtenerPorCodigoSN(codigoSn)
+
+        if not datossocio:
+            return JsonResponse({'error': f'No se encontró socio con RUT {codigoSn}'}, status=400)
+
+        # Obtener la dirección
+        if id_direccion == 'No hay direcciones disponibles':
+            address = ''
+        else:
+            direcciones = DireccionRepository.obtenerDireccionesID(id_direccion)
+            if not direcciones:
+                return JsonResponse({'error': 'Dirección no encontrada'}, status=400)
+            address = f"{direcciones.calleNumero}, {direcciones.comuna.nombre}"
+
+        # Obtener contacto
+        contacto_id = data.get('contacto')
+        if contacto_id == 'No hay contactos disponibles':
+            contactos = ''
+        else:
+            contactos = ContactoRepository.obtenerContacto(contacto_id)
+            if not contactos:
+                return JsonResponse({'error': 'Contacto no encontrado'}, status=400)
+            contactos = contactos.nombreCompleto if contactos.nombre != "1" else datossocio.nombre
+
+        # Obtener sucursal
+        detalle_sucursal = SucursalDB.objects.filter(codigo=sucursal).first()
+        if not detalle_sucursal:
+            return JsonResponse({'error': f'No se encontró la sucursal {sucursal}'}, status=400)
+
+        # Obtener usuario
+        try:
+            usuarios = UsuarioDB.objects.get(vendedor__codigo=vendedor)
+        except UsuarioDB.DoesNotExist:
+            return JsonResponse({'error': f'No se encontró usuario con código de vendedor {vendedor}'}, status=400)
+
+        # Manejo de fecha
+        fecha = data.get('valido_hasta')
+        if fecha:
+            try:
+                fecha = fecha.split("-")
+                fecha = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
+            except Exception:
+                return JsonResponse({'error': 'Formato de fecha inválido'}, status=400)
+        else:
+            today = date.today()
+            fecha = f"{today.day}-{today.month}-{today.year}"
+
+        # Construcción del diccionario de cotización
+        cotizacion = {
+            'numero': data.get('numero'),
+            'fecha': fecha,
+            'validez': fecha,
+            'totalNeto': data.get('totalNeto', 0),
+            'iva': data.get('iva', 0),
+            'totalbruto': data.get('totalbruto', 0),
+            'observaciones': data.get('observaciones', ''),
+            'vendedor': {
+                'nombre': usuarios.nombre,
+                'email': usuarios.email,
+                'telefono': usuarios.telefono,
+            },
+            'cliente': {
+                'rut': datossocio.rut,
+                'nombre': datossocio.nombre if datossocio.grupoSN.codigo == "105" else datossocio.razonSocial,
+                'razonSocial': datossocio.razonSocial,
+                'giro': datossocio.giro,
+                'telefono': datossocio.telefono,
+                'tipo': datossocio.grupoSN.codigo,
+                'email': datossocio.email,
+                'direccion': address,
+                'contacto': contactos,
+                'sucursal': detalle_sucursal.ubicacion,
+            },
+            'productos': data.get('DocumentLines', []),
+            'descuento_por_producto': [int(item.get('porcentaje_descuento', 0)) for item in data.get('DocumentLines', [])],
+        }
+
+        # Calcular totales
+        calculadora = CalculadoraTotales(data)
+        totales = calculadora.calcular_totales()
+        cotizacion["totales"] = totales
+        cotizacion["tiene_descuento"] = any(cotizacion["descuento_por_producto"])
+
+        # Obtener la URL absoluta
+        absolute_uri = request.build_absolute_uri()
+        print("PASO 2")
+
+        # Iniciar la tarea asíncrona
+        idCoti = data.get("numero")
+        if not idCoti or not str(idCoti).isdigit():
+            return JsonResponse({"error": "El número de cotización es inválido o está vacío."}, status=400)
+        
+        task = generar_pdf_async.delay(idCoti, cotizacion, request.build_absolute_uri('/'))
+
+        print(f"task {task.id}")
+        print("PASO 3")
+
+        return JsonResponse({'task_id': task.id, 'status': 'La generación del PDF ha comenzado.'})
+
+    except Exception as e:
+        print(f"Error inesperado: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=400)
+
     
+
+
+@csrf_exempt
+def verificar_estado_pdf(request, task_id):
+    task_result = AsyncResult(task_id)
+    
+    if task_result.ready():
+        if task_result.successful():
+            # Si la tarea está lista y fue exitosa
+            file_name = task_result.result
+            try:
+                file_path = default_storage.path(file_name)
+                
+                # Leer el archivo y devolverlo como respuesta
+                with open(file_path, 'rb') as f:
+                    response = HttpResponse(f.read(), content_type='application/pdf')
+                    response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+                
+                # Eliminar el archivo temporal
+                default_storage.delete(file_name)
+                return response
+            except Exception as e:
+                print(f"Error al procesar el PDF generado: {str(e)}")
+                return JsonResponse({'status': 'error', 'message': f'Error al procesar el PDF: {str(e)}'}, status=500)
+        else:
+            # Si la tarea terminó pero falló
+            return JsonResponse({
+                'status': 'failed',
+                'error': str(task_result.result) if task_result.result else 'Error desconocido'
+            }, status=500)
+    else:
+        # Obtener más información sobre el estado
+        return JsonResponse({
+            'status': task_result.state,
+            'info': str(task_result.info) if hasattr(task_result, 'info') else 'Procesando'
+        })
