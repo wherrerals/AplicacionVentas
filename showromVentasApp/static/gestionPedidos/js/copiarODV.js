@@ -120,28 +120,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
           traerInformacionCliente(cardCode);
 
+          // Iteración sobre `DocumentLines` para añadir cada producto
           const documentLines = data.DocumentLines;
+
+          console.log("Líneas de documento:", documentLines);
+        
+          documentLines.sort((a, b) => a.LineNum - b.LineNum);
+          
+
           documentLines.forEach((line, index) => {
               console.log("Producto: ", line);
+              const linea_documento = line.LineNum;
+              const docEntry_linea = line.DocEntry;
               const productoCodigo = line.ItemCode;
               const nombre = line.ItemDescription;
               const imagen = line.imagen;
-              const precioVenta = line.PriceAfterVAT;
+              const precioVenta = line.GrossPrice;
               const stockTotal = line.stockBodega;
-              const precioLista = line.GrossPrice;
-              const precioDescuento = line.DiscountPercent;
+              const precioLista = line.PriceList;
+              const precioDescuento = line.DescuentoMax;
               const sucursal = line.WarehouseCode;
+              const descuentoAplcado = line.DiscountPercent;
               const stockBodega = line.StockBodega;
               const comentario = line.FreeText;
               const precioCoti = precioVenta * line.Quantity;
               const cantidadCoti = line.Quantity;
+              const tipoentrega2 = line.ShippingMethod;
+
           
               let cantidad = cantidadCoti;  // Dejar la cantidad igual a cantidadCoti para todos los casos.
+
+              let linea_documento_real = parseInt(linea_documento);
+
           
               console.log("Agregando producto con datos:", {
-                  productoCodigo,
-                  nombre,
-                  stockBodega,
+                precioVenta,
+                precioCoti,
               });
               
           
@@ -174,6 +188,8 @@ document.addEventListener("DOMContentLoaded", function () {
               }, 100);
           
               agregarProducto(
+                  docEntry_linea, 
+                  linea_documento_real,
                   productoCodigo,
                   nombre,
                   imagen,
@@ -184,8 +200,10 @@ document.addEventListener("DOMContentLoaded", function () {
                   cantidad,
                   sucursal,
                   comentario,
+                  descuentoAplcado,
                   line.Quantity,
-                  precioCoti
+                  precioCoti,
+                  
               );
           });
           

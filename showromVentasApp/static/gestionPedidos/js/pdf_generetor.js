@@ -106,46 +106,81 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const id = 1; // Ajusta según tu lógica para el ID de cotización
 
-        fetch(`/ventas/cotizacion/${id}/pdf/`, {
+        fetch(`/ventas/generar_cotizacion_pdf/${id}/pdf/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCSRFToken() // Asegúrate de tener configurado CSRF correctamente
+                'X-CSRFToken': getCSRFToken()
             },
-            body: jsonData
+            body: JSON.stringify(documentData)
         })
+        .then(response => response.json())
+        .then(data => {
+            const taskId = data.task_id;
+            console.log("Tarea lanzada. ID de la tarea:", taskId);
 
-
-            .then(response => {
-                console.log("Respuesta del servidor:", response);
-                if (response.ok) return response.blob(); // PDF como blob
-                throw new Error('Error al generar el PDF');
-            })
-            .then(blob => {
-                // Crear un enlace para descargar el PDF
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `cotizacion_${docNum}.pdf`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                hideLoadingOverlay();
-                console.log("PDF generado y descargado con éxito.");
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                hideLoadingOverlay();
-                alert('Hubo un error al generar el PDF.');
-            });
-
-        console.log("URL de la solicitud:", `/ventas/cotizacion/${id}/pdf/`);
-
+            const interval = setInterval(() => {
+                fetch(`/ventas/verificar_estado_pdf/${taskId}/`)
+                    .then(response => {
+                        // Comprobar el tipo de contenido antes de procesar la respuesta
+                        const contentType = response.headers.get("content-type");
+                        if (contentType && contentType.includes("application/pdf")) {
+                            // Es un PDF, detener el intervalo y procesarlo
+                            clearInterval(interval);
+                            hideLoadingOverlay();
+                            return response.blob();
+                        } else if (contentType && contentType.includes("application/json")) {
+                            // Es un JSON, procesarlo como antes
+                            return response.json();
+                        } else {
+                            // Tipo de contenido desconocido, intentar como JSON primero
+                            return response.json().catch(() => response.blob());
+                        }
+                    })
+                    .then(data => {
+                        if (data instanceof Blob) {
+                            // Es un PDF, proceder a la descarga
+                            const url = window.URL.createObjectURL(data);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = `cotizacion_${docNum}.pdf`;
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            clearInterval(interval);
+                            hideLoadingOverlay();
+                            console.log("PDF generado y descargado con éxito.");
+                        } else if (data.status === 'pending') {
+                            // Tarea aún en proceso
+                            console.log("PDF aún en proceso...");
+                        } else if (data.status === 'failed') {
+                            // La tarea falló
+                            clearInterval(interval);
+                            hideLoadingOverlay();
+                            console.error("Error en la generación del PDF:", data.error);
+                            alert('Hubo un error al generar el PDF: ' + data.error);
+                        } else {
+                            // Otro estado, posiblemente completado pero no es un PDF directo
+                            console.log("Estado de la tarea:", data.status);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al verificar el estado o descargar el PDF:', error);
+                        clearInterval(interval);
+                        hideLoadingOverlay();
+                        alert('Hubo un error al procesar la respuesta del servidor.');
+                    });
+            }, 2000);
+        })
+        .catch(error => {
+            console.error('Error al lanzar la tarea:', error);
+            hideLoadingOverlay();
+            alert('Hubo un error al generar el PDF.');
+        });
     }
 
-    // Función para obtener el token CSRF (si usas Django)
     function getCSRFToken() {
-        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
     }
 });
 

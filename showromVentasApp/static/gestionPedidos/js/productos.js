@@ -1,6 +1,7 @@
 class Producto {
-    constructor(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado) {
+    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado) {
         
+        this.docEntry_linea = docEntry_linea;
         this.linea_documento = linea_documento;
         this.productoCodigo = productoCodigo;
         this.nombre = nombre;
@@ -14,8 +15,10 @@ class Producto {
         this.cantidad = cantidad;
         this.sucursal = sucursal;
         this.comentario = comentario;
-        this.descuentoAplcado = descuentoAplcado;
+        this.descuentoAplcado = descuentoAplcado ?? 0;
 
+        console.log("Producto descuentoAplcado:", this.descuentoAplcado);
+        console.log("Producto descuentoAplcado:", this.descuentoAplcado);
     }
     
 
@@ -75,6 +78,9 @@ class Producto {
     crearFila(contprod) {
         let newRow = document.createElement('tbody');
         newRow.className = 'product-row';
+        newRow.setAttribute('id', contprod);
+        newRow.setAttribute('data-docentryLinea', this.docEntry_linea);
+        newRow.setAttribute('data-itemcode', this.productoCodigo);
         newRow.innerHTML = `
         <tr>
             <tr>
@@ -232,7 +238,7 @@ class Producto {
 }
 
 // Función global para manejar la adición de productos
-function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, descuentoAplcado = 1 - 1) {
+function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, descuentoAplcado) {
     // Contador de productos
     console.log("cantidad: ", cantidad);
     console.log("sucursal: ", sucursal);
@@ -240,7 +246,7 @@ function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precio
     let contprod = document.querySelectorAll('#productos tbody').length + 1;
 
     // Crear una instancia de Producto
-    let producto = new Producto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado);
+    let producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado);
 
     let newRow = producto.crearFila(contprod);
 

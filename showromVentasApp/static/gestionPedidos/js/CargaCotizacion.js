@@ -151,6 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
           documentLines.forEach((line) => {
             console.log("Producto: ", line)
             const linea_documento = line.LineNum;
+            const docEntry_linea = line.DocEntry;
             const productoCodigo = line.ItemCode;
             const nombre = line.ItemDescription;
             const imagen = line.imagen;
@@ -176,11 +177,12 @@ document.addEventListener("DOMContentLoaded", function () {
               stockTotal,
               precioLista,
               precioDescuento,
+              descuentoAplcado,
               sucursal,
               comentario
             });
 
-            agregarProducto(linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado);
+            agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado);
           });
         }
 

@@ -1,5 +1,5 @@
 class Producto {
-    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado, cantidadCoti, precioCoti,  tipoentrega2, fechaEntrega = new Date().toISOString().split('T')[0]) {
+    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado, cantidadCoti, precioCoti, tipoentrega2, fechaEntrega = new Date().toISOString().split('T')[0]) {
         
         this.docEntry_linea = docEntry_linea;
         this.linea_documento = linea_documento;
@@ -21,8 +21,29 @@ class Producto {
         this.fechaEntrega = fechaEntrega;
         this.descuentoAplcado = descuentoAplcado ?? 0;
 
-        console.log("Producto descuentoAplcado:", this.descuentoAplcado);
-        console.log("Producto descuentoAplcado:", this.descuentoAplcado);
+        console.log("atributos del constructor mapeados",
+            {
+                docEntry_linea: this.docEntry_linea,
+                linea_documento: this.linea_documento,
+                productoCodigo: this.productoCodigo,
+                nombre: this.nombre,
+                imagen: this.imagen,
+                precioVenta: this.precioVenta,
+                stockTotal: this.stockTotal,
+                precioLista: this.precioLista,
+                precioDescuento: this.precioDescuento,
+                precioSinDescuento: this.precioSinDescuento,
+                totalProducto: this.totalProducto,
+                cantidad: this.cantidad,
+                sucursal: this.sucursal,
+                cantidadCoti: this.cantidadCoti,
+                precioCoti: this.precioCoti,
+                comentario: this.comentario,
+                tipoEntrega2: this.tipoEntrega2,
+                fechaEntrega: this.fechaEntrega,
+                descuentoAplcado: this.descuentoAplcado}
+
+        );
 
 
 
@@ -622,7 +643,7 @@ class Producto {
 let lineasDocumento = {}; // Objeto para almacenar las líneas por producto
 
 
-function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, tipoEntrega2, fechaEntrega, descuentoAplcado = 1 - 1) {
+function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, precioCoti, tipoEntrega2, fechaEntrega, descuentoAplcado = 1 - 1) {
     
     
     lineasDocumento[productoCodigo] = {
@@ -638,7 +659,7 @@ function agregarProducto(linea_documento, productoCodigo, nombre, imagen, precio
     // Crear instancia del producto
 
     const cantidadFinal = cantidad !== undefined ? cantidad : 1;
-    const producto = new Producto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, tipoEntrega2, fechaEntrega, descuentoAplcado);
+    const producto = new Producto(linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, precioCoti, tipoEntrega2, fechaEntrega, descuentoAplcado);
     const newRow = producto.crearFila(contprod); // Crear la fila del producto
 
     document.getElementById('productos').appendChild(newRow); // Agregar la fila al tbody

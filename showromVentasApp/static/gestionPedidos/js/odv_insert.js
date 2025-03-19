@@ -52,7 +52,18 @@ document.addEventListener("DOMContentLoaded", function () {
         const warehouseCode = bodegaSelect ? bodegaSelect.value : null;
         const comentarios = row.querySelector("#comentarios-1").value;
         const tipoEntregaLineas = row.querySelector("#tipoEntrega").value;
-        const cantidadInicialSAP = row.querySelector("#calcular_cantidad").getAttribute("data-cantidadInicialSAP"); 
+
+  // Selecciona el elemento <select> por su clase
+        const selectElement = document.querySelector(".form-select.bodega-select");
+
+        // Obtiene el <option> seleccionado
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+
+        // Obtiene el valor del atributo data-cantidadinicialsap
+        const cantidadInicialSAP = selectedOption.getAttribute("data-cantidadinicialsap");
+
+        console.log(cantidadInicialSAP); // Muestra el valor de data-cantidadinicialsap
+        
         const costingCode = warehouseCode;
         const cogsCostingCode = warehouseCode;
         const costingCode2 = "AV";
