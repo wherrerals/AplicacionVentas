@@ -38,7 +38,13 @@ document.addEventListener("DOMContentLoaded", function () {
                   document.getElementById("rutSN").setAttribute("data-rut", data[0].rut || '');
                   document.getElementById("rutSN").readOnly = true;
 
+
+                  // hacerle split al rut para solo capturar los datos antes del - 
+                  const rutSplit = data[0].rut.split('-');
+                  const rutSinGuion = rutSplit[0];
                   document.getElementById("inputCliente").setAttribute("data-codigoSN", data[0].codigoSN || '');
+                  document.getElementById("inputCliente").setAttribute("data-rut", rutSinGuion || '');
+
 
                   console.log("Valor de data[0].grupoSN:", data[0].grupoSN);
 

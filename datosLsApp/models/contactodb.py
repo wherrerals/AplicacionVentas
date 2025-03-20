@@ -8,13 +8,13 @@ class ContactoDB(models.Model):
         verbose_name = 'Contacto'
         verbose_name_plural = 'Contacto'
 
-    codigoInternoSap = models.IntegerField(default=0)
-    nombreCompleto = models.CharField(max_length=255)
-    nombre = models.CharField(max_length=255)
-    apellido = models.CharField(max_length=255)
-    telefono = models.CharField(max_length=20)
-    celular = models.CharField(max_length=20)
-    email = models.EmailField()
+    codigoInternoSap = models.IntegerField(default=0, null=True, blank=True)
+    nombreCompleto = models.CharField(max_length=255, null=True, blank=True)
+    nombre = models.CharField(max_length=255, null=True, blank=True)
+    apellido = models.CharField(max_length=255, null=True, blank=True)
+    telefono = models.CharField(max_length=20, null=True, blank=True)
+    celular = models.CharField(max_length=20, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
     SocioNegocio = models.ForeignKey(SocioNegocioDB, on_delete=models.CASCADE, default=1, null=True)
 
     def __str__(self):

@@ -555,10 +555,12 @@ def actualizarAgregarDirecion(request, socio):
     print("PASO 1")
     if request.method == "POST":
         try:
-
+            
             data = request.POST
             rut = data.get('cliente')
+            print(f"Rut: {rut}")
             carCode = SocioNegocio.generarCodigoSN(rut)
+            print(f"Rut: {rut}, carCode: {carCode}")
 
             SocioNegocio.actualizaroCrearDireccionSL(rut, carCode, request.POST)
 

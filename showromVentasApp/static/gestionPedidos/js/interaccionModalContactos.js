@@ -40,7 +40,7 @@ $(document).ready(function () {
 
         // Validar que al menos un contacto tenga datos completos
         if (contactos.length === 0) {
-            alert('Debes agregar al menos un contacto.');
+            alert('No se han realizado cambios en los contactos');
             return;
         }
 
