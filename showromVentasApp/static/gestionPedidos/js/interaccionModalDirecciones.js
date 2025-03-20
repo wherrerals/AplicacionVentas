@@ -297,17 +297,20 @@ $(document).ready(function () {
 });
 
 document.addEventListener("direccionEliminada", function (event) {
-    const direccionId = event.detail.direccionId;
-  
-    console.log("Dirección eliminada:", direccionId);
-  
+    const { direccionId, rowNum } = event.detail;
+
+    console.log(`Dirección eliminada: ID ${direccionId} (Fila ${rowNum})`);
+
     if (Array.isArray(window.direccionesAlmacenadas)) {
-      window.direccionesAlmacenadas = window.direccionesAlmacenadas.filter(
-        (dir) => dir.direccionId !== direccionId
-      );
-      console.log("Direcciones después de eliminar:", window.direccionesAlmacenadas);
+        // Buscar y eliminar con `rowNum` para evitar filtros innecesarios
+        window.direccionesAlmacenadas = window.direccionesAlmacenadas.filter(
+            (dir) => dir.direccionId !== direccionId
+        );
+
+        console.log("Direcciones después de eliminar:", window.direccionesAlmacenadas);
     } else {
-      console.error("No se pudo actualizar direccionesAlmacenadas.");
+        console.error("No se pudo actualizar direccionesAlmacenadas.");
     }
-  });
+});
+
   
