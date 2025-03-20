@@ -38,9 +38,7 @@
                             <a class="nav-link" href="{% url 'lista_ovs' %}" data-page="lista_ovs,ordenesVentas">Órdenes de Venta</a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'lista_solic_devoluciones' %}" data-page="lista_solic_devoluciones,solicitudes_devolucion">Solicitudes de Devolución</a>
-                        </li>
+
 
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'lista_clientes' %}" data-page="lista_clientes,creacion_clientes">Clientes</a>
@@ -53,6 +51,10 @@
                 {% endif %}
 
                 {% if 'Administrador' in grupos_usuario %}
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'lista_solic_devoluciones' %}" data-page="lista_solic_devoluciones,solicitudes_devolucion">Solicitudes de Devolución</a>
+                </li>
                 {% endif %}
                     </ul>
                 </div>

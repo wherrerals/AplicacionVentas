@@ -19,6 +19,7 @@ from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.models import DireccionDB, ContactoDB
 from adapters.sl_client import APIClient
+from logicaVentasApp.services.direccion import Direccion
 from taskApp.models import SyncState
 
 
@@ -1028,7 +1029,13 @@ class SocioNegocio:
     def crearYresponderCliente(self, carCode, rut):
         try:
             client = APIClient()
-            data = client.getInfoSN(carCode)            
+            data = client.getInfoSN(carCode)
+            print(f"DATOS DE CLIENTE PARA CREAR: {data}")
+
+            if data.get('error'):
+                print(f"Error al obtener datos del cliente: {data.get('error')}")
+                return JsonResponse({'success': False, 'message': 'No se encontraron resultados'}, status=404)
+
             data_creacion = self.procesarDatosSocionegocio(self.convertirJsonObjeto(data))
 
             if self.guardarClienteCompleto(data_creacion):
@@ -1118,9 +1125,11 @@ class SocioNegocio:
 
     def procesarNuevoCliente(self, dataSN):
         if not dataSN.get('direcciones'):
-            raise ValidationError("No se proporcionaron direcciones")        
-
+                dataSN['direcciones'] = Direccion.generarDireccionTiendas()   
         try:
+
+            print(f"DATOS DE CLIENTE PARA CREAR: {dataSN}")
+
             codigoSN = SocioNegocio.generarCodigoSN(self.rut)
 
             if not codigoSN:
@@ -1178,6 +1187,8 @@ class SocioNegocio:
             comunas = ComunaRepository().obtenerComunaPorId(id_comuna)    
             tipo_direccion = address.get("tipoDireccion", "")
 
+            print(f"id de comuna: {id_comuna}")
+            print(f"comuna: {comunas}")
             print(f"tiop de direccion: {tipo_direccion}")
 
             serialized_address = {

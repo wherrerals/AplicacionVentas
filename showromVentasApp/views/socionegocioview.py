@@ -238,6 +238,9 @@ class SocioNegocioView(FormView):
                 print("RUT:", rut)
                 return socio_negocio_service.responderInfoCliente(rut)
             else:
+                print("No existe en la base de datos")
+                print("Crear y responder cliente")
+                print("RUT:", rut)
                 return socio_negocio_service.crearYresponderCliente(cardCode, rut)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)

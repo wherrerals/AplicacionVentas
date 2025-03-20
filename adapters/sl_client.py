@@ -344,9 +344,28 @@ class APIClient:
     def getInfoSN(self, cardCode):
         details = f"BusinessPartners('{cardCode}')?$select=CardCode,CardName,CardType,Phone1,EmailAddress,Notes,GroupCode,FederalTaxID,BPAddresses,ContactEmployees"
         url = f"{self.base_url}{details}"
-        response = self.session.get(url, verify=False)  # Se realiza la solicitud GET
-        response.raise_for_status()  # Esto generará una excepción para cualquier código de estado HTTP 4xx/5xx
-        return response.json()
+        
+        try:
+
+            response = self.session.get(url, verify=False)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.HTTPError as http_err:
+            # Captura errores HTTP (como 404, 500, etc.)
+            error_message = f"HTTP error occurred: {http_err}"
+            print(error_message)
+            return {"error": True, "message": error_message, "status_code": response.status_code}
+        except requests.exceptions.RequestException as req_err:
+            # Captura otros errores relacionados con la solicitud (como problemas de conexión)
+            error_message = f"Request error occurred: {req_err}"
+            print(error_message)
+            return {"error": True, "message": error_message}
+        except Exception as e:
+            # Captura cualquier otra excepción inesperada
+            error_message = f"An unexpected error occurred: {e}"
+            print(error_message)
+            return {"error": True, "message": error_message}
+
 
     def detalleCotizacionCliente(self, docEntry):
         """

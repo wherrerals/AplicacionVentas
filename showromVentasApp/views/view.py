@@ -221,7 +221,6 @@ def enlazarComunas(request):
         JsonResponse: Las comunas de la región solicitada en formato JSON.
     """
 
-    print("Enlazando comunas")
     if request.method == 'GET':
         id_Region = request.GET.get('idRegion')
         
@@ -292,11 +291,7 @@ def get_vendedor_sucursal(request):
         sucurs = str(usuario.sucursal)
         nombreUser = usuario.nombre
         codVen = usuario.vendedor.codigo
-        
-        print(f"Usuario: {nombreUser}, Código de vendedor: {codVen}", f"Sucursal: {sucurs}")
-        
 
-                
         data = {
             'nombreUser': nombreUser,
             'codigoVendedor': codVen,
@@ -505,8 +500,6 @@ def mis_datos(request):
     usuario = UsuarioDB.objects.get(usuarios=request.user)
     user = request.user
 
-    print(f"Usuario: {usuario}, User: {user}")
-
     if request.method == "POST":
         nombre = request.POST['nombre']
         telefono = request.POST['telefono']
@@ -546,30 +539,19 @@ def mis_datos(request):
             return render(request, "mis_datos.html", {'email': user.email, "nombre": nombre, "telefono": usuario.telefono, "mensaje_error_contrasena": mensaje})
         
     nombre = usuario
-    print(f"Nombre: {nombre}")
-
     return render(request,"mis_datos.html",{'email': user.email, "nombre": nombre, "telefono":usuario.telefono})
 
 
 def actualizarAgregarDirecion(request, socio):
-    print("PASO 1")
     if request.method == "POST":
         try:
             
             data = request.POST
             rut = data.get('cliente')
-            print(f"Rut: {rut}")
             carCode = SocioNegocio.generarCodigoSN(rut)
-            print(f"Rut: {rut}, carCode: {carCode}")
-
             SocioNegocio.actualizaroCrearDireccionSL(rut, carCode, request.POST)
-
             conexionAPi = APIClient()
             dataMSQL = conexionAPi.obtenerDataSn(carCode, "BPAddresses")
-
-            print(f"Data obtenida de la API: {dataMSQL}")
-
-            
             result = Direccion().procesarDireccionDesdeAPI(dataMSQL, socio)
 
             #result = SocioNegocio.procesarDirecciones(request.POST, socio)
@@ -591,9 +573,6 @@ def actualizarAgregarContacto(request, socio):
 
             conexionAPi = APIClient()
             dataMSQL = conexionAPi.obtenerDataSn(carCode, "ContactEmployees")
-
-            print(f"Data obtenida de la API: {dataMSQL}")
-
             result = Contacto().procesarContactosDesdeAPI(dataMSQL, socio)
 
             return JsonResponse(result['data'], status=result['status'])
@@ -605,7 +584,6 @@ def actualizarAgregarContacto(request, socio):
 
 @login_required
 def agregarDireccion(request, socio):
-    print("estamos aqui")
     if request.method == "POST":
         nombredirecciones = request.POST.getlist('nombre_direccion[]')
         ciudades = request.POST.getlist('ciudad[]')
@@ -614,10 +592,6 @@ def agregarDireccion(request, socio):
         paises = request.POST.getlist('pais[]')
         regiones = request.POST.getlist('region[]')
         comunas = request.POST.getlist('comuna[]')
-
-        print(f"nombre direccion: ", nombredirecciones)
-        print(f"nombres de ciudades: ", ciudades)
-        print(f"tipo de direcciones: ", tipos)
 
         for i in range(len(nombredirecciones)):
             nombredireccion = nombredirecciones[i]
@@ -660,7 +634,6 @@ def agregarDireccion(request, socio):
                 print(f"Dirección duplicada con tipo {tipo_faltante} creada con éxito")
             else:
                 print(f"No se ha creado la dirección {i+1} porque algunos campos están vacíos.")
-        
         return redirect("/")
 
 
@@ -827,8 +800,7 @@ def busquedaProductos(request):
             }
             for producto in resultados
         ]
-        
-        print("mostrar stock total", resultados_formateados)
+
         return JsonResponse({'resultados': resultados_formateados})
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
@@ -993,11 +965,7 @@ def obtenerRegionesId(request):
 
     try:
         region = RegionRepository()
-
         region = region.obtenerRegionPorId(numeroRegion)
-
-        print(f"Región encontrada: {region}")
-
         data = {
             'numero': region.numero,
             'nombre': region.nombre        
@@ -1259,6 +1227,7 @@ def generar_cotizacion_pdf(request, cotizacion_id):
     try:
         # Parsear JSON de la solicitud
         data = json.loads(request.body)
+        print(f"Data recibida para PDF: {data}")
         logger.info(f"Data recibida para PDF: {data}")
 
         # Obtener datos del cliente
@@ -1332,7 +1301,7 @@ def generar_cotizacion_pdf(request, cotizacion_id):
         # Calcular totales
         calculadora = CalculadoraTotales(data)
         cotizacion["totales"] = calculadora.calcular_totales()
-        cotizacion["tiene_descuento"] = any(int(item.get('porcentaje_descuento', 0)) for item in data.get('DocumentLines', []))
+        cotizacion["tiene_descuento"] = any(float(item.get('porcentaje_descuento', 0)) for item in data.get('DocumentLines', []))
 
         # Obtener URL absoluta
         absolute_uri = request.build_absolute_uri()
@@ -1353,7 +1322,7 @@ def generar_cotizacion_pdf(request, cotizacion_id):
         return JsonResponse({'error': "Error interno del servidor."}, status=500)
 
 
-
+""" 
 @csrf_exempt
 def verificar_estado_pdf(request, task_id):
     task_result = AsyncResult(task_id)
@@ -1387,4 +1356,51 @@ def verificar_estado_pdf(request, task_id):
         return JsonResponse({
             'status': task_result.state,
             'info': str(task_result.info) if hasattr(task_result, 'info') else 'Procesando'
-        })
+        }) """
+
+@csrf_exempt
+def verificar_estado_pdf(request, task_id):
+    try:
+        task_result = AsyncResult(task_id)
+        
+        if task_result.ready():
+            if task_result.successful():
+                # Si la tarea está lista y fue exitosa
+                result = task_result.result
+                
+                # Decodificar el contenido del PDF desde base64
+                import base64
+                pdf_content = base64.b64decode(result['pdf_content'])
+                file_name = result['file_name']
+                
+                # Crear una respuesta HTTP con el contenido del PDF
+                response = HttpResponse(pdf_content, content_type='application/pdf')
+                response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+                return response
+            else:
+                # Si la tarea terminó pero falló
+                error_msg = str(task_result.result) if task_result.result else 'Error desconocido en la generación del PDF'
+                logger.error(f"Tarea PDF fallida: {error_msg}")
+                return JsonResponse({
+                    'status': 'failed',
+                    'error': error_msg
+                }, status=500)
+        else:
+            # Obtener más información sobre el estado
+            progress_info = 'Procesando'
+            if hasattr(task_result, 'info') and task_result.info:
+                if isinstance(task_result.info, dict) and 'progress' in task_result.info:
+                    progress_info = f"{task_result.info['progress']}% completado"
+                else:
+                    progress_info = str(task_result.info)
+            
+            return JsonResponse({
+                'status': task_result.state,
+                'info': progress_info
+            })
+    except Exception as e:
+        logger.error(f"Error verificando estado de tarea PDF {task_id}: {str(e)}")
+        return JsonResponse({
+            'status': 'error',
+            'error': f'Error verificando estado: {str(e)}'
+        }, status=500)

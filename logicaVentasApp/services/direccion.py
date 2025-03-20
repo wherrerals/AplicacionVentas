@@ -1,6 +1,5 @@
 import json
 from django.http import JsonResponse
-from logicaVentasApp.services.socionegocio import SocioNegocio
 
 
 class Direccion:
@@ -43,6 +42,8 @@ class Direccion:
 
             print("Requestadata",request_data)
 
+            from logicaVentasApp.services.socionegocio import SocioNegocio
+
             # Reutilizar el método original
             return SocioNegocio.procesarDirecciones(request_data, socio)
 
@@ -50,3 +51,18 @@ class Direccion:
             return JsonResponse({'success': False, 'message': f'Falta el campo: {str(e)}'}, status=400)
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'Error inesperado: {str(e)}'}, status=500)
+
+    @staticmethod
+    def generarDireccionTiendas():
+        direcciones = [
+                {
+                "nombreDireccion": "Direccion General",
+                "pais": 'Chile',
+                "region": '13',
+                "comuna": '13101',
+                "tipoDireccion": '12',
+                "ciudad": 'Santiago',
+                "direccion": 'Av. Las Condes 7363, Las Condes, Santiago, Chile',
+                }
+        ]
+        return direcciones
