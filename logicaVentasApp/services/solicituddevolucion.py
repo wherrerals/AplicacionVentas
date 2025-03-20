@@ -1,8 +1,39 @@
+from venv import logger
+from adapters.sl_client import APIClient
+from datosLsApp.repositories.contactorepository import ContactoRepository
+from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.productorepository import ProductoRepository
+from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from logicaVentasApp.services.documento import Documento
 
 
 class SolicitudesDevolucion(Documento):
+
+    def __init__(self, request=None):
+        
+        """
+        Inicializa una nueva instancia de la clase Cotizacion.
+
+        Args:
+            request (dict): Datos de la cotización.
+        """
+
+        super().__init__(request)
+        self.client = APIClient()
+        self.cliente = None
+        self.items = []
+
+    def get_endpoint(self):
+        """
+        Obtiene el endpoint específico de la cotización.
+
+        args:
+            None
+
+        Returns:
+            str: Endpoint de la cotización.
+        """
+        return 'ReturnRequest'
 
     def construirSolicitudesDevolucion(data):
         """
@@ -199,3 +230,263 @@ class SolicitudesDevolucion(Documento):
         print(f"RESULTADO: {resultado}")
 
         return resultado
+
+    def prepararJsonDevoluciones(self, jsonData):
+        """
+        Prepara los datos JSON específicos de la cotización.
+
+        Args:
+            jsonData (dict): Datos de la cotización.
+        
+        Returns:
+            dict: Datos de la cotización preparados para ser enviados a SAP.
+        """
+            
+        # Determinar el tipo de venta basado en el vendedor
+        codigo_vendedor = jsonData.get('SalesPersonCode')
+
+        print(f"CODIGO VENDEDOR: {codigo_vendedor}")
+
+        tipo_venta = self.tipoVentaTipoVendedor(codigo_vendedor)
+        
+        # Si el tipo de venta por vendedor no es válido ('NA'), determinar por líneas
+        if tipo_venta == 'NA':
+            lineas = jsonData.get('DocumentLines', [])
+            tipo_venta = self.tipoVentaTipoLineas(lineas)
+        
+        transportationCode = jsonData.get('TransportationCode')
+
+        if tipo_venta == 'NA' and transportationCode != '1':
+            tipo_venta = 'RESE'
+        elif tipo_venta == 'PROY':
+            tipo_venta = 'PROY'
+        elif tipo_venta == 'ECCO':
+            tipo_venta = 'ECCO'
+                    
+        adrres = jsonData.get('Address')
+        adrres2 = jsonData.get('Address2')
+        
+        idContacto = jsonData.get('ContactPersonCode')
+        
+        if idContacto == "No hay contactos disponibles":
+            numerocontactoSAp = "null"
+        else:
+            contacto = ContactoRepository.obtenerContacto(idContacto)
+            numerocontactoSAp = contacto.codigoInternoSap        #consultar en base de datos con el id capturado
+        
+
+        
+        direccion1 = DireccionRepository.obtenerDireccion(adrres)
+        direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)
+        
+        addresmodif = f"{direccion1.calleNumero}, {direccion1.comuna.nombre}\n{direccion1.ciudad}\n{direccion1.region.nombre}"
+        addresmodif2 = f"{direccionRepo2.calleNumero}, {direccionRepo2.comuna.nombre}\n{direccionRepo2.ciudad}\n{direccionRepo2.region.nombre}"
+        
+        # Datos de la cabecera
+        cabecera = {
+            'DocDate': jsonData.get('DocDate'),
+            'DocDueDate': jsonData.get('DocDueDate'),
+            'TaxDate': jsonData.get('TaxDate'),
+            'DocTotal': jsonData.get('DocTotal'),
+            #'ContactPersonCode': numerocontactoSAp,
+            'Address': addresmodif,
+            'Address2': addresmodif2,
+            'CardCode': jsonData.get('CardCode'),
+            'NumAtCard': jsonData.get('NumAtCard'),
+            'Comments': jsonData.get('Comments'),
+            'PaymentGroupCode': jsonData.get('PaymentGroupCode'),
+            'SalesPersonCode': jsonData.get('SalesPersonCode'),
+            'TransportationCode': jsonData.get('TransportationCode'),
+            #'U_LED_NROPSH': jsonData.get('U_LED_NROPSH'),
+            'U_LED_TIPVTA': tipo_venta,  # Tipo de venta calculado
+            'U_LED_TIPDOC': jsonData.get('U_LED_TIPDOC'),
+            'U_LED_FORENV': jsonData.get('TransportationCode'),
+        }
+
+        # Datos de las líneas
+        lineas = jsonData.get('DocumentLines', [])
+
+        repo_producto = ProductoRepository()
+        
+        #maper item code
+
+
+        lineas_json = [
+            
+            {
+                'lineNum': linea.get('LineNum'),
+                'ItemCode': linea.get('ItemCode'),
+                'Quantity': linea.get('Quantity'),
+                #'PriceAfVAT': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
+                #'GrossPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
+                'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
+                #'NetTaxAmount': repo_producto.obtener_precio_unitario_bruto(linea.get('ItemCode')) * linea.get('Quantity') - repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')) * linea.get('Quantity'),
+                #'TaxTotal': repo_producto.obtener_precio_unitario_bruto(linea.get('ItemCode')) * linea.get('Quantity') - repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')) * linea.get('Quantity'),
+                'ShipDate': linea.get('ShipDate'),
+                'FreeText': linea.get('FreeText'),
+                'DiscountPercent': linea.get('DiscountPercent'),
+                'WarehouseCode': linea.get('WarehouseCode'),
+                'CostingCode': linea.get('CostingCode'),
+                'ShippingMethod': linea.get('ShippingMethod'),
+                'COGSCostingCode': linea.get('COGSCostingCode'),
+                'CostingCode2': linea.get('CostingCode2'),
+                'COGSCostingCode2': linea.get('COGSCostingCode2'),
+            }
+
+            
+            for linea in lineas
+        ]
+
+        dic = {
+            **cabecera,
+            'DocumentLines': lineas_json,
+        }
+
+        print(dic)
+        
+        return {
+            **cabecera,
+            'DocumentLines': lineas_json,
+        }
+
+    def actualizarDocumento(self,docnum, docentry, data):
+        print(f"DocNum: {docnum}")
+        docentry = docentry
+
+        try:
+            docentry = int(docentry)
+            print(f"DocEntry: {docentry}")
+            jsonData = self.prepararJsonDevoluciones(data)
+            print(f"JSON: PROCESADO") 
+            response = self.client.actualizarDevolucionesSL(docentry, jsonData)
+            print(response)
+
+
+            if 'success' in response:
+                return {
+                    'success': 'Devolución creada exitosamente',
+                    'docNum': docnum,
+                    'docEntry': docentry
+                }
+
+        
+        except Exception as e:
+            logger.error(f"Error al actualizar la cotización: {str(e)}")
+            return {'error': str(e)}
+
+    def crearDocumento(self, data):
+        """
+        Crea una nueva cotización y maneja las excepciones según el código de respuesta.
+
+        Args:
+            data (dict): Datos de la cotización.
+
+        Returns:
+            dict: Respuesta de la API.
+        """
+        try:
+            # Verificar los datos antes de preparar el JSON
+            errores = self.validarDatosCotizacion(data)
+            if errores:
+                return {'error': errores}
+
+            # Preparar el JSON para la cotización
+            jsonData = self.prepararJsonDevoluciones(data)
+            
+            # Realizar la solicitud a la API
+            response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
+
+
+            print(response)
+            
+            # Verificar si response es un diccionario
+            if isinstance(response, dict):
+                # Si contiene DocEntry, es un éxito
+                if 'DocEntry' in response:
+                    doc_num = response.get('DocNum')
+                    doc_entry = response.get('DocEntry')
+                    salesPersonCode = response.get('SalesPersonCode')
+                    name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
+                    return {
+                        'success': 'Devolución creada exitosamente',
+                        'docNum': doc_num,
+                        'docEntry': doc_entry,
+                        'salesPersonCode': salesPersonCode,
+                        'salesPersonName': name_vendedor
+                    }
+                
+                # Si contiene un mensaje de error, manejarlo
+                elif 'error' in response:
+                    error_message = response.get('error', 'Error desconocido')
+                    return {'error': f"Error: {error_message}"}
+                else:
+                    return {'error': 'Respuesta inesperada de la API.'}
+            
+            else:
+                return {'error': 'La respuesta de la API no es válida.'}
+        
+        except Exception as e:
+            # Manejo de excepciones generales
+            logger.error(f"Error al crear la cotización: {str(e)}")
+            return {'error': str(e)}
+
+    def validarDatosCotizacion(self, data):
+        """
+        Verifica que los datos de la cotización sean correctos.
+
+        Args:
+            data (dict): Datos de la cotización.
+
+        Returns:
+            str: Mensajes de error si hay problemas con los datos, o vacío si son correctos.
+        """
+        errores = []
+
+        # Verificar que el cardcode esté presente
+        if not data.get('CardCode'):
+            errores.append("No se a ingresado cliente para la Cotizacion.")
+
+        if not data.get('DocumentLines'):
+            errores.append("La cotización debe tener al menos una línea de documento.")
+
+        # Verificar que la cantidad sea válida (mayor que cero)
+        for item in data.get('DocumentLines', []):
+            cantidad = item.get('Quantity', 0)
+            if cantidad <= 0:
+                errores.append(f"La cantidad del artículo {item.get('ItemCode')} debe ser mayor a cero.")
+
+        # Si hay errores, retornarlos como una cadena
+        return ' '.join(errores)
+
+    @staticmethod
+    def tipoVentaTipoVendedor(codigo_vendedor):
+        """
+        Asigna el tipo de venta a la cotización.
+
+        Args:
+            tipo_venta (str): Tipo de venta.
+        """
+        repo = VendedorRepository()
+        tipo_vendedor = repo.obtenerTipoVendedor(codigo_vendedor)
+
+        if tipo_vendedor == 'PR':
+            return 'PROY'
+        elif tipo_vendedor == 'CD':
+            return 'ECCO'
+        else:
+            return 'NA'
+
+    @staticmethod
+    def tipoVentaTipoLineas(lineas):
+        """
+        Asigna el tipo de venta a las líneas de la cotización.
+
+        - Si todas las lineas son del mismo warehouse, se asigna el tipo de venta: TIEN.
+        - Si las lineas son de diferentes warehouses, se asigna el tipo de venta: RESE.
+
+        Args:
+            lineas (list): Líneas de la cotización.
+        """
+
+        warehouses = set(linea.get('WarehouseCode') for linea in lineas)
+        return 'TIEN' if len(warehouses) == 1 else 'RESE'

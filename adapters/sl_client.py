@@ -744,6 +744,34 @@ class APIClient:
                 print(f"Cuerpo de la respuesta del servidor: {response.text}")
             raise
 
+    def actualizarDevolucionesSL(self, docEntry, data):
+        self.__login()
+        url = f"{self.base_url}ReturnRequest({docEntry})"
+
+        # Definir los encabezados, incluyendo el encabezado B1S-ReplaceCollectionsOnPatch
+        headers = {
+            "B1S-ReplaceCollectionsOnPatch": "true",  # Encabezado adicional
+            "Content-Type": "application/json",  # Asegúrate de incluir este encabezado si es necesario
+        }
+
+        try:
+            # Hacer la solicitud PATCH incluyendo los encabezados
+            response = self.session.patch(url, json=data, headers=headers, verify=False)
+
+            if response.status_code == 204:
+                return {
+                    "success": True,
+                    "message": "Cotización actualizada correctamente.",
+                }
+            else:
+                response.raise_for_status()
+                return response.json()
+        except requests.exceptions.HTTPError as e:
+            print(f"Error en la solicitud a la API: {e}")
+            if "response" in locals() and response is not None:
+                print(f"Cuerpo de la respuesta del servidor: {response.text}")
+            raise
+
     def actualizarDireccionSL(self, cardCode, data):
         self.__login()
         url = f"{self.base_url}BusinessPartners('{cardCode}')"

@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles.min.css' %}" />
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles2.css' %}" />
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/style3.css' %}" />
+  <script src="{% static 'gestionPedidos/js/rr_insert.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/sucursales_select.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -496,7 +497,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col" style="width: 70%;"><textarea class="form-control" placeholder="Observaciones"></textarea>
+        <div class="col" style="width: 70%;"><textarea id="Observaciones-1" class="form-control" placeholder="Observaciones"></textarea>
         </div>
         <div class="col">
           <div class="row">
@@ -529,9 +530,19 @@
         </div>
       </div>
       <div class="row" style="background: transparent;">
-        <div class="col" style="text-align: right;padding-right: 0px;"><button class="btn btn-primary" type="button"
-            style="font-size: 12px;">Guardar</button><span>&nbsp; &nbsp;</span><button class="btn btn-primary"
-            type="button" style="font-size: 12px;">Duplicar</button></div>
+        <div class="col" style="text-align: right;padding-right: 0px;">
+          <button id="saveButton" class="btn btn-primary" type="button" style="font-size: 12px">
+            Guardar
+          </button>
+          <span>&nbsp; &nbsp;</span>
+          <button id="botonacciones" class="btn btn-primary dropdown-toggle" aria-expanded="false"
+            data-bs-toggle="dropdown" type="button" style="font-size: 12px" hidden>
+            Copiar&nbsp;
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="#" id="copiar-ODV-1"  hidden>Orden de Venta</a>
+            <!-- <a class="dropdown-item" href="#">Solicitud de Devolución</a></div> -->
+          </div>
       </div>
     </form>
   </div>

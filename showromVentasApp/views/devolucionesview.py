@@ -69,12 +69,13 @@ class ReturnsView(View):
             '/': self.filtrarCotizaciones,
             '/ventas/detalles_devolucion': self.detallesDevolucion,
 
+
         }
 
     def post_route_map(self):
         return {
             '/ventas/listado_solicitudes_devolucion': self.filtrarCotizaciones,
-
+            '/ventas/crear_devolucion': self.crearOActualizarDevoluciones,
         }
     
     def handle_invalid_route(self, request):
@@ -159,3 +160,61 @@ class ReturnsView(View):
             rr = SolicitudesDevolucion()
             lines_data = rr.formatearDatos(data)
             return JsonResponse(lines_data, safe=False)
+
+    @csrf_exempt
+    def crearOActualizarDevoluciones(self, request):
+        try:
+            print("Creando o actualizando devolución")
+            data = json.loads(request.body)
+            print(data)
+            users_data = self.user_data(request)
+            
+            docEntry = data.get('DocEntry')
+            docnum = data.get('DocNum')
+            print(f"DocEntry: {docEntry}")
+            print(f"DocNum: {docnum}")
+            rr = SolicitudesDevolucion()
+
+            if docEntry:
+                if self.validar_vendedor(users_data['vendedor'], data['SalesPersonCode']) == True:
+                    actualizacion = rr.actualizarDocumento(docnum, docEntry, data)
+                    print("Actualización")
+                    return JsonResponse(actualizacion, status=200)
+        
+                else:
+                    #actualizar el SalesPersonCode
+                    data['SalesPersonCode'] = users_data['vendedor']
+                    creacion = rr.crearDocumento(data)
+                    return JsonResponse(creacion, status=201)
+            else:
+                creacion = rr.crearDocumento(data)
+                return JsonResponse(creacion, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'JSON inválido'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': f'Error inesperado: {str(e)}'}, status=500)
+        
+    def user_data(self, request):
+        user = request.user
+
+        codigoVendedor = UsuarioDB.objects.get(usuarios=user).vendedor.codigo
+
+        return {
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'is_staff': user.is_staff,
+            'is_superuser': user.is_superuser,
+            'is_active': user.is_active,
+            'vendedor': codigoVendedor
+        }
+    
+    def validar_vendedor(self, vendedor1, vendedor2):
+        print(vendedor1)
+        print(vendedor2)
+        if vendedor1 == vendedor2:
+            return True
+        else:
+            return False

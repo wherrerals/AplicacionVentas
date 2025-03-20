@@ -27,6 +27,7 @@ urlpatterns = [
     path('detalles_ODV/', OdvView.as_view(), name='detalles_ODV'),
     path('detalles_devolucion/', ReturnsView.as_view(), name='detalles_devolucion'),
     path('listado_solicitudes_devolucion/', ReturnsView.as_view(), name='listado_solicitudes_devolucion'),
+    path('crear_devolucion/', ReturnsView.as_view(), name='crear_devolucion'),
     path('productos/', Productos.as_view(), name='productos'),
     path('lista_cotizaciones/', view.list_quotations, name="lista_cotizaciones"),
     path('generar_cotizacion/', view.quotations, name="generar_cotizacion"),
