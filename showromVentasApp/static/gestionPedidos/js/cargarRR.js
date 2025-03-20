@@ -114,12 +114,12 @@ document.addEventListener("DOMContentLoaded", function () {
               }
             });
   
-            const docEntryElement = document.getElementById("numero_cotizacion");
+            const docEntryElement = document.getElementById("numero_orden");
             if (docEntryElement) {
               docEntryElement.setAttribute("data-docEntry", docEntry);
             }
   
-            const numeroCotizacionElement = document.getElementById("numero_cotizacion");
+            const numeroCotizacionElement = document.getElementById("numero_orden");
             if (numeroCotizacionElement) {
               numeroCotizacionElement.textContent = `${numCotizacion}`;
             }

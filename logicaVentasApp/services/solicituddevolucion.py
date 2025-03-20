@@ -285,7 +285,7 @@ class SolicitudesDevolucion(Documento):
         # Datos de la cabecera
         cabecera = {
             'DocDate': jsonData.get('DocDate'),
-            'DocDueDate': jsonData.get('DocDueDate'),
+            #'DocDueDate': jsonData.get('DocDueDate'),
             'TaxDate': jsonData.get('TaxDate'),
             'DocTotal': jsonData.get('DocTotal'),
             #'ContactPersonCode': numerocontactoSAp,
