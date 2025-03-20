@@ -66,6 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ].filter(campo => campo); // Filtra campos nulos o indefinidos
 
     function checkElementos() {
+        console.log('Verificando elementos...');
         const tieneTexto = elementosMonitoreados.some(elemento => elemento.textContent.trim() !== '');
         const noTieneTexto = elementosMonitoreados.every(elemento => elemento.textContent.trim() === '');
         const estado = estadoElemento ? estadoElemento.textContent.trim() : '';
