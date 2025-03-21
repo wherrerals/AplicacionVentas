@@ -17,6 +17,8 @@ ALLOWED_HOSTS = [
     "192.168.3.13",
     "localhost",
     "ventas.ledstudio.cl",
+    "172.25.50.8"
+
 ]  # Cambiar por el dominio o ip de la maquina en la que se va a desplegar la aplicacion
 
 # Base service Layer
