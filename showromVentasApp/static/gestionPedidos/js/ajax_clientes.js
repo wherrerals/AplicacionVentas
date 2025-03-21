@@ -125,7 +125,7 @@ $(document).ready(function () {
           } else {
             $("#resultadosClientes").append(
               '<br><a href="#" class="cliente-link-carga" data-rut="' +
-                rut +
+              cardcode +
                 '">Crear desde SAP</a>'
             );
           }
@@ -236,7 +236,7 @@ $(document).ready(function () {
                   hideLoadingOverlay();
                   console.error("Error en la solicitud AJAX:", error);
                   alert(
-                    "Error al obtener la información del cliente. Por favor, inténtelo de nuevo."
+                    "Este cliente no está en SAP. Por favor, regístralo para continuar."
                   );
                 });
             } else {
@@ -265,6 +265,8 @@ $(document).ready(function () {
     $("#telefonoSN").val("");
     $("#emailSN").val("");
     $("#giroSN").val("");
+    $('#rutSN').prop('readonly', false);
+
 
     // Restablece el select de contactos con la opción predeterminada
     $("#clientes").html(`<option value="">Seleccione un contacto</option>`);

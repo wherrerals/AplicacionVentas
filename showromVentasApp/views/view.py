@@ -1235,6 +1235,19 @@ def generar_cotizacion_pdf(request, cotizacion_id):
         snrepo = SocioNegocioRepository()
         datossocio = snrepo.obtenerPorCodigoSN(codigoSn)
 
+        email_socio = datossocio.email.lower()
+        if email_socio == 'null':
+            email_socio = ''
+        else:
+            email_socio = datossocio.email
+
+        telefono_socio = datossocio.telefono.lower()
+        if telefono_socio == 'null':
+            telefono_socio = ''
+        else:
+            telefono_socio = datossocio.telefono
+        
+
         # Obtener dirección
         id_direccion = data.get('direccion')
         address = ''
@@ -1288,9 +1301,9 @@ def generar_cotizacion_pdf(request, cotizacion_id):
                 'nombre': name,
                 'razonSocial': datossocio.razonSocial,
                 'giro': datossocio.giro,
-                'telefono': datossocio.telefono,
+                'telefono': telefono_socio,
                 'tipo': datossocio.grupoSN.codigo,
-                'email': datossocio.email,
+                'email': email_socio,
                 'direccion': address,
                 'contacto': contactos,
                 'sucursal': detalle_sucursal.ubicacion if detalle_sucursal else '',
