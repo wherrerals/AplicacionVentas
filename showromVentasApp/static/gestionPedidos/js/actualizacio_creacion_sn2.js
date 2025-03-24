@@ -222,10 +222,7 @@ function actualizarDatosCliente(clienteId, codigoSN) {
     $('#resultadosClientes').empty();
 
     // Formatear y actualizar el RUT en la vista
-    const rutDisplayParagraph = document.querySelector('#rut-display p');
-    const rutSinPuntos = clienteId.replace(/\./g, '');
-    const modifiedText = rutSinPuntos.length > 0 ? rutSinPuntos.slice(0, -1) + 'C' : '';
-    rutDisplayParagraph.textContent = modifiedText;
+
 
     // Llamar a las funciones de carga
     cargarDirecciones();

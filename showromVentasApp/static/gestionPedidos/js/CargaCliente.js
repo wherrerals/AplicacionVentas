@@ -98,22 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   //Actualiza el texto de codigo cliente en cliente.html
-  document.getElementById('rutSN').addEventListener('input', function (event) {
-    const inputText = event.target.value;
-    const rutDisplayParagraph = document.querySelector('#rut-display p');
 
-    const modifiedText = inputText.length > 0 ? inputText.slice(0, -1) + 'C' : '';
-  
-    rutDisplayParagraph.textContent = modifiedText;
-  });
-  
-  // Aplicar el manejo de entrada a ambos campos
-  if (rutInputSearch) {
-      handleRutInput(rutInputSearch);
-  }
-  if (rutInputField) {
-      handleRutInput(rutInputField);
-  }
 });
 
 

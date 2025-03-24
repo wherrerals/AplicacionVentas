@@ -1,5 +1,5 @@
 class Producto {
-    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado, cantidadCoti, precioCoti, tipoentrega2, fechaEntrega = new Date().toISOString().split('T')[0]) {
+    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado, tipoentrega2, cantidadCoti, precioCoti, fechaEntrega = new Date().toISOString().split('T')[0]) {
         
         this.docEntry_linea = docEntry_linea;
         this.linea_documento = linea_documento;

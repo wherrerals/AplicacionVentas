@@ -308,6 +308,8 @@ class SocioNegocio:
 
                 # Función para formatear las direcciones
                 direcciones_formateadas = SocioNegocio.formatear_direcciones(direcciones)
+
+                print("Direcciones formateadas: ", direcciones_formateadas)
                 
                 # Función para formatear los contactos
                 contactos_formateados = SocioNegocio.formatear_contactos(contactos)
@@ -347,21 +349,28 @@ class SocioNegocio:
         Returns:
             List: Lista con las direcciones formateadas.
         """
+        
+        nombres_direcciones_no_validos = ["TIENDA LC", "TIENDA GR", "TIENDA PH"]
+        direcciones_formateadas = []
 
-        return [{
-            "id": direccion.id,
-            'rowNum': direccion.rowNum,
-            'nombreDireccion': direccion.nombreDireccion,
-            'ciudad': direccion.ciudad,
-            'calleNumero': direccion.calleNumero,
-            'codigoImpuesto': direccion.codigoImpuesto,
-            'tipoDireccion': direccion.tipoDireccion,
-            'pais': direccion.pais,
-            'comuna': direccion.comuna.nombre,
-            'region': direccion.region.nombre,
-            'comuna_codigo': direccion.comuna.codigo,
-            'region_numero': direccion.region.numero,
-        } for direccion in direcciones]
+        for direccion in direcciones:
+            if direccion.nombreDireccion not in nombres_direcciones_no_validos:
+                direcciones_formateadas.append({
+                    "id": direccion.id,
+                    'rowNum': direccion.rowNum,
+                    'nombreDireccion': direccion.nombreDireccion,
+                    'ciudad': direccion.ciudad,
+                    'calleNumero': direccion.calleNumero,
+                    'codigoImpuesto': direccion.codigoImpuesto,
+                    'tipoDireccion': direccion.tipoDireccion,
+                    'pais': direccion.pais,
+                    'comuna': direccion.comuna.nombre,
+                    'region': direccion.region.nombre,
+                    'comuna_codigo': direccion.comuna.codigo,
+                    'region_numero': direccion.region.numero,
+                })
+
+        return direcciones_formateadas
 
     @staticmethod
     def formatear_contactos(contactos):
@@ -1271,6 +1280,9 @@ class SocioNegocio:
 
 
                 datoComuna = direccion.get('comuna')
+
+                print(f"COMUNA: {datoComuna}")
+                
                 # quitar el guion y limpiar el string
                 id_comuna = datoComuna.strip().split("-")[0].strip()
                 comunas = ComunaRepository().obtenerComunaPorId(id_comuna)

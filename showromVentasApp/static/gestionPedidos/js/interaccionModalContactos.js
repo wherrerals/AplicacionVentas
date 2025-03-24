@@ -10,11 +10,11 @@ $(document).ready(function () {
         // Recorrer cada div que contiene los contactos
         $('#listaContactos .col-sm-5').each(function () {
             // Obtener los valores de los inputs
-            let nombre = $(this).find('input[name="nombre[]"]').val();
-            let apellido = $(this).find('input[name="apellido[]"]').val();
-            let telefono = $(this).find('input[name="telefono[]"]').val();
-            let celular = $(this).find('input[name="celular[]"]').val();
-            let email = $(this).find('input[name="email[]"]').val();
+            let nombre = $(this).find('input[name="nombre[]"]').val() || $(this).find('input[name="nombre_static[]"]').val();
+            let apellido = $(this).find('input[name="apellido[]"]').val() || $(this).find('input[name="apellido_static[]"]').val();
+            let telefono = $(this).find('input[name="telefono[]"]').val() || $(this).find('input[name="telefono_static[]"]').val();
+            let celular = $(this).find('input[name="celular[]"]').val() || $(this).find('input[name="celular_static[]"]').val();
+            let email = $(this).find('input[name="email[]"]').val() || $(this).find('input[name="email_static[]"]').val();
             let contactoid = $(this).find('input[name="contacto_id[]"]').val();
             let codigoInternoSap = $(this).find('input[name="contacto_id[]"]').data('bpcode');
             console.log('Codigo interno SAP:', codigoInternoSap);

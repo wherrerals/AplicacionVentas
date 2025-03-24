@@ -38,10 +38,9 @@ $(document).ready(function () {
     traerInformacionCliente(clienteId);
 
     const rutDisplayParagraph = document.querySelector("#rut-display p");
-    const rutSinPuntos = clienteId.replace(/\./g, "");
-    const modifiedText =
-      rutSinPuntos.length > 0 ? rutSinPuntos.slice(0, -1) + "C" : "";
-    rutDisplayParagraph.textContent = modifiedText;
+
+    rutDisplayParagraph.textContent = codigoSN;
+    
 
     // Llamar a las funciones cargarContactos y cargarDirecciones
     cargarDirecciones();

@@ -163,7 +163,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 sucursal,
                 comentario,
                 descuentoAplcado,
-                docEntry_linea
+                docEntry_linea, 
+                tipoentrega2
               });
 
   

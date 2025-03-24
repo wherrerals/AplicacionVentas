@@ -346,8 +346,8 @@ class Cotizacion(Documento):
             'TaxDate': jsonData.get('TaxDate'),
             'DocTotal': jsonData.get('DocTotal'),
             #'ContactPersonCode': numerocontactoSAp,
-            'Address': addresmodif,
-            'Address2': addresmodif2,
+            #'Address': addresmodif,
+            #'Address2': addresmodif2,
             'CardCode': jsonData.get('CardCode'),
             'NumAtCard': jsonData.get('NumAtCard'),
             'Comments': jsonData.get('Comments'),
@@ -394,16 +394,31 @@ class Cotizacion(Documento):
             for linea in lineas
         ]
 
+        taxExtension = {
+            "StreetS": direccion1.calleNumero,
+            "CityS": direccion1.ciudad,
+            "CountyS": f"{direccion1.comuna.codigo} - {direccion1.comuna.nombre}",
+            "StateS": direccion1.region.numero,
+            "CountryS": "CL",
+            "StreetB": direccionRepo2.calleNumero,
+            "CityB": direccionRepo2.ciudad,
+            "CountyB": f"{direccionRepo2.comuna.codigo} - {direccionRepo2.comuna.nombre}",
+            "StateB": direccionRepo2.region.numero,
+            "CountryB": "CL",
+        } 
+
         dic = {
             **cabecera,
             'DocumentLines': lineas_json,
+            'TaxExtension': taxExtension
         }
 
-        print(dic)
+        print(f"JSON COTIZACION: {dic}")
         
         return {
             **cabecera,
             'DocumentLines': lineas_json,
+            'TaxExtension': taxExtension
         }
 
     def actualizarDocumento(self,docnum, docentry, data):

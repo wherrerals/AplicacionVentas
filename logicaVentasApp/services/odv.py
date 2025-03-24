@@ -560,16 +560,16 @@ class OrdenVenta(Documento):
             'DocDate': jsonData.get('DocDate'),
             'DocDueDate': jsonData.get('DocDueDate'),
             'TaxDate': jsonData.get('TaxDate'),
-            'DocTotal': jsonData.get('DocTotal'),
+            'DocTotal': int(jsonData.get('DocTotal')),
             #'ContactPersonCode': numerocontactoSAp,
-            'Address': addresmodif,
-            'Address2': addresmodif2,
+            #'Address': addresmodif,
+            #'Address2': addresmodif2,
             'CardCode': jsonData.get('CardCode'),
             'NumAtCard': jsonData.get('NumAtCard'),
             'Comments': jsonData.get('Comments'),
             'PaymentGroupCode': jsonData.get('PaymentGroupCode'),
             'SalesPersonCode': jsonData.get('SalesPersonCode'),
-            'TransportationCode': jsonData.get('TransportationCode'),
+            'TransportationCode': int(jsonData.get('TransportationCode')),
             #'U_LED_NROPSH': jsonData.get('U_LED_NROPSH'),
             'U_LED_TIPVTA': tipo_venta,
             'U_LED_TIPDOC': jsonData.get('U_LED_TIPDOC'),
@@ -602,18 +602,32 @@ class OrdenVenta(Documento):
             for linea in lineas
         ]
 
+        taxExtension = {
+            "StreetS": direccion1.calleNumero,
+            "CityS": direccion1.ciudad,
+            "CountyS": f"{direccion1.comuna.codigo} - {direccion1.comuna.nombre}",
+            "StateS": f"{direccion1.region.numero}",
+            "CountryS": "CL",
+            "StreetB": direccionRepo2.calleNumero,
+            "CityB": direccionRepo2.ciudad,
+            "CountyB": f"{direccionRepo2.comuna.codigo} - {direccionRepo2.comuna.nombre}",
+            "StateB": f"{direccionRepo2.region.numero}",
+            "CountryB": "CL",
+        } 
+
         dic = {
             **cabecera,
             'DocumentLines': lineas_json,
+            'TaxExtension': taxExtension
         }
 
-        print(dic)
-
+        print(f"JSON COTIZACION: {dic}")
+        
         return {
             **cabecera,
             'DocumentLines': lineas_json,
+            'TaxExtension': taxExtension
         }
-
     @staticmethod
     def tipoVentaTipoVendedor(codigo_vendedor):
         """

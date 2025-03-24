@@ -35,7 +35,7 @@ class Direccion:
             ]
 
             # Convertir al formato JSON string que espera el método original
-            direcciones_json = json.dumps(direcciones)
+            direcciones_json = json.dumps(direcciones, ensure_ascii=False)
 
             # Simular el request con getlist('contactos')
             request_data = {"direcciones": [direcciones_json]}
