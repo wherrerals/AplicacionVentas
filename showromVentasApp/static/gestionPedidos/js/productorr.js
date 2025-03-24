@@ -81,6 +81,12 @@ class Producto {
         newRow.setAttribute('id', contprod);
         newRow.setAttribute('data-docentryLinea', this.docEntry_linea);
         newRow.setAttribute('data-itemcode', this.productoCodigo);
+
+        // Verificar si el valor de docEntry_linea es "null"
+        if (this.docEntry_linea === "null") {
+            newRow.style.backgroundColor = '#F0F2F5'; // Color gris claro cuando es "null"
+        }
+
         newRow.innerHTML = `
         <tr>
             <tr>
