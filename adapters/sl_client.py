@@ -57,7 +57,6 @@ class APIClient:
             response = self.session.post(login_url, json=auth_data, verify=False)
             response.raise_for_status()
             self.__autehnticated = True
-            return print("Autenticado con exito")
 
     def logout(self):
         """
@@ -111,8 +110,6 @@ class APIClient:
 
         query_url = f"$crossjoin({crossjoin})?$expand={expand}&$orderby={order_by}&$filter={filter_condition}&$top={top}&$skip={skip}"
         url = f"{self.base_url}{query_url}"
-
-        print(f"esta es la url generada: {url}")
 
         response = self.session.get(url, headers=headers, verify=False)
         response.raise_for_status()
@@ -212,8 +209,6 @@ class APIClient:
             si la respuesta de la API contiene un error de estado retorna un diccionario con un mensaje de error.
             si se produce un error al analizar JSON retorna un diccionario con un mensaje de error.
         """
-        print("Creando cotizacion")
-        print(f"DATOS PARA LA COTIZACION: {data}")
         self.__login()
         url = f"{self.base_url}{endpoint}"
         try:
@@ -353,17 +348,14 @@ class APIClient:
         except requests.exceptions.HTTPError as http_err:
             # Captura errores HTTP (como 404, 500, etc.)
             error_message = f"HTTP error occurred: {http_err}"
-            print(error_message)
             return {"error": True, "message": error_message, "status_code": response.status_code}
         except requests.exceptions.RequestException as req_err:
             # Captura otros errores relacionados con la solicitud (como problemas de conexión)
             error_message = f"Request error occurred: {req_err}"
-            print(error_message)
             return {"error": True, "message": error_message}
         except Exception as e:
             # Captura cualquier otra excepción inesperada
             error_message = f"An unexpected error occurred: {e}"
-            print(error_message)
             return {"error": True, "message": error_message}
 
 
@@ -612,8 +604,6 @@ class APIClient:
         query_url = f"BusinessPartners?$select={select}&$orderby={order_by}&$filter={filter_condition}&$top={top}&$skip={skip}"
         url = f"{self.base_url}{query_url}"
 
-        print(url)
-
         response = self.session.get(url, headers=headers, verify=False)
         response.raise_for_status()
         return response.json()
@@ -836,7 +826,6 @@ class APIClient:
                 }
             else:
                 response.raise_for_status()
-                print("Respuesta de la API:", response.json())
                 return response.json()
         except requests.exceptions.HTTPError as e:
             print(f"Error en la solicitud a la API: {e}")
@@ -902,5 +891,4 @@ class APIClient:
 
         response = self.session.get(url, verify=False)
         response.raise_for_status()
-        print(f"URL DE SINC PRODUCTOS: {url}")
         return response.json()

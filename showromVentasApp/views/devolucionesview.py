@@ -116,7 +116,6 @@ class ReturnsView(View):
 
         # Manejar la solicitud de datos
         try:
-            print(f"Filters: {filters}")
             data = client.getData(endpoint=self.get_endpoint(), top=top, skip=skip, filters=filters)
             return JsonResponse({'data': data}, safe=False)
         except Exception as e:
@@ -164,21 +163,16 @@ class ReturnsView(View):
     @csrf_exempt
     def crearOActualizarDevoluciones(self, request):
         try:
-            print("Creando o actualizando devolución")
             data = json.loads(request.body)
-            print(data)
             users_data = self.user_data(request)
             
             docEntry = data.get('DocEntry')
             docnum = data.get('DocNum')
-            print(f"DocEntry: {docEntry}")
-            print(f"DocNum: {docnum}")
             rr = SolicitudesDevolucion()
 
             if docEntry:
                 if self.validar_vendedor(users_data['vendedor'], data['SalesPersonCode']) == True:
                     actualizacion = rr.actualizarDocumento(docnum, docEntry, data)
-                    print("Actualización")
                     return JsonResponse(actualizacion, status=200)
         
                 else:
@@ -212,8 +206,6 @@ class ReturnsView(View):
         }
     
     def validar_vendedor(self, vendedor1, vendedor2):
-        print(vendedor1)
-        print(vendedor2)
         if vendedor1 == vendedor2:
             return True
         else:

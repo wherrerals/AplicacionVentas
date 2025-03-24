@@ -9,13 +9,9 @@ class Contacto:
         pass
 
     def procesarContactosDesdeAPI(self, data, socio):
-        print("Procesando contactos desde API...")
-        print(f"Datos recibidos: {data}")
-
         try:
             # Extraer contactos de la respuesta
             contactos_api = data.get('ContactEmployees', [])
-            print(f"Contactos extraídos de la API: {contactos_api}")
 
             if not contactos_api:
                 return JsonResponse({'success': False, 'message': 'No se encontraron contactos en la respuesta de la API.'}, status=400)
@@ -32,12 +28,9 @@ class Contacto:
                 }
                 for contacto in contactos_api
             ]
-
-            print(f"Contactos transformados: {contactos}")
             # Convertir al formato JSON string que espera el método original
             contactos_json = json.dumps(contactos)
 
-            print(f"Contactos JSON: {contactos_json}")
             # Simular el request con getlist('contactos')
             request_data = {"contactos": [contactos_json]}
 

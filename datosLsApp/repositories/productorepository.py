@@ -74,9 +74,7 @@ class ProductoRepository:
             
             # Si el producto es una receta, calcular stock y costo de receta
             if producto_info.get("TreeType") == "iSalesTree":
-                try:
-                    print("PROCESANDO RECETA")
-                    
+                try:                    
                     # Calcular stock y costo de la receta
                     stock_receta, costo_receta = self.calcular_stock_y_costo_receta(producto_info["codigo"])
                     
@@ -84,7 +82,6 @@ class ProductoRepository:
                     producto.stockTotal = stock_receta
                     producto.costo = costo_receta
                     
-                    print(f"datos de descuento maximo: {precio_venta}, {costo_receta}, {rentabilidad_minima}")
                     
                     margen_bruto, descuento_maximo = self.calculate_margen_descuentos(precio_venta, costo_receta, rentabilidad_minima)
                     
@@ -251,7 +248,6 @@ class ProductoRepository:
         """
         producto = ProductoDB.objects.get(codigo=sku)
         
-        print(f"Descuento max {producto.dsctoMaxTienda}")
         return producto.dsctoMaxTienda
     
     def obtenerPrecioLista(sku):
@@ -265,8 +261,6 @@ class ProductoRepository:
         """
         metodo para obtener la imagen por medio del codigo del producto
         """
-
-        print(f"codigo: {codigo}")
         
         producto = ProductoDB.objects.get(codigo=codigo)
         return producto.imagen
@@ -341,8 +335,6 @@ class ProductoRepository:
         Returns:
             float: Precio neto del producto.
         """
-
-        print(f"sku: {sku}")
         
         producto = ProductoDB.objects.get(codigo=sku)
         precioventaunitario = producto.precioVenta
@@ -359,8 +351,6 @@ class ProductoRepository:
         Returns:
             float: Precio neto del producto.
         """
-
-        print(f"sku: {sku}")
         
         producto = ProductoDB.objects.get(codigo=sku)
         precioventaunitario = producto.precioVenta

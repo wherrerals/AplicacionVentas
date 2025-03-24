@@ -126,7 +126,6 @@ class SocioNegocioRepository:
     @staticmethod
     def actualizarClienteEmpresa(codigoSN, datosActualizados):
 
-        print(f"datos actualizados {datosActualizados}")
         try:
             cliente = SocioNegocioDB.objects.get(codigoSN=codigoSN)
             

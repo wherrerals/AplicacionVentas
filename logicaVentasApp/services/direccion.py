@@ -8,13 +8,10 @@ class Direccion:
         pass
 
     def procesarDireccionDesdeAPI(self, data, socio):
-        print("PASO 5")
-        print(f"Datos recibidos: {data}")
 
         try:
             # Extraer contactos de la respuesta
             direccioness_api = data.get('BPAddresses', [])
-            print(f"Contactos extraídos de la API: {direccioness_api}")
 
             if not direccioness_api:
                 return JsonResponse({'success': False, 'message': 'No se encontraron contactos en la respuesta de la API.'}, status=400)
@@ -40,7 +37,6 @@ class Direccion:
             # Simular el request con getlist('contactos')
             request_data = {"direcciones": [direcciones_json]}
 
-            print("Requestadata",request_data)
 
             from logicaVentasApp.services.socionegocio import SocioNegocio
 

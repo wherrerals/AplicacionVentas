@@ -112,11 +112,8 @@ class Cotizacion(Documento):
 
         name = data.get('carData')
         name_mayus = name.upper() if name else None
-        print(name_mayus)
         name_minus = name.lower() if name else None
-        print(name_minus)
         name_title = name.title() if name else None
-        print(name_title)
 
         if data.get('fecha_doc'):
             filters['Quotations/DocDate ge'] = str(f"'{data.get('fecha_doc')}'")
@@ -406,14 +403,6 @@ class Cotizacion(Documento):
             "StateB": direccionRepo2.region.numero,
             "CountryB": "CL",
         } 
-
-        dic = {
-            **cabecera,
-            'DocumentLines': lineas_json,
-            'TaxExtension': taxExtension
-        }
-
-        print(f"JSON COTIZACION: {dic}")
         
         return {
             **cabecera,
@@ -430,8 +419,6 @@ class Cotizacion(Documento):
             jsonData = self.prepararJsonCotizacion(data)
             
             response = self.client.actualizarCotizacionesSL(docentry, jsonData)
-            print(response)
-
 
             if 'success' in response:
                 return {
@@ -466,9 +453,6 @@ class Cotizacion(Documento):
             
             # Realizar la solicitud a la API
             response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
-
-
-            print(response)
             
             # Verificar si response es un diccionario
             if isinstance(response, dict):
@@ -574,14 +558,12 @@ class Cotizacion(Documento):
     def formatearDatos(self, json_data):
         # Extraer y limpiar la información del cliente
 
-        print(f"DATOS: {json_data}")
         client_info = json_data["Client"]["value"][0]
         quotations = client_info.get("Quotations", {})
         salesperson = client_info.get("SalesPersons", {})
         contact_employee = client_info.get("BusinessPartners/ContactEmployees", {})
         vendedor_repo = VendedorRepository()
         tipo_vendedor = vendedor_repo.obtenerTipoVendedor(salesperson.get("SalesEmployeeCode"))
-        print(f"TIPO VENDEDOR: {tipo_vendedor}")
 
         # Formatear los datos de cliente
         cliente = {

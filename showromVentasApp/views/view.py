@@ -299,7 +299,6 @@ def get_vendedor_sucursal(request):
         }
         
         #data = json.dumps(data)
-        print(data)
         
         return JsonResponse(data, status=200)
 
@@ -617,8 +616,6 @@ def agregarDireccion(request, socio):
                     SocioNegocio=socio,
                     pais=pais
                 )
-                print(f"Dirección {i+1} creada con éxito")
-
                 # Verificar y duplicar si es necesario
                 tipo_faltante = '12' if tipo == '13' else '13'
                 DireccionDB.objects.create(
@@ -631,7 +628,6 @@ def agregarDireccion(request, socio):
                     SocioNegocio=socio,
                     pais=pais
                 )
-                print(f"Dirección duplicada con tipo {tipo_faltante} creada con éxito")
             else:
                 print(f"No se ha creado la dirección {i+1} porque algunos campos están vacíos.")
         return redirect("/")
@@ -642,8 +638,6 @@ def agregarDireccion(request, socio):
 
 @login_required
 def agregarContacto(request, cliente, **kwargs):
-    print(f"RUT del cliente: {cliente}")
-    print("Data recibida: ", request.POST)
 
     clienteNoIncluido = None
     if cliente is None:
@@ -679,9 +673,6 @@ def agregarContacto(request, cliente, **kwargs):
             celulares = []
             emails = []
 
-        print(f"Contactos recibidos: {nombres}")
-        print(f"Apellidos recibidos: {apellidos}")
-
         # Iterar sobre los contactos recibidos
         for i in range(len(nombres)):
             nombre = nombres[i]
@@ -705,7 +696,7 @@ def agregarContacto(request, cliente, **kwargs):
                     email=email,
                     SocioNegocio=cliente
                 )
-                print(f"Contacto {i+1} creado con éxito: {nombreCompleto}")
+
             else:
                 print(f"No se ha creado el contacto {i+1} porque algunos campos están vacíos.")
 
@@ -752,7 +743,6 @@ def guardarContactosAJAX(request):
                     email=email,
                     SocioNegocio=cliente
                 )
-                print(f"Contacto {nombre_completo} creado con éxito")
             else:
                 print(f"No se ha creado el contacto porque algunos campos están vacíos.")
 
@@ -1092,13 +1082,8 @@ def onbtenerImgProducto(request):
 def generar_cotizacion_pdf_2(request, cotizacion_id):
     if request.method == 'POST':
         # Parsear datos JSON recibidos
-        print("Estamos en la vista")
-
         try:
             data = json.loads(request.body)
-
-            
-            print(f"Data recibida para PDF: {data}")
             
             codigoSn = data.get('rut')
             
@@ -1189,7 +1174,6 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
 
             calculadora = CalculadoraTotales(data)
             totales = calculadora.calcular_totales()
-            print(totales)
 
             cotizacion["totales"] = totales
 
@@ -1227,7 +1211,6 @@ def generar_cotizacion_pdf(request, cotizacion_id):
     try:
         # Parsear JSON de la solicitud
         data = json.loads(request.body)
-        print(f"Data recibida para PDF: {data}")
         logger.info(f"Data recibida para PDF: {data}")
 
         # Obtener datos del cliente
@@ -1334,42 +1317,6 @@ def generar_cotizacion_pdf(request, cotizacion_id):
         logger.error(f"Error inesperado: {str(e)}")
         return JsonResponse({'error': "Error interno del servidor."}, status=500)
 
-
-""" 
-@csrf_exempt
-def verificar_estado_pdf(request, task_id):
-    task_result = AsyncResult(task_id)
-    
-    if task_result.ready():
-        if task_result.successful():
-            # Si la tarea está lista y fue exitosa
-            file_name = task_result.result
-            try:
-                file_path = default_storage.path(file_name)
-                
-                # Leer el archivo y devolverlo como respuesta
-                with open(file_path, 'rb') as f:
-                    response = HttpResponse(f.read(), content_type='application/pdf')
-                    response['Content-Disposition'] = f'attachment; filename="{file_name}"'
-                
-                # Eliminar el archivo temporal
-                default_storage.delete(file_name)
-                return response
-            except Exception as e:
-                print(f"Error al procesar el PDF generado: {str(e)}")
-                return JsonResponse({'status': 'error', 'message': f'Error al procesar el PDF: {str(e)}'}, status=500)
-        else:
-            # Si la tarea terminó pero falló
-            return JsonResponse({
-                'status': 'failed',
-                'error': str(task_result.result) if task_result.result else 'Error desconocido'
-            }, status=500)
-    else:
-        # Obtener más información sobre el estado
-        return JsonResponse({
-            'status': task_result.state,
-            'info': str(task_result.info) if hasattr(task_result, 'info') else 'Procesando'
-        }) """
 
 @csrf_exempt
 def verificar_estado_pdf(request, task_id):

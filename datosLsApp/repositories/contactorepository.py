@@ -83,8 +83,6 @@ class ContactoRepository:
             email_contacto: str - Email del contacto
 
         """
-        print("creando contacto")
-        print(f"toda la data: {socio}, {codigo_interno_sap}, {nombre_contacto}, {apellido_contacto}, {telefono_contacto}, {email_contacto}, {celular_contacto}")
         try:
 
             socio_obj = get_object_or_404(SocioNegocioDB, codigoSN=socio)
@@ -99,7 +97,7 @@ class ContactoRepository:
                 email=email_contacto,
                 celular=celular_contacto
             )
-            print("nuevo_contacto", nuevo_contacto)
+
         except Exception as e:
             print("Error en crearContacto", e)
 
@@ -108,9 +106,7 @@ class ContactoRepository:
 
     def eliminarContactosPorSocio(socio):
         try:
-            print(f"Intentando eliminar contactos para el socio: {socio}")
             ContactoDB.objects.filter(SocioNegocio__codigoSN=socio).delete()
-            print("Contactos eliminados con éxito.")
         except Exception as e:
             print(f"Error al eliminar contactos: {e}")
             raise

@@ -39,8 +39,6 @@ class Productos(View):
         return JsonResponse({'error': 'Invalid URL'}, status=404)
 
     def listado_productos(self, request):
-        print('listado_productos')
-
         try:
             data = json.loads(request.body)
             filters = data.get('filters', {})

@@ -51,18 +51,12 @@ class Serializador:
     def mapearDirecciones(self, datos, cardCode, rut):
         dirRepo = DireccionRepository()
 
-        print("DATOS CREACION DE DIRECCIONES:", datos)
-
         if not isinstance(datos, list):
             raise ValueError("Se esperaba una lista de direcciones en 'datos'.")
 
         tipo_direcciones = list({direccion.get('tipoDireccion') for direccion in datos if 'tipoDireccion' in direccion})
-
         tipo_direcciones_complementarios = ["13" if t == "12" else "12" for t in tipo_direcciones]
-        print("TIPOS DE DIRECCIONES COMPLEMENTARIOS:", tipo_direcciones_complementarios)
-
         datos2 = dirRepo.obtenerDireccionPorSocioYTipo(cardCode, tipo_direcciones_complementarios)
-        print("DATOS DESDE LA BASE DE DATOS:", datos2)
 
         direcciones_mapeadas = []
 
@@ -74,8 +68,6 @@ class Serializador:
             id_comuna = direccion.get('comuna')
             comunas = ComunaRepository().obtenerComunaPorId(id_comuna)
             
-            print("COMUNA:", comunas)
-
             direcciones_mapeadas.append({
                 'RowNum': direccion.get('rowNum', ''),
                 'AddressName': direccion.get('nombreDireccion'),
@@ -99,9 +91,6 @@ class Serializador:
                     # Buscar la comuna por id 
                     comunas = ComunaRepository().obtenerComunaPorId(id_comuna)
                     
-                    print("COMUNA XX1:", comunas)
-
-                    
                     direcciones_mapeadas.append({
                         'RowNum': complementaria.get('rowNum', ''),
                         'AddressName': complementaria.get('nombreDireccion'),
@@ -122,9 +111,7 @@ class Serializador:
                 id_comuna = direccion.get('comuna')        
                 # Buscar la comuna por id 
                 comunas = ComunaRepository().obtenerComunaPorId(id_comuna)
-                
-                print("COMUNA XX2:", comunas)
-                
+                            
                 direcciones_mapeadas.append({
                     'RowNum': direccion_db.get('rowNum', ''),
                     'AddressName': direccion_db.get('nombreDireccion'),
@@ -161,8 +148,6 @@ class Serializador:
                 'FirstName': contacto.get('nombre'),
                 'LastName': contacto.get('apellido'),
             })
-
-        print("Contactos mapeados: ", contactos_mapeados)
         
         return {
             'ContactEmployees': contactos_mapeados
@@ -299,8 +284,6 @@ class Serializador:
 
 
     def serializarSN(data):
-
-        print(data)
         # Decodifica el JSON de entrada
         client_data = json.loads(data)
         

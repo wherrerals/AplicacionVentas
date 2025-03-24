@@ -36,9 +36,7 @@ class ComunaRepository:
         return:
             ComunaDB o 0 si no se encuentra
         """
-        
-        print("estamos en el repositorio")
-        
+                
         codigo_comuna = str(codigo_comuna)  # Convertir el código a cadena
         
         dato = ComunaDB.objects.filter(codigo=codigo_comuna)

@@ -39,18 +39,12 @@ class Producto:
         else:
             return "Error: El método contarProductos no retornó datos válidos."
 
-        print(f"Total de productos: {total_items}")
-        print(f"Skip actual: {state.value}")
-
         # Verificar si `skip` ha alcanzado el total y reiniciar si es necesario
         if skip >= total_items:
-            print("Reiniciando el valor de `skip`...")
-            print(f"Skip antes de reiniciar: {state.value}")
-            print(f"Total de productos: {total_items}")
+
             skip = 0
             state.value = 0
             state.save()
-            print(f"Skip después de reiniciar: {state.value}")
 
         # Obtener productos desde la API de SalesLayer usando `skip`
         productos = cliente.obtenerProductosSL(skip=skip)
@@ -83,7 +77,6 @@ class Producto:
 
             # Verificar si el listado ha estado vacío 3 veces consecutivas
             if empty_count >= 3:
-                print("Reiniciando el valor de `state.value` a 0 debido a 3 intentos vacíos consecutivos.")
                 state.value = 0  # Reiniciar el valor de `state.value` a 0
                 state.save()
                 empty_count = 0  # Resetear el contador de intentos vacíos
@@ -130,7 +123,6 @@ class Producto:
             datos_receta.append(data)  # Agregamos los datos del item a la lista
 
             # Imprimimos los datos del producto obtenido
-            print(f"Producto obtenido: {data}")
 
         return datos_receta  # Devolvemos la lista con todos los datos serializados
 
@@ -262,19 +254,3 @@ class Producto:
         filters = {k: v for k, v in filters.items() if v and v != "''"}
 
         return filters
-
-
-        
-"""
-
-            #if creacion is not None:
-                # Si la sincronización fue exitosa, incrementar el valor de `skip`
-
-            print(f"Skip antes de incrementar: {state.value}")
-            state.value += 1
-            print(f"Skip después de incrementar: {state.value}")
-            state.save()  # Guardar el nuevo valor de `skip`
-            print(f"Productos obtenidos: {jsonserializado}")
-
-            return "Productos Sincronizados"
-"""

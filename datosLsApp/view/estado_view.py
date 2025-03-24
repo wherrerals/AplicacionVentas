@@ -1,8 +1,9 @@
 import requests
 import json
 from django.http import JsonResponse
-from adapter.vtex_client import VTEXClient
-from adapter.sl_client import APIClient
+from adapters.sl_client import APIClient
+from adapters.vtex_client import VTEXClient
+
 
 def cambio_ordenes(request):
     if request.method == 'POST':
@@ -19,8 +20,6 @@ def cambio_ordenes(request):
                 folio_number = first_item.get('FolioNumber')
                 u_report_pdf = first_item.get('U_ReportPdf')
 
-                print(f'FolioNumber: {folio_number}')
-                print(f'U_ReportPdf: {u_report_pdf}')
             else:
                 return JsonResponse({'message': 'No se encontraron datos en Service Layer para el número de orden especificado'}, status=404)
             
@@ -30,9 +29,6 @@ def cambio_ordenes(request):
 
             value = vtex_data.get('value')
             creation_date = vtex_data.get('creationDate')
-
-            print(f'value: {value}')
-            print(f'creationDate: {creation_date}')
 
             # Construir el JSON y enviarlo a otra URL de VTEX
             payload = {

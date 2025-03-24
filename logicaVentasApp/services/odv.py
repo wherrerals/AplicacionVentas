@@ -35,11 +35,8 @@ class OrdenVenta(Documento):
 
         name = data.get('carData')
         name_mayus = name.upper() if name else None
-        print(name_mayus)
         name_minus = name.lower() if name else None
-        print(name_minus)
         name_title = name.title() if name else None
-        print(name_title)
 
         if data.get('fecha_doc'):
             filters['Orders/DocDate ge'] = str(f"'{data.get('fecha_doc')}'")
@@ -94,7 +91,6 @@ class OrdenVenta(Documento):
 
     def formatearDatos(self, json_data):
         # Extraer y limpiar la información del cliente  
-        print(f"JSON_DATA: {json_data}")      
 
         client_info = json_data["Client"]["value"][0]
         quotations = client_info.get("Orders", {})
@@ -102,7 +98,6 @@ class OrdenVenta(Documento):
         contact_employee = client_info.get("BusinessPartners/ContactEmployees", {})
         vendedor_repo = VendedorRepository()
         tipo_vendedor = vendedor_repo.obtenerTipoVendedor(salesperson.get("SalesEmployeeCode"))
-        print(f"TIPO VENDEDOR: {tipo_vendedor}")
 
         # Formatear los datos de cliente
         cliente = {
@@ -209,13 +204,10 @@ class OrdenVenta(Documento):
             "DocumentLines": document_lines
         }
 
-        print(f"RESULTADO_cotizacion: {document_lines}")
         return resultado
 
     # En odv.py - Método actualizado para manejar múltiples líneas del mismo SKU/bodega
     def actualizarDocumento(self, docnum, docentry, data):
-
-        print(f"DATA: {data}")
 
         try:
 
@@ -268,7 +260,6 @@ class OrdenVenta(Documento):
                 
                 # Capturar el stock actual en memoria para referencia
                 stock_service.capture_initial_stock(sku, bodega_id, stock_actual)
-                print(f"Stock inicial total para {sku} en bodega {bodega_id}: {cantidad_total} (DB: {stock_actual})")
 
             # Procesar las nuevas líneas y calcular diferencias
             stock_nuevo = {}
@@ -314,12 +305,10 @@ class OrdenVenta(Documento):
                         ).values_list('stock', flat=True).first() or 0
                         stock_service.capture_initial_stock(sku, bodega_id, stock_actual)
                     
-                    print(f"Nueva línea: SKU {sku} en bodega {bodega_id} con cantidad {nueva_cantidad_total}")
                     # Restar del stock disponible (es una nueva venta)
                     stock_service.actualizar_stock_por_diferencia(sku, bodega_id, -nueva_cantidad_total, stock_actual)
                 elif diferencia != 0:  # Si hay un cambio en la cantidad total
                     stock_actual = stock_service.get_initial_stock(sku, bodega_id)
-                    print(f"Cambio en línea existente: SKU {sku} en bodega {bodega_id}, diferencia {diferencia}")
                     # Si diferencia es positiva: se está pidiendo más, debemos restar al stock
                     # Si diferencia es negativa: se está pidiendo menos, debemos sumar al stock
                     stock_service.actualizar_stock_por_diferencia(sku, bodega_id, -diferencia, stock_actual)
@@ -327,7 +316,6 @@ class OrdenVenta(Documento):
             # Verificar líneas eliminadas: devolver el stock a las bodegas
             for (sku, bodega_id), cantidad_anterior_total in stock_anterior.items():
                 if (sku, bodega_id) not in stock_nuevo:
-                    print(f"SKU {sku} en bodega {bodega_id} fue eliminado, devolviendo {cantidad_anterior_total} unidades al stock.")
                     stock_actual = stock_service.get_initial_stock(sku, bodega_id)
                     
                     # Como el producto fue eliminado, devolvemos la cantidad al stock (sumamos)
@@ -355,8 +343,6 @@ class OrdenVenta(Documento):
     def crearDocumento(self, data):
 
         try:
-
-            print(f"DATA: {data}")
             
             errores = self.validarDatosODV(data)
             
@@ -386,12 +372,9 @@ class OrdenVenta(Documento):
             # Preparar el JSON para la cotización
             jsonData = self.prepararJsonODV(data)
 
-            print(f"previo a la creacion de la cotizacion")
-
             # Realizar la solicitud a la API
             response = sl.crearODV(jsonData)
 
-            print(f"RESPONSE: {response}")
             
             if isinstance(response, dict):
                 if 'DocEntry' in response:
@@ -469,8 +452,6 @@ class OrdenVenta(Documento):
         """
         Verifica que el stock total del código en la cotización no supere el stock disponible en bodega.
         """
-        print("Validando stock total por bodega...")
-        print(data)
 
         doc_entry = data.get("DocEntry")
 
@@ -484,7 +465,6 @@ class OrdenVenta(Documento):
             warehouse_code = linea["WarehouseCode"]
             quantity = linea["Quantity"]
 
-            print(f"doc_entry: {doc_entry}")
             cantidad_inicial_sap = int(linea.get("CantidadInicialSAP", 0))  # Obtener CantidadInicialSAP, si no existe, es 0
             clave = (item_code, warehouse_code)
 
@@ -498,8 +478,6 @@ class OrdenVenta(Documento):
                 stock_en_bodega = StockBodegasDB.objects.filter(
                     idProducto__codigo=item_code, idBodega=warehouse_code
                 ).values_list("stock", flat=True).first() or 0
-
-                print(f"Stock en bodega {warehouse_code} para {item_code}: {stock_en_bodega}")
 
                 # Ajustar stock disponible si DocEntry tiene un valor
                 if doc_entry:  
@@ -615,19 +593,13 @@ class OrdenVenta(Documento):
             "CountryB": "CL",
         } 
 
-        dic = {
-            **cabecera,
-            'DocumentLines': lineas_json,
-            'TaxExtension': taxExtension
-        }
-
-        print(f"JSON COTIZACION: {dic}")
         
         return {
             **cabecera,
             'DocumentLines': lineas_json,
             'TaxExtension': taxExtension
         }
+    
     @staticmethod
     def tipoVentaTipoVendedor(codigo_vendedor):
         """

@@ -135,8 +135,6 @@ class SocioNegocio:
 
                 response = conexionSL.actualizarSocioNegocioSL(cardcode, datosSerializados)
 
-                print(f"response dada {response}")
-
                 return repo.actualizarClienteEmpresa(cardcode, datos)
 
         except ValueError as ve:
@@ -309,8 +307,6 @@ class SocioNegocio:
                 # Función para formatear las direcciones
                 direcciones_formateadas = SocioNegocio.formatear_direcciones(direcciones)
 
-                print("Direcciones formateadas: ", direcciones_formateadas)
-                
                 # Función para formatear los contactos
                 contactos_formateados = SocioNegocio.formatear_contactos(contactos)
 
@@ -713,7 +709,6 @@ class SocioNegocio:
         
     def procesarContactos(data, socio):
             try:
-                print("Procesando contactos...")
                 contactos_json = data.get('contactos')
 
                 if not contactos_json:
@@ -1039,10 +1034,8 @@ class SocioNegocio:
         try:
             client = APIClient()
             data = client.getInfoSN(carCode)
-            print(f"DATOS DE CLIENTE PARA CREAR: {data}")
 
             if data.get('error'):
-                print(f"Error al obtener datos del cliente: {data.get('error')}")
                 return JsonResponse({'success': False, 'message': 'No se encontraron resultados'}, status=404)
 
             data_creacion = self.procesarDatosSocionegocio(self.convertirJsonObjeto(data))
@@ -1065,7 +1058,6 @@ class SocioNegocio:
         Returns:
             dict: Filtros para la consulta de socios de negocio.
         """
-        print(data)
         filters = {}
 
 
@@ -1074,11 +1066,8 @@ class SocioNegocio:
 
         name = filter_data.get('nombre')
         name_mayus = name.upper() if name else None
-        print(name_mayus)
         name_minus = name.lower() if name else None
-        print(name_minus)
         name_title = name.title() if name else None
-        print(name_title)
 
         if filter_data.get('codigo'):
             filters['contains(CardCode'] = f"'{filter_data['codigo']}')"
@@ -1104,8 +1093,6 @@ class SocioNegocio:
         
         # Obtener los datos del request
         dataSN = self.request
-
-        print(f"DATOS DE CLIENTE PARA ACTUALIZAR O CREAR: {dataSN}")
 
         # Validar el RUT
         if not self.verificarRutValido(self.rut):
@@ -1136,9 +1123,6 @@ class SocioNegocio:
         if not dataSN.get('direcciones'):
                 dataSN['direcciones'] = Direccion.generarDireccionTiendas()   
         try:
-
-            print(f"DATOS DE CLIENTE PARA CREAR: {dataSN}")
-
             codigoSN = SocioNegocio.generarCodigoSN(self.rut)
 
             if not codigoSN:
@@ -1196,10 +1180,6 @@ class SocioNegocio:
             comunas = ComunaRepository().obtenerComunaPorId(id_comuna)    
             tipo_direccion = address.get("tipoDireccion", "")
 
-            print(f"id de comuna: {id_comuna}")
-            print(f"comuna: {comunas}")
-            print(f"tiop de direccion: {tipo_direccion}")
-
             serialized_address = {
                 "AddressName": f'{address.get("nombreDireccion", "")}',
                 "Street": address.get("direccion", ""),
@@ -1212,7 +1192,6 @@ class SocioNegocio:
                 "AddressType": "bo_ShipTo" if tipo_direccion == "12" else "bo_BillTo"
             }
 
-            print(serialized_address)
             serialized_data["BPAddresses"].append(serialized_address)
             tipos_direccion[tipo_direccion] = serialized_address
 
@@ -1280,9 +1259,7 @@ class SocioNegocio:
 
 
                 datoComuna = direccion.get('comuna')
-
-                print(f"COMUNA: {datoComuna}")
-                
+                                
                 # quitar el guion y limpiar el string
                 id_comuna = datoComuna.strip().split("-")[0].strip()
                 comunas = ComunaRepository().obtenerComunaPorId(id_comuna)

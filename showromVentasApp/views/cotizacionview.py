@@ -173,8 +173,6 @@ class CotizacionView(View):
         }
     
     def validar_vendedor(self, vendedor1, vendedor2):
-        print(vendedor1)
-        print(vendedor2)
         if vendedor1 == vendedor2:
             return True
         else:

@@ -50,11 +50,8 @@ class SolicitudesDevolucion(Documento):
 
         name = data.get('carData')
         name_mayus = name.upper() if name else None
-        print(name_mayus)
         name_minus = name.lower() if name else None
-        print(name_minus)
         name_title = name.title() if name else None
-        print(name_title)
 
         if data.get('fecha_doc'):
             filters['ReturnRequest/DocDate ge'] = str(f"'{data.get('fecha_doc')}'")
@@ -136,8 +133,6 @@ class SolicitudesDevolucion(Documento):
     
     def formatearDatos(self, json_data):
         # Extraer y limpiar la información del cliente
-
-        print(f"DATOS: {json_data}")
 
         client_info = json_data["Client"]["value"][0]
         quotations = client_info.get("ReturnRequest", {})
@@ -227,8 +222,6 @@ class SolicitudesDevolucion(Documento):
             "DocumentLines": document_lines
         }
 
-        print(f"RESULTADO: {resultado}")
-
         return resultado
 
     def prepararJsonDevoluciones(self, jsonData):
@@ -244,9 +237,6 @@ class SolicitudesDevolucion(Documento):
             
         # Determinar el tipo de venta basado en el vendedor
         codigo_vendedor = jsonData.get('SalesPersonCode')
-
-        print(f"CODIGO VENDEDOR: {codigo_vendedor}")
-
         tipo_venta = self.tipoVentaTipoVendedor(codigo_vendedor)
         
         # Si el tipo de venta por vendedor no es válido ('NA'), determinar por líneas
@@ -356,14 +346,6 @@ class SolicitudesDevolucion(Documento):
             "CountryB": "CL",
         } 
 
-        dic = {
-            **cabecera,
-            'DocumentLines': lineas_json,
-            'TaxExtension': taxExtension
-        }
-
-        print(f"JSON COTIZACION: {dic}")
-        
         return {
             **cabecera,
             'DocumentLines': lineas_json,
@@ -371,17 +353,12 @@ class SolicitudesDevolucion(Documento):
         }
 
     def actualizarDocumento(self,docnum, docentry, data):
-        print(f"DocNum: {docnum}")
         docentry = docentry
 
         try:
             docentry = int(docentry)
-            print(f"DocEntry: {docentry}")
             jsonData = self.prepararJsonDevoluciones(data)
-            print(f"JSON: PROCESADO") 
             response = self.client.actualizarDevolucionesSL(docentry, jsonData)
-            print(response)
-
 
             if 'success' in response:
                 return {
@@ -416,9 +393,6 @@ class SolicitudesDevolucion(Documento):
             
             # Realizar la solicitud a la API
             response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
-
-
-            print(response)
             
             # Verificar si response es un diccionario
             if isinstance(response, dict):

@@ -98,8 +98,6 @@ class SocioNegocioView(FormView):
             try:
                 socioNegoService = SocioNegocio(request)
 
-                print(f"request{request}")
-
                 response = socioNegoService.crearOActualizarCliente()
 
                 response_data = json.loads(response.content)
@@ -213,13 +211,10 @@ class SocioNegocioView(FormView):
             JsonResponse con la información del cliente, o un mensaje de error
         """
         
-        print("BUSCANDO DATA DEL CLIENTE")
-
         if request.method != 'GET':
             return JsonResponse({'error': 'Método no permitido'}, status=405)
         
         rut = request.GET.get('rut')
-        print("RUT:", rut)
 
         if not rut:
             return JsonResponse({'error': 'No se proporcionó un RUT de socio de negocio'}, status=400)
@@ -227,20 +222,15 @@ class SocioNegocioView(FormView):
 
             socio_negocio_service = SocioNegocio(request)
 
-            print("obtener info cliente")
             cardCode = socio_negocio_service.generarCardCode(rut)
 
-            print("CardCode:", cardCode)
 
             if socio_negocio_service.verificarSocioDB(cardCode):
-                print("Existe en la base de datos")
-                print("Responder info cliente")
-                print("RUT:", rut)
+
                 return socio_negocio_service.responderInfoCliente(rut)
+            
             else:
-                print("No existe en la base de datos")
-                print("Crear y responder cliente")
-                print("RUT:", rut)
+                
                 return socio_negocio_service.crearYresponderCliente(cardCode, rut)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
@@ -269,14 +259,11 @@ class SocioNegocioView(FormView):
             
             return:
                 JsonResponse con los datos de los socios de negocio, o un mensaje de error
-        """
-        print("Request body:", request.body)  # Verifica el cuerpo de la solicitud JSON recibida
-        
+        """        
         client = APIClient()
 
         try:
             data = json.loads(request.body)
-            print("Received data:", data)  # Verifica los datos JSON recibidos
         except json.JSONDecodeError as e:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
@@ -289,10 +276,6 @@ class SocioNegocioView(FormView):
             skip = int(data.get('skip', 0))
         except ValueError:
             return JsonResponse({'error': 'Invalid parameters'}, status=400)
-
-        print("Applying filters:", filters)  # Verifica los filtros aplicados
-        print("-" * 10)  
-        print(filters)
 
         # Manejar la solicitud de datos
         try:
