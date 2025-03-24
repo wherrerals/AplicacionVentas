@@ -93,7 +93,7 @@ class Serializador:
             complementarias = [d for d in datos2 if str(d['tipoDireccion']) == tipo_complementario]
 
             for complementaria in complementarias:
-                if not any(d['AddressName'] == complementaria.get('nombreDireccion', '') for d in direcciones_mapeadas):
+                if not any(d['RowNum'] == complementaria.get('rowNum', '') for d in direcciones_mapeadas):
                     
                     id_comuna = complementaria.get('comuna')        
                     # Buscar la comuna por id 
@@ -116,7 +116,8 @@ class Serializador:
                     })
 
         for direccion_db in datos2:
-            if not any(d['AddressName'] == direccion_db.get('nombreDireccion', '') for d in direcciones_mapeadas):
+            # Si la dirección no está en la lista de direcciones mapeadas, agregarla
+            if not any(d['RowNum'] == direccion_db.get('rowNum', '') for d in direcciones_mapeadas):
                 
                 id_comuna = direccion.get('comuna')        
                 # Buscar la comuna por id 
