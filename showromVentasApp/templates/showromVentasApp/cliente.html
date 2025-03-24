@@ -74,6 +74,9 @@
 
       <div class="col-6" id="nombreApellidoSN" style="padding: 8px; text-align: left; height: 40px;">
         <p style="padding-bottom: 0px; padding-top: 0px; color: white;"></p>
+        {% if username %}
+        <p  id="sucursal" hidden>{{ sucursal }}</p>
+        {% endif %}
       </div>
 
       <div class="col-2" style="padding: 8px; text-align: right; height: 40px;">
@@ -236,8 +239,8 @@
             <label class="col-form-label" style="font-size: 13px;">Teléfono</label>
           </div>
           <div class="col-sm-3 col-md-3" style="width: 30%;">
-            <input class="form-control" type="tel" name="telefonoSN" id="telefonoSN"
-              style="font-size: 12px;border-color: rgb(159,168,175);">
+            <input class="form-control" type="tel" name="telefonoSN" id="telefonoSN" value="+56"
+              style="font-size: 12px;border-color: rgb(159,168,175);" maxlength="12">
           </div>
           <div class="col-sm-2 col-md-2" style="width: 20%; text-align: right;">
             <label class="col-form-label" style="font-size: 13px;">Email</label>

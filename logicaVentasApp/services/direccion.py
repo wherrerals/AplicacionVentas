@@ -48,17 +48,55 @@ class Direccion:
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'Error inesperado: {str(e)}'}, status=500)
 
-    @staticmethod
-    def generarDireccionTiendas():
+    def generarDireccionTiendas(sucursal):
         direcciones = [
-                {
-                "nombreDireccion": "Direccion General",
-                "pais": 'Chile',
-                "region": '13',
-                "comuna": '13101',
-                "tipoDireccion": '12',
-                "ciudad": 'Santiago',
-                "direccion": 'Av. Las Condes 7363, Las Condes, Santiago, Chile',
-                }
+            {
+                "Sucursal": "LC",
+                "nombreDireccion": "Showroom Las Condes",
+                "pais": "Chile",
+                "region": "13",
+                "comuna": "13114",
+                "tipoDireccion": "12",
+                "ciudad": "Santiago",
+                "direccion": "Las Condes 7363, Las Condes, Santiago, Chile"
+            },
+            {
+                "Sucursal": "PH",
+                "nombreDireccion": "Showroom Vitacura",
+                "pais": "Chile",
+                "region": "13",
+                "comuna": "13132",
+                "tipoDireccion": "12",
+                "ciudad": "Santiago",
+                "direccion": "Padre Hurtado Norte 1199, Vitacura, Santiago, Chile"
+            },
+            {
+                "Sucursal": "ME",
+                "nombreDireccion": "Showroom Renca",
+                "pais": "Chile",
+                "region": "13",
+                "comuna": "13128",
+                "tipoDireccion": "12",
+                "ciudad": "Santiago",
+                "direccion": "Av. Presidente Frei Montalva 550, Bodega 02, Renca, Santiago, Chile"
+            }
         ]
-        return direcciones
+        
+        # Diccionario para manejar equivalencias de sucursales
+        equivalencias = {
+            "LC": "LC",
+            "RS": "LC",
+            "ME": "ME",
+            "PH": "PH"
+        }
+        
+        # Buscar la sucursal con la equivalencia
+        sucursal_normalizada = equivalencias.get(sucursal)
+        
+        # Encontrar y devolver el diccionario de la sucursal
+        for direccion in direcciones:
+            if direccion["Sucursal"] == sucursal_normalizada:
+                return [direccion]
+        
+        # Si no se encuentra la sucursal, devolver None
+        return None

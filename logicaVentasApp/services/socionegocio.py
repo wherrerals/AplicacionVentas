@@ -1120,8 +1120,12 @@ class SocioNegocio:
             return JsonResponse({'success': False, 'message': 'Error al procesar el cliente'}, status=500)
 
     def procesarNuevoCliente(self, dataSN):
+
+        sucursal_venta = dataSN.get('sucursal', None)
+
         if not dataSN.get('direcciones'):
-                dataSN['direcciones'] = Direccion.generarDireccionTiendas()   
+                dataSN['direcciones'] = Direccion.generarDireccionTiendas(sucursal_venta)
+                print(dataSN['direcciones'])
         try:
             codigoSN = SocioNegocio.generarCodigoSN(self.rut)
 

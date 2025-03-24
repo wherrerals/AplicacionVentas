@@ -17,6 +17,7 @@ formularios.forEach(formulario => {
         const email = document.getElementById('emailSN').value;
         const telefono = document.getElementById('telefonoSN').value;
         const giro = document.getElementById('giroSN').value;
+        const sucursal = document.getElementById('sucursal').textContent;
         // docentry es el número de la cotización o numero_orden
         let docentry = null;
 
@@ -89,6 +90,7 @@ formularios.forEach(formulario => {
 
         // Crear un objeto con los datos del formulario
         data = {
+            sucursal: sucursal,
             docentry: docentry,
             nombreSN: nombre,
             apellidoSN: apellido,

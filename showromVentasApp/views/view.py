@@ -434,7 +434,40 @@ def creacion_clientes(request):
         HttpResponse: renderiza el template 'cliente.html'
     """
 
-    return render(request, "cliente.html")
+    if request.user.is_authenticated:
+        # Obtiene el nombre de usuario del modelo User de Django
+        username = request.user.username
+
+        # Intenta obtener el objeto UsuarioDB relacionado con el usuario autenticado
+        try:
+            usuario = UsuarioDB.objects.get(usuarios=request.user)
+            sucurs = usuario.sucursal  # Accede a la sucursal a través del modelo UsuarioDB
+            nombreUser = usuario.nombre  # Accede al nombre del usuario a través del modelo UsuarioDB
+            codVen = usuario.vendedor.codigo  # Accede al código del vendedor a través del modelo UsuarioDB
+
+        except UsuarioDB.DoesNotExist:
+            # Maneja el caso en que no se encuentre el usuario relacionado
+            JsonResponse({'error': 'No se encontró el usuario relacionado con el usuario autenticado'}, status=404)
+
+        # Obtiene el parámetro DocNum de la URL, o None si no está presente
+        doc_num = request.GET.get('docNum', None)
+
+        # Obtiene todas las regiones de la base de datos
+        regiones = RegionDB.objects.all()
+
+        # Contexto para renderizar el template
+        context = {
+            'docnum': doc_num,
+            'username': username,
+            'regiones': regiones,
+            'sucursal': sucurs,
+            'nombreuser': nombreUser,
+            'codigoVendedor': codVen
+        }
+
+        # Renderiza el template con el contexto
+        return render(request, 'cliente.html', context)
+
 
 @transaction.atomic 
 @login_required
