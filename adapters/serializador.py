@@ -50,6 +50,19 @@ class Serializador:
     
     def mapearDirecciones(self, datos, cardCode, rut):
         dirRepo = DireccionRepository()
+        
+        print(f"RUT: {rut}")
+        datosSocio = SocioNegocioRepository().buscarClientesPorRut(rut).first()
+        print(datosSocio)
+
+        cabezera = {
+            "EmailAddress" : datosSocio.email,
+            "Phone1": datosSocio.telefono,
+            "Phone2": datosSocio.telefono,
+            "Cellular": datosSocio.telefono,
+        }
+
+        print(datos)
 
         if not isinstance(datos, list):
             raise ValueError("Se esperaba una lista de direcciones en 'datos'.")
@@ -125,7 +138,15 @@ class Serializador:
                     'AddressType': "bo_BillTo" if direccion_db['tipoDireccion'] == "13" else "bo_ShipTo"
                 })
 
+                dic = {
+                    'bsnespartner': cabezera,
+                    'BPAddresses': direcciones_mapeadas
+                }
+                
+                print(dic)
+
         return {
+            **cabezera,
             'BPAddresses': direcciones_mapeadas
         }
 
