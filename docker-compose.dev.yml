@@ -1,4 +1,4 @@
-#version: '3.8'  #agregar esto solo se necesita especificar la versión
+version: '3.9'
 services:
   db:
     image: mysql:9.0.1
@@ -14,7 +14,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: dockerfile.app2
+      dockerfile: dockerfile.app
     command: >
         sh -c "
         python manage.py makemigrations --settings=config.settings.develop &&
@@ -23,7 +23,9 @@ services:
         python manage.py migrate datosLsApp --settings=config.settings.develop &&
         python manage.py makemigrations taskApp --settings=config.settings.develop &&
         python manage.py migrate taskApp --settings=config.settings.develop &&
-        python manage.py runserver --settings=config.settings.develop 0.0.0.0:8000
+        gunicorn --env DJANGO_SETTINGS_MODULE=config.settings.production config.wsgi:application \
+        --bind 0.0.0.0:7000 --workers=17 --threads=4 --timeout=180 \
+        --max-requests 1000 --max-requests-jitter 100 --log-level debug
         "
     volumes:
       - .:/app
@@ -51,7 +53,7 @@ services:
   celery-beat:
     build:
       context: .
-      dockerfile: dockerfile.app2
+      dockerfile: dockerfile.app
     command: celery -A config beat --loglevel=info
     depends_on:
       - rabbitmq
@@ -88,7 +90,7 @@ services:
   celery-worker-pdf:
     build:
       context: .
-      dockerfile: dockerfile.app2
+      dockerfile: dockerfile.app
     command: sh -c "celery -A config worker -Q q_pdf_generation -l info -E"
     depends_on:
       - rabbitmq
