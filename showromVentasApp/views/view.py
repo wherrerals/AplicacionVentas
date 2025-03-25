@@ -1115,8 +1115,11 @@ def onbtenerImgProducto(request):
 def generar_cotizacion_pdf_2(request, cotizacion_id):
     if request.method == 'POST':
         # Parsear datos JSON recibidos
+        
         try:
             data = json.loads(request.body)
+
+            print(f"datos recibidos: {data}")
             
             codigoSn = data.get('rut')
             
@@ -1291,17 +1294,22 @@ def generar_cotizacion_pdf(request, cotizacion_id):
 
         # Formatear fecha
         fecha = data.get('valido_hasta')
+        fecha_documento = data.get('fecha')
         if fecha:
             fecha = fecha.split("-")
             fecha = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
+            fecha_documento = fecha_documento.split("-")
+            fecha_documento = f"{fecha_documento[2]}-{fecha_documento[1]}-{fecha_documento[0]}"
+
         else:
             today = date.today()
             fecha = f"{today.day}-{today.month}-{today.year}"
+            fecha_documento = f"{today.day}-{today.month}-{today.year}"
 
         # Construir diccionario de cotización
         cotizacion = {
             'numero': data.get('numero'),
-            'fecha': fecha,
+            'fecha': fecha_documento,
             'validez': fecha,
             'totalNeto': data.get('totalNeto'),
             'iva': data.get('iva'),

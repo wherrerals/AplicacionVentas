@@ -11,11 +11,15 @@ document.addEventListener('DOMContentLoaded', function () {
         let mes = formatNumber(tresDiasDespues.getMonth() + 1);
         let año = tresDiasDespues.getFullYear();
 
-        let fechaFormateada = año + '-' + mes + '-' + dia;
+        let fechaFormateada = dia + '/' + mes + '/' + año;
+
+        let fechaSAp = año + '-' + mes + '-' + dia;
 
         let diasVencidosLabel = document.getElementById('docDueDate');
         if (diasVencidosLabel) {
             diasVencidosLabel.textContent = fechaFormateada;
+            // crear e insertar en el atributo  data-doc-due-date
+            diasVencidosLabel.setAttribute('data-docDueDate', fechaSAp);
         } else {
             //console.error('Elemento con ID "docDueDate" no encontrado.');
         }

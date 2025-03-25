@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const docEntry = document.getElementById("numero_cotizacion").getAttribute("data-docEntry")
         const docTotal = document.getElementById("total_bruto").getAttribute("data-total-bruto");
         const docDate = fechaSolo; //listo 
-        const docDueDate = document.getElementById("docDueDate").textContent; //listo
+        const docDueDate = document.getElementById("docDueDate").getAttribute("data-docDueDate"); //listo
         const taxDate = fechaSolo; // listo
         const rut = document.getElementById("inputCliente").getAttribute("data-codigoSN"); //listo
         const cardCode = rut;//listo
@@ -41,6 +41,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const contacto = contactoCliente.value;
 
         console.log('contacto seleccionado:', contacto);
+
+        //docdueDate
+        console.log('Fecha de vencimiento del documento:', docDueDate);
 
 
 

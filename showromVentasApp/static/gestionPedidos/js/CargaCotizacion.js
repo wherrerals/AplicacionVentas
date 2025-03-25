@@ -124,7 +124,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
           const dueDateElement = document.getElementById("docDueDate");
           if (dueDateElement) {
-            dueDateElement.textContent = `${docDate}`;
+            dueDateElement.setAttribute = `${docDate}`;
+
+            const date = new Date(docDate);
+
+            // Sumar 10 días
+            date.setDate(date.getDate() + 10);
+
+            // Formatear la fecha como dd/mm/yyyy
+            const formattedDate = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+
+            // Mostrar la fecha formateada
+            dueDateElement.textContent = formattedDate;
+
           }
 
           const estadoElement = document.querySelector('p strong[data-estado="bost_Open"]');

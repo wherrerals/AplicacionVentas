@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const docDate = fechaSolo;
         console.log("Fecha del documento:", docDate);
 
-        const docDueDate = document.getElementById("docDueDate").textContent.trim();
+        const docDueDate = document.getElementById("docDueDate").getAttribute("data-docDueDate");;
         console.log("Fecha de vencimiento:", docDueDate);
 
         const codigoVendedor = document.getElementById("vendedor_data").getAttribute("data-codeVen");
