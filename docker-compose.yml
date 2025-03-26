@@ -91,7 +91,7 @@ services:
     build:
       context: .
       dockerfile: dockerfile.app  # Asegúrate de que este Dockerfile esté configurado correctamente
-    command: celery -A config worker -Q cola_pdfs --concurrency=4 --loglevel=info
+    command: celery -A config worker -Q q_pdf_generation -l info -E
     depends_on:
       - rabbitmq
       - db
