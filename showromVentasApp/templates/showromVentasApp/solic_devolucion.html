@@ -27,7 +27,7 @@
         <input type="search" placeholder="Buscar" style="width: 100%;">
       </div>
       <div class="col-7 col-sm-4" style="text-align: left;width: 189px;">
-        <a class="btn btn-primary" role="button" href="{% url 'solicitudes_devolucion' %}" style="font-size: 12px;">+ Nueva Orden de Venta</a>
+        <a class="btn btn-primary" role="button" href="{% url 'solicitudes_devolucion' %}" style="font-size: 12px;">+ Nueva Solicitud</a>
       </div>
       <div class="col" style="text-align: right;padding-right: 0px;">
         <div class="dropdown">
@@ -307,14 +307,15 @@
 
       <div class="row" style="background: #f0f2f5;">
         <div class="col-sm-2 col-md-1" style="width: 20%;">
-          <label class="col-form-label" style="font-size: 13px;">Tipo Entrega</label>
+          <label class="col-form-label" style="font-size: 13px;">Tipo Deveolución</label>
         </div>
         <div class="col-3 col-sm-4 col-md-3" style="text-align: left;padding-right: 0px;width: 31%;">
           <select class="form-select" id="tipoEntrega-1" style="font-size: 12px;border-color: rgb(159,168,175);">
             <optgroup label="Tipo Devolución">
-              <option value="-1">Cambio mismo producto</option>
-              <option value="5">Garantía</option>
-              <option value="2">Nota de Crédito</option>
+              <option value="CAMB">Cambio mismo producto</option>
+              <option value="GARA">Garantía</option>
+              <option value="GARA">Interna</option>
+              <option value="NCRE">Nota de Crédito</option>
             </optgroup>
           </select>
         </div>

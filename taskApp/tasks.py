@@ -125,7 +125,7 @@ def generar_pdf_async(cotizacion_id, cotizacion_data, absolute_uri):
         # Retornar el contenido codificado y el nombre del archivo
         return {
             'pdf_content': pdf_base64,
-            'file_name': f"cotizacion_{cotizacion_id}.pdf"
+            'file_name': f"Cotizacion_{cotizacion_id}.pdf"
         }
     except Exception as e:
         logger.error(f"Error generando PDF para cotización {cotizacion_id}: {str(e)}")
