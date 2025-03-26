@@ -43,6 +43,7 @@ from celery.exceptions import TimeoutError
 from celery.result import AsyncResult
 from django.core.files.storage import default_storage
 
+from django.db.models import Q
 
 import logging
 
@@ -805,11 +806,12 @@ def user_data(request):
 @login_required
 def busquedaProductos(request):
     if request.method == 'GET' and 'numero' in request.GET:
+        
         numero = request.GET.get('numero')
         users_data = user_data(request)
 
         # Realiza la consulta a la base de datos para obtener los resultados
-        resultados = ProductoDB.objects.filter(codigo__icontains=numero)
+        resultados = ProductoDB.objects.filter(Q(codigo__icontains=numero) | Q(nombre__icontains=numero))
         # Convierte los resultados en una lista de diccionarios
         resultados_formateados = [
             {

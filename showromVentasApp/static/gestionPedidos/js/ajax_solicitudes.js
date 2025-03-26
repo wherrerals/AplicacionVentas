@@ -2,7 +2,8 @@ $(document).ready(function () {
     $('#inputNumero').on('input', function () { // escucha el evento de entrada en input con #inputNumero
         let numero = $(this).val();
         let tipoDoucmento = $('.tipoDocumento').text().trim();
-        if (numero) {
+        if (numero.length >= 3) { // si la longitud del número es mayor a 0
+            
             let buscarProductosUrl = '/ventas/buscarproductos/'; // URL para buscar productos
             $.ajax({ // realiza una solicitud ajax al servidor a la url buscar/
                 url: buscarProductosUrl,

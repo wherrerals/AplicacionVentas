@@ -13,31 +13,14 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 DEBUG = False
 
-ALLOWED_HOSTS = [
-    "192.168.3.13",
-    "localhost",
-    "ventas.ledstudio.cl",
-    "172.25.50.8"
-
-]  # Cambiar por el dominio o ip de la maquina en la que se va a desplegar la aplicacion
+ALLOWED_HOSTS = ["ventas.ledstudio.cl"] 
 
 # Base service Layer
-API_BASE_URL = "https://182.160.29.24:50003/b1s/v1/"
-COMPANY_DB = "LED_PROD"
-API_USERNAME = "manager"
-API_PASSWORD = "1245LED98"
+API_BASE_URL = os.environ.get("API_BASE_URL")
+COMPANY_DB = os.environ.get("COMPANY_DB")
+API_USERNAME = os.environ.get("API_USERNAME")
+API_PASSWORD = os.environ.get("API_PASSWORD")
 
-# Configuracion para docker
-""" DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'led_studio',
-        'USER': 'root',
-        'PASSWORD': 'Ea7hava5*',
-        'HOST': 'db',
-        'PORT': '4350',
-    }
-} """
 
 # Database local Production
 DATABASES = {

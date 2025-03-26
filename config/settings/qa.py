@@ -5,16 +5,15 @@ from dotenv import load_dotenv
 from config.settings.base import *
 from config.logging import *
 
-load_dotenv(Path.joinpath(BASE_DIR, ".env"))
 
+load_dotenv(Path.joinpath(BASE_DIR, ".env"))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
-# SECURITY WARNING: don't run with debug turned on in production!
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.3.42"]
+ALLOWED_HOSTS = ["192.168.3.13"]
 
 # Base service Layer
 API_BASE_URL = os.environ.get("API_BASE_URL")
@@ -22,7 +21,19 @@ COMPANY_DB = os.environ.get("COMPANY_DB")
 API_USERNAME = os.environ.get("API_USERNAME")
 API_PASSWORD = os.environ.get("API_PASSWORD")
 
-# Configuracion para DB docker
+# Configuracion para docker
+""" DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'led_studio',
+        'USER': 'root',
+        'PASSWORD': 'Ea7hava5*',
+        'HOST': 'db',
+        'PORT': '4350',
+    }
+} """
+
+# Database local Production
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -34,17 +45,6 @@ DATABASES = {
     }
 }
 
-# Configuracion para DB local
+STATIC_ROOT = Path.joinpath(BASE_DIR, "staticfiles")
 
-""" DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'led_studio',
-        'USER':'root',
-        'PASSWORD':'Ea7hava5*', #led_studio
-        #'PASSWORD':'Ea7hava5}', #home
-        #'PASSWORD':'qwerty', #nico
-        #'HOST':'localhost',
-        'PORT':'3306',
-    }
-}  """
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

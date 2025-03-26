@@ -257,7 +257,7 @@ class Serializador:
                 "Producto": {
                     "nombre": product_data.get("ItemName"),
                     "codigo": product_data.get("ItemCode"),
-                    "imagen": "imagen.jpg",  # Este dato debería ser dinámico si existe en el JSON
+                    "imagen": "https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/14ecba9f-2814-4029-9e0e-e5e6b9e2869c___b2a5497dbc81c0adc5576c48b2eeb27b.jpg.jpg",  # Este dato debería ser dinámico si existe en el JSON
                 }
             }
 

@@ -1,0 +1,101 @@
+#version: '3.8'  #agregar esto solo se necesita especificar la versión
+services:
+  db:
+    image: mysql:9.0.1
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      #MYSQL_USER: ${DB_USER}
+      #MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "4350:3306"
+
+  web:
+    build:
+      context: .
+      dockerfile: dockerfile.qa
+    command: >
+      sh -c "
+      rm -rf staticfiles/ &&
+      python manage.py makemigrations datosLsApp --settings=config.settings.qa &&
+      python manage.py migrate datosLsApp --settings=config.settings.qa &&
+      python manage.py makemigrations taskApp --settings=config.settings.qa &&
+      python manage.py migrate taskApp --settings=config.settings.qa &&
+      python manage.py makemigrations --settings=config.settings.qa &&
+      python manage.py migrate --settings=config.settings.qa &&
+      python manage.py collectstatic --no-input --settings=config.settings.qa &&
+      gunicorn --env DJANGO_SETTINGS_MODULE=config.settings.qa config.wsgi:application --bind 0.0.0.0:7000
+      "
+    volumes:
+      - .:/app
+    ports:
+      - "7000:7000"
+    depends_on:
+      - db
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: dockerfile.qa
+    command: celery -A config beat --loglevel=info
+    depends_on:
+      - rabbitmq
+      - db
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+
+  celery-worker-products:
+    build:
+      context: .
+      dockerfile: dockerfile.qa
+    command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in
+    depends_on:
+      - rabbitmq
+      - db
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+
+  celery-worker-users:
+    build:
+      context: .
+      dockerfile: dockerfile.qa
+    command: celery -A config worker --loglevel=info --concurrency=2 -Q q_clients_in
+    depends_on:
+      - rabbitmq
+      - db
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+
+  celery-worker-pdf:
+    build:
+      context: .
+      dockerfile: dockerfile.qa  # Asegúrate de que este Dockerfile esté configurado correctamente
+    command: celery -A config worker -Q q_pdf_generation -l info -E
+    depends_on:
+      - rabbitmq
+      - db
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+
+volumes:
