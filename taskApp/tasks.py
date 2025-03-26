@@ -105,6 +105,7 @@ def generar_pdf_async(cotizacion_id, cotizacion_data, absolute_uri):
             'quiet': True,  # Reduce logging output
             'print-media-type': True,  # Use print media type
             'page-size': 'Letter',  # Standard page size
+            'dpi': 100,  # Reducir la resolución de renderizado (por defecto suele ser 300)
             'margin-top': '0.75in',
             'margin-right': '0.75in',
             'margin-bottom': '0.75in',
