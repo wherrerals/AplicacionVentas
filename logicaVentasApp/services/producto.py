@@ -12,7 +12,7 @@ class Producto:
     def sync(self, tipo):
         # Obtener el valor de `skip` desde la base de datos
         state, created = SyncState.objects.get_or_create(
-            key='product_sync_skip_{tipo}', 
+            key=f'product_sync_skip_{tipo}', 
             defaults={'value': 0}
         )
         
@@ -46,7 +46,7 @@ class Producto:
 
         # Verificar si el conteo es válido
         if not isinstance(conteo, dict) or 'value' not in conteo or not conteo['value']:
-            raise ValueError("El conteo de productos no es válido")
+            raise ValueError(f"El conteo de productos no es válido en {tipo}")
 
         total_items = conteo['value'][0].get('ItemsCount', 0)
 
@@ -66,7 +66,7 @@ class Producto:
                 state.value = 0
                 state.save()
                 empty_count = 0
-            return "No hay productos para sincronizar"
+            return f"No hay productos para sincronizar en {tipo}"
     
         # Serializar los productos
         serialcer = Serializador('json')
@@ -90,7 +90,7 @@ class Producto:
             empty_count = 0  # Resetear el contador de intentos vacíos
 
         # Retornar el mensaje con la cantidad de productos sincronizados
-        return f"{total_synced} productos sincronizados exitosamente{listadoProductos} de la cola {tipo}"
+        return f"{total_synced} productos sincronizados exitosamente{listadoProductos} para el tipo {tipo}"
 
     
     def obtenerReceta(self, codigo):
