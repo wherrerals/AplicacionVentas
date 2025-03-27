@@ -15,6 +15,21 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+    <script>
+    document.querySelectorAll(".calcular_cantidad").forEach(input => {
+        input.addEventListener("click", function() {
+            this.select();
+        });
+    });
+
+    document.querySelectorAll(".agg_descuento").forEach(input => {
+        input.addEventListener("click", function() {
+            this.select();
+        });
+    });
+
+    </script>
+
   <style>
     button {
     background-color: #0B5ED7;
