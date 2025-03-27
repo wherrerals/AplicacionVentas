@@ -183,6 +183,8 @@ class Serializador:
                     "marca": product_data.get("U_LED_MARCA"),
                     "costo": product_data.get("AvgStdPrice"),
                     "TreeType": product_data.get("TreeType"),
+                    "descontinuado": product_data.get("U_LED_ARTDESC"), # 0 = Linea / 1 = Descontinuado
+                    "inactivo": product_data.get("Frozen"), #tYES = inactivo / tNO = activo
                 }
             }
 
