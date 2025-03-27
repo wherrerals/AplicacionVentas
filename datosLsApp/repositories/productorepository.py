@@ -69,7 +69,7 @@ class ProductoRepository:
                     "dsctoMaxTienda": descuento_maximo,
                     "dctoMaxProyectos": descuento_maximo,
                     "linkProducto": product_data.get("linkProducto", ""),
-                    "descontinuado": producto_info.get("descontinuado", ""),
+                    "descontinuado_sap": producto_info.get("descontinuado", ""),
                     "inactivo": producto_info.get("inactivo", ""),
                 },
             )
