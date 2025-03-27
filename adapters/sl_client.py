@@ -643,11 +643,17 @@ class APIClient:
             print(f"Error inesperado: {e}")
             raise
 
-    def obtenerProductosSL(self, skip=0):
+    def obtenerProductosSL(self, skip=0, tipo=""):
 
         self.__login()
         select = "ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection"
-        filter = "SalesItem eq 'tYES'"
+        if tipo == "nacional":
+            filter = "SalesItem eq 'tYES' and U_Origin eq 'N' and TreeType eq 'tNo'"
+        elif tipo == "importado":
+            filter = "SalesItem eq 'tYES' and U_Origin nq 'N' and TreeType eq 'tNo'"
+        else:
+            filter = "SalesItem eq 'tYES' and TreeType nq 'tNo'"
+        
         order_by = "ItemCode asc"
 
         url = f"{self.base_url}Items?$select={select}&$filter={filter}&$orderby={order_by}&$skip={skip}"
@@ -842,9 +848,17 @@ class APIClient:
         response.raise_for_status()  # Esto generará una excepción para cualquier código de estado HTTP 4xx/5xx
         return response.json()
 
-    def contarProductos(self):
+    def contarProductos(self, tipo=""):
         self.__login()
-        url = f"{self.base_url}Items?$apply=aggregate($count as ItemsCount)&$filter=SalesItem eq 'tYES'"
+        
+        if tipo == "nacional":
+            filter = "SalesItem eq 'tYES' and U_Origin eq 'N' and TreeType eq 'tNo'"
+        elif tipo == "importado":
+            filter = "SalesItem eq 'tYES' and U_Origin nq 'N' and TreeType eq 'tNo'"
+        else:
+            filter = "SalesItem eq 'tYES' and TreeType nq 'tNo'"        
+        
+        url = f"{self.base_url}Items?$apply=aggregate($count as ItemsCount)&$filter={filter}"
         response = self.session.get(url, verify=False)
         response.raise_for_status()
         return response.json()

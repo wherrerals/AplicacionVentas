@@ -86,9 +86,19 @@ CELERY_TASK_ROUTES = {
     "taskApp.tasks.sync_products": {
         "queue": "q_products_in"
     },  # Asigna la tarea a una cola específica
+
+    "taskApp.tasks.sync_products_receta": {
+        "queue": "q_products_in_receta"
+    },  # Asigna la tarea a una cola específica
+
+        "taskApp.tasks.sync_products_importado": {
+        "queue": "q_products_in_importado"
+    },  # Asigna la tarea a una cola específica
+
     "taskApp.tasks.syncUser": {
         "queue": "q_clients_in"
     },  # Asigna la tarea a una cola específica
+    
 }
 
 """ CELERY_TASK_ROUTES = {

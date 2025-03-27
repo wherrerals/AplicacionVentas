@@ -50,6 +50,19 @@ app.conf.beat_schedule = {
         "schedule": timedelta(seconds=10),  # Ejecutar cada 10 segundos
     },
     
+    "data-product-receta": {
+        "task": "taskApp.tasks.sync_products_receta",  # Ruta correcta a la tarea
+        #"schedule": crontab(minute="*/1"),  # Ejecutar cada minuto
+        "schedule": timedelta(seconds=10),  # Ejecutar cada 10 segundos
+    },
+    
+    "data-product-importados": {
+        "task": "taskApp.tasks.sync_products_importado",  # Ruta correcta a la tarea
+        #"schedule": crontab(minute="*/1"),  # Ejecutar cada minuto
+        "schedule": timedelta(seconds=10),  # Ejecutar cada 10 segundos
+    },
+    
+
     "data-user": {
         "task": "taskApp.tasks.syncUser",  # Ruta correcta a la tarea
         #"schedule": crontab(minute="*/1"),  # Ejecutar cada minuto

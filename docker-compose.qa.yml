@@ -72,6 +72,33 @@ services:
     environment:
       CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
 
+  celery-worker-products-recetas:
+    build:
+      context: .
+      dockerfile: dockerfile.app
+    command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in_receta
+    depends_on:
+      - rabbitmq
+      - db
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+  
+  celery-worker-products-importados:
+    build:
+      context: .
+      dockerfile: dockerfile.app
+    command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in_importado
+    depends_on:
+      - rabbitmq
+      - db
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+
+
   celery-worker-users:
     build:
       context: .

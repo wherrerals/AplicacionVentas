@@ -9,10 +9,10 @@ import pika
 
 class Producto:
 
-    def sync(self):
+    def sync(self, tipo):
         # Obtener el valor de `skip` desde la base de datos
         state, created = SyncState.objects.get_or_create(
-            key='product_sync_skip', 
+            key='product_sync_skip_{tipo}', 
             defaults={'value': 0}
         )
         
@@ -23,66 +23,74 @@ class Producto:
         # Inicializar el contador de intentos vacíos
         empty_count = 0
 
+        sync_method = {
+            "nacional": {
+                "count": lambda cliente, tipo: cliente.contarProductos(tipo=tipo),
+                "sync": lambda cliente, skip, tipo: cliente.obtenerProductosSL(skip=skip, tipo=tipo)
+            },
+            "receta": {
+                "count": lambda cliente, tipo: cliente.contarProductos(tipo=tipo),
+                "sync": lambda cliente, skip, tipo: cliente.contarProductos(skip=skip, tipo=tipo)
+            },
+            "importado": {
+                "count": lambda cliente, tipo: cliente.contarProductos(tipo=tipo),
+                "sync": lambda cliente, skip, tipo: cliente.contarProductos(skip=skip, tipo=tipo)
+            }
+        }
+
         # Crear instancia de APIClient
         cliente = APIClient()
 
-        # Obtener el valor total de productos desde la API
-        conteo = cliente.contarProductos()
+        # Contar productos
+        conteo = sync_method[tipo]["count"](cliente, tipo)
 
-        # Validar si `conteo` tiene la estructura correcta
-        if isinstance(conteo, dict) and 'value' in conteo and len(conteo['value']) > 0:
-            first_item = conteo['value'][0]
-            if 'ItemsCount' in first_item:
-                total_items = first_item['ItemsCount']
-            else:
-                return "Error: No se encontró la clave 'ItemsCount' en el resultado."
-        else:
-            return "Error: El método contarProductos no retornó datos válidos."
+        # Verificar si el conteo es válido
+        if not isinstance(conteo, dict) or 'value' not in conteo or not conteo['value']:
+            raise ValueError("El conteo de productos no es válido")
+
+        total_items = conteo['value'][0].get('ItemsCount', 0)
 
         # Verificar si `skip` ha alcanzado el total y reiniciar si es necesario
         if skip >= total_items:
-
             skip = 0
             state.value = 0
             state.save()
 
-        # Obtener productos desde la API de SalesLayer usando `skip`
-        productos = cliente.obtenerProductosSL(skip=skip)
+        # Obtener los productos
+        productos = sync_method[tipo]["sync"](cliente, skip, tipo)
 
-        # Si hay productos, sincronizarlos
-        if productos:
-            # Serializar los productos
-            serialcer = Serializador('json')
-            jsonserializado = serialcer.formatearDatos(productos)
-            
-            # Sincronizar los productos y su stock
-            repo = ProductoRepository()
-            creacion, listadoProductos = repo.sync_products_and_stock(jsonserializado)
-
-            # Verificar si el listado de productos está vacío
-            if not listadoProductos:
-                empty_count += 1
-            else:
-                empty_count = 0  # Resetear el contador si el listado no está vacío
-
-            # Incrementar el valor de `skip` si la sincronización fue exitosa
-            if creacion:
-                #synced_count = len(jsonserializado)
-                synced_count = len(listadoProductos)
-                total_synced += synced_count
-                
-                # Actualizar el valor de `skip` para la próxima llamada
-                state.value += synced_count
-                state.save()
-
-            # Verificar si el listado ha estado vacío 3 veces consecutivas
+        # Verificar si no hay productos para sincronizar
+        if not productos:
+            empty_count += 1
             if empty_count >= 3:
-                state.value = 0  # Reiniciar el valor de `state.value` a 0
+                state.value = 0
                 state.save()
-                empty_count = 0  # Resetear el contador de intentos vacíos
+                empty_count = 0
+            return "No hay productos para sincronizar"
+    
+        # Serializar los productos
+        serialcer = Serializador('json')
+        jsonserializado = serialcer.formatearDatos(productos)
+        
+        # Sincronizar los productos y su stock
+        repo = ProductoRepository()
+        creacion, listadoProductos = repo.sync_products_and_stock(jsonserializado)
+
+
+        # Incrementar el valor de `skip` si la sincronización fue exitosa
+        if creacion and listadoProductos:
+            #synced_count = len(jsonserializado)
+            synced_count = len(listadoProductos)
+            total_synced += synced_count
+            
+            # Actualizar el valor de `skip` para la próxima llamada
+            state.value += synced_count
+            state.save()
+
+            empty_count = 0  # Resetear el contador de intentos vacíos
 
         # Retornar el mensaje con la cantidad de productos sincronizados
-        return f"{total_synced} productos sincronizados exitosamente{listadoProductos}"
+        return f"{total_synced} productos sincronizados exitosamente{listadoProductos} de la cola {tipo}"
 
     
     def obtenerReceta(self, codigo):
