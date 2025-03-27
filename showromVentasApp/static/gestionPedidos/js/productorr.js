@@ -96,7 +96,7 @@ class Producto {
                         <small id="indixe_producto" data-lineNum="${this?.linea_documento}" data-indice="${contprod}">${contprod})</small><small>&nbsp;&nbsp;</small><small style="font-weight-bold" name="sku_producto">${this.productoCodigo}</small>
                         </div>
                         <div class="col-md-11 col-xxl-7" style="text-align: center;">
-                            <img src="${this.imagen}" width="50" height="50" style="width: 50px;height: 50px;" name="img_producto" id="img_productox">
+                            <img src="${this.imagen}" style="width: 80px;height: 80px;" name="img_producto" id="img_productox">
                         </div>
                     </div>
                 </td>
