@@ -30,11 +30,11 @@ class Producto:
             },
             "receta": {
                 "count": lambda cliente, tipo: cliente.contarProductos(tipo=tipo),
-                "sync": lambda cliente, skip, tipo: cliente.contarProductos(skip=skip, tipo=tipo)
+                "sync": lambda cliente, skip, tipo: cliente.obtenerProductosSL(skip=skip, tipo=tipo)
             },
             "importado": {
                 "count": lambda cliente, tipo: cliente.contarProductos(tipo=tipo),
-                "sync": lambda cliente, skip, tipo: cliente.contarProductos(skip=skip, tipo=tipo)
+                "sync": lambda cliente, skip, tipo: cliente.obtenerProductosSL(skip=skip, tipo=tipo)
             }
         }
 

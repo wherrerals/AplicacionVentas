@@ -17,7 +17,7 @@ class ProductoDB(models.Model):
     linkProducto = models.CharField(max_length=255, null=False)
     marca = models.CharField(max_length=20, default="Sin Marca", null=True) 
     costo = models.FloatField(default=0,null=False)
-    descontinuado = models.CharField(max_length=10, default='0')
+    descontinuado = models.CharField(max_length=10, default='0', null=True)
     inactivo = models.CharField(max_length=10, default='tNO', null=True)
 
     def __str__(self):

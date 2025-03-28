@@ -643,16 +643,16 @@ class APIClient:
             print(f"Error inesperado: {e}")
             raise
 
-    def obtenerProductosSL(self, skip=0, tipo=""):
+    def obtenerProductosSL(self, skip=0, tipo="nacional"):
 
         self.__login()
-        select = "ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection"
+        select = "ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,U_LED_ARTDESC,Frozen,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection"
         if tipo == "nacional":
-            filter = "SalesItem eq 'tYES' and U_Origin eq 'N' and TreeType eq 'tNo'"
+            filter = "SalesItem eq 'tYES' and U_Origin eq 'N' and TreeType eq 'iNotATree'"
         elif tipo == "importado":
-            filter = "SalesItem eq 'tYES' and U_Origin nq 'N' and TreeType eq 'tNo'"
+            filter = "SalesItem eq 'tYES' and U_Origin ne 'N' and TreeType eq 'iNotATree'"
         else:
-            filter = "SalesItem eq 'tYES' and TreeType nq 'tNo'"
+            filter = "SalesItem eq 'tYES' and TreeType ne 'iNotATree'"        
         
         order_by = "ItemCode asc"
 
@@ -852,11 +852,11 @@ class APIClient:
         self.__login()
         
         if tipo == "nacional":
-            filter = "SalesItem eq 'tYES' and U_Origin eq 'N' and TreeType eq 'tNo'"
+            filter = "SalesItem eq 'tYES' and U_Origin eq 'N' and TreeType eq 'iNotATree'"
         elif tipo == "importado":
-            filter = "SalesItem eq 'tYES' and U_Origin nq 'N' and TreeType eq 'tNo'"
+            filter = "SalesItem eq 'tYES' and U_Origin ne 'N' and TreeType eq 'iNotATree'"
         else:
-            filter = "SalesItem eq 'tYES' and TreeType nq 'tNo'"        
+            filter = "SalesItem eq 'tYES' and TreeType ne 'iNotATree'"        
         
         url = f"{self.base_url}Items?$apply=aggregate($count as ItemsCount)&$filter={filter}"
         response = self.session.get(url, verify=False)

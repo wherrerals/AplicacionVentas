@@ -76,7 +76,7 @@ services:
     build:
       context: .
       dockerfile: dockerfile.app
-    command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in_receta
+    command: celery -A config worker --loglevel=info --concurrency=4 -Q q_products_in_receta
     depends_on:
       - rabbitmq
       - db
