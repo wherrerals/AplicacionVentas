@@ -657,7 +657,7 @@ class APIClient:
         order_by = "ItemCode asc"
 
         url = f"{self.base_url}Items?$select={select}&$filter={filter}&$orderby={order_by}&$skip={skip}"
-
+        
         response = self.session.get(url, verify=False)
         response.raise_for_status()
         return response.json()

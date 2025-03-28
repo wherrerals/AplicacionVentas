@@ -76,8 +76,7 @@ class ProductoRepository:
 
             # Si el producto es una receta, calcular stock y costo de receta
             if producto_info.get("TreeType") == "iSalesTree":
-                print("INICIANDO PROCESO DE RECETA")
-                print(f"Producto {producto.codigo} es una receta.")
+
                 try:                    
                     # Calcular stock y costo de la receta
                     stock_receta, costo_receta = self.calcular_stock_y_costo_receta(producto_info["codigo"])
@@ -152,9 +151,9 @@ class ProductoRepository:
 
             # **Sincronizar stock del componente en las bodegas**
             producto = ProductoDB.objects.get(codigo=item_code)  # Obtener la instancia del producto
-            bodegas_datos = [{"nombre": bodega, "stock_disponible": stock_por_bodega[bodega] / cantidad_necesaria, "stock_comprometido": 0} for bodega in bodegas]
+            bodegas_datos = [{"nombre": bodega, "stock_disponible": stock_por_bodega[bodega], "stock_comprometido": 0} for bodega in bodegas]
 
-            print(f"datos de producto antes de sincronizar el stocl {producto.codigo} bodegas {bodegas_datos}")
+            #print(f"datos de producto antes de sincronizar el stocl {producto.codigo} bodegas {bodegas_datos}")
             self.sync_stock(producto, bodegas_datos)
 
 
@@ -201,8 +200,7 @@ class ProductoRepository:
             producto (ProductoDB): Instancia del producto.
             bodegas (list): Lista de diccionarios con datos de las bodegas y su stock.
         """
-        print(f"Sincronizando stock para el producto: {producto.codigo}")
-        print(f"Datos de bodegas: {bodegas}")
+
 
         for bodega_data in bodegas:
 
@@ -227,10 +225,6 @@ class ProductoRepository:
                 # Si existe, actualizamos los valores
                 stock_bodega.stock = stockVenta
                 stock_bodega.stockDisponibleReal = bodega_data.get("stock_disponible", -1)
-
-                print(f"Actualizando stock para el producto: {producto.codigo} en la bodega: {bodega.nombre}")
-                print(f"Nuevo stock: {stockVenta}, Stock disponible real: {bodega_data.get('stock_disponible', -1)}")
-                print(f"Stock comprometido: {bodega_data.get('stock_comprometido', -1)}")
                 
                 # Guardar los cambios
                 stock_bodega.save()
