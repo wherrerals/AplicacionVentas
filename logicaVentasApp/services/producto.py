@@ -44,6 +44,8 @@ class Producto:
         # Contar productos
         conteo = sync_method[tipo]["count"](cliente, tipo)
 
+        print(f"Conteo de productos para {tipo}: {conteo}")
+
         # Verificar si el conteo es válido
         if not isinstance(conteo, dict) or 'value' not in conteo or not conteo['value']:
             raise ValueError(f"El conteo de productos no es válido en {tipo}")

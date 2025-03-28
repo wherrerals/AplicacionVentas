@@ -648,11 +648,11 @@ class APIClient:
         self.__login()
         select = "ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,U_LED_ARTDESC,Frozen,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection"
         if tipo == "nacional":
-            filter = "SalesItem eq 'tYES' and U_Origin eq 'N' and TreeType eq 'iNotATree'"
+            filter = "SalesItem eq 'tYES' and U_Origin eq 'N' and TreeType eq 'iNotATree' and Frozen eq 'tNO'"
         elif tipo == "importado":
-            filter = "SalesItem eq 'tYES' and U_Origin ne 'N' and TreeType eq 'iNotATree'"
+            filter = "SalesItem eq 'tYES' and U_Origin ne 'N' and TreeType eq 'iNotATree' and Frozen eq 'tNO'"
         else:
-            filter = "SalesItem eq 'tYES' and TreeType ne 'iNotATree'"        
+            filter = "SalesItem eq 'tYES' and TreeType ne 'iNotATree' and Frozen eq 'tNO'"        
         
         order_by = "ItemCode asc"
 
@@ -852,11 +852,11 @@ class APIClient:
         self.__login()
         
         if tipo == "nacional":
-            filter = "SalesItem eq 'tYES' and U_Origin eq 'N' and TreeType eq 'iNotATree'"
+            filter = "SalesItem eq 'tYES' and U_Origin eq 'N' and TreeType eq 'iNotATree' and Frozen eq 'tNO'"
         elif tipo == "importado":
-            filter = "SalesItem eq 'tYES' and U_Origin ne 'N' and TreeType eq 'iNotATree'"
+            filter = "SalesItem eq 'tYES' and U_Origin ne 'N' and TreeType eq 'iNotATree' and Frozen eq 'tNO'"
         else:
-            filter = "SalesItem eq 'tYES' and TreeType ne 'iNotATree'"        
+            filter = "SalesItem eq 'tYES' and TreeType ne 'iNotATree' and Frozen eq 'tNO'"        
         
         url = f"{self.base_url}Items?$apply=aggregate($count as ItemsCount)&$filter={filter}"
         response = self.session.get(url, verify=False)

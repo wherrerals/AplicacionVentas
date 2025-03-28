@@ -140,8 +140,12 @@ document.addEventListener("DOMContentLoaded", function () {
       const stockPH = getStockBodega("PH");
       const stockLC = getStockBodega("LC");
       // quitar los decimales de los desucentos
-      const descuentoTienda = Math.round(product.dsctoMaxTienda * 100);
-      const descuentoProyecto = Math.round(product.dctoMaxProyectos * 100);
+      const descuentoTienda_float = parseFloat(product.dsctoMaxTienda * 100);
+      const descuentoProyecto_float = parseFloat(product.dctoMaxProyectos * 100);
+
+      const descuentoTienda = Math.floor(descuentoTienda_float);
+      const descuentoProyecto = Math.floor(descuentoProyecto_float);
+
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
