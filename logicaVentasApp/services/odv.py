@@ -196,8 +196,10 @@ class OrdenVenta(Documento):
                     "SalesStock": warehouse_info.get("SalesStock"),
                 }
             }
-            document_lines.append(document_line)
 
+            if document_line["Price"] and document_line["Price"] > 0:
+                document_lines.append(document_line)
+        
         # Formar el diccionario final
         resultado = {
             "Cliente": cliente,
