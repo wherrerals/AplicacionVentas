@@ -1149,6 +1149,8 @@ class SocioNegocio:
         cardcode = self.generarCodigoSN(rut)
         client_data = data
         
+        giro =  client_data.get("giroSN", "")
+
         # Serializa los datos principales del cliente
         serialized_data = {
             "CardCode": cardcode,
@@ -1157,7 +1159,7 @@ class SocioNegocio:
             "GroupCode": int(client_data.get("tipoSN", "")),
             "Phone1": client_data.get("telefonoSN", ""),
             "Phone2": client_data.get("telefonoSN", ""),
-            "Notes": client_data.get("giroSN", ""),
+            "Notes": giro or "NO INDICADO", 
             "PayTermsGrpCode": -1,
             "FederalTaxID": client_data.get("rutSN", ""),
             "SalesPersonCode": -1,
