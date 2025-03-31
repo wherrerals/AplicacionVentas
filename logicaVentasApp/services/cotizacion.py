@@ -296,6 +296,14 @@ class Cotizacion(Documento):
         """
             
         # Determinar el tipo de venta basado en el vendedor
+        print(f"jsonData: {jsonData}")
+
+        if jsonData.get('DocEntry'):
+            actualizar = True
+            client = APIClient()
+        else:
+            actualizar = False
+        
         codigo_vendedor = jsonData.get('SalesPersonCode')
         tipo_venta = self.tipoVentaTipoVendedor(codigo_vendedor)
         
@@ -363,13 +371,15 @@ class Cotizacion(Documento):
         repo_producto = ProductoRepository()
         
         #maper item code
+        lineas_json = []
 
+        for linea in lineas:
+            item_code = linea.get('ItemCode')
+        
 
-        lineas_json = [
-            
-            {
-                'lineNum': linea.get('LineNum'),
-                'ItemCode': linea.get('ItemCode'),
+            nueva_linea = {
+                'lineNum': linea.get('LineNum'), # +1 
+                'ItemCode': item_code,
                 'Quantity': linea.get('Quantity'),
                 #'PriceAfVAT': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
                 #'GrossPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
@@ -387,9 +397,21 @@ class Cotizacion(Documento):
                 'COGSCostingCode2': linea.get('COGSCostingCode2'),
             }
 
-            
-            for linea in lineas
-        ]
+            lineas_json.append(nueva_linea)
+            print(f"lineas_json: {lineas_json}")
+            if actualizar == True and linea.get('DocEntry_line') != 'null':
+                if repo_producto.es_receta(item_code):
+                    print("es receta")
+                    componentes = client.productTreesComponents(item_code)
+                    print(f"componentes: {componentes}")
+
+                    for componente in componentes.get('ProductTreeLines', [{}]):
+                        lineas_json.append({
+                            'ItemCode': componente['ItemCode'],
+                            'TreeType': 'iIngredient'
+                        })
+                else:
+                    pass
 
         taxExtension = {
             "StreetS": direccion1.calleNumero,

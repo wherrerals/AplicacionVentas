@@ -64,6 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const productRows = document.querySelectorAll('.product-row');
 
         productRows.forEach((row, index) => {
+            const linenum = row.querySelector("#indixe_producto").getAttribute('data-linenum'); //listo
             const itemCode = row.querySelector("[name='sku_producto']").innerText;
             const quantity = row.querySelector("[name='cantidad']").value;
             //const shipDate = row.querySelector("[name='fecha_envio']").value;
@@ -77,6 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const cogsCostingCode = warehouseCode;
             const costingCode2 = "AV";
             const cogsCostingCode2 = "AV";
+            const docentryLinea = row.getAttribute('data-docentryLinea'); // "null" o el valor asignado
 
             console.log('warehouseCode:', warehouseCode);
 
@@ -85,7 +87,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Crea un objeto con los datos de la línea
             const line = {
-                "LineNum": index,
+                "LineNum": linenum,
+                "DocEntry_line": docentryLinea,
                 "ItemCode": itemCode,
                 "Quantity": parseFloat(quantity),
                 "ShipDate": docDueDate, //shipDate,

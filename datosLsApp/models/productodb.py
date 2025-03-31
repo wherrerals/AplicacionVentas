@@ -19,6 +19,8 @@ class ProductoDB(models.Model):
     costo = models.FloatField(default=0,null=False)
     descontinuado = models.CharField(max_length=10, default='0', null=True)
     inactivo = models.CharField(max_length=10, default='tNO', null=True)
+    TreeType = models.CharField(max_length=50, default='DEFAULT', null=True)
+    
 
     def __str__(self):
         return self.codigo
