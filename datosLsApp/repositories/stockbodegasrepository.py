@@ -18,7 +18,9 @@ class StockBodegasRepository:
         :param producto_id: ID del producto.
         :return: Stock del producto en la bodega.
         """
-
+        print("consultarStockPorBodega")
+        print("producto_id", producto_id)
+        print("bodega_id", bodega_id)
         datoBodega = StockBodegasDB.objects.get(idProducto=producto_id, idBodega=bodega_id)
 
         return datoBodega.stock

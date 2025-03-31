@@ -259,6 +259,7 @@ class Cotizacion(Documento):
             tipo_venta (str): Tipo de venta.
         """
         repo = VendedorRepository()
+        print(f"codigo_vendedor: {codigo_vendedor}")
         tipo_vendedor = repo.obtenerTipoVendedor(codigo_vendedor)
 
         if tipo_vendedor == 'PR':
@@ -580,6 +581,8 @@ class Cotizacion(Documento):
     def formatearDatos(self, json_data):
         # Extraer y limpiar la información del cliente
 
+        bodegas = ["ME", "LC", "PH"]
+
         client_info = json_data["Client"]["value"][0]
         quotations = client_info.get("Quotations", {})
         salesperson = client_info.get("SalesPersons", {})
@@ -631,11 +634,15 @@ class Cotizacion(Documento):
             
             sku = line.get("ItemCode")
             bodega = line.get("WarehouseCode")
-            
+            if bodega not in bodegas:
+                bodega = "ME"
+
             imagen = ProductoRepository.obtenerImagenProducto(sku)
             marca = ProductoRepository.obtenerMarcaProducto(sku)
             descuentoMax = ProductoRepository.descuentoMax(sku)
             priceList = ProductoRepository.obtenerPrecioLista(sku)
+
+            
 
             stock_bodega = StockBodegasRepository.consultarStockPorBodega(sku, bodega)
             
