@@ -9,9 +9,16 @@ class ContactoManager {
         // Verificar si el elemento 'agregar_cont' existe antes de agregar el evento
         const agregarCont = document.getElementById('agregar_cont');
         if (agregarCont) {
-            agregarCont.addEventListener('click', () => this.agregarContacto('cont'));
+            agregarCont.addEventListener('click', () => {
+                try {
+                    this.agregarContacto('cont');
+                } catch (error) {
+                    this.agregarContacto('listaContactos');
+                }
+            });
             console.log('Evento de agregar contacto inicializado.');
         }
+        
 
         // Verificar si el elemento 'agregar_cont_modal' existe antes de agregar el evento
         const agregarContModal = document.getElementById('agregar_cont_modal');
