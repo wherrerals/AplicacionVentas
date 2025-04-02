@@ -591,11 +591,10 @@ class SocioNegocio:
 
             # RUT sin puntos y guion
             if '.' in rut:
-                return False, "El RUT no debe contener puntos."
-
+                return False  # Formato incorrecto
 
             if "-" not in rut:
-                return False, "El RUT debe contener un guion antes del dígito verificador."
+                return False
             
             partes = rut.split("-")
             if len(partes) != 2:
@@ -1105,10 +1104,9 @@ class SocioNegocio:
         dataSN = self.request
 
         # Validar el RUT
-        is_valid, message = self.verificarRutValido(self.rut)
-        if not is_valid:
-            return JsonResponse({'success': False, 'message': message}, status=400)
-      
+        if not self.verificarRutValido(self.rut):
+            return JsonResponse({'success': False, 'message': 'Favor revisar el rut ingresado no debe tener . y debe tener el - antes de su digito verigicador'}, status=400)        
+        
         try:
             # Validar los datos obligatorios
             self.validarDatosObligatorios()
