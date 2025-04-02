@@ -588,14 +588,24 @@ class SocioNegocio:
             bool: True si el RUT es válido, False si no.
         """
         try:
+
             # RUT sin puntos y guion
-            rut = rut.replace(".", "").replace("-", "")
+            if '.' in rut:
+                return False, "El RUT no debe contener puntos."
+
+
+            if "-" not in rut:
+                return False, "El RUT debe contener un guion antes del dígito verificador."
+            
+            partes = rut.split("-")
+            if len(partes) != 2:
+                return False  # Formato incorrecto
             
             # Separar el dígito verificador del número base
-            numero, digito_verificador = rut[:-1], rut[-1].upper()
-
+            numero, digito_verificador = partes
             #numero base en entero
-            numero = int(numero)
+            numero = numero.replace(".", "")  # Quitar puntos
+            digito_verificador = digito_verificador.upper()  # Convertir a mayúsculas
             
             # Invertir los dígitos del número base para el cálculo
             numero_invertido = str(numero)[::-1]
@@ -1095,9 +1105,10 @@ class SocioNegocio:
         dataSN = self.request
 
         # Validar el RUT
-        if not self.verificarRutValido(self.rut):
-            return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)        
-        
+        is_valid, message = self.verificarRutValido(self.rut)
+        if not is_valid:
+            return JsonResponse({'success': False, 'message': message}, status=400)
+      
         try:
             # Validar los datos obligatorios
             self.validarDatosObligatorios()
