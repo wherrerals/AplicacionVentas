@@ -367,3 +367,21 @@ class ProductoRepository:
         producto = ProductoDB.objects.get(codigo=sku)
         precioventaunitario = producto.precioVenta
         return precioventaunitario
+
+    def es_receta(self, item_code):
+        """
+        Verifica si un producto es una receta.
+        
+        Args:
+            item_code (str): Código del producto.
+        
+        Returns:
+            bool: True si es una receta, False en caso contrario.
+        """
+        
+        try:
+            producto = ProductoDB.objects.get(codigo=item_code)
+            return producto.TreeType == "iSalesTree"
+        
+        except ProductoDB.DoesNotExist:
+            return False

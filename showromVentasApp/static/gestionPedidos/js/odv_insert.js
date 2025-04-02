@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const productRows = document.querySelectorAll(".product-row");
   
       productRows.forEach((row, index) => {
+        const linenum = row.querySelector("#indixe_producto").getAttribute('data-linenum'); //listo
         const itemCode = row.querySelector("[name='sku_producto']").innerText;
         const quantity = row.querySelector("[name='cantidad']").value;
         const discount = row.querySelector("#agg_descuento").value;
@@ -52,6 +53,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const warehouseCode = bodegaSelect ? bodegaSelect.value : null;
         const comentarios = row.querySelector("#comentarios-1").value;
         const tipoEntregaLineas = row.querySelector("#tipoEntrega").value;
+
+        const docentryLinea = row.getAttribute('data-docentryLinea'); // "null" o el valor asignado
 
   // Selecciona el elemento <select> por su clase
         const selectElement = document.querySelector(".form-select.bodega-select");
@@ -70,7 +73,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const cogsCostingCode2 = "AV";
   
         const line = {
-          LineNum: index,
+          LineNum: linenum,
+          DocEntry_line: docentryLinea,
           ItemCode: itemCode,
           Quantity: parseFloat(quantity),
           ShipDate: fechaentregaLineas,

@@ -32,7 +32,6 @@ class Cotizacion(Documento):
         construirFiltrosCotizaciones: Construye los filtros para la consulta de cotizaciones.
         buscarDocumentosCotizacion: Busca los detalles de una cotización basada en el DocEntry.
         prepararLineasInternas: Prepara las líneas de documento de la cotización para ser mostradas en la vista de detalle.
-        prepararJsonCotizacion: Prepara los datos JSON específicos de la cotización.
         crearDocumento: Crea una nueva cotización y maneja las excepciones según el código de respuesta.
         eliminarDocumento: Elimina una cotización.
         actualizarEstadoDocumento: Actualiza el estado de una cotización.
@@ -285,139 +284,13 @@ class Cotizacion(Documento):
         return 'TIEN' if len(warehouses) == 1 else 'RESE'
         
 
-    def prepararJsonCotizacion(self, jsonData):
-        """
-        Prepara los datos JSON específicos de la cotización.
-
-        Args:
-            jsonData (dict): Datos de la cotización.
-        
-        Returns:
-            dict: Datos de la cotización preparados para ser enviados a SAP.
-        """
-            
-        # Determinar el tipo de venta basado en el vendedor
-        codigo_vendedor = jsonData.get('SalesPersonCode')
-        tipo_venta = self.tipoVentaTipoVendedor(codigo_vendedor)
-        
-        # Si el tipo de venta por vendedor no es válido ('NA'), determinar por líneas
-        if tipo_venta == 'NA':
-            lineas = jsonData.get('DocumentLines', [])
-            tipo_venta = self.tipoVentaTipoLineas(lineas)
-        
-        transportationCode = jsonData.get('TransportationCode')
-
-        if tipo_venta == 'NA' and transportationCode != '1':
-            tipo_venta = 'RESE'
-        elif tipo_venta == 'PROY':
-            tipo_venta = 'PROY'
-        elif tipo_venta == 'ECCO':
-            tipo_venta = 'ECCO'
-                    
-        adrres = jsonData.get('Address')
-        adrres2 = jsonData.get('Address2')
-        
-        idContacto = jsonData.get('ContactPersonCode')
-        
-        if idContacto == "No hay contactos disponibles":
-            numerocontactoSAp = "null"
-        else:
-            contacto = ContactoRepository.obtenerContacto(idContacto)
-            numerocontactoSAp = contacto.codigoInternoSap        #consultar en base de datos con el id capturado
-        
-        if adrres == "No hay direcciones disponibles":
-            addresmodif = "null"
-        else:
-            direccion1 = DireccionRepository.obtenerDireccion(adrres)
-            addresmodif = f"{direccion1.calleNumero}, {direccion1.comuna.nombre}\n{direccion1.ciudad}\n{direccion1.region.nombre}"
-
-        if adrres2 == "No hay direcciones disponibles":
-            addresmodif2 = "null"
-        else:
-            direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)
-            addresmodif2 = f"{direccionRepo2.calleNumero}, {direccionRepo2.comuna.nombre}\n{direccionRepo2.ciudad}\n{direccionRepo2.region.nombre}"
-        
-        # Datos de la cabecera
-        cabecera = {
-            'DocDate': jsonData.get('DocDate'),
-            'DocDueDate': jsonData.get('DocDueDate'),
-            'TaxDate': jsonData.get('TaxDate'),
-            'DocTotal': jsonData.get('DocTotal'),
-            #'ContactPersonCode': numerocontactoSAp,
-            #'Address': addresmodif,
-            #'Address2': addresmodif2,
-            'CardCode': jsonData.get('CardCode'),
-            'NumAtCard': jsonData.get('NumAtCard'),
-            'Comments': jsonData.get('Comments'),
-            'PaymentGroupCode': jsonData.get('PaymentGroupCode'),
-            'SalesPersonCode': jsonData.get('SalesPersonCode'),
-            'TransportationCode': jsonData.get('TransportationCode'),
-            #'U_LED_NROPSH': jsonData.get('U_LED_NROPSH'),
-            'U_LED_TIPVTA': tipo_venta,  # Tipo de venta calculado
-            'U_LED_TIPDOC': jsonData.get('U_LED_TIPDOC'),
-            'U_LED_FORENV': jsonData.get('TransportationCode'),
-        }
-
-        # Datos de las líneas
-        lineas = jsonData.get('DocumentLines', [])
-
-        repo_producto = ProductoRepository()
-        
-        #maper item code
-
-
-        lineas_json = [
-            
-            {
-                'lineNum': linea.get('LineNum'),
-                'ItemCode': linea.get('ItemCode'),
-                'Quantity': linea.get('Quantity'),
-                #'PriceAfVAT': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
-                #'GrossPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
-                'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
-                #'NetTaxAmount': repo_producto.obtener_precio_unitario_bruto(linea.get('ItemCode')) * linea.get('Quantity') - repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')) * linea.get('Quantity'),
-                #'TaxTotal': repo_producto.obtener_precio_unitario_bruto(linea.get('ItemCode')) * linea.get('Quantity') - repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')) * linea.get('Quantity'),
-                'ShipDate': linea.get('ShipDate'),
-                'FreeText': linea.get('FreeText'),
-                'DiscountPercent': linea.get('DiscountPercent'),
-                'WarehouseCode': linea.get('WarehouseCode'),
-                'CostingCode': linea.get('CostingCode'),
-                'ShippingMethod': linea.get('ShippingMethod'),
-                'COGSCostingCode': linea.get('COGSCostingCode'),
-                'CostingCode2': linea.get('CostingCode2'),
-                'COGSCostingCode2': linea.get('COGSCostingCode2'),
-            }
-
-            
-            for linea in lineas
-        ]
-
-        taxExtension = {
-            "StreetS": direccion1.calleNumero,
-            "CityS": direccion1.ciudad,
-            "CountyS": f"{direccion1.comuna.codigo} - {direccion1.comuna.nombre}",
-            "StateS": direccion1.region.numero,
-            "CountryS": "CL",
-            "StreetB": direccionRepo2.calleNumero,
-            "CityB": direccionRepo2.ciudad,
-            "CountyB": f"{direccionRepo2.comuna.codigo} - {direccionRepo2.comuna.nombre}",
-            "StateB": direccionRepo2.region.numero,
-            "CountryB": "CL",
-        } 
-        
-        return {
-            **cabecera,
-            'DocumentLines': lineas_json,
-            'TaxExtension': taxExtension
-        }
-
     def actualizarDocumento(self,docnum, docentry, data):
         
         docentry = docentry
 
         try:
             docentry = int(docentry)
-            jsonData = self.prepararJsonCotizacion(data)
+            jsonData = self.prepare_json_document(data)
             
             response = self.client.actualizarCotizacionesSL(docentry, jsonData)
 
@@ -450,7 +323,7 @@ class Cotizacion(Documento):
                 return {'error': errores}
 
             # Preparar el JSON para la cotización
-            jsonData = self.prepararJsonCotizacion(data)
+            jsonData = self.prepare_json_document(data)
             
             # Realizar la solicitud a la API
             response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)

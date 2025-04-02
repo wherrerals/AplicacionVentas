@@ -324,7 +324,7 @@ class OrdenVenta(Documento):
                     stock_service.actualizar_stock_por_diferencia(sku, bodega_id, cantidad_anterior_total, stock_actual)
 
             # Preparar JSON y actualizar documento en SAP
-            jsonData = self.prepararJsonODV(data)
+            jsonData = self.prepare_json_document(data)
             client = APIClient()
             response = client.actualizarODVSL(int(docentry), jsonData)
 
@@ -372,7 +372,7 @@ class OrdenVenta(Documento):
                 stock_service.actualizar_stock(sku, bodega_id, -cantidad, stock_actual)
 
             # Preparar el JSON para la cotización
-            jsonData = self.prepararJsonODV(data)
+            jsonData = self.prepare_json_document(data)
 
             # Realizar la solicitud a la API
             response = sl.crearODV(jsonData)
@@ -495,112 +495,6 @@ class OrdenVenta(Documento):
 
         return errores if errores else "Stock validado correctamente."
 
-
-            
-
-
-    
-    def prepararJsonODV(self, jsonData):
-
-        codigo_vendedor = jsonData.get('SalesPersonCode')
-        tipo_venta = self.tipoVentaTipoVendedor(codigo_vendedor)
-        
-        if tipo_venta == 'NA':
-            lineas = jsonData.get('DocumentLines', [])
-            tipo_venta = self.tipoVentaTipoLineas(lineas)
-            
-            
-        adrres = jsonData.get('Address')
-        adrres2 = jsonData.get('Address2')
-        
-        idContacto = jsonData.get('ContactPersonCode')
-        
-        if idContacto == "No hay contactos disponibles":
-            numerocontactoSAp = "null"
-        else:
-            contacto = ContactoRepository.obtenerContacto(idContacto)
-            numerocontactoSAp = contacto.codigoInternoSap   
-        
-        if adrres == "No hay direcciones disponibles":
-            addresmodif = "null"
-        else:
-            direccion1 = DireccionRepository.obtenerDireccion(adrres)
-            addresmodif = f"{direccion1.calleNumero}, {direccion1.comuna.nombre}\n{direccion1.ciudad}\n{direccion1.region.nombre}"
-
-        if adrres2 == "No hay direcciones disponibles":
-            addresmodif2 = "null"
-        else:
-            direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)
-            addresmodif2 = f"{direccionRepo2.calleNumero}, {direccionRepo2.comuna.nombre}\n{direccionRepo2.ciudad}\n{direccionRepo2.region.nombre}"
-
-
-        
-        # Datos de la cabecera
-        cabecera = {
-            'DocDate': jsonData.get('DocDate'),
-            'DocDueDate': jsonData.get('DocDueDate'),
-            'TaxDate': jsonData.get('TaxDate'),
-            'DocTotal': int(jsonData.get('DocTotal')),
-            #'ContactPersonCode': numerocontactoSAp,
-            #'Address': addresmodif,
-            #'Address2': addresmodif2,
-            'CardCode': jsonData.get('CardCode'),
-            'NumAtCard': jsonData.get('NumAtCard'),
-            'Comments': jsonData.get('Comments'),
-            'PaymentGroupCode': jsonData.get('PaymentGroupCode'),
-            'SalesPersonCode': jsonData.get('SalesPersonCode'),
-            'TransportationCode': int(jsonData.get('TransportationCode')),
-            #'U_LED_NROPSH': jsonData.get('U_LED_NROPSH'),
-            'U_LED_TIPVTA': tipo_venta,
-            'U_LED_TIPDOC': jsonData.get('U_LED_TIPDOC'),
-            'U_LED_FORENV': jsonData.get('TransportationCode'),
-        }
-
-        # Datos de las líneas
-        lineas = jsonData.get('DocumentLines', [])
-
-        repo_producto = ProductoRepository()
-
-        
-        #lineas = self.ajustarShippingMethod(lineas)
-        lineas_json = [
-            {
-                'lineNum': linea.get('LineNum'),
-                'ItemCode': linea.get('ItemCode'),
-                'Quantity': linea.get('Quantity'),
-                'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
-                'ShipDate': linea.get('ShipDate'),
-                'FreeText': linea.get('FreeText'),
-                'DiscountPercent': linea.get('DiscountPercent'),
-                'WarehouseCode': linea.get('WarehouseCode'),
-                'CostingCode': linea.get('CostingCode'),
-                'ShippingMethod': linea.get('ShippingMethod'),
-                'COGSCostingCode': linea.get('COGSCostingCode'),
-                'CostingCode2': linea.get('CostingCode2'),
-                'COGSCostingCode2': linea.get('COGSCostingCode2'),
-            }
-            for linea in lineas
-        ]
-
-        taxExtension = {
-            "StreetS": direccion1.calleNumero,
-            "CityS": direccion1.ciudad,
-            "CountyS": f"{direccion1.comuna.codigo} - {direccion1.comuna.nombre}",
-            "StateS": f"{direccion1.region.numero}",
-            "CountryS": "CL",
-            "StreetB": direccionRepo2.calleNumero,
-            "CityB": direccionRepo2.ciudad,
-            "CountyB": f"{direccionRepo2.comuna.codigo} - {direccionRepo2.comuna.nombre}",
-            "StateB": f"{direccionRepo2.region.numero}",
-            "CountryB": "CL",
-        } 
-
-        
-        return {
-            **cabecera,
-            'DocumentLines': lineas_json,
-            'TaxExtension': taxExtension
-        }
     
     @staticmethod
     def tipoVentaTipoVendedor(codigo_vendedor):
