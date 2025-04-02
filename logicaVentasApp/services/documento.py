@@ -244,7 +244,7 @@ class Documento(ABC):
         
 
             nueva_linea = {
-                'lineNum': line_num, # +1 
+                'lineNum': linea.get('LineNum'),
                 'ItemCode': item_code,
                 'Quantity': linea.get('Quantity'),
                 #'PriceAfVAT': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
@@ -266,10 +266,12 @@ class Documento(ABC):
 
 
             lineas_json.append(nueva_linea)
-            line_num += 1
-            """ 
-            print(f"lineas_json: {lineas_json}")
-            if actualizar == True and linea.get('DocEntry_line') != 'null':
+            #line_num += 1
+            """
+            print(f"actualizar: {actualizar}")
+            print(f"docEntry: {linea.get('DocEntry_line')}")
+            if actualizar and linea.get('DocEntry_line') != 'null':
+                print(f"item code: {item_code}")
                 if repo_producto.es_receta(item_code):
                     print("es receta")
                     componentes = client.productTreesComponents(item_code)
@@ -283,12 +285,7 @@ class Documento(ABC):
                         })
 
                         line_num += 1
-                else:
-                    pass 
-                """
-
-
-        print(f"lineas_json: {lineas_json}")
+            """
 
         taxExtension = {
             "StreetS": direccion1.calleNumero,
@@ -302,7 +299,15 @@ class Documento(ABC):
             "StateB": direccionRepo2.region.numero,
             "CountryB": "CL",
         } 
-        
+    
+        dic = {
+            **cabecera,
+            'DocumentLines': lineas_json,
+            'TaxExtension': taxExtension
+        }
+
+        print(f"dic: {dic}")
+
         return {
             **cabecera,
             'DocumentLines': lineas_json,
