@@ -598,7 +598,7 @@ class SocioNegocio:
             
             partes = rut.split("-")
             if len(partes) != 2:
-                return False  # Formato incorrecto
+                return False, "Formato incorrecto de RUT."
             
             # Separar el dígito verificador del número base
             numero, digito_verificador = partes
@@ -631,7 +631,7 @@ class SocioNegocio:
                 digito_calculado = str(digito_calculado)
 
             # Retornar si el dígito verificador coincide con el calculado
-            return digito_calculado == digito_verificador
+            return (digito_calculado == digito_verificador, "El RUT es válido." if digito_calculado == digito_verificador else "El RUT es inválido.")
 
         except Exception as e:
             print(f"Error al verificar RUT: {str(e)}")
