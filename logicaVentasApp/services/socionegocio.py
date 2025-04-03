@@ -577,6 +577,7 @@ class SocioNegocio:
         except Exception as e:
             return {'error': f"Error inesperado: {str(e)}"}
 
+
     def verificarRutValido(self, rut):
         """
         Método para verificar si un RUT es válido.
@@ -591,14 +592,15 @@ class SocioNegocio:
 
             # RUT sin puntos y guion
             if '.' in rut:
-                return False  # Formato incorrecto
+                return False, "El RUT no debe contener puntos."
+
 
             if "-" not in rut:
-                return False
+                return False, "El RUT debe contener un guion antes del dígito verificador."
             
             partes = rut.split("-")
             if len(partes) != 2:
-                return False, "Formato incorrecto de RUT."
+                return False, "Tiene que tener el formato correcto: 'XXXXXXXX-X'."
             
             # Separar el dígito verificador del número base
             numero, digito_verificador = partes
@@ -1104,9 +1106,10 @@ class SocioNegocio:
         dataSN = self.request
 
         # Validar el RUT
-        if not self.verificarRutValido(self.rut):
-            return JsonResponse({'success': False, 'message': 'Favor revisar el rut ingresado no debe tener . y debe tener el - antes de su digito verigicador'}, status=400)        
-        
+        is_valid, message = self.verificarRutValido(self.rut)
+        if not is_valid:
+            return JsonResponse({'success': False, 'message': message}, status=400)
+      
         try:
             # Validar los datos obligatorios
             self.validarDatosObligatorios()
@@ -1228,7 +1231,7 @@ class SocioNegocio:
         
         if not contactos:  # Si no hay contactos, genera uno basado en el cliente principal
             contacto_cliente_principal = {
-                "Name": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
+                "Name": f"{client_data.get('nombreSN', '')}".strip(),
                 "Phone1": client_data.get("telefonoSN", ""),
                 "MobilePhone": client_data.get("telefonoSN", ""),
                 "E_Mail": client_data.get("emailSN", ""),
