@@ -237,55 +237,43 @@ class Documento(ABC):
         
         #maper item code
         lineas_json = []
-        line_num = 0
+
+
+        # Mapeo de item code
+        lineas_json = []
 
         for linea in lineas:
             item_code = linea.get('ItemCode')
-        
+            
+            if repo_producto.es_receta(item_code):
+                treeType = 'iSalesTree'
+            else:
+                treeType = 'iNotATree'
+            
+            # Obtener lineNum, pero solo usarlo si es un número válido
+            #line_num_str = linea.get('LineNum')
+            #line_num = int(line_num_str) if line_num_str and line_num_str.isdigit() else None  # Dejarlo como None si no es válido
+            line_num = 0
+            warehouseCode = linea.get('WarehouseCode')
 
             nueva_linea = {
-                'lineNum': linea.get('LineNum'),
+                #'lineNum': line_num,  # Se mantiene como None si no hay un valor válido
                 'ItemCode': item_code,
                 'Quantity': linea.get('Quantity'),
-                #'PriceAfVAT': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
-                #'GrossPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
                 'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
-                #'NetTaxAmount': repo_producto.obtener_precio_unitario_bruto(linea.get('ItemCode')) * linea.get('Quantity') - repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')) * linea.get('Quantity'),
-                #'TaxTotal': repo_producto.obtener_precio_unitario_bruto(linea.get('ItemCode')) * linea.get('Quantity') - repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')) * linea.get('Quantity'),
                 'ShipDate': linea.get('ShipDate'),
                 'FreeText': linea.get('FreeText'),
                 'DiscountPercent': linea.get('DiscountPercent'),
-                'WarehouseCode': linea.get('WarehouseCode'),
+                'WarehouseCode': warehouseCode,
                 'CostingCode': linea.get('CostingCode'),
                 'ShippingMethod': linea.get('ShippingMethod'),
                 'COGSCostingCode': linea.get('COGSCostingCode'),
                 'CostingCode2': linea.get('CostingCode2'),
                 'COGSCostingCode2': linea.get('COGSCostingCode2'),
+                'TreeType': treeType,
             }
 
-
-
             lineas_json.append(nueva_linea)
-            #line_num += 1
-            """
-            print(f"actualizar: {actualizar}")
-            print(f"docEntry: {linea.get('DocEntry_line')}")
-            if actualizar and linea.get('DocEntry_line') != 'null':
-                print(f"item code: {item_code}")
-                if repo_producto.es_receta(item_code):
-                    print("es receta")
-                    componentes = client.productTreesComponents(item_code)
-                    print(f"componentes: {componentes}")
-
-                    for componente in componentes.get('ProductTreeLines', [{}]):
-                        lineas_json.append({
-                            'lineNum': line_num, # +1 
-                            'ItemCode': componente['ItemCode'],
-                            'TreeType': 'iIngredient'
-                        })
-
-                        line_num += 1
-            """
 
         taxExtension = {
             "StreetS": direccion1.calleNumero,
