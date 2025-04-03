@@ -900,17 +900,12 @@ class SocioNegocio:
         # Empleados de contacto del socio de negocio
         empleados_contacto = []
         for contacto in data.get("ContactEmployees", []) or []:  # Asegurar que sea iterable
-            fullName = contacto.get("Name", "")
-            if fullName and isinstance(fullName, str): 
-                nombre, apellido = (fullName.split(' ', 1) + [""])[:2]
-            else:
-                nombre, apellido = "Null", "None"
 
             empleados_contacto.append({
                 "codigoInternoSap": contacto.get("InternalCode", ""),
-                "nombreCompleto": fullName,
-                "nombre": nombre,
-                "apellido": apellido,
+                "nombreCompleto": contacto.get("FirstName", ""),
+                "nombre": contacto.get("FirstName", ""),
+                "apellido": contacto.get("LastName", ""),
                 "telefono": contacto.get("Phone1", ""),
                 "celular": contacto.get("Phone1", ""),
                 "email": contacto.get("E_Mail", ""),
@@ -1230,25 +1225,32 @@ class SocioNegocio:
         contactos = client_data.get("contactos", [])
         
         if not contactos:  # Si no hay contactos, genera uno basado en el cliente principal
+            name = client_data.get("nombreSN", "")
+            if len (name) > 40:
+                name = name[:40]
+            name = name.split(" ")[0]  # Solo el primer nombre
             contacto_cliente_principal = {
-                "Name": f"{client_data.get('nombreSN', '')}".strip(),
+                "Name": name,
                 "Phone1": client_data.get("telefonoSN", ""),
                 "MobilePhone": client_data.get("telefonoSN", ""),
                 "E_Mail": client_data.get("emailSN", ""),
-                "FirstName": client_data.get("nombreSN", ""),
-                "LastName": client_data.get("apellidoSN", "")
+                "FirstName": name,
             }
             serialized_data["ContactEmployees"].append(contacto_cliente_principal)
         else:
             for contact in contactos:
+                name = contact.get("nombreContacto", "")
+                if len(name) > 40:
+                    name = name[:40]
                 serialized_contact = {
-                    "Name": f"{contact.get('nombreContacto', '')} {contact.get('apellidoContacto', '')}".strip(),
+                    "Name": name,
                     "Phone1": contact.get("telefonoContacto", ""),
                     "MobilePhone": contact.get("telefonoContacto", ""),
                     "E_Mail": contact.get("emailContacto", ""),
-                    "FirstName": contact.get("nombreContacto", ""),
+                    "FirstName": name,
                     "LastName": contact.get("apellidoContacto", "")
                 }
+
                 serialized_data["ContactEmployees"].append(serialized_contact)
         return serialized_data
 

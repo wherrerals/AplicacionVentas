@@ -27,9 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const totalNeto = document.querySelector("#total_neto").textContent;
 
-
         const ivaGeneral = document.querySelector("#iva").textContent;
-
 
         const totalbruto = document.querySelector("#total_bruto").textContent;
 
@@ -106,82 +104,113 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const id = 1; // Ajusta según tu lógica para el ID de cotización
 
-        fetch(`/ventas/generar_cotizacion_pdf/${id}/pdf/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCSRFToken()
-            },
-            body: JSON.stringify(documentData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            const taskId = data.task_id;
-            console.log("Tarea lanzada. ID de la tarea:", taskId);
+        // Iniciar el proceso con los datos capturados
+        generarCotizacionPDF(id, documentData, docNum);
+    }
 
-            const interval = setInterval(() => {
-                fetch(`/ventas/verificar_estado_pdf/${taskId}/`)
-                    .then(response => {
-                        // Comprobar el tipo de contenido antes de procesar la respuesta
-                        const contentType = response.headers.get("content-type");
-                        if (contentType && contentType.includes("application/pdf")) {
-                            // Es un PDF, detener el intervalo y procesarlo
+    function generarCotizacionPDF(id, documentData, docNum) {
+        const maxTimeout = 20000; // 45 segundos en milisegundos
+        let timeoutId;
+        
+        function iniciarProceso() {
+            fetch(`/ventas/generar_cotizacion_pdf/${id}/pdf/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify(documentData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const taskId = data.task_id;
+                console.log("Tarea lanzada. ID de la tarea:", taskId);
+                
+                // Si taskId es undefined, reiniciamos el proceso inmediatamente
+                if (!taskId) {
+                    console.warn("task_id es undefined, reiniciando el proceso...");
+                    iniciarProceso();
+                    return;
+                }
+                
+                let interval;
+                
+                // Configuramos el timeout global de 45 segundos
+                timeoutId = setTimeout(() => {
+                    if (interval) clearInterval(interval);
+                    hideLoadingOverlay();
+                    alert("Algo ha salido mal. La operación ha excedido el tiempo límite. Por favor, inténtalo de nuevo.");
+                }, maxTimeout);
+                
+                interval = setInterval(() => {
+                    fetch(`/ventas/verificar_estado_pdf/${taskId}/`)
+                        .then(response => {
+                            // Comprobar el tipo de contenido antes de procesar la respuesta
+                            const contentType = response.headers.get("content-type");
+                            if (contentType && contentType.includes("application/pdf")) {
+                                // Es un PDF, detener el intervalo y timeout y procesarlo
+                                clearInterval(interval);
+                                clearTimeout(timeoutId);
+                                hideLoadingOverlay();
+                                return response.blob();
+                            } else if (contentType && contentType.includes("application/json")) {
+                                // Es un JSON, procesarlo como antes
+                                return response.json();
+                            } else {
+                                // Tipo de contenido desconocido, intentar como JSON primero
+                                return response.json().catch(() => response.blob());
+                            }
+                        })
+                        .then(data => {
+                            if (data instanceof Blob) {
+                                // Es un PDF, proceder a la descarga
+                                const url = window.URL.createObjectURL(data);
+                                const a = document.createElement("a");
+                                a.href = url;
+                                a.download = `cotizacion_${docNum}.pdf`;
+                                document.body.appendChild(a);
+                                a.click();
+                                a.remove();
+                                clearInterval(interval);
+                                clearTimeout(timeoutId);
+                                hideLoadingOverlay();
+                                console.log("PDF generado y descargado con éxito.");
+                            } else if (data.status === 'pending') {
+                                // Tarea aún en proceso
+                                console.log("PDF aún en proceso...");
+                            } else if (data.status === 'failed') {
+                                // La tarea falló
+                                clearInterval(interval);
+                                clearTimeout(timeoutId);
+                                hideLoadingOverlay();
+                                console.error("Error en la generación del PDF:", data.error);
+                                alert('Hubo un error al generar el PDF: ' + data.error);
+                            } else {
+                                // Otro estado, posiblemente completado pero no es un PDF directo
+                                console.log("Estado de la tarea:", data.status);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error al verificar el estado o descargar el PDF:', error);
                             clearInterval(interval);
+                            clearTimeout(timeoutId);
                             hideLoadingOverlay();
-                            return response.blob();
-                        } else if (contentType && contentType.includes("application/json")) {
-                            // Es un JSON, procesarlo como antes
-                            return response.json();
-                        } else {
-                            // Tipo de contenido desconocido, intentar como JSON primero
-                            return response.json().catch(() => response.blob());
-                        }
-                    })
-                    .then(data => {
-                        if (data instanceof Blob) {
-                            // Es un PDF, proceder a la descarga
-                            const url = window.URL.createObjectURL(data);
-                            const a = document.createElement("a");
-                            a.href = url;
-                            a.download = `cotizacion_${docNum}.pdf`;
-                            document.body.appendChild(a);
-                            a.click();
-                            a.remove();
-                            clearInterval(interval);
-                            hideLoadingOverlay();
-                            console.log("PDF generado y descargado con éxito.");
-                        } else if (data.status === 'pending') {
-                            // Tarea aún en proceso
-                            console.log("PDF aún en proceso...");
-                        } else if (data.status === 'failed') {
-                            // La tarea falló
-                            clearInterval(interval);
-                            hideLoadingOverlay();
-                            console.error("Error en la generación del PDF:", data.error);
-                            alert('Hubo un error al generar el PDF: ' + data.error);
-                        } else {
-                            // Otro estado, posiblemente completado pero no es un PDF directo
-                            console.log("Estado de la tarea:", data.status);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error al verificar el estado o descargar el PDF:', error);
-                        clearInterval(interval);
-                        hideLoadingOverlay();
-                        alert('Hubo un error al procesar la respuesta del servidor.');
-                    });
-            }, 2000);
-        })
-        .catch(error => {
-            console.error('Error al lanzar la tarea:', error);
-            hideLoadingOverlay();
-            alert('Hubo un error al generar el PDF.');
-        });
+                            alert('Hubo un error al procesar la respuesta del servidor.');
+                        });
+                }, 2000);
+            })
+            .catch(error => {
+                console.error('Error al lanzar la tarea:', error);
+                hideLoadingOverlay();
+                alert('Hubo un error al generar el PDF.');
+            });
+        }
+        
+        // Iniciamos el proceso
+        iniciarProceso();
     }
 
     function getCSRFToken() {
         return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
     }
 });
-
-

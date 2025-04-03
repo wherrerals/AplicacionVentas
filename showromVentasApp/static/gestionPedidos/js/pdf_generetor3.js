@@ -93,7 +93,14 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("JSON generado:", jsonData);
 
         const id = 1; // Ajusta según tu lógica para el ID de cotización
+        generarCotizacionPDF(id, documentData, docNum);
+    }
 
+    function generarCotizacionPDF(id, documentData, docNum) {
+        const maxTimeout = 20000; // 45 segundos en milisegundos
+        let timeoutId;
+
+    function iniciarProceso() {
         fetch(`/ventas/generar_cotizacion_pdf/${id}/pdf/`, {
             method: 'POST',
             headers: {
@@ -107,7 +114,23 @@ document.addEventListener("DOMContentLoaded", function () {
             const taskId = data.task_id;
             console.log("Tarea lanzada. ID de la tarea:", taskId);
 
-            const interval = setInterval(() => {
+                // Si taskId es undefined, reiniciamos el proceso inmediatamente
+            if (!taskId) {
+                console.warn("task_id es undefined, reiniciando el proceso...");
+                iniciarProceso();
+                return;
+            }
+
+            let interval;
+
+            // Configurar el timeout global de 40 segundos
+            timeoutId = setTimeout(() => {
+                if (interval) clearInterval(interval);
+                hideLoadingOverlay();
+                alert("Algo ha salido mal. La operación ha excedido el tiempo límite. Por favor, inténtalo de nuevo.");
+            }, maxTimeout);
+
+            interval = setInterval(() => {
                 fetch(`/ventas/verificar_estado_pdf/${taskId}/`)
                     .then(response => {
                         // Comprobar el tipo de contenido antes de procesar la respuesta
@@ -115,6 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         if (contentType && contentType.includes("application/pdf")) {
                             // Es un PDF, detener el intervalo y procesarlo
                             clearInterval(interval);
+                            clearTimeout(timeoutId);
                             hideLoadingOverlay();
                             return response.blob();
                         } else if (contentType && contentType.includes("application/json")) {
@@ -155,6 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     .catch(error => {
                         console.error('Error al verificar el estado o descargar el PDF:', error);
                         clearInterval(interval);
+                        clearTimeout(timeoutId);
                         hideLoadingOverlay();
                         alert('Hubo un error al procesar la respuesta del servidor.');
                     });
@@ -165,6 +190,8 @@ document.addEventListener("DOMContentLoaded", function () {
             hideLoadingOverlay();
             alert('Hubo un error al generar el PDF.');
         });
+    }
+        iniciarProceso();
     }
 
     function getCSRFToken() {

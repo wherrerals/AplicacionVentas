@@ -20,6 +20,11 @@ app.autodiscover_tasks()
 def debug_task(self):
     print(f'Request: {self.request!r}')
 
+# En tu configuración Celery
+app.conf.broker_heartbeat = 300  # 5 minutos (balance entre tráfico y detección de fallos)
+app.conf.broker_connection_timeout = 30  # Mantener 30 segundos
+app.conf.broker_connection_retry = True  # Mantener True
+app.conf.broker_connection_max_retries = 10  # Menos reintentos para fallar rápido
 
 app.conf.update(
     # Gestión de tareas y colas
