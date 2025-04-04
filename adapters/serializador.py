@@ -151,7 +151,7 @@ class Serializador:
         for contacto in datos:
             contactos_mapeados.append({
                 'InternalCode': contacto.get('codigoInternoSap'),
-                'Name': f"{contacto.get('nombre')}",
+                'Name': f"{contacto.get('nombre')} {contacto.get('apellido')}",
                 'Phone1': contacto.get('telefono'),
                 'MobilePhone': contacto.get('celular'),
                 'E_Mail': contacto.get('email'),

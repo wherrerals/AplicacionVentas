@@ -1173,8 +1173,6 @@ class SocioNegocio:
             "Cellular": client_data.get("telefonoSN", ""),
             "EmailAddress": client_data.get("emailSN", ""),
             "CardForeignName": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
-            #"ShipToDefault": "DESPACHO",
-            #"BilltoDefault": "FACTURACION",
             "DunningTerm": "ESTANDAR",
             "CompanyPrivate": "cPrivate",
             "AliasName": client_data.get("nombreSN", ""),
@@ -1226,7 +1224,7 @@ class SocioNegocio:
         
         if not contactos:  # Si no hay contactos, genera uno basado en el cliente principal
             name = client_data.get("nombreSN", "")
-            if len (name) > 40:
+            if len(name) > 40:
                 name = name[:40]
             name = name.split(" ")[0]  # Solo el primer nombre
             contacto_cliente_principal = {
@@ -1235,7 +1233,7 @@ class SocioNegocio:
                 "MobilePhone": client_data.get("telefonoSN", ""),
                 "E_Mail": client_data.get("emailSN", ""),
                 "FirstName": name,
-                "LastName": name
+                "LastName": client_data.get("apellidoSN", "") or name,
             }
             serialized_data["ContactEmployees"].append(contacto_cliente_principal)
         else:
@@ -1253,6 +1251,8 @@ class SocioNegocio:
                 }
 
                 serialized_data["ContactEmployees"].append(serialized_contact)
+
+        print(f"Datos serializados: {serialized_data}")
         return serialized_data
 
     def procesarDirecciones(data, socio):
