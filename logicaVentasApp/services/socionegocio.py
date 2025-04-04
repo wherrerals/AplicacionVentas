@@ -577,6 +577,7 @@ class SocioNegocio:
         except Exception as e:
             return {'error': f"Error inesperado: {str(e)}"}
 
+
     def verificarRutValido(self, rut):
         """
         Método para verificar si un RUT es válido.
@@ -588,14 +589,24 @@ class SocioNegocio:
             bool: True si el RUT es válido, False si no.
         """
         try:
+
             # RUT sin puntos y guion
-            rut = rut.replace(".", "").replace("-", "")
+            if '.' in rut:
+                return False, "El RUT no debe contener puntos."
+
+
+            if "-" not in rut:
+                return False, "El RUT debe contener un guion antes del dígito verificador."
+            
+            partes = rut.split("-")
+            if len(partes) != 2:
+                return False, "Tiene que tener el formato correcto: 'XXXXXXXX-X'."
             
             # Separar el dígito verificador del número base
-            numero, digito_verificador = rut[:-1], rut[-1].upper()
-
+            numero, digito_verificador = partes
             #numero base en entero
-            numero = int(numero)
+            numero = numero.replace(".", "")  # Quitar puntos
+            digito_verificador = digito_verificador.upper()  # Convertir a mayúsculas
             
             # Invertir los dígitos del número base para el cálculo
             numero_invertido = str(numero)[::-1]
@@ -622,7 +633,7 @@ class SocioNegocio:
                 digito_calculado = str(digito_calculado)
 
             # Retornar si el dígito verificador coincide con el calculado
-            return digito_calculado == digito_verificador
+            return (digito_calculado == digito_verificador, "El RUT es válido." if digito_calculado == digito_verificador else "El RUT es inválido.")
 
         except Exception as e:
             print(f"Error al verificar RUT: {str(e)}")
@@ -889,17 +900,12 @@ class SocioNegocio:
         # Empleados de contacto del socio de negocio
         empleados_contacto = []
         for contacto in data.get("ContactEmployees", []) or []:  # Asegurar que sea iterable
-            fullName = contacto.get("Name", "")
-            if fullName and isinstance(fullName, str): 
-                nombre, apellido = (fullName.split(' ', 1) + [""])[:2]
-            else:
-                nombre, apellido = "Null", "None"
 
             empleados_contacto.append({
                 "codigoInternoSap": contacto.get("InternalCode", ""),
-                "nombreCompleto": fullName,
-                "nombre": nombre,
-                "apellido": apellido,
+                "nombreCompleto": contacto.get("FirstName", ""),
+                "nombre": contacto.get("FirstName", ""),
+                "apellido": contacto.get("LastName", ""),
                 "telefono": contacto.get("Phone1", ""),
                 "celular": contacto.get("Phone1", ""),
                 "email": contacto.get("E_Mail", ""),
@@ -1095,9 +1101,10 @@ class SocioNegocio:
         dataSN = self.request
 
         # Validar el RUT
-        if not self.verificarRutValido(self.rut):
-            return JsonResponse({'success': False, 'message': 'RUT inválido'}, status=400)        
-        
+        is_valid, message = self.verificarRutValido(self.rut)
+        if not is_valid:
+            return JsonResponse({'success': False, 'message': message}, status=400)
+      
         try:
             # Validar los datos obligatorios
             self.validarDatosObligatorios()
@@ -1166,8 +1173,6 @@ class SocioNegocio:
             "Cellular": client_data.get("telefonoSN", ""),
             "EmailAddress": client_data.get("emailSN", ""),
             "CardForeignName": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
-            #"ShipToDefault": "DESPACHO",
-            #"BilltoDefault": "FACTURACION",
             "DunningTerm": "ESTANDAR",
             "CompanyPrivate": "cPrivate",
             "AliasName": client_data.get("nombreSN", ""),
@@ -1218,26 +1223,36 @@ class SocioNegocio:
         contactos = client_data.get("contactos", [])
         
         if not contactos:  # Si no hay contactos, genera uno basado en el cliente principal
+            name = client_data.get("nombreSN", "")
+            if len(name) > 40:
+                name = name[:40]
+            name = name.split(" ")[0]  # Solo el primer nombre
             contacto_cliente_principal = {
-                "Name": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
+                "Name": name,
                 "Phone1": client_data.get("telefonoSN", ""),
                 "MobilePhone": client_data.get("telefonoSN", ""),
                 "E_Mail": client_data.get("emailSN", ""),
-                "FirstName": client_data.get("nombreSN", ""),
-                "LastName": client_data.get("apellidoSN", "")
+                "FirstName": name,
+                "LastName": client_data.get("apellidoSN", "") or name,
             }
             serialized_data["ContactEmployees"].append(contacto_cliente_principal)
         else:
             for contact in contactos:
+                name = contact.get("nombreContacto", "")
+                if len(name) > 40:
+                    name = name[:40]
                 serialized_contact = {
-                    "Name": f"{contact.get('nombreContacto', '')} {contact.get('apellidoContacto', '')}".strip(),
+                    "Name": name,
                     "Phone1": contact.get("telefonoContacto", ""),
                     "MobilePhone": contact.get("telefonoContacto", ""),
                     "E_Mail": contact.get("emailContacto", ""),
-                    "FirstName": contact.get("nombreContacto", ""),
+                    "FirstName": name,
                     "LastName": contact.get("apellidoContacto", "")
                 }
+
                 serialized_data["ContactEmployees"].append(serialized_contact)
+
+        print(f"Datos serializados: {serialized_data}")
         return serialized_data
 
     def procesarDirecciones(data, socio):
