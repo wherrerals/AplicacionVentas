@@ -1235,6 +1235,7 @@ class SocioNegocio:
                 "MobilePhone": client_data.get("telefonoSN", ""),
                 "E_Mail": client_data.get("emailSN", ""),
                 "FirstName": name,
+                "LastName": name
             }
             serialized_data["ContactEmployees"].append(contacto_cliente_principal)
         else:
