@@ -258,6 +258,7 @@ class Documento(ABC):
 
             nueva_linea = {
                 #'lineNum': line_num,  # Se mantiene como None si no hay un valor válido
+                'TreeType': treeType,
                 'ItemCode': item_code,
                 'Quantity': linea.get('Quantity'),
                 'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
@@ -270,7 +271,6 @@ class Documento(ABC):
                 'COGSCostingCode': linea.get('COGSCostingCode'),
                 'CostingCode2': linea.get('CostingCode2'),
                 'COGSCostingCode2': linea.get('COGSCostingCode2'),
-                'TreeType': treeType,
             }
 
             lineas_json.append(nueva_linea)
