@@ -98,7 +98,7 @@ class DireccionManager {
               <label class="col-form-label" style="font-size: 13px;">Nombre</label> 
             </div>
             <div class="col">
-              <input class="form-control" type="text" id="nombreDireccionSN" name="nombre_direccion[]" id="nombre_direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
+              <input class="form-control" type="text" id="nombreDireccionSN" name="nombre_direccion[]" value="Dirección" id="nombre_direccion" style="border-color: rgb(159,168,175);font-size: 12px;">
             </div>
           </div>
 

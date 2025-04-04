@@ -14,6 +14,34 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+  <script>
+    function actualizarGiro() {
+        let selectedRadio = document.querySelector('input[name="grupoSN"]:checked'); 
+        let giroSN = document.getElementById("giroSN");
+    
+        // Verifica si el radio seleccionado es "Persona Natural" o "Empresa"
+        if (selectedRadio) {
+            if (selectedRadio.value === "105") {
+                giroSN.value = "Persona Natural"; // Establece "Persona Natural" si es Persona
+            } else if (selectedRadio.value === "106" || selectedRadio.value === "100") {
+                giroSN.value = ""; // Borra el contenido si es Empresa
+            }
+        }
+    }
+    
+    // Agrega el evento change a ambos radio buttons
+    document.addEventListener("DOMContentLoaded", function() {
+        // Configuración inicial
+        actualizarGiro();
+        
+        // Agregar evento a todos los radio buttons del grupo
+        let radioButtons = document.querySelectorAll('input[name="grupoSN"]');
+        radioButtons.forEach(function(radio) {
+            radio.addEventListener('change', actualizarGiro);
+        });
+    });
+    
+    </script>
 
 </head>
 
