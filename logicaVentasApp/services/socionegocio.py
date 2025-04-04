@@ -71,6 +71,8 @@ class SocioNegocio:
         self.validarApellido()
         self.validarTelefono()
         self.tamañotelefono()        
+        self.validarDirecciones()
+        self.validarContactos()
 
     def procesarClienteExistente(self, codigosn, datosCliente, datosNuevos):
 
@@ -392,7 +394,18 @@ class SocioNegocio:
         } for contacto in contactos]
 
 
-    
+    def validarDirecciones(self):
+        for direcciones in self.request.get("direcciones", []):
+            # Verificar si la dirección tiene los campos obligatorios
+            if any(not direcciones.get(campo) for campo in ['tipoDireccion', 'nombreDireccion', 'pais', 'region', 'comuna', 'ciudad', 'direccion']):
+                raise ValidationError("Faltan datos obligatorios en la dirección")
+
+    def validarContactos(self):
+        for contacto in self.request.get("contactos", []):
+            # Verificar si el contacto tiene los campos obligatorios
+            if any(not contacto.get(campo) for campo in ['nombreContacto', 'apellidoContacto', 'telefonoContacto', 'puestoContacto', 'emailContacto']):
+                raise ValidationError("Faltan datos obligatorios en el contacto")
+
     def validarGrupoSN(self):
         """
         Método para validar el grupo de socio de negocio.
@@ -1100,6 +1113,7 @@ class SocioNegocio:
         # Obtener los datos del request
         dataSN = self.request
 
+        print(f"datosSN: {dataSN}")
         # Validar el RUT
         is_valid, message = self.verificarRutValido(self.rut)
         if not is_valid:
