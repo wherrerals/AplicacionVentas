@@ -71,6 +71,7 @@ class ProductoRepository:
                     "linkProducto": product_data.get("linkProducto", "NO_DISPONIBLE"),
                     "descontinuado": producto_info.get("descontinuado", "0"),
                     "inactivo": producto_info.get("inactivo", ""),
+                    "TreeType": producto_info.get("TreeType", ""),
                 },
             )
 
