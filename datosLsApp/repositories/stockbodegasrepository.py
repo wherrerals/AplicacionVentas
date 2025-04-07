@@ -18,6 +18,34 @@ class StockBodegasRepository:
         :param producto_id: ID del producto.
         :return: Stock del producto en la bodega.
         """
+
+        print("consultarStockPorBodega")
+        print("producto_id: ", producto_id)
+        print("bodega_id: ", bodega_id)
+
+        try:
+            # Verifica si el producto y la bodega existen
+            datoBodega = StockBodegasDB.objects.get(idProducto=producto_id, idBodega=bodega_id)
+
+            return datoBodega.stock
+        except StockBodegasDB.DoesNotExist:
+            # Si no existe, retorna 0
+            return 0
+        except StockBodegasDB.MultipleObjectsReturned:
+            # Si hay múltiples objetos, también retorna 0
+            return 0
+        except Exception as e:
+            # Manejo de excepciones genérico
+            print(f"Error al consultar stock por bodega: {e}")
+            return 0
+""" 
         datoBodega = StockBodegasDB.objects.get(idProducto=producto_id, idBodega=bodega_id)
 
-        return datoBodega.stock
+        print("datoBodega: ", datoBodega)
+        print("datoBodega.stock: ", datoBodega.stock)
+
+        if datoBodega is None:
+            return 0
+        else:
+            return datoBodega.stock
+ """
