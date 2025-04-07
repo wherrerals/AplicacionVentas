@@ -312,8 +312,14 @@ class SocioNegocio:
                 # Función para formatear los contactos
                 contactos_formateados = SocioNegocio.formatear_contactos(contactos)
 
+                #quitar el - y el digito verificador del rut
+                rut = socio.rut.split("-")[0] if "-" in socio.rut else socio.rut
+
                 # Agregar el socio formateado al resultado
                 resultados_formateados.append({
+                    
+                    
+                    'id' : rut,
                     'nombre': socio.nombre,
                     'apellido': socio.apellido,
                     'razonSocial': socio.razonSocial,

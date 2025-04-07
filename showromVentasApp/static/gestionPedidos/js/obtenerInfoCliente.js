@@ -16,6 +16,8 @@ $(document).ready(function(){
         // Asignar el rut como atributo data-rut del input
         $('#inputCliente').attr('data-rut', clienteId);
 
+        console.log("codigoSN: ", codigoSN)
+
         // Asignar el codigoSN como atributo data-codigoSN del input
         $('#inputCliente').attr('data-codigoSN', codigoSN);
 
@@ -53,11 +55,21 @@ function traerInformacionCliente(clienteId) {
         success: function(data) {
             if (data.resultadosClientes && data.resultadosClientes.length > 0) {
 
-                // Obtener el primer cliente de la lista de resultados
-                const cliente = data.resultadosClientes[0];
+                // Obtener el cliente con id == clienteId
+                const cliente = data.resultadosClientes.find(cliente => cliente.id == clienteId);
+                //const cliente = data.resultadosClientes[0];
                 const nombre = cliente.nombre;
                 const apellido = cliente.apellido;
                 const codigoSN = cliente.codigoSN;
+
+                lista  = {
+                    id: clienteId,
+                    nombre: nombre,
+                    apellido: apellido,
+                    codigoSN: codigoSN
+                }
+
+                console.log('Cliente seleccionado:', lista);
 
                 console.log('Información del cliente XXX:', cliente);
 
