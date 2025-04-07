@@ -15,7 +15,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: dockerfile.app
+      dockerfile: ./docker/dockerfile.app
     command: >
       sh -c "
       rm -rf staticfiles/ &&
@@ -51,7 +51,7 @@ services:
   celery-beat:
     build:
       context: .
-      dockerfile: dockerfile.app
+      dockerfile: ./docker/dockerfile.app
     command: celery -A config beat --loglevel=info
     depends_on:
       - rabbitmq
@@ -64,7 +64,7 @@ services:
   celery-worker-products:
     build:
       context: .
-      dockerfile: dockerfile.app
+      dockerfile: ./docker/dockerfile.app
     command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in
     depends_on:
       - rabbitmq
@@ -78,7 +78,7 @@ services:
   celery-worker-products-recetas:
     build:
       context: .
-      dockerfile: dockerfile.app
+      dockerfile: ./docker/dockerfile.app
     command: celery -A config worker --loglevel=info --concurrency=4 -Q q_products_in_receta
     depends_on:
       - rabbitmq
@@ -91,7 +91,7 @@ services:
   celery-worker-products-importados:
     build:
       context: .
-      dockerfile: dockerfile.app
+      dockerfile: ./docker/dockerfile.app
     command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in_importado
     depends_on:
       - rabbitmq
@@ -104,7 +104,7 @@ services:
   celery-worker-users:
     build:
       context: .
-      dockerfile: dockerfile.app
+      dockerfile: ./docker/dockerfile.app
     command: celery -A config worker --loglevel=info --concurrency=2 -Q q_clients_in
     depends_on:
       - rabbitmq
@@ -117,7 +117,7 @@ services:
   celery-worker-pdf:
     build:
       context: .
-      dockerfile: dockerfile.app  # Asegúrate de que este Dockerfile esté configurado correctamente
+      dockerfile: ./docker/dockerfile.app  # Asegúrate de que este Dockerfile esté configurado correctamente
     command: celery -A config worker -Q q_pdf_generation -l info -E
     depends_on:
       - rabbitmq
