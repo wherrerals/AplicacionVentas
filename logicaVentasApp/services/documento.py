@@ -198,16 +198,14 @@ class Documento(ABC):
             numerocontactoSAp = contacto.codigoInternoSap        #consultar en base de datos con el id capturado
         
         if adrres == "No hay direcciones disponibles":
-            addresmodif = "null"
-        else:
             direccion1 = DireccionRepository.obtenerDireccion(adrres)
-            addresmodif = f"{direccion1.calleNumero}, {direccion1.comuna.nombre}\n{direccion1.ciudad}\n{direccion1.region.nombre}"
+        else:
+            direccion1 = DireccionRepository.obtenerDireccion(adrres2)
 
         if adrres2 == "No hay direcciones disponibles":
-            addresmodif2 = "null"
-        else:
             direccionRepo2 = DireccionRepository.obtenerDireccion(adrres2)
-            addresmodif2 = f"{direccionRepo2.calleNumero}, {direccionRepo2.comuna.nombre}\n{direccionRepo2.ciudad}\n{direccionRepo2.region.nombre}"
+        else:
+            direccionRepo2 = DireccionRepository.obtenerDireccion(adrres)
         
         # Datos de la cabecera
         cabecera = {
