@@ -56,6 +56,9 @@ class APIClient:
             }
             response = self.session.post(login_url, json=auth_data, verify=False)
             response.raise_for_status()
+
+            self.session_id = self.session.cookies.get("B1SESSION")
+
             self.__autehnticated = True
 
     def logout(self):
@@ -712,7 +715,11 @@ class APIClient:
         headers = {
             "B1S-ReplaceCollectionsOnPatch": "true",  # Encabezado adicional
             "Content-Type": "application/json",  # Asegúrate de incluir este encabezado si es necesario
+            "Cookie": f"B1SESSION={self.session_id}",  # <- Aquí agregas la cookie
         }
+
+        print(f"URL: {url}")
+        print(f"Headers: {headers}")
 
         try:
 
@@ -739,6 +746,8 @@ class APIClient:
         headers = {
             "B1S-ReplaceCollectionsOnPatch": "true",  # Encabezado adicional
             "Content-Type": "application/json",  # Asegúrate de incluir este encabezado si es necesario
+            "Cookie": f"B1SESSION={self.session_id}",  # <- Aquí agregas la cookie
+
         }
 
         try:
@@ -767,6 +776,7 @@ class APIClient:
         headers = {
             "B1S-ReplaceCollectionsOnPatch": "true",  # Encabezado adicional
             "Content-Type": "application/json",  # Asegúrate de incluir este encabezado si es necesario
+            "Cookie": f"B1SESSION={self.session_id}",  # <- Aquí agregas la cookie
         }
 
         try:
@@ -794,7 +804,9 @@ class APIClient:
         headers = {
             "B1S-ReplaceCollectionsOnPatch": "true",  # Encabezado adicional
             "Content-Type": "application/json",  # Asegúrate de incluir este encabezado si es necesario
+            "Cookie": f"B1SESSION={self.session_id}",  # <- Aquí agregas la cookie
         }
+
         try:
 
             response = self.session.patch(url, json=data, headers=headers, verify=False)
@@ -820,7 +832,7 @@ class APIClient:
         headers = {
             #"B1S-ReplaceCollectionsOnPatch": "true",  # Encabezado adicional
             "Content-Type": "application/json",  # Asegúrate de incluir este encabezado si es necesario
-            
+            "Cookie": f"B1SESSION={self.session_id}",  # <- Aquí agregas la cookie
         }
         try:
             response = self.session.patch(url, json=data, headers=headers, verify=False)
