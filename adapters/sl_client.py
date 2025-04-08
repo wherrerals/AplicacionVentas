@@ -313,7 +313,7 @@ class APIClient:
         response.raise_for_status()
         return response.json()
 
-    def crearCliente(self, data):
+    def create_bp_sl(self, data):
         """
         permite la creacion de clientes en la base de datos de SAP
 

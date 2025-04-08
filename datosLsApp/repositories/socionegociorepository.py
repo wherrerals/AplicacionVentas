@@ -7,7 +7,7 @@ class SocioNegocioRepository:
 
     Metodos disponibles:
 
-    - obtenerPorRut(rut)
+    - get_by_rut(rut)
     - crearCliente(**kwargs)
     - buscarClientesPorRut(rut)
     - buscarClientesPorNombre(nombre)
@@ -16,7 +16,7 @@ class SocioNegocioRepository:
     """
     
     @staticmethod
-    def obtenerPorRut(rut):
+    def get_by_rut(rut):
         """
         Obtiene un socio de negocio por su rut
         

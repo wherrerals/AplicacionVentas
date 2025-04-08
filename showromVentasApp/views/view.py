@@ -581,7 +581,7 @@ def actualizarAgregarDirecion(request, socio):
             
             data = request.POST
             rut = data.get('cliente')
-            carCode = SocioNegocio.generarCodigoSN(rut)
+            carCode = SocioNegocio.generate_bp_code(rut)
             SocioNegocio.actualizaroCrearDireccionSL(rut, carCode, request.POST)
             conexionAPi = APIClient()
             dataMSQL = conexionAPi.obtenerDataSn(carCode, "BPAddresses")
@@ -600,7 +600,7 @@ def actualizarAgregarContacto(request, socio):
         try:
             data = request.POST
             rut = data.get('cliente')
-            carCode = SocioNegocio.generarCodigoSN(rut)
+            carCode = SocioNegocio.generate_bp_code(rut)
 
             SocioNegocio.actualizaroCrearContactosSL(carCode, request.POST)
 

@@ -45,7 +45,7 @@ class SocioNegocioView(FormView):
 
         # Definir un diccionario de rutas a métodos POST
         route_map = {
-            '/ventas/agregar_editar_clientes/': self.agregarSocioNegocio,
+            '/ventas/agregar_editar_clientes/': self.create_or_update_bp_view,
             '/ventas/filtrar_socios_negocio/': self.filtrarSociosNegocio,
             '/ventas/listado_socios_negocio/': self.listarSociosNegocio,
 
@@ -91,36 +91,32 @@ class SocioNegocioView(FormView):
 
             pass
 
-    def agregarSocioNegocio(self, request):
+    def create_or_update_bp_view(self, request):
         
         if request.method == 'POST':
 
             try:
-                socioNegoService = SocioNegocio(request)
+                business_partner = SocioNegocio(request)
+                #create_or_update = business_partner.create_or_update_bp()
 
-                response = socioNegoService.crearOActualizarCliente()
+                response = json.loads(business_partner.create_or_update_bp().content)
 
-                response_data = json.loads(response.content)
-
-                if response_data.get('success'):
-                    return JsonResponse(
-                        {
+                if response.get('success'):
+                    return JsonResponse({
                             'success': True,
-                            'message': response_data.get('message', 'Cliente creado o actualizado con éxito'),
-                            'codigoSN': response_data.get('codigoSN')  # Este campo es opcional
+                            'message': response.get('message', 'Cliente creado o actualizado con éxito'),
+                            'codigoSN': response.get('codigoSN')  # Este campo es opcional
                         },
-                        status=201
-                    )
+                        status=201)
 
                 else:
                     return JsonResponse(
                         {
                             'success': False,
-                            'message': response_data.get('message', 'Error al crear o actualizar el cliente'),
-                            'details': response_data.get('details', 'Detalles no disponibles')  # Si hay más detalles
+                            'message': response.get('message', 'Error al crear o actualizar el cliente'),
+                            'details': response.get('details', 'Detalles no disponibles')  # Si hay más detalles
                         },
-                        status=400
-                    )
+                        status=400)
 
             except ValidationError as e:
                 return JsonResponse({'success': False, 'error': str(e)}, status=400)

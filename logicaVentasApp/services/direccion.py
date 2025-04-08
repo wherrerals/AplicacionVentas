@@ -48,7 +48,7 @@ class Direccion:
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'Error inesperado: {str(e)}'}, status=500)
 
-    def generarDireccionTiendas(sucursal):
+    def generate_store_address(sucursal):
         direcciones = [
             {
                 "Sucursal": "LC",
