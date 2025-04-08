@@ -377,7 +377,7 @@ class Producto {
         const skuElem = row.querySelector('[name="sku_producto"]');
         
         // Si el producto comienza con "SV", no limitamos la cantidad
-        if (skuElem && skuElem.textContent.startsWith('SV')) {
+        if (skuElem && skuElem.textContent.startsWith('SV') || skuElem.textContent.startsWith('L') ) {
             return;
         }
     
