@@ -463,7 +463,12 @@ class OrdenVenta(Documento):
 
         # Primera pasada: sumar las cantidades por (SKU, Bodega)
         for linea in data.get("DocumentLines", []):
+            
             item_code = linea["ItemCode"]
+            if item_code.startswith("SV") or item_code.startswith("L"):
+                continue  # Salta a la siguiente iteración sin procesar este producto
+
+
             warehouse_code = linea["WarehouseCode"]
             quantity = linea["Quantity"]
 
