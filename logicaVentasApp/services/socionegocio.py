@@ -3,7 +3,6 @@ import logging
 from venv import logger
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import transaction
 from django.core.exceptions import ValidationError
 from adapters.serializador import Serializador
 from datosLsApp.models.gruposndb import GrupoSNDB
@@ -46,7 +45,6 @@ class SocioNegocio:
             self.giro = dataSN.get('giroSN')
             self.telefono = dataSN.get('telefonoSN')
         else:
-            # Atributos inicializados como None por defecto
             self.gruposn = None
             self.rut = None
             self.email = None
@@ -59,12 +57,8 @@ class SocioNegocio:
         
     def validate_madatary_data_bp(self):
         """
-        Metodo para validar los datos obligatorios
-
-        Raises:
-            ValidationError: Si algún dato obligatorio no se encuentra.
+        this method is used to validate the mandatory data of the business partner.
         """
-
         self.validarGrupoSN()
         self.validarRut()
         self.validarEmail()
@@ -77,105 +71,50 @@ class SocioNegocio:
 
     def procesarClienteExistente(self, codigosn, datosCliente, datosNuevos):
 
-        try:
-            verificacionSap = self.verificarSocioNegocioSap(codigosn)
-            logger.info(f"Resultado de verificación en SAP: {verificacionSap}")
+        verificacionSap = self.verificarSocioNegocioSap(codigosn)
 
-            if verificacionSap:
-                # Actualizar cliente en la base de datos
-                if not self.actualizarSocioNegocio(codigosn, datosNuevos):
-                    raise ValueError("Error al actualizar el cliente en la base de datos")
-                
-                return JsonResponse({'success': True, 'message': 'Cliente actualizado exitosamente'})
+        if verificacionSap:
 
-            return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
+            updata_bp = self.actualizarSocioNegocio(codigosn, datosNuevos)
+            print("updata_bp", updata_bp)
             
-        except ConnectionError as e:
-            return JsonResponse({'success': False, 'message': 'Error de conexión con SAP'}, status=500)
-        except ValueError as e:
-            return JsonResponse({'success': False, 'message': str(e)}, status=400)
-        except Exception as e:
-            return JsonResponse({'success': False, 'message': 'Ocurrio un erro inesperado'}, status=500)
+            if updata_bp.get('error'): 
+                return JsonResponse({'error': True, 'message': updata_bp['message']}, status=400)
+            
+            return JsonResponse({'success': True, 'message': 'Cliente actualizado exitosamente'})
+        
 
     def actualizarSocioNegocio(self, cardcode, datos):
 
         repo = SocioNegocioRepository()
+        conexionSL = APIClient()
+        serializer = Serializador(formato='json')
 
-        try:
-            # Verificar grupo de cliente
-            grupo_sn = datos.get('tipoSN')
+        # Verificar grupo de cliente
+        grupo_sn = datos.get('tipoSN')
 
-            if not grupo_sn:
-                raise ValueError("El atributo 'gruposn' no está definido o es inválido.")
+        datosSerializados = serializer.serializar(datos, cardcode)
+        response = conexionSL.actualizarSocioNegocioSL(cardcode, datosSerializados)
 
-            if grupo_sn == '105':
-
-                logger.info("Actualizando cliente persona...")
-                
-                conexionSL = APIClient()
-
-                serializer = Serializador(formato='json')
-
-                datosSerializados = serializer.serializar(datos, cardcode)
-
-
-                logger.info(f"Datos serializados para la API: {datosSerializados}")
-                
-                response = conexionSL.actualizarSocioNegocioSL(cardcode, datosSerializados)
-                
+        if response.get('error'):
+            return ({'error': True, 'message': response['message']})
+        
+        else:
+            if grupo_sn == '105':            
                 return repo.actualizarCliente(cardcode, datos)
-            
             else:
-                logger.info("Actualizando cliente empresa...")
-
-                conexionSL = APIClient()
-
-                serializer = Serializador(formato='json')
-
-                datosSerializados = serializer.serializar(datos, cardcode)
-
-                logger.info(f"Datos serializados para la API: {datosSerializados}")
-
-                response = conexionSL.actualizarSocioNegocioSL(cardcode, datosSerializados)
-
                 return repo.actualizarClienteEmpresa(cardcode, datos)
-
-        except ValueError as ve:
-            logger.error(f"Error de validación: {str(ve)}")
-            return {'success': False, 'message': f"Error de validación: {str(ve)}"}
-
-        except Exception as e:
-            logger.error(f"Error inesperado al actualizar socio de negocio: {str(e)}")
-            return {'success': False, 'message': f"Error inesperado: {str(e)}"}
-
 
 
     def obtenerGrupoSN(self):
-        """
-        Método para obtener el grupo de socio de negocio.
 
-        Raises:
-            ValidationError: Si el grupo de socio de negocio no se encuentra.
-
-        Returns:
-            GrupoSNDB: Grupo de socio de negocio.
-        """
         grupoSN = GrupoSNRepository.obtenerGrupoSNPorCodigo(self.gruposn)
         if not grupoSN:
             raise ValidationError(f"Grupo de socio de negocio no encontrado para el código: {self.gruposn}")
         return grupoSN
 
     def obtenerTipoCliente(self):
-        """
-        Método para obtener el tipo de cliente 'Natural'.
 
-        Raises:
-            ValidationError: Si el tipo de cliente no se encuentra.
-
-        Returns:
-            TipoClienteDB: Tipo de cliente 'Natural'.
-
-        """
         tipoCliente = TipoClienteRepository.obtenerTipoClientePorCodigo('N')
         if not tipoCliente:
             raise ValidationError("Tipo de cliente no encontrado")
@@ -191,35 +130,12 @@ class SocioNegocio:
     @staticmethod
     def generate_bp_code(rut):
 
-        """
-        Método para generar el código de socio de negocio.
-
-        Args:
-            rut (str): RUT del cliente.
-        
-        Returns:
-            str: Código de socio de
-        """
         rut_sn = rut.split("-")[0] if "-" in rut else rut
         return rut_sn.replace(".", "") + 'C'
 
 
     @staticmethod
     def agregarDireccionYContacto(request, cliente):
-        """
-        Método para agregar una dirección y un contacto a un cliente.
-
-        Args:
-            request (HttpRequest): Request de la vista.
-            cliente (SocioNegocioDB): Cliente al que se le agregará la dirección y el contacto.
-        
-        Raises:
-            ValidationError: Si no se encuentra la dirección o el contacto.
-
-        Returns:
-            JsonResponse: Si la dirección y el contacto se agregaron exitosamente, retorna un mensaje de éxito.
-                        Si hubo un error, retorna un mensaje de error y un código de estado 400.
-        """
 
         from showromVentasApp.views.view import agregarDireccion, agregarContacto
 
@@ -253,17 +169,6 @@ class SocioNegocio:
         return JsonResponse({"mensaje": "Dirección y contacto agregados exitosamente."})
 
     def buscarSocioNegocio(identificador, buscar_por_nombre=False):
-        """
-        Método para buscar un socio de negocio por nombre o rut.
-
-        Args:
-            identificador (str): Nombre o rut del socio de negocio.
-            buscar_por_nombre (bool): Indica si se busca por nombre o por rut.
-
-        Returns:
-            Si se encontraron resultados, retorna un diccionario con los datos de los socios de negocio.
-            Si no se encontraron resultados, retorna una lista vacía.
-        """
 
         try:
             if buscar_por_nombre:
@@ -322,16 +227,7 @@ class SocioNegocio:
 
     @staticmethod
     def formatear_direcciones(direcciones):
-        """
-        Método para formatear las direcciones de un socio de negocio.
 
-        Args:
-            direcciones (QuerySet): Direcciones del socio de negocio.
-
-        Returns:
-            List: Lista con las direcciones formateadas.
-        """
-        
         nombres_direcciones_no_validos = ["TIENDA LC", "TIENDA GR", "TIENDA PH"]
         direcciones_formateadas = []
 
@@ -356,15 +252,6 @@ class SocioNegocio:
 
     @staticmethod
     def formatear_contactos(contactos):
-        """
-        Método para formatear los contactos de un socio de negocio.
-
-        Args:
-            contactos (QuerySet): Contactos del socio de negocio.
-
-        Returns:
-            List: Lista con los contactos formateados.
-        """
 
         return [{
             'id': contacto.id,
@@ -391,34 +278,15 @@ class SocioNegocio:
                 raise ValidationError("Faltan datos obligatorios en el contacto")
 
     def validarGrupoSN(self):
-        """
-        Método para validar el grupo de socio de negocio.
-
-        Raises:
-            ValidationError: Si el grupo de socio de negocio no se encuentra.
-        """
-
         if not self.gruposn:
             raise ValidationError("Grupo de socio de negocio no encontrado")
         
     def validarNombre(self):
-        """
-        Método para validar el nombre del cliente.
-
-        Raises:
-            ValidationError: Si el nombre no se encuentra.
-        """
-
         if not self.nombre:
             raise ValidationError("Nombre no encontrado")
         
     def validarApellido(self):
-        """
-        Método para validar el apellido del cliente.
 
-        Raises:
-            ValidationError: Si el apellido no se encuentra.
-        """
         if self.gruposn == '105':
             if not self.apellido :
                 raise ValidationError("Apellido no encontrado") 
@@ -426,145 +294,69 @@ class SocioNegocio:
             self.apellido = None
         
     def validarTelefono(self):
-        """
-        Método para validar el teléfono del cliente.
-
-        Raises:
-            ValidationError: Si el teléfono no se encuentra.
-        """
 
         if not self.telefono:
             raise ValidationError("Teléfono no encontrado")
     
     def tamañotelefono(self):
-        """
-        Método para validar el tamaño del teléfono del cliente.
-        """
 
         if len(self.telefono) < 12:
             raise ValidationError("El teléfono debe tener al menos 12 dígitos")
     
     def validarRut(self):
-        """
-        Método para validar el RUT del cliente.
-        
-        Raises:
-            ValidationError: Si el RUT no se encuentra.
-        """
 
         if not self.rut:
             raise ValidationError("RUT no encontrado")
         
     def validarEmail(self):
-        """
-        Metodo para validar el email del cliente.
-
-        Raises:
-            ValidationError: Si el email no se encuentra.
-        """
 
         if not self.email:
             raise ValidationError("Email no encontrado")
         
     def verificarSocioDB(self, rut):
-        """
-        Metodo que verifica si un socio de negocio existe en la base de datos.
 
-        Args:
-            rut (str): rut del socio de negocio.
-
-        Returns:
-            bool: True si el socio de negocio existe, False si no.
-        """
-        try:
-            repo = SocioNegocioRepository()
-            socio = repo.obtenerPorCodigoSN(rut)
-            if socio:
-                return True
-            
-            else:
-                return False
-        except Exception as e:
-            return JsonResponse({'success': False, 'message': 'Error al verificar el socio de negocio'}, status=500)
+        repo = SocioNegocioRepository()
+        socio = repo.obtenerPorCodigoSN(rut)
+        
+        return True if socio else False
                     
     def verificarSocioNegocioSap(self, cardCode):
-        """
-        
-        Método para verificar si un socio de negocio existe en SAP.
-        
-        Args:
-            cardCode (str): Código del socio de negocio.
-            
-        Returns:
-            bool: True si el socio de negocio existe, False si no.            
-        """
 
         client = APIClient()
+        response = client.verificarCliente(endpoint="BusinessPartners", cardCode=cardCode)
+        return True if 'CardCode' in response else False
 
-        try:
-            
-            response = client.verificarCliente(endpoint="BusinessPartners", cardCode=cardCode)
-
-            # Verifica si la respuesta contiene el 'CardCode'
-            if 'CardCode' in response:
-                return True
-            else:
-                return False
-        except Exception as e:
-            print(f"Error al verificar socio de negocio en SAP: {str(e)}")
-            return False
     
     def obtenerDatosCliente(self, cardCode):
         
-        try:
-            cliente = SocioNegocioDB.objects.get(rut=cardCode)
-            direcciones = DireccionRepository().obtenerDireccionesPorCliente(cliente)
-            contactos = ContactoRepository().obtenerContactosPorCliente(cliente)
-            return cliente, direcciones, contactos
-        except SocioNegocioDB.DoesNotExist:
-            raise ValueError(f"No se encontró el cliente con RUT: {cardCode}")
+        cliente = SocioNegocioDB.objects.get(rut=cardCode)
+        direcciones = DireccionRepository().obtenerDireccionesPorCliente(cliente)
+        contactos = ContactoRepository().obtenerContactosPorCliente(cliente)
+        return cliente, direcciones, contactos
+
 
 
     def create_sap_bp(self, json_data_bp):
-        print(f"Datos a enviar a SAP: {json_data_bp}")
+        print("create sap bp")
+        
         api_conection = APIClient()
         
-        try:
-            response = api_conection.create_bp_sl(json_data_bp)
+        response = api_conection.create_bp_sl(json_data_bp)
+        
+        if isinstance(response, dict):
+            if 'CardCode' in response:
 
-            print(f"Response to create_bp_sl: {response}")
+                return response
             
-            if isinstance(response, dict):
-                # Verificar si la respuesta contiene un 'CardCode'
-                if 'CardCode' in response:
-                    card_code = response.get('CardCode')                    
-                    # Extraer BPAddresses si está presente
-                    bp_addresses = response.get('BPAddresses', [])
-                    row_nums = [address.get('RowNum') for address in bp_addresses if 'RowNum' in address]
-                    
-                    # Extraer ContactEmployees si está presente
-                    contact_employees = response.get('ContactEmployees', [])
-                    internal_codes = [employee.get('InternalCode') for employee in contact_employees if 'InternalCode' in employee]
-
-
-                    return response
-                
-                # Manejar el mensaje de error si lo hay
-                elif 'error' in response:
-                    error_message = response.get('error', 'Error desconocido')
-                    return {'error': f"Error: {error_message}"}
-                else:
-                    return {'error': 'Respuesta inesperada de la API.'}
-            
+            elif 'error' in response:
+                return {'error': response.text}
             else:
-                return {'error': 'La respuesta de la API no es válida.'}
+                return {'error': 'Respuesta inesperada de la API.'}
+        
+        else:
+            return {'error': 'La respuesta de la API no es válida.'}
 
-        except json.JSONDecodeError as e:
-            return {'error': 'Error al decodificar el JSON.'}
-        except ConnectionError as e:
-            return {'error': 'Error de conexión con SAP.'}
-        except Exception as e:
-            return {'error': f"Error inesperado: {str(e)}"}
+
 
 
     def verify_valid_rut(self, rut):

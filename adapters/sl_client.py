@@ -618,34 +618,25 @@ class APIClient:
         self.__login()
 
         url = f"{self.base_url}BusinessPartners('{cardCode}')"
+        response = self.session.patch(url, data, verify=False)
 
-        try:
-            # Enviar la solicitud PATCH a la API
-            response = self.session.patch(url, data, verify=False)
+        # Manejar la respuesta según el código de estado
+        if response.status_code == 204:
+            return {
+                "success": True,
+                "message": "Socio de negocio actualizado correctamente.",
+            }
+        
+        else:
+           error_data = response.json()
+           error_message = error_data.get('error', {}).get('message', {}).get('value', 'Error desconocido')
 
-            # Manejar la respuesta según el código de estado
-            if response.status_code == 204:
-                # Si la respuesta es 204, no hay contenido en la respuesta, pero la operación fue exitosa
-
-                return {
-                    "success": True,
-                    "message": "Socio de negocio actualizado correctamente.",
-                }
-            else:
-                # Si la respuesta tiene contenido (por ejemplo, 200 OK o 201 Created), procesar la respuesta
-                response.raise_for_status()  # Lanzar un error si la respuesta no es exitosa
-                return response.json()
-
-        except requests.exceptions.HTTPError as e:
-            # Si ocurre un error en la solicitud, imprimir y lanzar la excepción
-            if "response" in locals() and response is not None:
-                print(f"Cuerpo de la respuesta del servidor: {response.text}")
-            raise
-        except Exception as e:
-            # Capturar otros posibles errores y registrarlos
-            print(f"Error inesperado: {e}")
-            raise
-
+           return {
+                "error": True,
+                "message": f"Respuesta error SAP: {error_message}",
+            }
+    
+    
     def obtenerProductosSL(self, skip=0, tipo="nacional"):
 
         self.__login()

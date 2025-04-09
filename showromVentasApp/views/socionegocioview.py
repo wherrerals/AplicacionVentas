@@ -82,51 +82,34 @@ class SocioNegocioView(FormView):
             return handler(request)
         return JsonResponse({'error': 'Invalid URL'}, status=404)
 
-
-
-    def agregarSN(self, request):
-
-        if request.method == 'POST':
-            
-
-            pass
-
     def create_or_update_bp_view(self, request):
         
         if request.method == 'POST':
 
-            try:
-                business_partner = SocioNegocio(request)
-                #create_or_update = business_partner.create_or_update_bp()
+            business_partner = SocioNegocio(request)
 
-                response = json.loads(business_partner.create_or_update_bp().content)
+            response = json.loads(business_partner.create_or_update_bp().content)
 
-                if response.get('success'):
-                    return JsonResponse({
-                            'success': True,
-                            'message': response.get('message', 'Cliente creado o actualizado con éxito'),
-                            'codigoSN': response.get('codigoSN')  # Este campo es opcional
-                        },
-                        status=201)
+            print("Response:", response)  # Para depuración
+            print(response.get('success'))  # Para depuración
 
-                else:
-                    return JsonResponse(
-                        {
-                            'success': False,
-                            'message': response.get('message', 'Error al crear o actualizar el cliente'),
-                            'details': response.get('details', 'Detalles no disponibles')  # Si hay más detalles
-                        },
-                        status=400)
+            if response.get('success'):
+                return JsonResponse({
+                        'success': True,
+                        'message': response.get('message', 'Cliente creado o actualizado con éxito'),
+                        'codigoSN': response.get('codigoSN')  # Este campo es opcional
+                    },
+                    status=201)
 
-            except ValidationError as e:
-                return JsonResponse({'success': False, 'error': str(e)}, status=400)
+            else:
+                return JsonResponse(
+                    {
+                        'error': False,
+                        'message': response.get('message', 'Error al crear o actualizar el cliente'),
+                        'details': response.get('details', 'Detalles no disponibles')  # Si hay más detalles
+                    },
+                    status=400)
 
-            except KeyError as e:
-                return JsonResponse({'success': False, 'error': f"Falta el campo requerido: {str(e)}"}, status=400)
-
-            except Exception as e:
-                print(f"Error inesperado: {str(e)}")
-                return JsonResponse({'success': False, 'error': 'Error inesperado, contacte con soporte'}, status=500)
             
     def busquedaSocioNegocio(self, request):
         """
