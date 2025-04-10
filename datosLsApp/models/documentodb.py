@@ -1,4 +1,5 @@
 from django.db import models
+from datosLsApp.models.lineadb import LineaDB
 from datosLsApp.models.vendedordb import VendedorDB
 from datosLsApp.models.condicionpagodb import CondicionPagoDB
 from datosLsApp.models.tipodoctributariodb import TipoDocTributarioDB
@@ -20,7 +21,7 @@ class DocumentoDB(models.Model):
     fechaEntrega = models.DateField(null = False)
     horarioEntrega = models.DateTimeField(null = False)
     referencia = models.CharField(max_length=255)
-    comentario = models.CharField(max_length=255)  # Corregí el nombre del campo aquí
+    comentario = models.CharField(max_length=255)
     totalAntesDelDescuento = models.FloatField()
     descuento = models.FloatField(default=0) 
     totalDocumento = models.FloatField(null = False)
@@ -31,7 +32,7 @@ class DocumentoDB(models.Model):
     tipoentrega = models.ForeignKey(TipoEntregaDB, on_delete=models.CASCADE, default=1)
     tipoobjetoSap = models.ForeignKey(TipoObjetoSapDB, on_delete=models.CASCADE, default=1)    
     tipoVenta = models.ForeignKey(TipoVentaDB, on_delete=models.CASCADE, default=1)
-    # Otros campos que puedas tener
+    document_lineas = models.ManyToManyField(LineaDB, related_name='documentos')
     
     def __str__(self):
         return f'Documento {self.docNum} - Tipo: {self.tipo_documento.nombre} - Vendedor: {self.nombre_vendedor.nombre}'

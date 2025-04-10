@@ -1,6 +1,5 @@
 from django.db import models
 from datosLsApp.models.tipoobjetosapdb import TipoObjetoSapDB
-from datosLsApp.models.documentodb import DocumentoDB
 from datosLsApp.models.tipoentregadb import TipoEntregaDB
 from datosLsApp.models.productodb import ProductoDB
 
@@ -23,7 +22,6 @@ class LineaDB(models.Model):
     numLineaBase = models.IntegerField(null = False)
     fechaEntrega = models.DateField(null = False)
     direccionEntrega = models.CharField(max_length=255)
-    documento = models.ForeignKey(DocumentoDB, on_delete=models.CASCADE, default=1)
     tipoentrega = models.ForeignKey(TipoEntregaDB, on_delete=models.CASCADE, default=1)
     tipoobjetoSap = models.ForeignKey(TipoObjetoSapDB, on_delete=models.CASCADE, default=1)    
 

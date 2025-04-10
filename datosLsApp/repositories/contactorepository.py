@@ -3,60 +3,13 @@ from datosLsApp.models import ContactoDB
 from datosLsApp.models.socionegociodb import SocioNegocioDB
 
 class ContactoRepository:
-    """
-    Repositorio de Contactos
-
-    Metodos disponibles:
-
-    - obtenerContactosPorCliente(cliente)
-    - obtenerContacto(contacto_id)
-    - actualizarContacto(contacto_obj, nombre_contacto, apellido_contacto, telefono_contacto, celular_contacto,  email_contacto)
-    - crearContacto(socio, nombre_contacto, apellido_contacto, telefono_contacto, email_contacto, celular_contacto)
-    """
-
     def obtenerContactosPorCliente(self, cliente):
-        """
-        Obtiene las direcciones de un cliente
-
-        params:
-            cliente: SocioNegocioDB
-
-            - Cliente al que pertenecen las direcciones
-
-        return:
-            QuerySet
-        """
         return ContactoDB.objects.filter(SocioNegocio=cliente)
 
     def obtenerContacto(contacto_id):
-        """
-        Obtiene un Contacto por su id
-
-        params:
-            contacto_id: int
-
-            - Id del contacto
-
-        return:
-            ContactoDB
-
-            - Contacto encontrado
-        """
         return ContactoDB.objects.filter(id=contacto_id).first()
     
     def actualizarContacto(contacto_obj, nombre_contacto, apellido_contacto, telefono_contacto, celular_contacto,  email_contacto):
-        """
-        Actualiza los datos de un contacto
-
-        params:
-            contacto_obj: ContactoDB - Contacto a actualizar
-            nombre_contacto: str - Nombre del contacto
-            apellido_contacto: str - Apellido del contacto
-            telefono_contacto: str - Telefono del contacto
-            celular_contacto: str - Celular del contacto
-            email_contacto: str - Email del contacto
-
-        """
         try:
             contacto_obj.nombreCompleto = nombre_contacto + " " + apellido_contacto
             contacto_obj.nombre = nombre_contacto
@@ -71,18 +24,6 @@ class ContactoRepository:
 
 
     def crearContacto(socio, codigo_interno_sap, nombre_contacto, apellido_contacto, telefono_contacto, email_contacto, celular_contacto):
-        """
-        Crea un nuevo contacto
-
-        params:
-            socio: int - Id del socio al que pertenece el contacto
-            nombre_contacto: str - Nombre del contacto
-            apellido_contacto: str - Apellido del contacto
-            telefono_contacto: str - Telefono del contacto
-            celular_contacto: str - Celular del contacto
-            email_contacto: str - Email del contacto
-
-        """
         try:
 
             socio_obj = get_object_or_404(SocioNegocioDB, codigoSN=socio)
@@ -90,7 +31,7 @@ class ContactoRepository:
             nuevo_contacto = ContactoDB.objects.create(
                 SocioNegocio=socio_obj,
                 codigoInternoSap = codigo_interno_sap,
-                nombreCompleto = nombre_contacto + " " + apellido_contacto,
+                nombreCompleto = nombre_contacto,
                 nombre=nombre_contacto,
                 apellido=apellido_contacto,
                 telefono=telefono_contacto,
