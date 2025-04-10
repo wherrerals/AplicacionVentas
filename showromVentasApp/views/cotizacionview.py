@@ -130,31 +130,30 @@ class CotizacionView(View):
 
     @csrf_exempt
     def crearOActualizarCotizacion(self, request):
-        try:
-            data = json.loads(request.body)
-            users_data = self.user_data(request)
-            docEntry = data.get('DocEntry')
-            docnum = data.get('DocNum')
-            cotizacion = Cotizacion()
+        data = json.loads(request.body)
+        users_data = self.user_data(request)
+        docEntry = data.get('DocEntry')
+        docnum = data.get('DocNum')
+        cotizacion = Cotizacion()
 
-            if docEntry:
-                if self.validar_vendedor(users_data['vendedor'], data['SalesPersonCode']) == True:
-                    actualizacion = cotizacion.actualizarDocumento(docnum, docEntry, data)
-                    return JsonResponse(actualizacion, status=200)
-        
-                else:
-                    #actualizar el SalesPersonCode
-                    data['SalesPersonCode'] = users_data['vendedor']
-                    creacion = cotizacion.crearDocumento(data)
-                    return JsonResponse(creacion, status=201)
+        if docEntry:
+            if self.validar_vendedor(users_data['vendedor'], data['SalesPersonCode']) == True:
+                actualizacion = cotizacion.actualizarDocumento(docnum, docEntry, data)
+                print(actualizacion)
+                return JsonResponse(actualizacion, status=200)
+    
             else:
+                #actualizar el SalesPersonCode
+                data['SalesPersonCode'] = users_data['vendedor']
                 creacion = cotizacion.crearDocumento(data)
+                print(creacion)
                 return JsonResponse(creacion, status=201)
+        else:
+            creacion = cotizacion.crearDocumento(data)
+            print(creacion)
+            return JsonResponse(creacion, status=201)
 
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'JSON inválido'}, status=400)
-        except Exception as e:
-            return JsonResponse({'error': f'Error inesperado: {str(e)}'}, status=500)
+
         
     def user_data(self, request):
         user = request.user

@@ -264,3 +264,14 @@ class Producto:
         filters = {k: v for k, v in filters.items() if v and v != "''"}
 
         return filters
+
+    @staticmethod
+    def update_recipe_ingredients(docEntry):
+
+        serviceLayer = APIClient()
+        
+        document_lines = serviceLayer.detalleCotizacionLineas(docEntry=docEntry)
+
+        print(f"Document lines: {document_lines}")
+
+        return document_lines

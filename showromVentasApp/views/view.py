@@ -1407,3 +1407,13 @@ def verificar_estado_pdf(request, task_id):
             'status': 'error',
             'error': f'Error verificando estado: {str(e)}'
         }, status=500)
+    
+
+def probandoActualizador(request):
+    try:
+        # Llamar a la función de actualización de productos
+        prueba = Producto.update_recipe_ingredients(docEntry=218077)
+
+        return JsonResponse({'status': 'Actualización completada', 'data': prueba}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
