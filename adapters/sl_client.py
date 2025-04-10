@@ -297,22 +297,20 @@ class APIClient:
             return {"error": f"Error al actualizar el estado: {error_message}"}
 
     def verificarCliente(self, endpoint, cardCode):
-        """
-        Verifica si un cliente existe en la base de datos de SAP
-
-        Parámetros:
-            endpoint : str, opcional
-                El endpoint donde se creara la cotizacion (por defecto es '').
-            cardCode : str, opcional
-                El codigo de cliente a verificar.
-        """
         self.__login()
         select = "CardCode"
         url = f"{self.base_url}{endpoint}('{cardCode}')?$select={select}"
         response = self.session.get(url, verify=False)
-        response.raise_for_status()
-        return response.json()
+        
+        # Si la respuesta no fue exitosa, imprime los detalles del error
+        if response.status_code != 200:
+            print(f"Error HTTP: {response.status_code}")
+            error_json = response.json()
+            print(f"Mensaje de error: {error_json['error']['message']['value']}")
+            return False
 
+        return True
+    
     def create_bp_sl(self, data):
         """
         permite la creacion de clientes en la base de datos de SAP

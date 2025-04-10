@@ -69,19 +69,25 @@ class SocioNegocio:
         self.validarDirecciones()
         self.validarContactos()
 
-    def procesarClienteExistente(self, codigosn, datosCliente, datosNuevos):
-
-        verificacionSap = self.verificarSocioNegocioSap(codigosn)
+    def process_existing_bp(self, cardcode, datosCliente, newData):
+        
+        verificacionSap = self.verify_sap_bp(cardcode)
 
         if verificacionSap:
 
-            updata_bp = self.actualizarSocioNegocio(codigosn, datosNuevos)
-            print("updata_bp", updata_bp)
+            updata_bp = self.actualizarSocioNegocio(cardcode, newData)
             
             if updata_bp.get('error'): 
                 return JsonResponse({'error': True, 'message': updata_bp['message']}, status=400)
             
             return JsonResponse({'success': True, 'message': 'Cliente actualizado exitosamente'})
+        
+        else:
+            # Si no existe en SAP, se crea un nuevo socio de negocio
+            print("no existe en sap")
+            SocioNegocioDB.objects.delete(socioNegocio=datosCliente.codigoSN)
+            return self.process_new_bp(cardcode, newData)
+        
         
 
     def actualizarSocioNegocio(self, cardcode, datos):
@@ -320,11 +326,14 @@ class SocioNegocio:
         
         return True if socio else False
                     
-    def verificarSocioNegocioSap(self, cardCode):
-
+    def verify_sap_bp(self, cardCode):
         client = APIClient()
         response = client.verificarCliente(endpoint="BusinessPartners", cardCode=cardCode)
-        return True if 'CardCode' in response else False
+
+        if not response:
+            print(f"respondiendo ando: {response}")
+
+        return True if response else False
 
     
     def obtenerDatosCliente(self, cardCode):
@@ -882,28 +891,20 @@ class SocioNegocio:
         
         if not is_valid:
             return JsonResponse({'success': False, 'message': message}, status=400)
-      
-        try:
-            self.validate_madatary_data_bp()
+    
+        self.validate_madatary_data_bp()
 
-            # validating the bp existence in the database
-            rut = self.rut            
-            card_code = SocioNegocio.generate_bp_code(rut)
-            exiting_bp = SocioNegocioRepository.get_by_rut(self.rut)
+        # validating the bp existence in the database
+        exiting_bp = SocioNegocioRepository.get_by_rut(self.rut)
 
-            if exiting_bp is not None:
-                return self.procesarClienteExistente(card_code, exiting_bp, datosNuevos=bp_data)
-            
-            # processing the new business partner
-            self.process_new_bp(card_code, bp_data)
-
-            return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
+        if exiting_bp is not None:
+            return self.process_existing_bp(SocioNegocio.generate_bp_code(self.rut), exiting_bp, newData=bp_data)
         
-        except ValidationError as e:
-            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+        # processing the new business partner
+        self.process_new_bp(SocioNegocio.generate_bp_code(self.rut), bp_data)
+
+        return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
         
-        except Exception as e:
-            return JsonResponse({'success': False, 'message': 'Error al procesar el cliente'}, status=500)
 
     def process_new_bp(self, card_code, data_bp):
         # get branch from data_bp, if not found, generate a new one for default

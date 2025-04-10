@@ -167,7 +167,7 @@ class SocioNegocioView(FormView):
             # Valor por defecto para pruebas
 
             if cardCode:
-                socio_existe = SocioNegocio.verificarSocioNegocioSap(cardCode) 
+                socio_existe = SocioNegocio.verify_sap_bp(cardCode) 
 
 
                 if socio_existe == True:
