@@ -9,6 +9,7 @@ from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.productorepository import ProductoRepository
 from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
+from datosLsApp.serializer.documentSerializer import SerializerDocument
 from logicaVentasApp.services.documento import Documento
 import logging
 logger = logging.getLogger(__name__)
@@ -248,40 +249,6 @@ class Cotizacion(Documento):
             }
             for line in documentLines
         ]
-    
-    @staticmethod
-    def tipoVentaTipoVendedor(codigo_vendedor):
-        """
-        Asigna el tipo de venta a la cotización.
-
-        Args:
-            tipo_venta (str): Tipo de venta.
-        """
-        repo = VendedorRepository()
-        print(f"codigo_vendedor: {codigo_vendedor}")
-        tipo_vendedor = repo.obtenerTipoVendedor(codigo_vendedor)
-
-        if tipo_vendedor == 'PR':
-            return 'PROY'
-        elif tipo_vendedor == 'CD':
-            return 'ECCO'
-        else:
-            return 'NA'
-
-    @staticmethod
-    def tipoVentaTipoLineas(lineas):
-        """
-        Asigna el tipo de venta a las líneas de la cotización.
-
-        - Si todas las lineas son del mismo warehouse, se asigna el tipo de venta: TIEN.
-        - Si las lineas son de diferentes warehouses, se asigna el tipo de venta: RESE.
-
-        Args:
-            lineas (list): Líneas de la cotización.
-        """
-
-        warehouses = set(linea.get('WarehouseCode') for linea in lineas)
-        return 'TIEN' if len(warehouses) == 1 else 'RESE'
         
 
     def actualizarDocumento(self,docnum, docentry, data):
@@ -290,7 +257,7 @@ class Cotizacion(Documento):
 
         try:
             docentry = int(docentry)
-            jsonData = self.prepare_json_document(data)
+            jsonData = SerializerDocument.document_serializer(data)
             
             response = self.client.actualizarCotizacionesSL(docentry, jsonData)
 
@@ -323,7 +290,7 @@ class Cotizacion(Documento):
                 return {'error': errores}
 
             # Preparar el JSON para la cotización
-            jsonData = self.prepare_json_document(data)
+            jsonData = SerializerDocument.document_serializer(data)
             
             # Realizar la solicitud a la API
             response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)

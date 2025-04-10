@@ -324,7 +324,7 @@ class OrdenVenta(Documento):
                     stock_service.actualizar_stock_por_diferencia(sku, bodega_id, cantidad_anterior_total, stock_actual)
 
             # Preparar JSON y actualizar documento en SAP
-            jsonData = self.prepare_json_document(data)
+            jsonData = self.document_serializer(data)
             client = APIClient()
             response = client.actualizarODVSL(int(docentry), jsonData)
 
@@ -372,7 +372,7 @@ class OrdenVenta(Documento):
                 stock_service.actualizar_stock(sku, bodega_id, -cantidad, stock_actual)
 
             # Preparar el JSON para la cotización
-            jsonData = self.prepare_json_document(data)
+            jsonData = self.document_serializer(data)
 
             # Realizar la solicitud a la API
             response = sl.crearODV(jsonData)
@@ -522,7 +522,7 @@ class OrdenVenta(Documento):
     
 
     @staticmethod
-    def tipoVentaTipoLineas(lineas):
+    def Sale_type_line_type(lineas):
         """
         Asigna el tipo de venta a las líneas de la cotización.
 

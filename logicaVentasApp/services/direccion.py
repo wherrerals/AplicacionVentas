@@ -1,6 +1,8 @@
 import json
 from django.http import JsonResponse
 
+from datosLsApp.repositories.direccionrepository import DireccionRepository
+
 
 class Direccion:
 
@@ -100,3 +102,18 @@ class Direccion:
         
         # Si no se encuentra la sucursal, devolver None
         return None
+    
+    @staticmethod
+    def assign_bill_ship_addres(adrres, adrres2):
+        
+        if adrres == "No hay direcciones disponibles":
+            addres_bill = DireccionRepository.obtenerDireccion(adrres)
+        else:
+            addres_bill = DireccionRepository.obtenerDireccion(adrres2)
+
+        if adrres2 == "No hay direcciones disponibles":
+            addres_ship = DireccionRepository.obtenerDireccion(adrres2)
+        else:
+            addres_ship = DireccionRepository.obtenerDireccion(adrres)
+        
+        return addres_bill, addres_ship

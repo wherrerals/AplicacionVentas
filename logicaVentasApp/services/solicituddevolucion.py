@@ -242,7 +242,7 @@ class SolicitudesDevolucion(Documento):
         # Si el tipo de venta por vendedor no es válido ('NA'), determinar por líneas
         if tipo_venta == 'NA':
             lineas = jsonData.get('DocumentLines', [])
-            tipo_venta = self.tipoVentaTipoLineas(lineas)
+            tipo_venta = self.Sale_type_line_type(lineas)
         
         transportationCode = jsonData.get('TransportationCode')
 
@@ -472,7 +472,7 @@ class SolicitudesDevolucion(Documento):
             return 'NA'
 
     @staticmethod
-    def tipoVentaTipoLineas(lineas):
+    def Sale_type_line_type(lineas):
         """
         Asigna el tipo de venta a las líneas de la cotización.
 
