@@ -9,6 +9,7 @@ from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.productorepository import ProductoRepository
 from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
+from datosLsApp.serializer.documentSerializer import SerializerDocument
 from logicaVentasApp.services.documento import Documento
 import logging
 
@@ -324,7 +325,7 @@ class OrdenVenta(Documento):
                     stock_service.actualizar_stock_por_diferencia(sku, bodega_id, cantidad_anterior_total, stock_actual)
 
             # Preparar JSON y actualizar documento en SAP
-            jsonData = self.document_serializer(data)
+            jsonData = SerializerDocument.document_serializer(data)
             client = APIClient()
             response = client.actualizarODVSL(int(docentry), jsonData)
 
@@ -372,7 +373,7 @@ class OrdenVenta(Documento):
                 stock_service.actualizar_stock(sku, bodega_id, -cantidad, stock_actual)
 
             # Preparar el JSON para la cotización
-            jsonData = self.document_serializer(data)
+            jsonData = SerializerDocument.document_serializer(data)
 
             # Realizar la solicitud a la API
             response = sl.crearODV(jsonData)
@@ -410,15 +411,6 @@ class OrdenVenta(Documento):
             
 
     def validarDatosODV(self, data):
-        """
-        Verifica que los datos de la cotización sean correctos.
-
-        Args:
-            data (dict): Datos de la cotización.
-
-        Returns:
-            str: Mensajes de error si hay problemas con los datos, o vacío si son correctos.
-        """
         errores = []
 
         # Verificar que el cardcode esté presente
@@ -451,9 +443,6 @@ class OrdenVenta(Documento):
 
     @staticmethod
     def validar_stock_total_por_bodega(data):
-        """
-        Verifica que el stock total del código en la cotización no supere el stock disponible en bodega.
-        """
 
         doc_entry = data.get("DocEntry")
 
@@ -503,12 +492,6 @@ class OrdenVenta(Documento):
     
     @staticmethod
     def tipoVentaTipoVendedor(codigo_vendedor):
-        """
-        Asigna el tipo de venta a la cotización.
-
-        Args:
-            tipo_venta (str): Tipo de venta.
-        """
         
         repo = VendedorRepository()
         tipo_vendedor = repo.obtenerTipoVendedor(codigo_vendedor)
@@ -523,15 +506,6 @@ class OrdenVenta(Documento):
 
     @staticmethod
     def Sale_type_line_type(lineas):
-        """
-        Asigna el tipo de venta a las líneas de la cotización.
-
-        - Si todas las lineas son del mismo warehouse, se asigna el tipo de venta: TIEN.
-        - Si las lineas son de diferentes warehouses, se asigna el tipo de venta: RESE.
-
-        Args:
-            lineas (list): Líneas de la cotización.
-        """
         
         shipping_methods = set(linea.get('ShippingMethod') for linea in lineas)
         warehouses = set(linea.get('WarehouseCode') for linea in lineas)
@@ -540,21 +514,3 @@ class OrdenVenta(Documento):
             return 'TIEN'
         else:
             return 'RESE'
-""" 
-    @staticmethod
-    def ajustarShippingMethod(lineas):
-
-        for linea in lineas:
-            shipping_method = linea.get('ShippingMethod')
-            warehouse_code = linea.get('WarehouseCode')
-
-            # Regla para ShippingMethod
-            if shipping_method == "2":
-                if warehouse_code == "LC":
-                    linea['ShippingMethod'] = "3"
-                elif warehouse_code == "ME":
-                    linea['ShippingMethod'] = "2"
-                elif warehouse_code == "PH":
-                    linea['ShippingMethod'] = "4"
-
-        return lineas """

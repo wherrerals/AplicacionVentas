@@ -85,8 +85,9 @@ class SocioNegocio:
         else:
             # Si no existe en SAP, se crea un nuevo socio de negocio
             print("no existe en sap")
-            SocioNegocioDB.objects.delete(socioNegocio=datosCliente.codigoSN)
-            return self.process_new_bp(cardcode, newData)
+            SocioNegocioDB.objects.filter(rut=datosCliente.rut).delete()
+            self.process_new_bp(cardcode, newData)
+            return JsonResponse({'success': True, 'message': 'Cliente actualizado exitosamente'})
         
         
 
