@@ -63,6 +63,13 @@ function limpiarInformacionCliente() {
     // Limpia todos los campos relacionados con el cliente
     $('#inputCliente').val(''); 
     
+    let estadoElement = $('#estado');
+    let estadoActual = estadoElement.text().trim();
+    
+    if (estadoActual === "Cerrado" || estadoActual === "Cancelado") {
+        estadoElement.text('Abierta');
+        estadoElement.attr('data-estado', 'bost_Open');
+    }
 
     // limpia en cotizaciones y ordenes
     $('#numero_cotizacion').text('');
