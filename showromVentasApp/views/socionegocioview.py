@@ -200,17 +200,14 @@ class SocioNegocioView(FormView):
         try:
 
             socio_negocio_service = SocioNegocio(request)
-
-            cardCode = socio_negocio_service.generarCardCode(rut)
-
-
-            if socio_negocio_service.verificarSocioDB(cardCode):
-
+            #cardCode = socio_negocio_service.generarCardCode(rut)
+            if socio_negocio_service.verificarSocioDB(rut):
+                print("Socio de negocio ya existe en la base de datos")
                 return socio_negocio_service.responderInfoCliente(rut)
             
             else:
-                
-                return socio_negocio_service.crearYresponderCliente(cardCode, rut)
+                print("Socio de negocio no existe en la base de datos")
+                return socio_negocio_service.crearYresponderCliente(rut, rut)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     

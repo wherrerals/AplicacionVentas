@@ -81,22 +81,27 @@ class SocioNegocioRepository:
         return SocioNegocioDB.objects.filter(nombre__icontains=nombre)
     
     def obtenerPorCodigoSN(self, codigoSN):
-        """
-        Obtiene un socio de negocio por su código
-        
-        params:
-            codigoSN: str
 
-            - Código del socio de negocio a buscar
-        
-        return:
-            SocioNegocioDB | None
-        """
-        
-        try:
-            return SocioNegocioDB.objects.get(codigoSN=codigoSN)
-        except SocioNegocioDB.DoesNotExist:
-            return None
+        card_code = f"{codigoSN}C"
+        card_code_min = card_code.lower()
+
+        # Intentar buscar el código exacto primero
+        socio = SocioNegocioDB.objects.filter(codigoSN=card_code).first()
+
+        if socio:
+            print("Socio encontrado con código exacto:", socio)
+            return socio
+
+        # Si no existe, intentar con minúsculas
+        socio_min = SocioNegocioDB.objects.filter(codigoSN=card_code_min).first()
+
+        if socio_min:
+            print("Socio encontrado con código en minúsculas:", socio_min)
+            return socio_min
+
+        print("No se encontró socio de negocio con código:", codigoSN)
+        return None
+
 
     @staticmethod
     def actualizarCliente(codigoSN, datosActualizados):

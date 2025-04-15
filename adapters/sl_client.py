@@ -338,26 +338,35 @@ class APIClient:
             raise
 
     def getInfoSN(self, cardCode):
-        details = f"BusinessPartners('{cardCode}')?$select=CardCode,CardName,CardType,Phone1,EmailAddress,Notes,GroupCode,FederalTaxID,BPAddresses,ContactEmployees"
+        card_code  = f"{cardCode}C"
+        card_code_min = card_code.lower()
+
+        details = f"BusinessPartners?$select=CardCode,CardName,CardType,Phone1,EmailAddress,Notes,GroupCode,FederalTaxID,BPAddresses,ContactEmployees&$filter=CardCode eq '{card_code}' or CardCode eq '{card_code_min}'"
         url = f"{self.base_url}{details}"
+
+        print(f"URL: {url}")
         
         try:
-
             response = self.session.get(url, verify=False)
             response.raise_for_status()
-            return response.json()
+            data = response.json()
+
+            # Normalizar respuesta si viene en formato "value"
+            if "value" in data:
+                if len(data["value"]) > 0:
+                    return data["value"][0]
+                else:
+                    return {"error": True, "message": "No se encontró ningún BusinessPartner con ese código."}
+            else:
+                return data
+
         except requests.exceptions.HTTPError as http_err:
-            # Captura errores HTTP (como 404, 500, etc.)
-            error_message = f"HTTP error occurred: {http_err}"
-            return {"error": True, "message": error_message, "status_code": response.status_code}
+            return {"error": True, "message": f"HTTP error occurred: {http_err}", "status_code": response.status_code}
         except requests.exceptions.RequestException as req_err:
-            # Captura otros errores relacionados con la solicitud (como problemas de conexión)
-            error_message = f"Request error occurred: {req_err}"
-            return {"error": True, "message": error_message}
+            return {"error": True, "message": f"Request error occurred: {req_err}"}
         except Exception as e:
-            # Captura cualquier otra excepción inesperada
-            error_message = f"An unexpected error occurred: {e}"
-            return {"error": True, "message": error_message}
+            return {"error": True, "message": f"An unexpected error occurred: {e}"}
+
 
 
     def detalleCotizacionCliente(self, docEntry):
