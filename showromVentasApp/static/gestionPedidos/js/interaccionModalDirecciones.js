@@ -227,6 +227,9 @@ $(document).ready(function () {
         (document.getElementById("rutSN")?.getAttribute("data-rut")) || 
         "";
         
+        let cardCode = (document.getElementById("inputCliente")?.getAttribute("data-codigosn"))
+        console.log('Cliente CardCode capturado:', cardCode);
+
         // URL para guardar direcciones
         let urlguardarDir = `/ventas/guardar_direcciones/${rutCliente}/`;
 
@@ -241,7 +244,8 @@ $(document).ready(function () {
             type: 'POST',
             data: {
                 'direcciones': JSON.stringify(direcciones),
-                'cliente': clienteRut
+                'cliente': clienteRut,
+                'cardCode': cardCode
             },
             headers: {
                 "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val()

@@ -48,6 +48,9 @@ $(document).ready(function () {
         let clienteRut = $('#inputCliente').data('rut');
         console.log('Cliente RUT capturado:', clienteRut);
 
+        let cardCode = (document.getElementById("inputCliente")?.getAttribute("data-codigosn"))
+        console.log('Cliente CardCode capturado:', cardCode);
+
         const rutCliemte = document.getElementById("inputCliente").getAttribute("data-codigoSN");
 
 
@@ -66,7 +69,9 @@ $(document).ready(function () {
             type: 'POST',
             data: {
                 'contactos': JSON.stringify(contactos),
-                'cliente': clienteRut  // Asumiendo que el cliente está en un atributo `data-rut`
+                'cliente': clienteRut,  // Asumiendo que el cliente está en un atributo `data-rut`
+                'cardCode': cardCode
+
             },
             headers: {
                 "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val()  // Incluir el token CSRF en los headers

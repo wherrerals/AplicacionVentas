@@ -578,10 +578,11 @@ def mis_datos(request):
 def actualizarAgregarDirecion(request, socio):
     if request.method == "POST":
         try:
-            
             data = request.POST
             rut = data.get('cliente')
-            carCode = SocioNegocio.generate_bp_code(rut)
+            #carCode = SocioNegocio.generate_bp_code(rut)
+            carCode = data.get('cardCode')
+
             SocioNegocio.actualizaroCrearDireccionSL(rut, carCode, request.POST)
             conexionAPi = APIClient()
             dataMSQL = conexionAPi.obtenerDataSn(carCode, "BPAddresses")
@@ -600,7 +601,8 @@ def actualizarAgregarContacto(request, socio):
         try:
             data = request.POST
             rut = data.get('cliente')
-            carCode = SocioNegocio.generate_bp_code(rut)
+            #carCode = SocioNegocio.generate_bp_code(rut)
+            carCode = data.get('cardCode')
 
             SocioNegocio.actualizaroCrearContactosSL(carCode, request.POST)
 

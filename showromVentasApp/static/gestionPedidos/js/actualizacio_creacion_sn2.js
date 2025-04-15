@@ -25,7 +25,8 @@ formularios.forEach(formulario => {
         // Intenta capturar el contenido de "numero_cotizacion"
         const cotizacionElement = document.getElementById("numero_cotizacion");
         
-        
+        console.log(cardCode);
+
         // Si no encuentra "numero_cotizacion", busca "numero_orden"
         if (cotizacionElement) {
             docentry = cotizacionElement.textContent;
@@ -97,7 +98,7 @@ formularios.forEach(formulario => {
             apellidoSN: apellido,
             tipoSN: tipo,
             rutSN: rut,
-            cardCode: cardCode,
+            cardCodeSN: cardCode,
             emailSN: email,
             telefonoSN: telefono,
             giroSN: giro,

@@ -894,16 +894,18 @@ class SocioNegocio:
         
         if not is_valid:
             return JsonResponse({'success': False, 'message': message}, status=400)
-    
-        self.validate_madatary_data_bp()
+        
+        try:
+            self.validate_madatary_data_bp()
+        except ValidationError as e:
+            # Puedes adaptar el mensaje como prefieras
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
 
-        # validating the bp existence in the database
         exiting_bp = SocioNegocioRepository.get_by_rut(self.rut)
 
         if exiting_bp is not None:
             return self.process_existing_bp(bp_data.get('cardCodeSN'), exiting_bp, newData=bp_data)
-        
-        # processing the new business partner
+
         self.process_new_bp(SocioNegocio.generate_bp_code(self.rut), bp_data)
 
         return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})

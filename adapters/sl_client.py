@@ -298,9 +298,13 @@ class APIClient:
 
     def verificarCliente(self, endpoint, cardCode):
         self.__login()
+
+        print(cardCode)
         select = "CardCode"
         url = f"{self.base_url}{endpoint}('{cardCode}')?$select={select}"
         response = self.session.get(url, verify=False)
+        print(f"URL: {url}")
+        print(f"status_code: {response.status_code}")
         
         # Si la respuesta no fue exitosa, imprime los detalles del error
         if response.status_code != 200:
