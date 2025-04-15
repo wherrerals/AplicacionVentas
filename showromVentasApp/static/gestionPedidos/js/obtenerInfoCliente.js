@@ -42,6 +42,8 @@ function traerInformacionCliente(clienteId) {
         clienteId = clienteId.split("-")[0];
     }
 
+    console.log("clienteId: ", clienteId)
+
     // URL para buscar clientes
 
     let buscarClientesUrl = `/ventas/buscar_clientes/?numero=${clienteId}`;
@@ -54,11 +56,12 @@ function traerInformacionCliente(clienteId) {
         
         success: function(data) {
             if (data.resultadosClientes && data.resultadosClientes.length > 0) {
-
+                
+                console.log('Clientes encontrados:', data.resultadosClientes);
                 // Obtener el cliente con id == clienteId
                 const cliente = data.resultadosClientes.find(cliente => cliente.id == clienteId);
                 //const cliente = data.resultadosClientes[0];
-                const nombre = cliente.nombre;
+                const nombre = cliente.nombre || cliente.razonSocial;
                 const apellido = cliente.apellido;
                 const codigoSN = cliente.codigoSN;
 

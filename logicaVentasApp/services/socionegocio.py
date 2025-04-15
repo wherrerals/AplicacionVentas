@@ -181,9 +181,12 @@ class SocioNegocio:
             if buscar_por_nombre:
                 # Si se busca por nombre, usa el repositorio que busca por nombre
                 resultados_clientes = SocioNegocioRepository.buscarClientesPorNombre(identificador)
+                print("resultados_clientesXXX", resultados_clientes)
             else:
                 # Si no, se busca por rut (número)
+                
                 resultados_clientes = SocioNegocioRepository.buscarClientesPorRut(identificador)
+                print("resultados_clientes", resultados_clientes)
 
             if not resultados_clientes:
                 logging.info(f"No se encontraron resultados para el identificador: {identificador}")
@@ -225,6 +228,8 @@ class SocioNegocio:
                     'direcciones': direcciones_formateadas,
                     'contactos': contactos_formateados
                 })
+
+            print("resultados_formateados", resultados_formateados)
 
             return resultados_formateados
         

@@ -72,7 +72,7 @@ $(document).ready(function () {
     let parametros = {};
 
     // Limpiar la "C" al final del valor si existe
-    if (inputValue.endsWith("C")) {
+    if (inputValue.endsWith("C") || inputValue.endsWith("c")) {
       inputValue = inputValue.slice(0, -1); // Remueve la última letra "C"
     }
 
@@ -137,7 +137,7 @@ $(document).ready(function () {
             let cadCode = event.target.getAttribute("data-cadcode");
 
             // Eliminar la "C" final si está presente
-            if (cadCode && cadCode.endsWith("C")) {
+            if (cadCode && cadCode.endsWith("C") || cadCode && cadCode.endsWith("c")) {
               cadCode = cadCode.slice(0, -1);
             }
 
@@ -209,7 +209,7 @@ $(document).ready(function () {
             let cadCode = event.target.getAttribute("data-rut");
 
             // Eliminar la "C" final si está presente
-            if (cadCode && cadCode.endsWith("C")) {
+            if (cadCode && cadCode.endsWith("C") || cadCode && cadCode.endsWith("c")) {
               cadCode = cadCode.slice(0, -1);
             }
 

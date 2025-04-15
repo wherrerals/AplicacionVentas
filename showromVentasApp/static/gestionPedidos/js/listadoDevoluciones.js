@@ -192,7 +192,7 @@ showLoadingOverlay();
                 let cadCode = event.target.getAttribute('data-cadcode');
         
                 // Eliminar la "C" final si está presente
-                if (cadCode && cadCode.endsWith("C")) {
+                if (cadCode && cadCode.endsWith("C") || cadCode && cadCode.endsWith("c")) {
                     cadCode = cadCode.slice(0, -1);
                 }
         

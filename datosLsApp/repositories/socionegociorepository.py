@@ -82,6 +82,8 @@ class SocioNegocioRepository:
     
     def obtenerPorCodigoSN(self, codigoSN):
 
+        codigoSN = codigoSN.replace("C", "").replace("c", "").replace("-", "").replace(".", "").replace(" ", "").strip()
+
         card_code = f"{codigoSN}C"
         card_code_min = card_code.lower()
 

@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
           console.log("Tipo de comentarios: ", comentarios);
           
 
-          if (cardCode.endsWith("C")) {
+          if (cardCode.endsWith("C") || cardCode.endsWith("c")) {
             cardCode = cardCode.slice(0, -1);
           }
 

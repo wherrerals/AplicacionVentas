@@ -131,7 +131,10 @@ class SocioNegocioView(FormView):
                 # Búsqueda por número (rut)
                 if numero:
                     # Limpiar la "C" al final del número si existe
-                    numero = numero.rstrip('C')
+                    numero = numero.replace('C', '').replace('c', '')
+                    
+                    print("Número:", numero)  # Para depuración
+                    
                     resultados_por_numero = SocioNegocio.buscarSocioNegocio(numero)
                     resultados.extend(resultados_por_numero)
 

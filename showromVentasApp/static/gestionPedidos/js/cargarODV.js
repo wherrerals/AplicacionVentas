@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
             tipoEntregaSelect.value = tipoentrega;
           }
   
-            if (cardCode.endsWith("C")) {
+            if (cardCode.endsWith("C") || cardCode.endsWith("c")) {
               cardCode = cardCode.slice(0, -1);
             }
   
