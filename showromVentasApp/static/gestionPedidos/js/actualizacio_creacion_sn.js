@@ -13,6 +13,7 @@ formularios.forEach(formulario => {
         const nombre = document.getElementById('nombreSN').value;
         const apellido = document.getElementById('apellidoSN').value;
         const rut = document.getElementById('rutSN').value;
+        const cardCode = document.getElementById('inputCliente').getAttribute('data-codigosn') || null;
         const tipo = document.querySelector('input[name="grupoSN"]:checked').value;
         const email = document.getElementById('emailSN').value;
         const telefono = document.getElementById('telefonoSN').value;
@@ -96,6 +97,7 @@ formularios.forEach(formulario => {
             apellidoSN: apellido,
             tipoSN: tipo,
             rutSN: rut,
+            cardCodeSN: cardCode,
             emailSN: email,
             telefonoSN: telefono,
             giroSN: giro,

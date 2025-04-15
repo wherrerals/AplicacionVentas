@@ -887,6 +887,8 @@ class SocioNegocio:
         # get data from request
         bp_data = self.request
 
+        print(f"bp_data: {bp_data}")
+
         # validating mandatory data
         is_valid, message = self.verify_valid_rut(self.rut)
         
@@ -899,7 +901,7 @@ class SocioNegocio:
         exiting_bp = SocioNegocioRepository.get_by_rut(self.rut)
 
         if exiting_bp is not None:
-            return self.process_existing_bp(SocioNegocio.generate_bp_code(self.rut), exiting_bp, newData=bp_data)
+            return self.process_existing_bp(bp_data.get('cardCodeSN'), exiting_bp, newData=bp_data)
         
         # processing the new business partner
         self.process_new_bp(SocioNegocio.generate_bp_code(self.rut), bp_data)
