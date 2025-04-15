@@ -723,6 +723,8 @@ class APIClient:
         print(f"URL: {url}")
         print(f"Headers: {headers}")
 
+        print(f"Data: {data}")
+
         try:
 
             response = self.session.patch(url, json=data, headers=headers, verify=False)

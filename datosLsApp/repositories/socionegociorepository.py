@@ -101,6 +101,24 @@ class SocioNegocioRepository:
 
         print("No se encontró socio de negocio con código:", codigoSN)
         return None
+    
+    def obtenerPorCodigoSN2(self, codigoSN):
+        """
+        Obtiene un socio de negocio por su código
+        
+        params:
+            codigoSN: str
+
+            - Código del socio de negocio a buscar
+        
+        return:
+            SocioNegocioDB | None
+        """
+        
+        try:
+            return SocioNegocioDB.objects.get(codigoSN=codigoSN)
+        except SocioNegocioDB.DoesNotExist:
+            return None
 
 
     @staticmethod

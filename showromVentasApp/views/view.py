@@ -1147,7 +1147,7 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
                     contactos = datossocio.nombre
 
             sucursal = data.get('sucursal')
-            datossocio = snrepo.obtenerPorCodigoSN(codigoSn)
+            datossocio = snrepo.obtenerPorCodigoSN2(codigoSn)
 
             detalle_sucursal = SucursalDB.objects.filter(codigo=sucursal).first()
 
@@ -1256,7 +1256,9 @@ def generar_cotizacion_pdf(request, cotizacion_id):
         # Obtener datos del cliente
         codigoSn = data.get('rut')
         snrepo = SocioNegocioRepository()
-        datossocio = snrepo.obtenerPorCodigoSN(codigoSn)
+        datossocio = snrepo.obtenerPorCodigoSN2(codigoSn)
+
+        print(f"Datos del socio: {datossocio}")
 
         email_socio = datossocio.email.lower()
         if email_socio == 'null':

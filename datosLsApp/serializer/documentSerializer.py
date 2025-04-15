@@ -53,7 +53,6 @@ class SerializerDocument:
             warehouseCode = linea.get('WarehouseCode')
 
             nueva_linea = {
-                'TreeType': treeType,
                 'ItemCode': item_code,
                 'Quantity': linea.get('Quantity'),
                 'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
@@ -65,7 +64,7 @@ class SerializerDocument:
                 'ShippingMethod': linea.get('ShippingMethod'),
                 'COGSCostingCode': linea.get('COGSCostingCode'),
                 'CostingCode2': linea.get('CostingCode2'),
-                'COGSCostingCode2': linea.get('COGSCostingCode2'),
+                'TreeType': treeType
             }
 
             lineas_json.append(nueva_linea)
