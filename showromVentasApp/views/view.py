@@ -1249,11 +1249,8 @@ def prueba(request):
 @require_POST
 def generar_cotizacion_pdf(request, cotizacion_id):
     try:
-        # Parsear JSON de la solicitud
         data = json.loads(request.body)
-        logger.info(f"Data recibida para PDF: {data}")
 
-        # Obtener datos del cliente
         codigoSn = data.get('rut')
         snrepo = SocioNegocioRepository()
         datossocio = snrepo.obtenerPorCodigoSN2(codigoSn)

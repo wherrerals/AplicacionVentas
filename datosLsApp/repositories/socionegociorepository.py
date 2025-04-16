@@ -1,5 +1,6 @@
 from datosLsApp.models import SocioNegocioDB
 
+
 class SocioNegocioRepository:
 
     """
@@ -121,7 +122,32 @@ class SocioNegocioRepository:
             return SocioNegocioDB.objects.get(codigoSN=codigoSN)
         except SocioNegocioDB.DoesNotExist:
             return None
+    
+    def data_bp_for_pdf(codigoSN, sucursal):
 
+        from datosLsApp.models.contactodb import ContactoDB
+        from datosLsApp.models.direcciondb import DireccionDB
+        from datosLsApp.models.sucursaldb import SucursalDB
+
+        data_bp = SocioNegocioDB.objects.get(codigoSN=codigoSN)
+        address = DireccionDB.objects.filter(SocioNegocio=data_bp.codigoSN, tipoDireccion="13").first()
+        contact = ContactoDB.objects.filter(SocioNegocio=data_bp.codigoSN).first()
+        branch_detail = SucursalDB.objects.filter(codigo=sucursal).first()
+
+        def clean(value):
+            return '' if value in (None, 'null') else value
+
+        data = {
+            "name": f"{data_bp.nombre} {data_bp.apellido}" if data_bp.tipoSN == "105" else data_bp.razonSocial,
+            "email": clean(data_bp.email),
+            "phone": clean(data_bp.telefono),
+            "address": clean(address.comuna.nombre) if address else '',
+            "contact": clean(contact.nombre) if contact else '',
+            "contact_phone": clean(contact.telefono) if contact else '',
+            "branch_detail": clean(branch_detail.codigo) if branch_detail else '',
+        }
+
+        return data
 
     @staticmethod
     def actualizarCliente(codigoSN, datosActualizados):

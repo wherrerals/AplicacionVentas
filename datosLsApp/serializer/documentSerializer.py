@@ -13,6 +13,12 @@ class SerializerDocument:
 
     @staticmethod
     def document_serializer(doc_data):
+
+        if doc_data.get('DocEntry'):
+            actualizar = True
+            client = APIClient()
+        else:
+            actualizar = False
         
         type_sales = Seller.tipoVentaTipoVendedor(doc_data.get('SalesPersonCode'))
         
@@ -23,27 +29,15 @@ class SerializerDocument:
                     
         addres_bill, address_ship = Direccion.assign_bill_ship_addres(doc_data.get('Address'), doc_data.get('Address2'))
         
-        cabecera = {
-            'DocDate': doc_data.get('DocDate'),
-            'DocDueDate': doc_data.get('DocDueDate'),
-            'TaxDate': doc_data.get('TaxDate'),
-            'DocTotal': doc_data.get('DocTotal'),
-            'CardCode': doc_data.get('CardCode'),
-            'NumAtCard': doc_data.get('NumAtCard'),
-            'Comments': doc_data.get('Comments'),
-            'PaymentGroupCode': doc_data.get('PaymentGroupCode'),
-            'SalesPersonCode': doc_data.get('SalesPersonCode'),
-            'TransportationCode': doc_data.get('TransportationCode'),
-            'U_LED_TIPVTA': type_sales,
-            'U_LED_TIPDOC': doc_data.get('U_LED_TIPDOC'),
-            'U_LED_FORENV': doc_data.get('TransportationCode'),
-        }
+        cabecera = SerializerDocument.create_header(doc_data, doc_data.get('DocEntry'), type_sales)
 
         repo_producto = ProductoRepository()
         lineas_json = []
 
         for linea in doc_data.get('DocumentLines', []):
             item_code = linea.get('ItemCode')
+            receta_line_num = linea.get('LineNum')  # Este es el LineNum base de la receta
+
             
             if repo_producto.es_receta(item_code):
                 treeType = 'iSalesTree'
@@ -53,6 +47,7 @@ class SerializerDocument:
             warehouseCode = linea.get('WarehouseCode')
 
             nueva_linea = {
+                'lineNum': receta_line_num,
                 'ItemCode': item_code,
                 'Quantity': linea.get('Quantity'),
                 'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
@@ -68,6 +63,22 @@ class SerializerDocument:
             }
 
             lineas_json.append(nueva_linea)
+            
+            if actualizar and linea.get('DocEntry_line') != 'null':
+                if repo_producto.es_receta(item_code):
+                    componentes = client.productTreesComponents(item_code)
+                    componente_line_num = int(receta_line_num) + 1
+
+
+                    for componente in componentes.get('ProductTreeLines', [{}]):
+                        lineas_json.append({
+                            'lineNum': componente_line_num, # +1 
+                            'ItemCode': componente['ItemCode'],
+                            'TreeType': 'iIngredient'
+                        })
+
+                        componente_line_num += 1  # Incrementamos para el siguiente componente
+
 
         taxExtension = {
             "StreetS": addres_bill.calleNumero,
@@ -81,9 +92,56 @@ class SerializerDocument:
             "StateB": address_ship.region.numero,
             "CountryB": "CL",
         } 
-    
+
+        dic = {
+            **cabecera,
+            'DocumentLines': lineas_json,
+            'TaxExtension': taxExtension
+        }
+
+        print(f"Json: {dic}")
+
         return {
             **cabecera,
             'DocumentLines': lineas_json,
             'TaxExtension': taxExtension
         }
+    
+    @staticmethod
+    def create_header(doc_data, docentry, type_sales):
+
+        print(f"DocEntry: {docentry}")
+
+        if docentry is not None and docentry != '':
+            cabecera = {
+                'DocDate': doc_data.get('DocDate'),
+                'DocDueDate': doc_data.get('DocDueDate'),
+                'TaxDate': doc_data.get('TaxDate'),
+                'DocTotal': doc_data.get('DocTotal'),
+                'NumAtCard': doc_data.get('NumAtCard'),
+                'Comments': doc_data.get('Comments'),
+                'PaymentGroupCode': doc_data.get('PaymentGroupCode'),
+                'SalesPersonCode': doc_data.get('SalesPersonCode'),
+                'TransportationCode': doc_data.get('TransportationCode'),
+                'U_LED_TIPVTA': type_sales,
+                'U_LED_TIPDOC': doc_data.get('U_LED_TIPDOC'),
+                'U_LED_FORENV': doc_data.get('TransportationCode'),
+            }
+        else:
+            cabecera = {
+                'DocDate': doc_data.get('DocDate'),
+                'DocDueDate': doc_data.get('DocDueDate'),
+                'TaxDate': doc_data.get('TaxDate'),
+                'DocTotal': doc_data.get('DocTotal'),
+                'CardCode': doc_data.get('CardCode'),
+                'NumAtCard': doc_data.get('NumAtCard'),
+                'Comments': doc_data.get('Comments'),
+                'PaymentGroupCode': doc_data.get('PaymentGroupCode'),
+                'SalesPersonCode': doc_data.get('SalesPersonCode'),
+                'TransportationCode': doc_data.get('TransportationCode'),
+                'U_LED_TIPVTA': type_sales,
+                'U_LED_TIPDOC': doc_data.get('U_LED_TIPDOC'),
+                'U_LED_FORENV': doc_data.get('TransportationCode'),
+            }
+
+        return cabecera
