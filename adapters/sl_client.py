@@ -342,6 +342,8 @@ class APIClient:
             raise
 
     def getInfoSN(self, cardCode):
+        #eliminar c, C, - y . del cardCode
+        cardCode = cardCode.replace("C", "").replace("c", "").replace("-", "").replace(".", "").replace(" ", "").strip()
         card_code  = f"{cardCode}C"
         card_code_min = card_code.lower()
 
