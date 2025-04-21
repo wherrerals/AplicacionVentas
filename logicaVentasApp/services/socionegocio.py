@@ -889,12 +889,10 @@ class SocioNegocio:
 
     #Creacion Socio Negocio
     def create_or_update_bp(self):
-        # get data from request
         bp_data = self.request
 
         print(f"bp_data: {bp_data}")
 
-        # validating mandatory data
         is_valid, message = self.verify_valid_rut(self.rut)
         
         if not is_valid:
@@ -903,10 +901,16 @@ class SocioNegocio:
         try:
             self.validate_madatary_data_bp()
         except ValidationError as e:
-            # Puedes adaptar el mensaje como prefieras
             return JsonResponse({'success': False, 'message': str(e)}, status=400)
+        
+        rut_sap = self.rut.split("-")[0] + "C"
 
         exiting_bp = SocioNegocioRepository.get_by_rut(self.rut)
+        exiting_bp_sap = self.verify_sap_bp(rut_sap)
+
+        if exiting_bp_sap:
+            self.crearYresponderCliente(rut_sap, rut_sap)
+            return JsonResponse({'success': True, 'message': 'Cliente Creado desde SAP exitosamente'})
 
         if exiting_bp is not None:
             return self.process_existing_bp(bp_data.get('cardCodeSN'), exiting_bp, newData=bp_data)
