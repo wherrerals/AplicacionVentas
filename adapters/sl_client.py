@@ -4,6 +4,8 @@ import json
 from django.conf import settings
 import logging
 
+from adapters.batch.batch_product import BatchProduct
+
 logger = logging.getLogger(__name__)
 
 
@@ -924,3 +926,23 @@ class APIClient:
         response = self.session.get(url, verify=False)
         response.raise_for_status()
         return response.json()
+
+    def bacth_processes_products(self, listItems):
+
+        listItems = [{"ItemCode": "A10000035"}, {"ItemCode": "A10000037"}]
+
+        body, boundary, changeset_boundary = BatchProduct.generate_batch(listItems)
+
+        headers = {"Content-Type": f"multipart/mixed;boundary={boundary}"}
+
+        print("body:", body)
+
+        batch_response = self.session.post(f"{self.base_url}/$batch", data=body, headers=headers, verify=False)     
+
+        print("Status:", batch_response.status_code)
+        print("Content-Type:", batch_response.headers.get("Content-Type"))
+        print("Text:", batch_response.text)
+
+        if batch_response.status_code == 202:
+            print("Batch process completed successfully.")
+        return True
