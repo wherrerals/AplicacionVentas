@@ -143,19 +143,15 @@ class OdvView(View):
         try:
             data = json.loads(request.body)
 
-            users_data = self.user_data(request)
+            #users_data = self.user_data(request)
             docEntry = data.get("DocEntry")
             docnum = data.get("DocNum")
             odv = OrdenVenta()
-
             if docEntry:
-                if self.validar_vendedor(users_data['vendedor'], data['SalesPersonCode']) == True:
-                    actualizacion = odv.actualizarDocumento(docnum, docEntry, data)
-                    return JsonResponse(actualizacion, status=200)
-                else:
-                    data['SalesPersonCode'] = users_data['vendedor']
-                    creacion = odv.crearDocumento(data)
-                    return JsonResponse(creacion, status=201)
+                actualizacion = odv.actualizarDocumento(docnum, docEntry, data)
+                print(actualizacion)
+                return JsonResponse(actualizacion, status=200)
+            
             else:
                 creacion = odv.crearDocumento(data)
                 return JsonResponse(creacion, status=201)
