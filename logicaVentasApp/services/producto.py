@@ -47,8 +47,16 @@ class Producto:
         print(f"Conteo de productos para {tipo}: {conteo}")
 
         # Verificar si el conteo es válido
-        if not isinstance(conteo, dict) or 'value' not in conteo or not conteo['value']:
+        if not isinstance(conteo, dict) or 'value' not in conteo:
             raise ValueError(f"El conteo de productos no es válido en {tipo}")
+
+        # Si no hay productos, dejar skip en 0 y salir del proceso
+        if not conteo['value']:
+            print(f"No hay productos para sincronizar en {tipo}. Reiniciando skip.")
+            skip = 0
+            state.value = 0
+            state.save()
+            return f"No hay productos para sincronizar en {tipo}"
 
         total_items = conteo['value'][0].get('ItemsCount', 0)
 
