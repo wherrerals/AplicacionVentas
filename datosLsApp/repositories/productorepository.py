@@ -9,17 +9,6 @@ from django.db.models import Sum, F
 
 class ProductoRepository:
     def calculate_margen_descuentos(self, precio_venta, costo, rentabilidad_minima):
-        """
-        Calcula el margen bruto y el descuento máximo.
-        
-        Args:
-            precio_venta (float): Precio de venta del producto.
-            costo (float): Costo del producto.
-            rentabilidad_minima (float): Rentabilidad mínima en porcentaje.
-
-        Returns:
-            tuple: Margen bruto y descuento máximo.
-        """
 
         if precio_venta <= 0 or costo <= 0:
             return 0, 0
@@ -30,12 +19,7 @@ class ProductoRepository:
             return margen_bruto, max(descuento_maximo, 0)  # Asegurar que no sea negativo
 
     def sync_products_and_stock(self, products):
-        """
-        Sincroniza los productos y su stock en bodegas.
-        
-        Args:
-            products (list): Lista de diccionarios con datos de productos y su stock.
-        """
+
         rentabilidad_minima = 50
         productos_procesados = []
         
@@ -127,8 +111,8 @@ class ProductoRepository:
             item_code_componente = componente["ItemCode"]
             cantidad_necesaria = componente["Quantity"]
             
-            stock_componente = self.obtener_stock_componente(item_code_componente)        
-            costo_componente = self.obtener_costo_componente(item_code_componente)
+            stock_componente = self.obtener_stock_componentes_db_receta(item_code_componente)        
+            costo_componente = self.obtener_costo_componente_db(item_code_componente)
 
             # Calcular el total del stock del componente en todas sus bodegas
             stock_total_componente = sum(stock_componente.values())
@@ -167,7 +151,7 @@ class ProductoRepository:
 
 
     def obtener_stock_componente(self, item_code):
-        """Obtiene el stock disponible de un componente desde la API, filtrando por bodegas específicas."""
+
         ApiClientSL = APIClient()
         stock_data = ApiClientSL.urlPrueba(item_code)
 
@@ -183,25 +167,37 @@ class ProductoRepository:
             for bodega in warehouses
             if bodega["WarehouseCode"] in bodegas_permitidas
         }
+    
+    def obtener_stock_componentes_db_receta(self, item_code):
+        # Lista de bodegas permitidas (usando los nombres como están en la BD)
+        bodegas_permitidas = {"ME", "PH", "LC"}
         
+        # Obtener los registros de stock para el producto
+        stocks = StockBodegasDB.objects.filter(
+            idProducto__codigo=item_code,
+            idBodega__nombre__in=bodegas_permitidas
+        ).values("idBodega__nombre", "stock")
+        
+        # Crear el diccionario en el mismo formato que el otro método
+        return {
+            stock["idBodega__nombre"]: stock["stock"]
+            for stock in stocks
+        }
 
     def obtener_costo_componente(self, item_code):
-        """Obtiene el costo promedio del componente desde la API."""
+
         ApiClientSL = APIClient()
         item_data = ApiClientSL.urlPrueba(item_code)
         return item_data.get("AvgStdPrice", 0.0)
 
-
+    def obtener_costo_componente_db(self, item_code):
+        try:
+            producto = ProductoDB.objects.get(codigo=item_code)
+            return producto.costo
+        except ProductoDB.DoesNotExist:
+            return 0.0
 
     def sync_stock(self, producto, bodegas):
-        """
-        Sincroniza la información de stock para un producto en las bodegas.
-
-        Args:
-            producto (ProductoDB): Instancia del producto.
-            bodegas (list): Lista de diccionarios con datos de las bodegas y su stock.
-        """
-
 
         for bodega_data in bodegas:
 
@@ -240,12 +236,7 @@ class ProductoRepository:
 
 
     def update_stock_total(self, producto):
-        """
-        Calcula y actualiza el stock total del producto sumando el stock disponible en las bodegas.
 
-        Args:
-            producto (ProductoDB): Instancia del producto.
-        """
         stock_total = StockBodegasDB.objects.filter(idProducto=producto).aggregate(
             total_stock=Sum('stock')
         )['total_stock'] or 0
@@ -256,32 +247,22 @@ class ProductoRepository:
 
 
     def descuentoMax(sku):
-        """
-        metodo para obtener el descuento maximo del producto
-        """
+
         producto = ProductoDB.objects.get(codigo=sku)
         
         return producto.dsctoMaxTienda
     
     def obtenerPrecioLista(sku):
-        """
-        metodo para obtener el precio de lista del producto
-        """
+
         producto = ProductoDB.objects.get(codigo=sku)
         return producto.precioLista
     
     def obtenerImagenProducto(codigo):
-        """
-        metodo para obtener la imagen por medio del codigo del producto
-        """
         
         producto = ProductoDB.objects.get(codigo=codigo)
         return producto.imagen
     
     def obtenerMarcaProducto(codigo):
-        """
-        metodo para obtener la marca por medio del codigo del producto
-        """
         
         producto = ProductoDB.objects.get(codigo=codigo)
         return producto.marca
@@ -339,47 +320,20 @@ class ProductoRepository:
             return result[0] if result else 0
         
     def obtener_precio_unitario_neto(self, sku):
-        """
-        Obtiene el precio neto de un producto, considerando el precio de lista y el descuento máximo.
-        
-        Args:
-            sku (str): Código del producto.
-        
-        Returns:
-            float: Precio neto del producto.
-        """
-        
+
         producto = ProductoDB.objects.get(codigo=sku)
         precioventaunitario = producto.precioVenta
         return round(precioventaunitario / 1.19, 4)
         #return precioventaunitario
 
     def obtener_precio_unitario_bruto(self, sku):
-        """
-        Obtiene el precio neto de un producto, considerando el precio de lista y el descuento máximo.
-        
-        Args:
-            sku (str): Código del producto.
-        
-        Returns:
-            float: Precio neto del producto.
-        """
-        
+
         producto = ProductoDB.objects.get(codigo=sku)
         precioventaunitario = producto.precioVenta
         return precioventaunitario
 
     def es_receta(self, item_code):
-        """
-        Verifica si un producto es una receta.
-        
-        Args:
-            item_code (str): Código del producto.
-        
-        Returns:
-            bool: True si es una receta, False en caso contrario.
-        """
-        
+
         try:
             producto = ProductoDB.objects.get(codigo=item_code)
             return producto.TreeType == "iSalesTree"

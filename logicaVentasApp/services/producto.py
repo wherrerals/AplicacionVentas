@@ -28,15 +28,15 @@ class Producto:
                 "count": lambda cliente, tipo: cliente.contarProductos(tipo=tipo),
                 "sync": lambda cliente, skip, tipo: cliente.obtenerProductosSL(skip=skip, tipo=tipo)
             },
-            "receta": {
-                "count": lambda cliente, tipo: cliente.contarProductos(tipo=tipo),
-                "sync": lambda cliente, skip, tipo: cliente.obtenerProductosSL(skip=skip, tipo=tipo)
-            },
             "importado": {
                 "count": lambda cliente, tipo: cliente.contarProductos(tipo=tipo),
                 "sync": lambda cliente, skip, tipo: cliente.obtenerProductosSL(skip=skip, tipo=tipo)
+            },
+            "receta": {
+                    "count": lambda cliente, tipo: cliente.contarProductos(tipo=tipo),
+                    "sync": lambda cliente, skip, tipo: cliente.obtenerProductosSL(skip=skip, tipo=tipo)
+                }
             }
-        }
 
         # Crear instancia de APIClient
         cliente = APIClient()
