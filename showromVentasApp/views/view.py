@@ -826,6 +826,7 @@ def busquedaProductos(request):
                 'maxDescuento': limitar_descuento(producto, users_data),  # Aplica el nuevo método aquí
             }
             for producto in resultados
+            if producto.precioVenta > 0
         ]
 
         return JsonResponse({'resultados': resultados_formateados})
