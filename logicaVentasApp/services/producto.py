@@ -82,6 +82,7 @@ class Producto:
         # Incrementar el valor de `skip` si la sincronización fue exitosa
         if creacion and listadoProductos:
             #synced_count = len(jsonserializado)
+            cliente.bacth_processes_products(listadoProductos)
             synced_count = len(listadoProductos)
             total_synced += synced_count
             
@@ -92,7 +93,7 @@ class Producto:
             empty_count = 0  # Resetear el contador de intentos vacíos
 
         # Retornar el mensaje con la cantidad de productos sincronizados
-        return f"{total_synced} productos sincronizados exitosamente{listadoProductos} para el tipo {tipo}"
+        return listadoProductos
 
     
     def obtenerReceta(self, codigo):

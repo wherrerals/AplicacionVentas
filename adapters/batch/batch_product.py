@@ -19,7 +19,7 @@ class BatchProduct:
 
         if listItems:
             for item in listItems:
-                item_code = item['ItemCode']
+                item_code = item
                 body_parts.append(f"--{changeset_boundary}")
                 body_parts.append("Content-Type: application/http")
                 body_parts.append("Content-Transfer-Encoding: binary")

@@ -657,11 +657,11 @@ class APIClient:
         self.__login()
         select = "ItemCode,ItemName,TreeType,SalesItem,InventoryItem,AvgStdPrice,U_LED_MARCA,U_LED_ARTDESC,Frozen,UpdateDate,UpdateTime,ItemPrices,ItemWarehouseInfoCollection"
         if tipo == "nacional":
-            filter = "SalesItem eq 'tYES' and U_Origin eq 'N' and TreeType eq 'iNotATree' and Frozen eq 'tNO'"
+            filter = "SalesItem eq 'tYES' and U_Origin eq 'N' and TreeType eq 'iNotATree' and U_LED_SYNC eq 1"
         elif tipo == "importado":
-            filter = "SalesItem eq 'tYES' and U_Origin ne 'N' and TreeType eq 'iNotATree' and Frozen eq 'tNO'"
+            filter = "SalesItem eq 'tYES' and U_Origin ne 'N' and TreeType eq 'iNotATree' and U_LED_SYNC eq 1"
         else:
-            filter = "SalesItem eq 'tYES' and TreeType ne 'iNotATree' and Frozen eq 'tNO'"        
+            filter = "SalesItem eq 'tYES' and TreeType ne 'iNotATree' and U_LED_SYNC eq 1"        
         
         order_by = "ItemCode asc"
 
@@ -872,11 +872,11 @@ class APIClient:
         self.__login()
         
         if tipo == "nacional":
-            filter = "SalesItem eq 'tYES' and U_Origin eq 'N' and TreeType eq 'iNotATree' and Frozen eq 'tNO'"
+            filter = "SalesItem eq 'tYES' and U_Origin eq 'N' and TreeType eq 'iNotATree' and U_LED_SYNC eq 1"
         elif tipo == "importado":
-            filter = "SalesItem eq 'tYES' and U_Origin ne 'N' and TreeType eq 'iNotATree' and Frozen eq 'tNO'"
+            filter = "SalesItem eq 'tYES' and U_Origin ne 'N' and TreeType eq 'iNotATree' and U_LED_SYNC eq 1"
         else:
-            filter = "SalesItem eq 'tYES' and TreeType ne 'iNotATree' and Frozen eq 'tNO'"        
+            filter = "SalesItem eq 'tYES' and TreeType ne 'iNotATree' and U_LED_SYNC eq 1"        
         
         url = f"{self.base_url}Items?$apply=aggregate($count as ItemsCount)&$filter={filter}"
         response = self.session.get(url, verify=False)
@@ -928,8 +928,6 @@ class APIClient:
         return response.json()
 
     def bacth_processes_products(self, listItems):
-
-        listItems = [{"ItemCode": "A10000035"}, {"ItemCode": "A10000037"}]
 
         body, boundary, changeset_boundary = BatchProduct.generate_batch(listItems)
 
