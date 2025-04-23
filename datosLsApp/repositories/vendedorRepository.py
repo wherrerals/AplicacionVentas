@@ -7,8 +7,11 @@ class VendedorRepository:
         Obtiene el tipo de vendedor.
         """
 
-        vendedor = VendedorDB.objects.get(codigo=codigo)
-        return vendedor.tipoVendedor
+        try:
+            vendedor = VendedorDB.objects.get(codigo=codigo)
+            return vendedor.tipoVendedor
+        except VendedorDB.DoesNotExist:
+            return 'NA'
     
     def obtenerNombreVendedor(codigo):
         """
