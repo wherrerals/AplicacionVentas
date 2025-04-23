@@ -812,13 +812,12 @@ def busquedaProductos(request):
         numero = request.GET.get('numero')
         users_data = user_data(request)
 
-        # Realiza la consulta a la base de datos para obtener los resultados
         resultados = ProductoDB.objects.filter(Q(codigo__icontains=numero) | Q(nombre__icontains=numero))
-        # Convierte los resultados en una lista de diccionarios
+
         resultados_formateados = [
             {
                 'codigo': producto.codigo,
-                'nombre': producto.nombre,
+                'nombre': producto.nombre + " (Descontinuado)" if producto.descontinuado == "1" else producto.nombre,
                 'imagen': producto.imagen,
                 'precio': producto.precioVenta,
                 'stockTotal': producto.stockTotal,
@@ -826,7 +825,7 @@ def busquedaProductos(request):
                 'maxDescuento': limitar_descuento(producto, users_data),  # Aplica el nuevo método aquí
             }
             for producto in resultados
-            if producto.precioVenta > 0
+            if producto.precioVenta > 0 and producto.inactivo != "tYES"
         ]
 
         return JsonResponse({'resultados': resultados_formateados})
