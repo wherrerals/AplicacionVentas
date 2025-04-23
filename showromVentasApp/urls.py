@@ -51,6 +51,7 @@ urlpatterns = [
     path('obtener_comuna_id/', view.obtenerComunasId, name='obtener_comuna_id'),
     path('obtener_stock_bodegas/', view.obtenerStockBodegas, name='obtener_stock'),
     path('detalles_cotizacion/', cotizacionView.detallesCotizacion, name='detalles_cotizacion'),
+    path('get_docEntry/', cotizacionView.get_docEntry, name='get_docEntry'),    
     path('duplicar_cotizacion/', cotizacionView.duplicarCotizacion, name='duplicar_cotizacion'),
     path('ordenesVentas/', view.odv, name='ordenesVentas'),
     path('solicitudes_devolucion/', view.return_requests, name='solicitudes_devolucion'),

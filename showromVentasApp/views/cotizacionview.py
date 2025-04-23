@@ -63,6 +63,7 @@ class CotizacionView(View):
         return {
             '/ventas/listado_Cotizaciones': self.listarCotizaciones, # Listado de cotizaciones, no es necesaria se deja para ver si es usada en otra parte del codigo. 
             '/ventas/detalles_cotizacion': self.detallesCotizacion,
+            '/ventas/get_docEntry': self.get_docEntry,
             '/ventas/duplicar_cotizacion': self.duplicarCotizacion,
             '/ventas/copiar_a_odv': self.copiarAODV,
         }
@@ -193,6 +194,19 @@ class CotizacionView(View):
             except json.JSONDecodeError as e:
                 return JsonResponse({'error': 'JSON inválido'}, status=400)
     
+    def get_docEntry(self, request):
+        
+        doc_num = request.GET.get('docNum')
+        type_document = request.GET.get('type_document')
+
+        request_sl = APIClient()
+
+        doc_entry = request_sl.get_docEntry_sl(type_document, doc_num)
+
+        print(f"DocEntry: {doc_entry}")
+
+        return JsonResponse(doc_entry, safe=False)
+
     def detallesCotizacion(self, request):
         # Obtener el parámetro 'docentry' de la solicitud
         docentry = request.GET.get('docentry')

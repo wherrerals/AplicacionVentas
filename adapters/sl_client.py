@@ -944,3 +944,22 @@ class APIClient:
         if batch_response.status_code == 202:
             print("Batch process completed successfully.")
         return True
+    
+    def get_docEntry_sl(self, type_document, doc_num):
+
+        select = f"$select=DocEntry&$filter=DocNum eq {doc_num}"
+        url = f"{self.base_url}{type_document}?{select}"
+
+        response = self.session.get(url, verify=False)
+        
+        print(f"URL: {url}")
+        print(f"Response: {response.status_code}")
+        # Verificar si la respuesta fue exitosa
+        if response.status_code == 200:
+            data = response.json()
+            if 'value' in data and len(data['value']) > 0:
+                doc_entry = data['value'][0].get('DocEntry')
+                return doc_entry
+        
+        # Si algo falló o no se encontró el documento
+        return None

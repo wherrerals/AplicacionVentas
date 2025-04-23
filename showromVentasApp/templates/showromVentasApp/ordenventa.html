@@ -91,8 +91,18 @@ input::-webkit-inner-spin-button {
   <div class="container">
     <div class="row" style="color: var(--bs-secondary-color);">
       <div class="col-sm-4" style="text-align: right;padding-right: 0px;">
-        <input type="search" placeholder="Buscar" style="width: 100%;">
+        <input type="search" placeholder="Buscar Numero Orden"  id="search_odv" style="width: 100%;">
       </div>
+
+      
+      <div class="col-auto">
+        <svg id="lupa-busqueda" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="gray"
+          class="bi bi-search" viewBox="0 0 16 16" style="cursor: pointer; margin-top: 6px">
+          <path
+            d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001a1.007 1.007 0 0 0-.058.058l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.059-.058zm-5.442-9.29a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11z" />
+        </svg>
+      </div>
+      
       <div class="col-7 col-sm-4" style="text-align: left;width: 189px;">
         <a class="btn btn-primary" role="button" href="{% url 'ordenesVentas' %}" style="font-size: 12px;">+ Nueva Orden de Venta</a>
       </div>
@@ -653,6 +663,7 @@ input::-webkit-inner-spin-button {
   <script src="{% static 'gestionPedidos/js/interaccionModalContactos.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/interaccionModalDirecciones.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/odv_insert.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/search_data_document.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/pdf_generetor3.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
