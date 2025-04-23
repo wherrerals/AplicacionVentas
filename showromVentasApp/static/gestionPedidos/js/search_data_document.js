@@ -48,11 +48,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
       
-      // Evento de click para el botón de búsqueda
+/*       // Evento de click para el botón de búsqueda
       searchButton.addEventListener('click', function() {
         const searchValue = searchInput.value.trim();
         processSearch(searchValue);
-      });
+      }); */
       
       // También permitir búsqueda al presionar Enter en el input
       searchInput.addEventListener('keypress', function(event) {
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Configurar manejadores para cada par de input/botón
-  handleSearch('search_quotate', 'search_quotate', '/ventas/generar_cotizacion/?docentry=${dato}');
-  handleSearch('search_odv', 'search_odv', '/ventas/ordenesVentas/?docentry=${dato}');
-  handleSearch('search_rr', 'search_rr', '/ventas/solicitudes_devolucion/?docentry=${dato}');
+  handleSearch('search_quotate', 'lupa-busqueda', '/ventas/generar_cotizacion/?docentry=${dato}');
+  handleSearch('search_odv', 'lupa-busqueda', '/ventas/ordenesVentas/?docentry=${dato}');
+  handleSearch('search_rr', 'lupa-busqueda', '/ventas/solicitudes_devolucion/?docentry=${dato}');
 });
