@@ -41,6 +41,7 @@ class SalesConsultationView(View):
 
         return {
             '/ventas/consulta-ventas': self.sales_consultation,
+            '/ventas/lista-ventas': self.sales_list_view,
         }
     
     def sales_consultation(self, request):
@@ -49,3 +50,9 @@ class SalesConsultationView(View):
         context = UserContext.user_context(authenticated_user, request)
 
         return render(request, 'salesConsultation.html', context)
+    
+    def sales_list_view(self, request):
+        authenticated_user = ValitadionApp.user_autentication(request)
+        context = UserContext.user_context(authenticated_user, request)
+
+        return render(request, 'list_sales_global.html', context)

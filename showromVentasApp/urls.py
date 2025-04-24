@@ -31,6 +31,7 @@ urlpatterns = [
     path('crear_devolucion/', ReturnsView.as_view(), name='crear_devolucion'),
     path('productos/', Productos.as_view(), name='productos'),
     path('consulta-ventas/', SalesConsultationView.as_view(), name='consulta_ventas'),
+    path('lista-ventas/', SalesConsultationView.as_view(), name='lista_ventas'),
     path('lista_cotizaciones/', view.list_quotations, name="lista_cotizaciones"),
     path('generar_cotizacion/', view.quotations, name="generar_cotizacion"),
     path('lista_ovs/', view.lista_ovs, name='lista_ovs'),
