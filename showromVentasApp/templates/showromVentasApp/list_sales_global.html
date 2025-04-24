@@ -1,0 +1,229 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title>Ventas Showroom V0.1</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles.min.css' %}">
+  <link rel="stylesheet" href="{% static 'gestionPedidos/css/moreStyles.css' %}">
+</head>
+
+<body>
+  <!-- Start: Navbar Right Links -->
+  {% include "barra.html" %}
+  <!-- End: Navbar Right Links -->
+  
+  
+<div class="row" style="color: var(--bs-secondary-color);background: var(--bs-body-color);">
+  <div class="col-sm-12" style="background: transparent;color: var(--bs-secondary-color);padding-top: 8px;height: 39px;text-align: center;">
+    <p style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);">Cotizaciones</p>
+  </div>
+</div>
+<div class="row" >
+  <div class="col">
+    <p></p>
+  </div>
+</div>
+<form id="filterForm">
+  <div class="container" style="padding: 0px;padding-left: 10px;">
+
+    <div class="row" style="color: var(--bs-secondary-color); font-size: 12px;">
+
+      <div class="col-sm-4" style="position: relative; text-align: right;">
+          <input class="form-control" type="search" id="buscarlistacootizacion" placeholder="Buscar" 
+                style="width: 100%; height: 32px; font-size: 12px; padding-right: 35px;">
+      </div>
+  
+      <!-- Nueva columna para mantener separación entre buscar y el botón -->
+      <div class="col-auto">
+          <svg id="lupa-busqueda" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="gray" class="bi bi-search" viewBox="0 0 16 16" style="cursor: pointer; margin-top: 6px;">
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001a1.007 1.007 0 0 0-.058.058l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.059-.058zm-5.442-9.29a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11z"/>
+          </svg>
+      </div>
+  
+      <div class="col-sm-3 col-md-4" style="text-align: left;">
+          <a class="btn btn-primary" role="button" id="btn_nva_cotizacion" style="text-align: left; font-size: 12px;" href="{% url 'generar_cotizacion' %}">+ Nueva Cotización</a>
+      </div>
+  
+      <div class="col" style="text-align: right;">
+          <div class="row">
+              <div class="col-sm-3 col-md-4" style="padding-right: 0px; padding-top: 5px;">
+                  <span>Inicio:&nbsp;</span>
+              </div>
+              <div class="col-sm-8 col-md-8">
+                  <input class="form-control" id="fecha_inicio" name="fecha_inicio" placeholder="Fecha inicio" type="date" style="font-size: 12px;">
+              </div>
+          </div>
+  
+          <div class="row">
+              <div class="col-sm-3 col-md-4" style="padding-right: 0px; padding-top: 5px;">
+                  <span>Fin:&nbsp;</span>
+              </div>
+              <div class="col-sm-8 col-md-8">
+                  <input class="form-control" id="fecha_fin" name="fecha_fin" placeholder="Fecha fin" type="date" style="font-size: 12px;">
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <nav>
+    <ul class="pagination" id="pagination-bottom">
+      <li class="page-item">
+        <a class="page-link" aria-label="Previous" href="#" id="prevButtonBottom">
+          <span aria-hidden="true">«</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" aria-label="Next" href="#" id="nextButtonBottom">
+          <span aria-hidden="true">»</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  
+    
+    <div class="row">
+      <div class="col">
+        <p></p>
+      </div>
+    </div>
+
+
+<!--       <div id="loader" style="display: none; text-align: center; padding: 20px;"> -->
+    <div id="" style="display: none; text-align: center; padding: 20px;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p>Cargando cotizaciones...</p>
+    </div>
+
+    <div class="row">
+      <div class="col" style="font-size: 12px;">
+        <div class="table-responsive" style="width: 100%;">
+          <table class="table">
+            <thead>
+              <tr style="background: var(--bs-body-color);">
+                <th style="background: transparent;color: var(--bs-table-bg);">
+                  <div>
+                    <span>SAP</span>
+                  </div>
+                  <div>
+                    <input class="form-control" type="search" id="buscar_num_sap" name="docNum" placeholder="Número de Documento" style="width: 100%;font-size: 12px;">
+                  </div>
+                </th>
+                <th style="background: transparent;color: var(--bs-table-bg);">
+                  <div>
+                    <span>Cliente</span>
+                  </div>
+                  <div>
+                    <input class="form-control" type="search" id="buscar_cliente" name="cardName" placeholder="Nombre del Cliente"style="width: 100%;font-size: 12px;">
+                  </div>
+                </th>
+                <th style="background: transparent;color: var(--bs-table-bg);">
+                  <div>
+                    <span>Vendedor</span>
+                  </div>
+                  <div>
+                    <select class="form-select" id="filtro_vendedor" name="salesEmployeeName" placeholder="Nombre del Vendedor" style="width: 90px;font-size: 12px;">
+                      <optgroup label="--">
+                        {% if 'Vendedor' in grupos_usuario  or 'Administrador' in grupos_usuario%}
+                          {% if username %}
+                            <option value="{{codigo_vendedor}}" selected="">Míos</option>
+                          {% endif %}
+                        {% endif %}
+                        {% if 'Administrador' in grupos_usuario %}
+                        <option value="">Todos</option>
+                        {% endif %}
+                      </optgroup>
+                    </select>
+                  </div>
+                </th>
+                <th style="background: transparent;color: var(--bs-table-bg);">
+                  <div>
+                    <span>Fecha</span>
+                  </div>
+                  <div>
+                    <input class="form-control" id="fecha_doc" name="fecha_documento" type="date" style="width: 100%;font-size: 12px;">
+                  </div>
+                </th>
+                <th style="background: transparent;color: var(--bs-table-bg);">
+                  <div>
+                    <span>Estado</span>
+                  </div>
+                  <div>
+                    <select class="form-select" id="filtro_estado" name="DocumentStatus" placeholder="Estado del Documento" style="width: 100px;font-size: 12px;">
+                      <optgroup label="Estado">
+                        <option value="" selected="">Todos</option>
+                        <option value="O" >Abierto</option>
+                        <option value="C">Cerrado</option>
+                        <option value="Y">Cancelado</option>
+                      </optgroup>
+                    </select>
+                  </div>
+                </th>
+                <th style="background: transparent;color: var(--bs-table-bg);">
+                  <div>
+                    <span>Neto</span>
+                  </div>
+                  <div>
+                    <input class="form-control" type="search" id="buscar_neto" name="docNeto" style="width: 100%;font-size: 12px; " readonly>
+                  </div>
+                </th>
+                <th style="background: transparent;color: var(--bs-table-bg);">
+                  <div>
+                    <span>Bruto</span>
+                  </div>
+                  <div>
+                    <input class="form-control" type="search" id="buscar_bruto" name="docTotal" placeholder="Total del Documento" style="width: 100%;font-size: 12px;">
+                  </div>
+                </th>
+              </tr>
+            </thead>
+              
+            <tbody id="listadoCotizaciones"> </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <nav>
+      <ul class="pagination">
+        <li class="page-item">
+          <a class="page-link" aria-label="Previous" href="#" id="prevButtonBottom">
+            <span aria-hidden="true">«</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" aria-label="Next" href="#" id="nextButtonBottom">
+            <span aria-hidden="true">»</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    
+  </div>
+
+</form>
+<div class="row" style="background: var(--bs-body-color);">
+  <div class="col">
+    <p></p>
+  </div>
+</div>
+
+<!-- Overlay de carga -->
+<div id="loadingOverlay" style="display: none;">
+  <div class="spinner"></div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'gestionPedidos/js/loader.js' %}"></script>
+<script src="{% static 'gestionPedidos/js/listadoCotizazcion.js' %}"></script>
+</body>
+
+</html>
