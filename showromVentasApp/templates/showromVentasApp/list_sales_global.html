@@ -29,76 +29,21 @@
   </div>
 </div>
 <form id="filterForm">
-  <div class="container" style="padding: 0px;padding-left: 10px;">
-
-    <div class="row" style="color: var(--bs-secondary-color); font-size: 12px;">
-
-        <div class="col-sm-4" style="text-align: right; padding-right: 0px">
-            <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" id="buscarlistacootizacion"  placeholder="Buscar N° Venta" aria-label="Search">
-                <button class="btn btn-outline-primary fw-bold" type="submit">Buscar</button>
-            </form>
-        </div>
+  <div class="container-fluid" style="padding: 0px;padding-left: 80px; padding-right: 80px;">
   
-      <div class="col" style="text-align: right;">
-          <div class="row">
-              <div class="col-sm-3 col-md-4" style="padding-right: 0px; padding-top: 5px;">
-                  <span>Inicio:&nbsp;</span>
-              </div>
-              <div class="col-sm-8 col-md-8">
-                  <input class="form-control" id="fecha_inicio" name="fecha_inicio" placeholder="Fecha inicio" type="date" style="font-size: 12px;">
-              </div>
-          </div>
-  
-          <div class="row">
-              <div class="col-sm-3 col-md-4" style="padding-right: 0px; padding-top: 5px;">
-                  <span>Fin:&nbsp;</span>
-              </div>
-              <div class="col-sm-8 col-md-8">
-                  <input class="form-control" id="fecha_fin" name="fecha_fin" placeholder="Fecha fin" type="date" style="font-size: 12px;">
-              </div>
-          </div>
-      </div>
-  </div>
-
-  <nav>
-    <ul class="pagination" id="pagination-bottom">
-      <li class="page-item">
-        <a class="page-link" aria-label="Previous" href="#" id="prevButtonBottom">
-          <span aria-hidden="true">«</span>
-        </a>
-      </li>
-      <li class="page-item">
-        <a class="page-link" aria-label="Next" href="#" id="nextButtonBottom">
-          <span aria-hidden="true">»</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-  
-    
     <div class="row">
       <div class="col">
         <p></p>
       </div>
     </div>
 
-
-<!--       <div id="loader" style="display: none; text-align: center; padding: 20px;"> -->
-    <div id="" style="display: none; text-align: center; padding: 20px;">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Cargando...</span>
-      </div>
-      <p>Cargando cotizaciones...</p>
-    </div>
-
     <div class="row">
       <div class="col" style="font-size: 12px;">
         <div class="table-responsive" style="width: 100%;">
-          <table class="table">
+          <table class="table" style="width: 100%;"">
             <thead>
               <tr style="background: #a6773a">
-                <th style="background: transparent;color: var(--bs-table-bg);">
+                <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">
                   <div>
                     <span>Nº SAP</span>
                   </div>
@@ -106,7 +51,7 @@
                     <input class="form-control" type="search" id="buscar_num_sap" name="docNum" placeholder="Número de Documento" style="width: 100%;font-size: 12px;">
                   </div>
                 </th>
-                <th style="background: transparent;color: var(--bs-table-bg);">
+                <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">
                     <div>
                       <span>Tipo de Documento:</span>
                     </div>
@@ -114,7 +59,7 @@
                       <input class="form-control" type="search" id="buscar_num_sap" name="docNum" placeholder="Número de Documento" style="width: 100%;font-size: 12px;">
                     </div>
                   </th>
-                  <th style="background: transparent;color: var(--bs-table-bg);">
+                  <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">
                     <div>
                       <span>Folio</span>
                     </div>
@@ -122,7 +67,7 @@
                       <input class="form-control" type="search" id="buscar_num_sap" name="docNum" placeholder="Número de Documento" style="width: 100%;font-size: 12px;">
                     </div>
                   </th>
-                <th style="background: transparent;color: var(--bs-table-bg);">
+                <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">
                   <div>
                     <span>Cliente</span>
                   </div>
@@ -130,26 +75,17 @@
                     <input class="form-control" type="search" id="buscar_cliente" name="cardName" placeholder="Nombre del Cliente"style="width: 100%;font-size: 12px;">
                   </div>
                 </th>
-                <th style="background: transparent;color: var(--bs-table-bg);">
+                <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">
                   <div>
                     <span>Vendedor</span>
                   </div>
                   <div>
-                    <select class="form-select" id="filtro_vendedor" name="salesEmployeeName" placeholder="Nombre del Vendedor" style="width: 90px;font-size: 12px;">
-                      <optgroup label="--">
-                        {% if 'Vendedor' in grupos_usuario  or 'Administrador' in grupos_usuario%}
-                          {% if username %}
-                            <option value="{{codigo_vendedor}}" selected="">Míos</option>
-                          {% endif %}
-                        {% endif %}
-                        {% if 'Administrador' in grupos_usuario %}
-                        <option value="">Todos</option>
-                        {% endif %}
-                      </optgroup>
+                    <select class="form-select" id="filtro_vendedor" name="salesEmployeeName" placeholder="Nombre del Vendedor" style="width: 100%;font-size: 12px;">
+                        <option value="" selected>Todos</option>
                     </select>
                   </div>
                 </th>
-                <th style="background: transparent;color: var(--bs-table-bg);">
+                <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">
                   <div>
                     <span>Fecha</span>
                   </div>
@@ -157,12 +93,12 @@
                     <input class="form-control" id="fecha_doc" name="fecha_documento" type="date" style="width: 100%;font-size: 12px;">
                   </div>
                 </th>
-                <th style="background: transparent;color: var(--bs-table-bg);">
+                <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">
                   <div>
                     <span>Estado</span>
                   </div>
                   <div>
-                    <select class="form-select" id="filtro_estado" name="DocumentStatus" placeholder="Estado del Documento" style="width: 100px;font-size: 12px;">
+                    <select class="form-select" id="filtro_estado" name="DocumentStatus" placeholder="Estado del Documento" style="width: 100%;font-size: 12px;">
                       <optgroup label="Estado">
                         <option value="" selected="">Todos</option>
                         <option value="O" >Abierto</option>
@@ -172,7 +108,7 @@
                     </select>
                   </div>
                 </th>
-                <th style="background: transparent;color: var(--bs-table-bg);">
+                <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">
                   <div>
                     <span>Neto</span>
                   </div>
@@ -180,7 +116,7 @@
                     <input class="form-control" type="search" id="buscar_neto" name="docNeto" style="width: 100%;font-size: 12px; " readonly>
                   </div>
                 </th>
-                <th style="background: transparent;color: var(--bs-table-bg);">
+                <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">
                   <div>
                     <span>Bruto</span>
                   </div>
@@ -229,8 +165,7 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- <script src="{% static 'gestionPedidos/js/loader.js' %}"></script>
- --><script src="{% static 'gestionPedidos/js/list_sales.js' %}"></script>
+<script src="{% static 'gestionPedidos/js/loader.js' %}"></script>
+<script src="{% static 'gestionPedidos/js/list_sales.js' %}"></script>
 </body>
-
 </html>

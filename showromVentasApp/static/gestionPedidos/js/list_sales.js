@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     let currentPage = 1; // Controlar la página actual
-    const recordsPerPage = 20; // Cantidad de registros por página
+    const recordsPerPage = 15; // Cantidad de registros por página
     let totalPages = null; // No conocemos el total de páginas inicialmente
     let activeFilters = {}; // Variable para almacenar los filtros aplicados
 
@@ -60,55 +60,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     };
 
-// Función para aplicar el filtro basado en el contenido del campo de búsqueda
-const aplicarFiltroDesdeBusqueda = () => {
-    const searchText = document.querySelector('#buscarlistacootizacion').value.trim();
-
-    // Coloca el valor en el campo de filtro correspondiente
-    if (!isNaN(searchText)) {
-        // Número de documento (SAP)
-        document.querySelector('[name="docNum"]').value = searchText;
-    } else if (/^\d{1,4}[-\/]\d{1,2}[-\/]\d{1,4}$/.test(searchText)) {
-        // Fecha en formato YYYY-MM-DD
-        document.querySelector('[name="fecha_documento"]').value = searchText;
-    } else if (["abierto", "cerrado", "cancelado", "Abierto", "Cerrado", "Cancelado"].includes(searchText)) {
-        // Estado del documento
-        const estadoMap = {
-            "abierto": "O",
-            "cerrado": "C",
-            "cancelado": "Y",
-            "Abierto": "O",
-            "Cerrado": "C",
-            "Cancelado": "Y"
-        };
-        document.querySelector('[name="DocumentStatus"]').value = estadoMap[searchText];
-    } else {
-        // Nombre del cliente
-        document.querySelector('[name="cardName"]').value = searchText;
-    }
-
-    // Limpiar el input de búsqueda después de colocar el valor
-    document.querySelector('#buscarlistacootizacion').value = '';
-
-    // Aplica los filtros y realiza la búsqueda
-    const filters = getFilterData();
-    applyFiltersAndFetchData(filters); // Aplica los filtros
-    window.scrollTo(0, 0); // Desplazar hacia la parte superior de la página
-};
-
-// Evento para capturar texto en el campo de búsqueda y aplicar el filtro al presionar "Enter"
-document.querySelector('#buscarlistacootizacion').addEventListener('keydown', function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault(); 
-        aplicarFiltroDesdeBusqueda();
-    }
-});
-
-// Evento para aplicar el filtro al hacer clic en la lupa
-document.querySelector('#lupa-busqueda').addEventListener('click', function() {
-    aplicarFiltroDesdeBusqueda();
-});
-
 showLoadingOverlay();
 
     const displayQuotations = (quotations) => {
@@ -155,15 +106,15 @@ showLoadingOverlay();
     
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><a href="#" class="docentry-link" data-docentry="${quotation.DocEntry}">${quotation.DocNum}</a></td>
-                <td><a href="#" class="docentry-link" data-docentry="${quotation.DocEntry}">${quotation.DocNum}</a></td>
-                <td><a href="#" class="docentry-link" data-docentry="${quotation.DocEntry}">${quotation.DocNum}</a></td>
-                <td><a href="#" class="cliente-link" data-cadcode="${quotation.CardCode}">${quotation.CardCode} - ${quotation.CardName || 'Cliente Desconocido'}</a></td>
-                <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
-                <td>${fechaFormateada}</td>
-                <td>${status}</td>
-                <td style="text-align: right;"> ${vatSumFormatted}</td>
-                <td style="text-align: right;"> ${docTotalFormatted}</td>
+                <td class="fw-bold" style="text-align: center; font-size: 12px;"><a href="#" class="docentry-link" data-docentry="${quotation.DocEntry}">${quotation.DocNum}</a></td>
+                <td style="text-align: left; font-size: 12px;">${salesPerson.SalesEmployeeName || 'N/A'}</td>
+                <td style="text-align: left; font-size: 12px;">${salesPerson.SalesEmployeeName || 'N/A'}</td>
+                <td class="fw-bold" style="text-align: left; font-size: 12px;"><a href="#" class="cliente-link" data-cadcode="${quotation.CardCode}">${quotation.CardCode} - ${quotation.CardName || 'Cliente Desconocido'}</a></td>
+                <td style="text-align: left; font-size: 12px;">${salesPerson.SalesEmployeeName || 'N/A'}</td>
+                <td style="text-align: center; font-size: 12px;">${fechaFormateada}</td>
+                <td style="text-align: center; font-size: 12px;">${status}</td>
+                <td style="text-align: right; font-size: 12px;"> ${vatSumFormatted}</td>
+                <td style="text-align: right; font-size: 12px;"> ${docTotalFormatted}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -227,8 +178,6 @@ showLoadingOverlay();
     
     const getFilterData = () => {
         return {
-            fecha_inicio: document.querySelector('[name="fecha_inicio"]').value,
-            fecha_fin: document.querySelector('[name="fecha_fin"]').value,
             fecha_doc: document.querySelector('[name="fecha_documento"]').value,
             docNum: document.querySelector('[name="docNum"]').value,
             carData: document.querySelector('[name="cardName"]').value,
