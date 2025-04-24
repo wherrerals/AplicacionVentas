@@ -891,8 +891,6 @@ class SocioNegocio:
     def create_or_update_bp(self):
         bp_data = self.request
 
-        print(f"bp_data: {bp_data}")
-
         is_valid, message = self.verify_valid_rut(self.rut)
         
         if not is_valid:
@@ -909,11 +907,11 @@ class SocioNegocio:
         exiting_bp_sap = self.verify_sap_bp(rut_sap)
 
         if exiting_bp_sap:
+            if exiting_bp is not None:
+                return self.process_existing_bp(bp_data.get('cardCodeSN'), exiting_bp, newData=bp_data)
+            
             self.crearYresponderCliente(rut_sap, rut_sap)
             return JsonResponse({'success': True, 'message': 'Cliente Creado desde SAP exitosamente'})
-
-        if exiting_bp is not None:
-            return self.process_existing_bp(bp_data.get('cardCodeSN'), exiting_bp, newData=bp_data)
 
         self.process_new_bp(SocioNegocio.generate_bp_code(self.rut), bp_data)
 
