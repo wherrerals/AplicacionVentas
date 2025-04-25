@@ -66,4 +66,5 @@ urlpatterns = [
     path('verificar_estado_pdf/<str:task_id>/', view.verificar_estado_pdf, name='verificar_estado_pdf'),
     path('prueba/', view.prueba, name='prueba'),
     path('actualizando_recetas/', view.probandoActualizador, name='actualizando_recetas'),
+    path('obtener-ventas/', SalesConsultationView.as_view(), name='obtener_ventas'),
 ]

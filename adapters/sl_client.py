@@ -926,6 +926,21 @@ class APIClient:
         response = self.session.get(url, verify=False)
         response.raise_for_status()
         return response.json()
+    
+    def get_sales_sl(self, filter=None, type_document=None):
+
+        self.__login()
+        cross_join = f"{type_document},SalesPersons"
+        expand = f"{type_document}($select=DocEntry,DocNum,DocObjectCode,DocumentSubType,ReserveInvoice,FolioNumber,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)&$orderby=DocNum desc"
+
+        url = f"{self.base_url}$crossjoin({cross_join})?$expand={expand}&$filter={filter}"
+
+        response = self.session.get(url, verify=False)
+
+        response.raise_for_status()
+        return response.json()
+    
+    
 
     def bacth_processes_products(self, listItems):
 

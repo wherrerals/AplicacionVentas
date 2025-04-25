@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 from venv import logger
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
@@ -1057,7 +1058,16 @@ class SocioNegocio:
             logging.error(f"Error general en la sincronización: {str(e)}")
             return {"success": False, "message": "Ocurrió un error en la sincronización."}
 
+    @staticmethod
+    def get_clen_carCode(identificado_bp):
 
-        
+        cardCode = identificado_bp.strip()
+        cardCode = cardCode.replace(" ", "").replace(".", "").rstrip("Cc", "")
+        cardCode = re.sub(r'-/w$', '', cardCode)
+
+        return cardCode
+
+
+
 
 
