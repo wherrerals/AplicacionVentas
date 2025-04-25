@@ -5,6 +5,7 @@ from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 
 # Importing modules
 from logicaVentasApp.context.user_context import UserContext
@@ -17,6 +18,8 @@ logger = logging.getLogger(__name__)
 class SalesConsultationView(View):
 
     # this method dispatches the request to the appropriate handler based on the HTTP method
+    @method_decorator(csrf_exempt)
+    @method_decorator(login_required)
     @method_decorator(require_http_methods(["GET", "POST"]))
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -52,6 +55,7 @@ class SalesConsultationView(View):
         return render(request, 'salesConsultation.html', context)
     
     def sales_list_view(self, request):
+
         authenticated_user = ValitadionApp.user_autentication(request)
         context = UserContext.user_context(authenticated_user, request)
 
