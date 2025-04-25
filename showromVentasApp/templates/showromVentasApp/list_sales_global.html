@@ -57,7 +57,7 @@
                       <span>Tipo de Documento:</span>
                     </div>
                     <div>
-                      <input class="form-control" type="search" id="buscar_num_sap" name="docNum" placeholder="Número de Documento" style="width: 100%;font-size: 12px;">
+                      <input class="form-control" type="search" id="buscar_num_sap" name="docNum" placeholder="" style="width: 100%;font-size: 12px; background: #a6773a;"" readonly>
                     </div>
                   </th>
                   <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">
@@ -73,7 +73,7 @@
                     <span>Cliente</span>
                   </div>
                   <div>
-                    <input class="form-control" type="search" id="buscar_cliente" name="cardName" placeholder="Nombre del Cliente"style="width: 100%;font-size: 12px;">
+                    <input class="form-control" type="search" id="buscar_cliente" name="cardName" placeholder="Código o Rut Cliente"style="width: 100%;font-size: 12px;">
                   </div>
                 </th>
                 <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">
@@ -167,5 +167,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'gestionPedidos/js/loader.js' %}"></script>
+<script src="{% static 'gestionPedidos/js/list_sales.js' %}"></script>
 </body>
 </html>

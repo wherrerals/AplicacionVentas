@@ -933,8 +933,9 @@ class APIClient:
         cross_join = f"{type_document},SalesPersons"
         expand = f"{type_document}($select=DocEntry,DocNum,DocObjectCode,DocumentSubType,ReserveInvoice,FolioNumber,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal, DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)&$orderby=DocNum desc"
 
-        url = f"{self.base_url}$crossjoin({cross_join})?$expand={expand}&$filter={filter}"
+        url = f"{self.base_url}$crossjoin({cross_join})?$expand={expand}&$filter=Invoices/SalesPersonCode eq SalesPersons/SalesEmployeeCode and {filter}"
 
+        print(f"URL: {url}")
         response = self.session.get(url, verify=False)
 
         response.raise_for_status()

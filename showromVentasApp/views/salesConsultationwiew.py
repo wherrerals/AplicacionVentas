@@ -1,3 +1,4 @@
+import json
 import logging
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -10,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 # Importing modules
 from adapters.sl_client import APIClient
 from logicaVentasApp.context.user_context import UserContext
-from logicaVentasApp.services.cotizacion import Cotizacion
+from logicaVentasApp.services.salesConsultation import SalesConsultation
 from logicaVentasApp.services.valitadionApp import ValitadionApp
 
 logger = logging.getLogger(__name__)
@@ -24,9 +25,6 @@ class SalesConsultationView(View):
     @method_decorator(require_http_methods(["GET", "POST"]))
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
-    
-    def __init__(self):
-        self.api_get_way_sl = APIClient() # Initialize the API client
     
     def get(self, request, *args, **kwargs):
         try:
@@ -50,12 +48,14 @@ class SalesConsultationView(View):
             return route_handler(request, *args, **kwargs)
         except Exception as e:
             logger.error(f"Error in POST method: {str(e)}")
-            return self.handle_error(e)
+            return JsonResponse({'error': 'Ocurrió un error en el servidor'}, status=500)
+
 
     def post_route_map(self):
         return {
             '/ventas/obtener-ventas': self.get_sales_view,
         }
+
 
     def get_route_map(self):
 
@@ -80,11 +80,11 @@ class SalesConsultationView(View):
 
     def get_sales_view(self, request):
 
-        print("get_sales_view")
+        api_service_layer = APIClient()
+        type_sales = "Invoices"
 
-        type_sales = request.get('typeSales')
-    
-        build_filters = Cotizacion.build_query_filters(request, type_sales)
-        get_sales = self.api_get_way_sl.get_sales_sl(build_filters, type_sales)
-
-        print(f"get_sales {get_sales}")
+        build_filters = SalesConsultation.build_query_filters(json.loads(request.body), type_sales)
+        get_sales = api_service_layer.get_sales_sl(build_filters, type_sales)
+        
+        print("get_sales", get_sales)
+        return JsonResponse({"data": get_sales}, safe=False)

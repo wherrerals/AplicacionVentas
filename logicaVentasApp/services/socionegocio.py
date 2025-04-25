@@ -1062,9 +1062,10 @@ class SocioNegocio:
     def get_clen_carCode(identificado_bp):
 
         cardCode = identificado_bp.strip()
-        cardCode = cardCode.replace(" ", "").replace(".", "").rstrip("Cc", "")
-        cardCode = re.sub(r'-/w$', '', cardCode)
-
+        cardCode = cardCode.replace(" ", "").replace(".", "").rstrip("Cc")
+        cardCode = re.sub(r'-\d+$', '', cardCode)
+        cardCode = re.sub(r'-\w+$', '', cardCode)
+        
         return cardCode
 
 
