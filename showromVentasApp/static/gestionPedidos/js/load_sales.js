@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
     const docEntry = getQueryParam('docentry');
     if (docEntry) {
-      const vendedorDataElement = document.querySelector("#vendedor_data");
+      const vendedorDataElement = document.getElementById("vendedor_data");
       const showroomElement = document.getElementById("sucursal");
       const estadoElement = document.getElementById('estado');
   
@@ -19,32 +19,47 @@ document.addEventListener("DOMContentLoaded", function () {
   
       showLoadingOverlay();
   
-      fetch(`/ventas/detalles_cotizacion/?docentry=${docEntry}`)
+      fetch(`/ventas/detalles-ventas/?docentry=${docEntry}`)
         .then(response => {
           if (!response.ok) throw new Error('Error al obtener la información de la cotización');
           return response.json();
         })
         .then(data => {
-          if (data.Cliente && data.Cliente.SalesPersons) {
+          console.log("Datos de la cotización:", data);
+
+          if (data.Invoices) {
             console.log("Datos de la cotización:", data);
   
-            const salesEmployeeName = data.Cliente.SalesPersons.SalesEmployeeName;
-            const salesPersonCode = data.Cliente.SalesPersons.SalesEmployeeCode;
-            const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
-            const numCotizacion = data.Cliente.Quotations.DocNum;
-            const docDate = data.Cliente.Quotations.DocDate;
-            const canceled = data.Cliente.Quotations.Cancelled;
-            let cardCode = data.Cliente.Quotations.CardCode;
-            const DocumentStatus = data.Cliente.Quotations.DocumentStatus;
-            const docEntry = data.Cliente.Quotations.DocEntry;
-            const razonSocial = data.Cliente.Quotations.CardName;
-            const tipoentrega = data.Cliente.Quotations.TransportationCode;
-            const tipoFactura = data.Cliente.Quotations.U_LED_TIPDOC;
-            const referencia = data.Cliente.Quotations.NumAtCard;
-            const comentarios = data.Cliente.Quotations.Comments;
+            const salesEmployeeName = data.Invoices.SalesEmployeeName;
+            const salesPersonCode = data.Invoices.SalesEmployeeCode;
+            const sucursal = data.Invoices.U_LED_SUCURS;
+            const numCotizacion = data.Invoices.DocNum;
+            const docDate = data.Invoices.DocDate;
+            const canceled = data.Invoices.Cancelled;
+            let cardCode = data.Invoices.CardCode;
+            const DocumentStatus = data.Invoices.DocumentStatus;
+            const docEntry = data.Invoices.DocEntry;
+            const razonSocial = data.Invoices.CardName;
+            const tipoentrega = data.Invoices.TransportationCode;
+            const tipoFactura = data.Invoices.U_LED_TIPDOC;
+            const referencia = data.Invoices.NumAtCard;
+            const comentarios = data.Invoices.Comments;
+            const contactos = data.Invoices.Contactos;
+            const name_user = data.Invoices.CardName;
+            const name_contact = data.Invoices.FirstName;
+            const internal_code = data.Invoices.InternalCode;
   
-            const contactos = data.Cliente.ContactEmployee.Contactos;
-  
+            const name_user_element = document.getElementById("inputCliente");
+            const contact_element = document.getElementById("idContact");
+
+            if (contact_element) {
+              contact_element.innerText = name_contact;
+              contact_element.setAttribute("data-contacto", internal_code);
+            }
+
+            if (name_user_element) {
+              name_user_element.innerText = name_user;
+            } 
   
             console.log("Tipo de comentarios: ", referencia);
             console.log("Tipo de comentarios: ", comentarios);
@@ -54,8 +69,10 @@ document.addEventListener("DOMContentLoaded", function () {
               cardCode = cardCode.slice(0, -1);
             }
   
-            const vendedorMatch = salesEmployeeName.match(/^[^-]+-\s*([^\s/]+.*?)\s*(\/|$)/);
-            const vendedorLimpio = vendedorMatch ? vendedorMatch[1].trim() : "Vendedor desconocido";
+            const vendedorMatch = salesEmployeeName
+            console.log("Vendedor: ", vendedorMatch);
+            const vendedorLimpio = vendedorMatch ? vendedorMatch : "Vendedor desconocido";
+            console.log("Vendedor limpio: ", vendedorLimpio);
   
             if (vendedorDataElement) {
               vendedorDataElement.innerText = vendedorLimpio;
@@ -91,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const tipoEntregaSelect = document.getElementById("tipoEntrega-1");
   
             if (tipoEntregaSelect) {
-              tipoEntregaSelect.value = tipoentrega;
+              tipoEntregaSelect.innerText = tipoentrega;
             }
   
             const tipoDocRadios = document.getElementsByName("tipoDocTributario");
@@ -155,13 +172,29 @@ document.addEventListener("DOMContentLoaded", function () {
               const imagen = line.imagen;
               const precioVenta = line.GrossPrice;
               const stockTotal = 0;
-              const precioLista = line.PriceList;
-              const precioDescuento = line.DescuentoMax;
+              const precioLista = line.GrossPrice;
+              const precioDescuento = line.DiscountPercent;
               const descuentoAplcado = line.DiscountPercent;
               const sucursal = line.WarehouseCode;
               const comentario = line.FreeText;
   
               let linea_documento_real = parseInt(linea_documento);
+              console.log("agg")
+              console.log(
+                "Línea de documento:", linea_documento, 
+                "DocEntry línea:", docEntry_linea, 
+                "Código de producto:", productoCodigo, 
+                "Nombre:", nombre, 
+                "Imagen:", imagen, 
+                "Precio de venta:", precioVenta, 
+                "Stock total:", stockTotal, 
+                "Precio lista:", precioLista, 
+                "Precio descuento:", precioDescuento, 
+                "Cantidad:", line.Quantity, 
+                "Sucursal:", sucursal, 
+                "Comentario:", comentario, 
+                "Descuento aplicado:", descuentoAplcado
+              );
   
               agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado);
             });
@@ -172,9 +205,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         .catch(error => {
           console.error('Error en la solicitud AJAX:', error);
-          if (vendedorDataElement) {
-            vendedorDataElement.innerText = "Error al cargar datos";
-          }
+          console.log("Error en la solicitud AJAX:", error);
           hideLoadingOverlay();
   
         });

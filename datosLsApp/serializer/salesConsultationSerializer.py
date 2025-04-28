@@ -1,3 +1,5 @@
+from datosLsApp.repositories.productorepository import ProductoRepository
+from logicaVentasApp.services.trasportation import Trasnportation
 from logicaVentasApp.services.typeofsale import TypeOfSale
 import re
 
@@ -36,6 +38,8 @@ class SalesConsultationSerializer:
     
     def serializer_sales_details(data_bp, data_lines):
 
+        print("data_lines", data_lines)
+
         if not data_bp or not data_lines:
             return {}
         
@@ -45,12 +49,13 @@ class SalesConsultationSerializer:
             "FederalTaxID": invoice_data.get("FederalTaxID"),
             "CardCode": invoice_data.get("CardCode"),
             "CardName": invoice_data.get("CardName"),
-            "TransportationCode": invoice_data.get("TransportationCode"),
             "Address": invoice_data.get("Address"),
             "Address2": invoice_data.get("Address2"),
             "DocDate": invoice_data.get("DocDate"),
             "Comments": invoice_data.get("Comments"),
             "DocumentStatus": invoice_data.get("DocumentStatus"),
+            "Cancelled": invoice_data.get("Cancelled"),
+            "TransportationCode": Trasnportation.get_transportation_code(invoice_data.get("TransportationCode")),
         }
 
         invoice_lines = []
@@ -58,26 +63,38 @@ class SalesConsultationSerializer:
             doc_line = data.get('Invoices/DocumentLines', {})
             if doc_line:
                 data_lines = {
+                    "DocEntry": doc_line.get("DocEntry"),
+                    "LineNum": doc_line.get("LineNum"),
                     "ItemCode": doc_line.get("ItemCode"),
+                    "ItemDescription": doc_line.get("ItemDescription"),
+                    "imagen":  ProductoRepository.obtenerImagenProducto(doc_line.get("ItemCode")),
                     "Quantity": doc_line.get("Quantity"),
-                    "UnitPrice": doc_line.get("UnitPrice"),
-                    "ShipDate": doc_line.get("ShipDate"),
+                    "GrossPrice": doc_line.get("GrossPrice"),
                     "FreeText": doc_line.get("FreeText"),
                     "DiscountPercent": doc_line.get("DiscountPercent"),
                     "WarehouseCode": doc_line.get("WarehouseCode"),
                     "CostingCode": doc_line.get("CostingCode"),
-                    "ShippingMethod": doc_line.get("ShippingMethod"),
-                    "COGSCostingCode": doc_line.get("COGSCostingCode"),
-                    "CostingCode2": doc_line.get("CostingCode2")
+                    "DiscountPercent": doc_line.get("DiscountPercent"),
+                    "WarehouseCode": doc_line.get("WarehouseCode"),
+                    "GrossPrice": doc_line.get("GrossPrice"),
                 }
+
                 invoice_lines.append(data_lines)
         
         sales_data = data_bp.get('SalesPersons', {})
+        sales_data_contact = data_bp.get('BusinessPartners/ContactEmployees', {})
+
+        if sales_data_contact:
+            invoice_bp["InternalCode"] = sales_data_contact.get("InternalCode")
+            invoice_bp["FirstName"] = re.sub(r'.*-\s*','',sales_data_contact.get("FirstName"))
+
         if sales_data:
             invoice_bp["SalesEmployeeCode"] = sales_data.get("SalesEmployeeCode")
             invoice_bp["SalesEmployeeName"] = re.sub(r'.*-\s*','',sales_data.get("SalesEmployeeName"))
             invoice_bp["U_LED_SUCURS"] = sales_data.get("U_LED_SUCURS")
         
+        
+
         return {
             "Invoices": invoice_bp,
             "DocumentLines": invoice_lines

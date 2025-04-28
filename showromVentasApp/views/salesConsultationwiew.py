@@ -99,7 +99,7 @@ class SalesConsultationView(View):
         sales_data_bp = api_service_layer.sales_details_sl_bp(type_document='Invoices', docEntry=docEntry)
         sales_data_lines = api_service_layer.sales_details_sl_lines(type_document='Invoices', docEntry=docEntry)
         data_sales_serializer = SalesConsultationSerializer.serializer_sales_details(sales_data_bp, sales_data_lines)
-
+        print("data_sales_serializer", data_sales_serializer)
         return JsonResponse(data_sales_serializer, safe=False)
 
 
