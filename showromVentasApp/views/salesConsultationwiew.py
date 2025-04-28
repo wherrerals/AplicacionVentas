@@ -63,6 +63,7 @@ class SalesConsultationView(View):
         return {
             '/ventas/consulta-ventas': self.sales_consultation,
             '/ventas/lista-ventas': self.sales_list_view,
+            '/ventas/detalles-ventas': self.sales_details_view,
         }
     
     def sales_consultation(self, request):
@@ -83,8 +84,23 @@ class SalesConsultationView(View):
 
         api_service_layer = APIClient()
         type_sales = "Invoices"
+
         build_filters = SalesConsultation.build_query_filters(json.loads(request.body), type_sales)
         get_data_sales = api_service_layer.get_sales_sl(build_filters, type_sales)
         data_sales_serializer = SalesConsultationSerializer.serializer_sales(get_data_sales)
-             
+
         return JsonResponse({"data": data_sales_serializer}, safe=False)
+
+    def sales_details_view(self, request):
+        
+        docEntry = request.GET.get('docentry')
+        api_service_layer = APIClient()
+
+        sales_data_bp = api_service_layer.sales_details_sl_bp(type_document='Invoices', docEntry=docEntry)
+        sales_data_lines = api_service_layer.sales_details_sl_lines(type_document='Invoices', docEntry=docEntry)
+        data_sales_serializer = SalesConsultationSerializer.serializer_sales_details(sales_data_bp, sales_data_lines)
+
+        return JsonResponse(data_sales_serializer, safe=False)
+
+
+        

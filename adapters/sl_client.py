@@ -963,7 +963,8 @@ class APIClient:
     
     def get_docEntry_sl(self, type_document, doc_num):
 
-        select = f"$select=DocEntry&$filter=DocNum eq {doc_num}"
+        order_by = f"DocDate desc"
+        select = f"$select=DocEntry&$orderby={order_by}&$filter=DocNum eq {doc_num}"
         url = f"{self.base_url}{type_document}?{select}"
 
         response = self.session.get(url, verify=False)
@@ -979,3 +980,51 @@ class APIClient:
         
         # Si algo falló o no se encontró el documento
         return None
+
+    def sales_details_sl_bp(self, type_document, docEntry):
+
+        crossjoin = f"{type_document},SalesPersons,BusinessPartners/ContactEmployees"
+        expand = f"{type_document}($select=DocEntry,DocNum, FederalTaxID, CardCode,CardName,TransportationCode,Address,Address2,DocDate,Comments,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
+        filter = f"{type_document}/DocEntry eq {docEntry} and {type_document}/SalesPersonCode eq SalesPersons/SalesEmployeeCode and {type_document}/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode"
+        
+        url = (f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}")
+
+        print(f"URL: {url}")
+
+
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+
+        data_sales = response.json()
+
+        if 'value' in data_sales and len(data_sales['value']) > 0:
+            return data_sales['value'][0]
+        else:
+            filter = f"{type_document}/DocEntry eq {docEntry} and {type_document}/SalesPersonCode eq SalesPersons/SalesEmployeeCode"
+            url = (f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}")
+            response = self.session.get(url, verify=False)
+            response.raise_for_status()
+            data_sales = response.json()
+            return data_sales['value'][0]
+
+    def sales_details_sl_lines(self, type_document, docEntry):
+        crossJoin = (f"{type_document},{type_document}/DocumentLines,Items/ItemWarehouseInfoCollection")
+        expand = f"{type_document}/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
+        filter = f"{type_document}/DocEntry eq {docEntry} and {type_document}/DocumentLines/DocEntry eq {type_document}/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq {type_document}/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq {type_document}/DocumentLines/WarehouseCode"
+
+        base_url = self.base_url
+        url = f"{base_url}/$crossjoin({crossJoin})?$expand={expand}&$filter={filter}"
+
+        all_data = []
+
+        while url:
+            response = self.session.get(url, verify=False)
+            response.raise_for_status()
+            data = response.json()
+
+            all_data.extend(data.get("value", []))
+
+            next_link = data.get("odata.nextLink")
+            url = f"{base_url}/{next_link}" if next_link else None  
+
+        return {"value": all_data}
