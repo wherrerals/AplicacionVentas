@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 
 # Importing modules
 from adapters.sl_client import APIClient
+from datosLsApp.serializer.salesConsultationSerializer import SalesConsultationSerializer
 from logicaVentasApp.context.user_context import UserContext
 from logicaVentasApp.services.salesConsultation import SalesConsultation
 from logicaVentasApp.services.valitadionApp import ValitadionApp
@@ -82,9 +83,8 @@ class SalesConsultationView(View):
 
         api_service_layer = APIClient()
         type_sales = "Invoices"
-
         build_filters = SalesConsultation.build_query_filters(json.loads(request.body), type_sales)
-        get_sales = api_service_layer.get_sales_sl(build_filters, type_sales)
-        
-        print("get_sales", get_sales)
-        return JsonResponse({"data": get_sales}, safe=False)
+        get_data_sales = api_service_layer.get_sales_sl(build_filters, type_sales)
+        data_sales_serializer = SalesConsultationSerializer.serializer_sales(get_data_sales)
+             
+        return JsonResponse({"data": data_sales_serializer}, safe=False)

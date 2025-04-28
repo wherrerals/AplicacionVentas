@@ -57,7 +57,7 @@
                       <span>Tipo de Documento:</span>
                     </div>
                     <div>
-                      <input class="form-control" type="search" id="buscar_num_sap" name="docNum" placeholder="" style="width: 100%;font-size: 12px; background: #a6773a;"" readonly>
+                      <input class="form-control" type="search" id="buscar_num_sap" name="docNum" placeholder="" style="width: 100%;font-size: 12px; background: #a6773a;" readonly>
                     </div>
                   </th>
                   <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">
@@ -81,8 +81,8 @@
                     <span>Vendedor</span>
                   </div>
                   <div>
-                    <select class="form-select" id="filtro_vendedor" name="salesEmployeeName" placeholder="Nombre del Vendedor" style="width: 100%;font-size: 12px;">
-                        <option value="" selected>Todos</option>
+                    <select class="form-select" id="filtro_vendedor" name="salesEmployeeName" placeholder="" style="width: 100%;font-size: 12px;  background: #a6773a;"  readonly>
+                        <option value="" selected disabled></option>
                     </select>
                   </div>
                 </th>
@@ -91,7 +91,7 @@
                     <span>Fecha</span>
                   </div>
                   <div>
-                    <input class="form-control" id="fecha_doc" name="fecha_documento" type="date" style="width: 100%;font-size: 12px;">
+                    <input class="form-control" id="fecha_doc" name="fecha_documento" type="date" style="width: 100%;font-size: 12px;" disabled>
                   </div>
                 </th>
                 <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">
@@ -99,7 +99,7 @@
                     <span>Estado</span>
                   </div>
                   <div>
-                    <select class="form-select" id="filtro_estado" name="DocumentStatus" placeholder="Estado del Documento" style="width: 100%;font-size: 12px;">
+                    <select class="form-select" id="filtro_estado" name="DocumentStatus" placeholder="Estado del Documento" style="width: 100%;font-size: 12px;" disabled>
                       <optgroup label="Estado">
                         <option value="" selected="">Todos</option>
                         <option value="O" >Abierto</option>
@@ -114,7 +114,7 @@
                     <span>Neto</span>
                   </div>
                   <div>
-                    <input class="form-control" type="search" id="buscar_neto" name="docNeto" style="width: 100%;font-size: 12px; " readonly>
+                    <input class="form-control" type="search" id="buscar_neto" name="docNeto" style="width: 100%;font-size: 12px; " readonly disabled>
                   </div>
                 </th>
                 <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">
@@ -122,7 +122,7 @@
                     <span>Bruto</span>
                   </div>
                   <div>
-                    <input class="form-control" type="search" id="buscar_bruto" name="docTotal" placeholder="Total del Documento" style="width: 100%;font-size: 12px;">
+                    <input class="form-control" type="search" id="buscar_bruto" name="docTotal" placeholder="Total del Documento" style="width: 100%;font-size: 12px;" disabled>
                   </div>
                 </th>
               </tr>

@@ -29,3 +29,15 @@ class TypeOfSale:
         
         else:
             return type_sales
+    
+    staticmethod
+    def get_type_of_sale(document, reserve):
+
+        if document == '--' and reserve == 'Y':
+            return 'Factura de Reserva'
+        elif document == '--' and reserve == 'N':
+            return 'Factura'
+        elif document == 'IB' and reserve == 'Y':
+            return 'Boleta de Reserva'
+        elif document == 'IB' and reserve == 'N':   
+            return 'Boleta'
