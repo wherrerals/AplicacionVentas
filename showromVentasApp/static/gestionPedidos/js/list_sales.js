@@ -31,14 +31,24 @@ document.addEventListener("DOMContentLoaded", function () {
     if (buscarCliente) {
         buscarCliente.addEventListener('input', () => {
             const allEmpty =
-                !buscarCliente.value.trim() &&
-                !fechaDoc.value.trim() &&
-                !filtroEstado.value.trim() &&
-                !buscarBruto.value.trim();
+                !buscarCliente.value.trim()
     
             if (allEmpty) {
+
+                if (fechaDoc) fechaDoc.value = '';
+                if (filtroEstado) filtroEstado.value = '';
+                if (buscarBruto) buscarBruto.value = '';
+
                 toggleFields(false);
             }
+        });
+    }
+
+    if (fechaDoc) {
+        fechaDoc.addEventListener('change', () => {
+            currentPage = 1; // Reinicia a la primera página
+            const filters = getFilterData(); // Obtiene filtros actuales
+            applyFiltersAndFetchData(filters); // Ejecuta la búsqueda
         });
     }
 
@@ -77,7 +87,14 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok');
+            
+                if (buscarCliente && buscarCliente.value.trim() !== '') {
+
+                    toggleFields(true); // Enable fields after fetching data
+                }
+            
             return response.json();
+
         })
         .then(data => {
             console.log('Data completa recibida:', data);

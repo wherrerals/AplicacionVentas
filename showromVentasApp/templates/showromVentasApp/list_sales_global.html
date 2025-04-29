@@ -21,7 +21,7 @@
   
 <div class="row" style="color: var(--bs-secondary-color);background: #a6773a;">
   <div class="col-sm-12" style="background: transparent;color: var(--bs-secondary-color);padding-top: 8px;height: 39px;text-align: center;">
-    <p style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);">Listado Ventas</p>
+    <p class="fw-bold" style="padding-bottom: 0px;padding-top: 0px;color: var(--bs-body-bg);">Consulta de Ventas</p>
   </div>
 </div>
 <div class="row" >
@@ -29,14 +29,25 @@
     <p></p>
   </div>
 </div>
+
+
 <form id="filterForm">
-  <div class="container-fluid" style="padding: 0px;padding-left: 80px; padding-right: 80px;">
+  <div class="container" style="padding: 0px;padding-left: 10px ">
   
-    <div class="row">
-      <div class="col">
-        <p></p>
-      </div>
-    </div>
+    <nav>
+      <ul class="pagination">
+        <li class="page-item">
+          <a class="page-link" aria-label="Previous" href="#" id="prevButtonBottom">
+            <span aria-hidden="true">«</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" aria-label="Next" href="#" id="nextButtonBottom">
+            <span aria-hidden="true">»</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
 
     <div class="row">
       <div class="col" style="font-size: 12px;">
@@ -114,7 +125,7 @@
                     <span>Neto</span>
                   </div>
                   <div>
-                    <input class="form-control" type="search" id="buscar_neto" name="docNeto" style="width: 100%;font-size: 12px; background: #a6773a;" readonly disabled>
+                    <input class="form-control" type="search" id="" name="" style="width: 100%;font-size: 12px; background: #a6773a;" readonly disabled>
                   </div>
                 </th>
                 <th style="background: transparent;color: var(--bs-table-bg); text-align: center;">

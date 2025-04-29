@@ -24,7 +24,7 @@
                     <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5M3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0m9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0"> </path>
                 </svg>
                 </span>
-                <span>Ventas Showroom</span></a>
+                <span>Studio GO</span></a>
                 <button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-2">
                     <span class="visually-hidden">Toggle navigation</span>
                     <span class="navbar-toggler-icon"></span>
@@ -45,6 +45,9 @@
                             <a class="nav-link" href="{% url 'lista_clientes' %}" data-page="lista_clientes,creacion_clientes">Clientes</a>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'lista_ventas' %}" data-page="lista-ventas,consulta-ventas">Consulta de Ventas</a>
+                        </li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'reporte_stock' %}" data-page="reporte_stock">Reporte Stock</a>
