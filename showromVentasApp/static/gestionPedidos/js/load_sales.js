@@ -25,7 +25,6 @@ document.addEventListener("DOMContentLoaded", function () {
           return response.json();
         })
         .then(data => {
-          console.log("Datos de la cotización:", data);
 
           if (data.Invoices) {
             console.log("Datos de la cotización:", data);
@@ -60,19 +59,13 @@ document.addEventListener("DOMContentLoaded", function () {
             if (name_user_element) {
               name_user_element.innerText = name_user;
             } 
-  
-            console.log("Tipo de comentarios: ", referencia);
-            console.log("Tipo de comentarios: ", comentarios);
             
-  
             if (cardCode.endsWith("C") || cardCode.endsWith("c")) {
               cardCode = cardCode.slice(0, -1);
             }
   
             const vendedorMatch = salesEmployeeName
-            console.log("Vendedor: ", vendedorMatch);
             const vendedorLimpio = vendedorMatch ? vendedorMatch : "Vendedor desconocido";
-            console.log("Vendedor limpio: ", vendedorLimpio);
   
             if (vendedorDataElement) {
               vendedorDataElement.innerText = vendedorLimpio;
@@ -158,13 +151,10 @@ document.addEventListener("DOMContentLoaded", function () {
   
             traerInformacionCliente(cardCode);
   
-            const documentLines = data.DocumentLines;
-            console.log("Líneas de documento:", documentLines);
-            
+            const documentLines = data.DocumentLines;            
             documentLines.sort((a, b) => a.LineNum - b.LineNum);
   
             documentLines.forEach((line) => {
-              console.log("Producto: ", line)
               const linea_documento = line.LineNum;
               const docEntry_linea = line.DocEntry;
               const productoCodigo = line.ItemCode;
@@ -179,22 +169,6 @@ document.addEventListener("DOMContentLoaded", function () {
               const comentario = line.FreeText;
   
               let linea_documento_real = parseInt(linea_documento);
-              console.log("agg")
-              console.log(
-                "Línea de documento:", linea_documento, 
-                "DocEntry línea:", docEntry_linea, 
-                "Código de producto:", productoCodigo, 
-                "Nombre:", nombre, 
-                "Imagen:", imagen, 
-                "Precio de venta:", precioVenta, 
-                "Stock total:", stockTotal, 
-                "Precio lista:", precioLista, 
-                "Precio descuento:", precioDescuento, 
-                "Cantidad:", line.Quantity, 
-                "Sucursal:", sucursal, 
-                "Comentario:", comentario, 
-                "Descuento aplicado:", descuentoAplcado
-              );
   
               agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado);
             });
@@ -204,13 +178,10 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         
         .catch(error => {
-          console.error('Error en la solicitud AJAX:', error);
-          console.log("Error en la solicitud AJAX:", error);
           hideLoadingOverlay();
   
         });
     } else {
-      console.log("No se ha proporcionado un DocEntry en la URL.");
       hideLoadingOverlay();
     }
   
@@ -231,14 +202,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const radioInput = document.querySelector(`input[name="grupoSN"][value="${grupoSN}"]`);
       if (radioInput) {
         radioInput.checked = true;
-        console.log("Grupo seleccionado:", grupoSN);
-        // Ejecuta la función cambiarLabel con la opción seleccionada.
         cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow');
       } else {
         console.warn("No se encontró el input con el valor:", grupoSN);
       }
   
-      // Agregar evento onchange para que funcione dinámicamente al cambiar la selección.
       document.getElementsByName('grupoSN').forEach(radio => {
         radio.addEventListener('change', () => {
           cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow');

@@ -4,8 +4,43 @@ document.addEventListener("DOMContentLoaded", function () {
     let totalPages = null;
     let activeFilters = {};
     let allSales = []; // Store all sales data for pagination
+    const fechaDoc = document.getElementById('fecha_doc');
+    const filtroEstado = document.getElementById('filtro_estado');
+    const buscarBruto  = document.getElementById('buscar_bruto');
+
+    function toggleFields(enabled) {
+        if (fechaDoc) fechaDoc.disabled = !enabled;
+        if (filtroEstado) filtroEstado.disabled = !enabled;
+        if (buscarBruto) buscarBruto.disabled = !enabled;
+    }
 
     const getSkip = (page) => (page - 1) * recordsPerPage;
+
+    [fechaDoc, filtroEstado, buscarBruto].forEach(input => {
+        if (input) {
+            input.addEventListener('input', () => {
+                const allEmpty = !fechaDoc.value.trim() && !filtroEstado.value.trim() && !buscarBruto.value.trim();
+                if (allEmpty) {
+                    toggleFields(false);
+                }
+            });
+        }
+    });    
+
+    const buscarCliente = document.getElementById('buscar_cliente');
+    if (buscarCliente) {
+        buscarCliente.addEventListener('input', () => {
+            const allEmpty =
+                !buscarCliente.value.trim() &&
+                !fechaDoc.value.trim() &&
+                !filtroEstado.value.trim() &&
+                !buscarBruto.value.trim();
+    
+            if (allEmpty) {
+                toggleFields(false);
+            }
+        });
+    }
 
     const vendedorSelect = document.querySelector('#filtro_vendedor');
     if (vendedorSelect) {
@@ -70,10 +105,12 @@ document.addEventListener("DOMContentLoaded", function () {
             // If we still have no data, check for empty response
             if (allSales.length === 0) {
                 document.querySelector('#listSales').innerHTML = '<tr><td colspan="9" class="text-center">No se encontraron resultados.</td></tr>';
+                toggleFields(false); // Deshabilita si no hay resultados
                 hideLoader();
                 return;
             }
-            
+
+
             // Calculate total pages based on all results
             totalPages = Math.ceil(allSales.length / recordsPerPage);
             
@@ -278,15 +315,16 @@ document.addEventListener("DOMContentLoaded", function () {
         hideLoadingOverlay();
     }
 
+
     const getFilterData = () => {
-        const docNumInput = document.querySelector('[name="docNum"]');
-        const cardNameInput = document.querySelector('[name="cardName"]');
-        const vendedorSelect = document.querySelector('#filtro_vendedor');
-        
         return {
-            docNum: docNumInput ? docNumInput.value : '',
-            carData: cardNameInput ? cardNameInput.value : '',
-            salesEmployeeName: vendedorSelect ? vendedorSelect.value : ''
+            fecha_doc: document.querySelector('[name="fecha_documento"]').value,
+            docNum: document.querySelector('[name="docNum"]').value,
+            carData: document.querySelector('[name="cardName"]').value,
+            salesEmployeeName: document.querySelector('#filtro_vendedor').value,
+            DocumentStatus: document.querySelector('[name="DocumentStatus"]').value,
+            docTotal: document.querySelector('[name="docTotal"]').value,
+            folio_number: document.getElementById('search_folio').value,
         };
     };
 
@@ -424,4 +462,5 @@ document.addEventListener("DOMContentLoaded", function () {
             applyFiltersAndFetchData(filters);
         }
     }
+    toggleFields(false);
 });
