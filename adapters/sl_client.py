@@ -984,13 +984,10 @@ class APIClient:
     def sales_details_sl_bp(self, type_document, docEntry):
 
         crossjoin = f"{type_document},SalesPersons,BusinessPartners/ContactEmployees"
-        expand = f"{type_document}($select=DocEntry,DocNum, FederalTaxID, CardCode,CardName,TransportationCode,Address,Address2,DocDate,Comments,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
+        expand = f"{type_document}($select=DocumentSubType,ReserveInvoice,FolioNumber,DocEntry,DocNum, FederalTaxID, CardCode,CardName,TransportationCode,Address,Address2,DocDate,Comments,DocumentStatus,Cancelled,U_LED_TIPVTA,U_LED_TIPDOC,U_LED_NROPSH,NumAtCard,VatSum,DocTotal,  DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeCode,SalesEmployeeName,U_LED_SUCURS),BusinessPartners/ContactEmployees($select=InternalCode,FirstName)"
         filter = f"{type_document}/DocEntry eq {docEntry} and {type_document}/SalesPersonCode eq SalesPersons/SalesEmployeeCode and {type_document}/ContactPersonCode eq BusinessPartners/ContactEmployees/InternalCode"
         
         url = (f"{self.base_url}$crossjoin({crossjoin})?$expand={expand}&$filter={filter}")
-
-        print(f"URL: {url}")
-
 
         response = self.session.get(url, verify=False)
         response.raise_for_status()
@@ -1026,5 +1023,4 @@ class APIClient:
 
             next_link = data.get("odata.nextLink")
             url = f"{base_url}/{next_link}" if next_link else None  
-
         return {"value": all_data}

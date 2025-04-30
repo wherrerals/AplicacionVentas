@@ -38,7 +38,7 @@ class SalesConsultationSerializer:
     
     def serializer_sales_details(data_bp, data_lines):
 
-        print("data_lines", data_lines)
+        print("data_bp", data_bp)
 
         if not data_bp or not data_lines:
             return {}
@@ -46,11 +46,15 @@ class SalesConsultationSerializer:
         invoice_data = data_bp.get('Invoices', {})
         
         invoice_bp = {
+            "documenttype": TypeOfSale.get_type_of_sale(invoice_data.get("DocumentSubType"), invoice_data.get("ReserveInvoice")),
+            "FolioNumber": invoice_data.get("FolioNumber"),
+            "DocEntry": invoice_data.get("DocEntry"),
+            "DocNum": invoice_data.get("DocNum"),
             "FederalTaxID": invoice_data.get("FederalTaxID"),
             "CardCode": invoice_data.get("CardCode"),
             "CardName": invoice_data.get("CardName"),
-            "Address": invoice_data.get("Address"),
-            "Address2": invoice_data.get("Address2"),
+            "Address": invoice_data.get("Address").split("\r")[0],
+            "Address2": invoice_data.get("Address2").split("\r")[0],
             "DocDate": invoice_data.get("DocDate"),
             "Comments": invoice_data.get("Comments"),
             "DocumentStatus": invoice_data.get("DocumentStatus"),

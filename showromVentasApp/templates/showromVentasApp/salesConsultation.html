@@ -6,8 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
   <meta name="csrf-token" content="{{ csrf_token }}" />
-  <title>App V: Consultar Ventas</title>
-  <link rel="icon" type="image/x-icon" href="{% static 'gestionPedidos/img/led_studio_icon.ico' %}">
+  <title>Studio GO</title>
   <link rel="icon" type="image/x-icon" href="{% static 'gestionPedidos/img/led_studio_icon.ico' %}">
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/moreStyles.css' %}" />
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles.min.css' %}" />
@@ -44,9 +43,9 @@
         <div class="dropdown">
           <button class="btn btn-outline-primary dropdown-toggle fw-bold" aria-expanded="false" data-bs-toggle="dropdown" type="button"> Acciones&nbsp; </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item" href="#" id="">Copiar a Cotización</a>
-            <a class="dropdown-item" href="#" id="">Copiar a Orden de Venta</a>
-            <a class="dropdown-item" href="#" id="">Copiar a Solicitud Devolución</a>
+            <a class="dropdown-item" href="#" id="">Copiar en Cotización</a>
+            <a class="dropdown-item" href="#" id="copiar-ODV">Copiar en Orden de Venta</a>
+            <a class="dropdown-item" href="#" id="">Copiar en Solicitud Devolución</a>
             <a class="dropdown-item" href="#" id="">Imprimir / Descargar PDF</a>
           </div>
         </div>
@@ -65,10 +64,10 @@
     <!--Inicio header Consulta Documento-->
     <div class="row" style="background: #a6773a">
       <div class="col" style="padding-top: 12px">
-        <p class="tipoDocumento" style="padding-bottom: 0px; padding-top: 0px; color: var(--bs-body-bg);">Documento:</p>
+        <p class="tipoDocumento" id="consultaDoucmento" style="padding-bottom: 0px; padding-top: 0px; color: var(--bs-body-bg);">Documento:</p>
       </div>
       <div class="col" style="text-align: left; padding-top: 12px">
-        <p class="fw-bold" id="numero_cotizacion" data-docEntry="" style="padding-bottom: 0px; padding-top: 0px; color: var(--bs-body-bg);">Nota de Crédito</p>
+        <p class="fw-bold" id="tipo_documento" style="padding-bottom: 0px; padding-top: 0px; color: var(--bs-body-bg);"></p>
       </div>
 
       <div class="col" style="text-align: right; padding-top: 12px">
@@ -81,7 +80,7 @@
         <p style="padding-bottom: 0px; padding-top: 0px; color: var(--bs-body-bg);">Folio:</p>
       </div>
       <div class="col" style="text-align: left; padding-top: 12px; padding-bottom: 0px">
-        <p class="fw-bold" style="padding-bottom: 0px; padding-top: 0px; color: var(--bs-body-bg);"></p>
+        <p class="fw-bold" id="folio_cotizacion" style="padding-bottom: 0px; padding-top: 0px; color: var(--bs-body-bg);"></p>
       </div>
     </div>
     <!--Fin header Consulta Documento-->
@@ -164,10 +163,10 @@
 
       <div class="row d-flex align-items-center" style="background: #f0f2f5;  padding-top: 10px;">
         <div class="col-sm-1 col-md-1" style="width: 20%">
-          <label class="col-form-label" style="font-size: 16px">Dirección Despacho:</label>
+          <label class="col-form-label" for="direcciones_despacho" style="font-size: 16px">Dirección Despacho:</label>
         </div>
         <div class="col" style="width: 35%; padding-right: 0px;  padding-top: 0px;">
-          <p class="fw-bold" type="text" name="cliente" style="border-color: rgb(159, 168, 175); font-size: 16px; padding-top: 7px;" id="direcciones_despacho" data-rut="" data-codigoSN=""/></p>
+          <p class="fw-bold" type="text" name="direcciones_despacho" style="border-color: rgb(159, 168, 175); font-size: 16px; padding-top: 7px;" id="direcciones_despacho" data-rut="" data-codigoSN=""/></p>
         </div>
 
         <div class="col-md-1" style="width: 10%; text-align: left; padding-left: 0px; padding-right: 0px;">
@@ -185,10 +184,10 @@
 
       <div class="row d-flex align-items-center" style="background: #f0f2f5">
         <div class="col-sm-1 col-md-1" style="width: 20%;">
-          <label class="col-form-label" style="font-size: 16px">Dirección Facturación:</label>
+          <label class="col-form-label" for="direcciones_facturacion" style="font-size: 16px">Dirección Facturación:</label>
         </div>
         <div class="col" style="width: 35%; padding-right: 0px;  padding-top: 10px;">
-          <p class="fw-bold" type="text" name="cliente" style="border-color: rgb(159, 168, 175); font-size: 16px" id="direcciones_facturacion" data-rut="" data-codigoSN=""/></p>
+          <p class="fw-bold" type="text" name="direcciones_facturacion" style="border-color: rgb(159, 168, 175); font-size: 16px" id="direcciones_facturacion" data-rut="" data-codigoSN=""/></p>
         </div>
 
         <div class="col-md-1" style="width: 10%; text-align: left; padding-left: 0px; padding-right: 0px;">
@@ -356,12 +355,11 @@
     <div class="spinner"></div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
   <script src="{% static 'gestionPedidos/js/loader.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/interfazUsuario.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/obtenerInfoCliente.js' %}"></script>
-  <script src="{% static 'gestionPedidos/js/gestorDirecciones.js' %}"></script>
-  <script src="{% static 'gestionPedidos/js/gestorContacto.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/actualizacio_creacion_sn.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/ajax_solicitudes.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/ajax_clientes.js' %}"></script>
@@ -371,9 +369,8 @@
   <script src="{% static 'gestionPedidos/js/productosInteraccion.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/cargarInfoClientes.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/load_sales.js' %}"></script>
-  <script src="{% static 'gestionPedidos/js/interaccionModalContactos.js' %}"></script>
-  <script src="{% static 'gestionPedidos/js/interaccionModalDirecciones.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/search_data_document.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/pdf_generetor.js' %}"></script>
+
 </body>
 </html>

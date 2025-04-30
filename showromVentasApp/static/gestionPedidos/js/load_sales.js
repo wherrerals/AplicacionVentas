@@ -31,8 +31,10 @@ document.addEventListener("DOMContentLoaded", function () {
   
             const salesEmployeeName = data.Invoices.SalesEmployeeName;
             const salesPersonCode = data.Invoices.SalesEmployeeCode;
+            const folio = data.Invoices.FolioNumber;
             const sucursal = data.Invoices.U_LED_SUCURS;
             const numCotizacion = data.Invoices.DocNum;
+            const documenttype = data.Invoices.documenttype;
             const docDate = data.Invoices.DocDate;
             const canceled = data.Invoices.Cancelled;
             let cardCode = data.Invoices.CardCode;
@@ -47,9 +49,21 @@ document.addEventListener("DOMContentLoaded", function () {
             const name_user = data.Invoices.CardName;
             const name_contact = data.Invoices.FirstName;
             const internal_code = data.Invoices.InternalCode;
-  
+            const address = data.Invoices.Address;
+            const address2 = data.Invoices.Address2; 
             const name_user_element = document.getElementById("inputCliente");
             const contact_element = document.getElementById("idContact");
+
+            const address_element = document.getElementById("direcciones_facturacion");
+            const address2_element = document.getElementById("direcciones_despacho");
+
+            if (address_element) {
+              address_element.innerText = address;
+            }
+
+            if (address2_element) {
+              address2_element.innerText = address2;
+            }
 
             if (contact_element) {
               contact_element.innerText = name_contact;
@@ -120,6 +134,16 @@ document.addEventListener("DOMContentLoaded", function () {
             const numeroCotizacionElement = document.getElementById("numero_cotizacion");
             if (numeroCotizacionElement) {
               numeroCotizacionElement.textContent = `${numCotizacion}`;
+            }
+
+            const folioElement = document.getElementById("folio_cotizacion");
+            if (folioElement) {
+              folioElement.textContent = `${folio}`;
+            }
+
+            const documenttypeElement = document.getElementById("tipo_documento");
+            if (documenttypeElement) {
+              documenttypeElement.textContent = `${documenttype}`;
             }
   
             const dueDateElement = document.getElementById("docDueDate");

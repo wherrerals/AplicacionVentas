@@ -147,6 +147,15 @@ function actualizarContactos(contactos) {
 
 // Función para actualizar las direcciones de despacho y facturación
 function actualizarDirecciones(direcciones, selectId, tipoDireccion) {
+
+    const typeDocument = document.getElementById('consultaDoucmento');
+    console.log('typeDocument:', typeDocument);
+    if(typeDocument) {
+
+        // no continuar con el flujo de la funcion, ya que no se ha seleccionado un cliente
+        return;
+    }
+
     let select = $(selectId); 
     select.empty();
 
