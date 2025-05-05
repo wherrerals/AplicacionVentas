@@ -1,7 +1,8 @@
+from logicaVentasApp.services.documento import Documento
 from logicaVentasApp.services.socionegocio import SocioNegocio
 
 
-class SalesConsultation:
+class Invoice(Documento):
 
     @staticmethod
     def build_query_filters(data, type):

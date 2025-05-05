@@ -3,7 +3,7 @@ from logicaVentasApp.services.trasportation import Trasnportation
 from logicaVentasApp.services.typeofsale import TypeOfSale
 import re
 
-class SalesConsultationSerializer:
+class InvoiceSerializer:
 
     @staticmethod
     def serializer_sales(data):

@@ -2,7 +2,7 @@ from django.urls import path
 from showromVentasApp.views.cotizacionview import CotizacionView
 from showromVentasApp.views.devolucionesview import ReturnsView
 from showromVentasApp.views.odvView import OdvView
-from showromVentasApp.views.salesConsultationwiew import SalesConsultationView
+from showromVentasApp.views.invoiceView import InvoiceView
 from showromVentasApp.views.socionegocioview import SocioNegocioView
 from showromVentasApp.views.productoview import Productos
 from showromVentasApp.views import view
@@ -30,8 +30,8 @@ urlpatterns = [
     path('listado_solicitudes_devolucion/', ReturnsView.as_view(), name='listado_solicitudes_devolucion'),
     path('crear_devolucion/', ReturnsView.as_view(), name='crear_devolucion'),
     path('productos/', Productos.as_view(), name='productos'),
-    path('consulta-ventas/', SalesConsultationView.as_view(), name='consulta_ventas'),
-    path('lista-ventas/', SalesConsultationView.as_view(), name='lista_ventas'),
+    path('consulta-ventas/', InvoiceView.as_view(), name='consulta_ventas'),
+    path('lista-ventas/', InvoiceView.as_view(), name='lista_ventas'),
     path('lista_cotizaciones/', view.list_quotations, name="lista_cotizaciones"),
     path('generar_cotizacion/', view.quotations, name="generar_cotizacion"),
     path('lista_ovs/', view.lista_ovs, name='lista_ovs'),
@@ -66,6 +66,6 @@ urlpatterns = [
     path('verificar_estado_pdf/<str:task_id>/', view.verificar_estado_pdf, name='verificar_estado_pdf'),
     path('prueba/', view.prueba, name='prueba'),
     path('actualizando_recetas/', view.probandoActualizador, name='actualizando_recetas'),
-    path('obtener-ventas/', SalesConsultationView.as_view(), name='obtener_ventas'),
-    path('detalles-ventas/', SalesConsultationView.as_view(), name='detalles_ventas'),
+    path('obtener-ventas/', InvoiceView.as_view(), name='obtener_ventas'),
+    path('detalles-ventas/', InvoiceView.as_view(), name='detalles_ventas'),
 ]

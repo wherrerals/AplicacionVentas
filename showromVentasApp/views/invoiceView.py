@@ -10,15 +10,15 @@ from django.contrib.auth.decorators import login_required
 
 # Importing modules
 from adapters.sl_client import APIClient
-from datosLsApp.serializer.salesConsultationSerializer import SalesConsultationSerializer
+from datosLsApp.serializer.salesConsultationSerializer import InvoiceSerializer
 from logicaVentasApp.context.user_context import UserContext
-from logicaVentasApp.services.salesConsultation import SalesConsultation
+from logicaVentasApp.services.invoice import Invoice
 from logicaVentasApp.services.valitadionApp import ValitadionApp
 
 logger = logging.getLogger(__name__)
 
 
-class SalesConsultationView(View):
+class InvoiceView(View):
 
     # this method dispatches the request to the appropriate handler based on the HTTP method
     @method_decorator(login_required)
@@ -85,9 +85,9 @@ class SalesConsultationView(View):
         api_service_layer = APIClient()
         type_sales = "Invoices"
 
-        build_filters = SalesConsultation.build_query_filters(json.loads(request.body), type_sales)
+        build_filters = Invoice.build_query_filters(json.loads(request.body), type_sales)
         get_data_sales = api_service_layer.get_sales_sl(build_filters, type_sales)
-        data_sales_serializer = SalesConsultationSerializer.serializer_sales(get_data_sales)
+        data_sales_serializer = InvoiceSerializer.serializer_sales(get_data_sales)
 
         return JsonResponse({"data": data_sales_serializer}, safe=False)
 
@@ -98,9 +98,11 @@ class SalesConsultationView(View):
 
         sales_data_bp = api_service_layer.sales_details_sl_bp(type_document='Invoices', docEntry=docEntry)
         sales_data_lines = api_service_layer.sales_details_sl_lines(type_document='Invoices', docEntry=docEntry)
-        data_sales_serializer = SalesConsultationSerializer.serializer_sales_details(sales_data_bp, sales_data_lines)
+        data_sales_serializer = InvoiceSerializer.serializer_sales_details(sales_data_bp, sales_data_lines)
         print("data_sales_serializer", data_sales_serializer)
         return JsonResponse(data_sales_serializer, safe=False)
+    
+    
 
 
         
