@@ -17,17 +17,17 @@ document.addEventListener("DOMContentLoaded", function () {
         const cantidad = cantidadCoti;
         const sucursal = line.WarehouseCode;
         const comentario = line.FreeText;
-        const descuentoAplcado = line.DiscountPercent;
+        const descuentoAplcado =0;
         const tipoentrega2 = line.ShippingMethod;
   
         // Opcional: si no tienes stock ni imagen, se puede dejar en null o ajustar
-        const imagen = null;
-        const precioVenta = 11000;
-        const stockTotal = 11000;
-        const precioLista = 11000;
-        const precioDescuento = 11000;
-        const stockBodega = 1;
-        const precioCoti = 11000;
+        const imagen = line.imagen;
+        const precioVenta = line.Price;
+        const stockTotal = '';
+        const precioLista = line.PriceList;
+        const precioDescuento = line.descuentoMax;
+        const stockBodega = '';
+        const precioCoti = line.Price;
   
         const isSVProduct = productoCodigo.startsWith("SV");
   

@@ -55,8 +55,9 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion").forEach((button
             .then((response) => response.json())
             .then((data) => {
                 console.log("Respuesta del backend:", data);
+                console.log(data.lineas);
                 if (data.status === "ok") {
-                    sessionStorage.setItem("documentLines", JSON.stringify(lines));
+                    sessionStorage.setItem("documentLines", JSON.stringify(data.lineas));
                     if (botonPresionado === "duplicar-ODV") {
                         sessionStorage.setItem("tipoDocumento", "ODV");
                         window.location.href = `/ventas/ordenesVentas/`;

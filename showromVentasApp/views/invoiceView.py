@@ -13,6 +13,7 @@ from adapters.sl_client import APIClient
 from datosLsApp.serializer.invoiceSerializer import InvoiceSerializer
 from logicaVentasApp.context.user_context import UserContext
 from logicaVentasApp.services.invoice import Invoice
+from logicaVentasApp.services.usuario import User
 from logicaVentasApp.services.valitadionApp import ValitadionApp
 
 logger = logging.getLogger(__name__)
@@ -89,7 +90,9 @@ class InvoiceView(View):
 
         build_filters = Invoice.build_query_filters(json.loads(request.body), type_sales)
         get_data_sales = api_service_layer.get_sales_sl(build_filters, type_sales)
+        print("get_data_sales", get_data_sales)
         data_sales_serializer = InvoiceSerializer.serializer_sales(get_data_sales)
+        print("data_sales_serializer", data_sales_serializer)
 
         return JsonResponse({"data": data_sales_serializer}, safe=False)
 
@@ -100,6 +103,7 @@ class InvoiceView(View):
 
         sales_data_bp = api_service_layer.sales_details_sl_bp(type_document='Invoices', docEntry=docEntry)
         sales_data_lines = api_service_layer.sales_details_sl_lines(type_document='Invoices', docEntry=docEntry)
+        print("sales_data_lines", sales_data_lines)
         data_sales_serializer = InvoiceSerializer.serializer_sales_details(sales_data_bp, sales_data_lines)
         print("data_sales_serializer", data_sales_serializer)
         return JsonResponse(data_sales_serializer, safe=False)
@@ -110,8 +114,9 @@ class InvoiceView(View):
             try:
                 data = json.loads(request.body)
 
+                sales_person_code = User.user_data(request)['vendedor']
                 print("data", data)
-                lineas_procesadas = InvoiceSerializer.serialize_invoice_lines(data)
+                lineas_procesadas = InvoiceSerializer.serialize_invoice_lines(data, sales_person_code)
                 print("lineas_procesadas", lineas_procesadas)
                 # Procesar duplicación u otras tareas
                 

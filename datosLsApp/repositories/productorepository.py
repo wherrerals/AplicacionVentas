@@ -257,6 +257,11 @@ class ProductoRepository:
         producto = ProductoDB.objects.get(codigo=sku)
         return producto.precioLista
     
+    def obtenerPrecioVenta(sku):
+        
+        producto = ProductoDB.objects.get(codigo=sku)
+        return producto.precioVenta
+
     def obtenerImagenProducto(codigo):
         
         producto = ProductoDB.objects.get(codigo=codigo)

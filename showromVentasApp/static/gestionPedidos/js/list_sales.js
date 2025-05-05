@@ -186,13 +186,16 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             
             function formatCurrency(value) {
-                if (value === undefined || value === null) return '$ 0';
-                
-                const integerValue = Math.floor(value);
+                // Convertimos el valor a número entero
+                const integerValue = value;
                 let formattedValue = integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+            
+                // Si el valor tiene 4 dígitos y no incluye un punto, lo añadimos manualmente
                 if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
                     formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
                 }
+            
+                // Agregamos el símbolo de peso al principio
                 return `$ ${formattedValue}`;
             }
 

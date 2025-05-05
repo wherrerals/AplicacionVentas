@@ -1,4 +1,6 @@
+import math
 from datosLsApp.repositories.productorepository import ProductoRepository
+from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from logicaVentasApp.services.trasportation import Trasnportation
 from logicaVentasApp.services.typeofsale import TypeOfSale
 import re
@@ -105,12 +107,34 @@ class InvoiceSerializer:
         }
 
     @staticmethod
-    def serialize_invoice_lines(json_data):
+    def serialize_invoice_lines(json_data, salesperson):
         print("json_data", json_data)
         document_lines = []
+        vendedor_repo = VendedorRepository()
+        tipo_vendedor = vendedor_repo.obtenerTipoVendedor(salesperson)
 
         for line_info in json_data["DocumentLine"]["value"]:
             line = line_info  # <-- Ya está todo en line_info
+
+            sku = line.get("ItemCode")
+
+            imagen = ProductoRepository.obtenerImagenProducto(sku)
+            marca = ProductoRepository.obtenerMarcaProducto(sku)
+            descuentoMax = ProductoRepository.descuentoMax(sku)
+            priceList = ProductoRepository.obtenerPrecioLista(sku)
+            precioVenta = ProductoRepository.obtenerPrecioVenta(sku)
+
+            if tipo_vendedor == 'P':
+                if marca == "LST":
+                    descuentoMax =  math.floor(min(descuentoMax * 100, 25))
+                else:
+                    descuentoMax = math.floor(min(descuentoMax * 100, 15))
+            else:
+                if marca == "LST":
+                    descuentoMax = math.floor(min(descuentoMax * 100, 15))
+                else:
+                    descuentoMax = math.floor(min(descuentoMax * 100, 10))
+
             warehouse_info = {
                 "WarehouseCode": line.get("WarehouseCode"),
             }
@@ -127,8 +151,11 @@ class InvoiceSerializer:
                 "WarehouseInfo": warehouse_info,
                 "WarehouseCode": line.get("WarehouseCode"),
                 "ShippingMethod": line.get("ShippingMethod"),
-
-
+                "imagen": imagen,
+                "marca": marca,
+                "descuentoMax": descuentoMax,
+                "PriceList": priceList,
+                "Price": precioVenta,
             }
 
             if document_line.get("Quantity", 1) > 0:
