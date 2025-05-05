@@ -68,4 +68,5 @@ urlpatterns = [
     path('actualizando_recetas/', view.probandoActualizador, name='actualizando_recetas'),
     path('obtener-ventas/', InvoiceView.as_view(), name='obtener_ventas'),
     path('detalles-ventas/', InvoiceView.as_view(), name='detalles_ventas'),
+    path('duplicar-documento/', InvoiceView.as_view(), name='duplicar_documento'),
 ]

@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 
 # Importing modules
 from adapters.sl_client import APIClient
-from datosLsApp.serializer.salesConsultationSerializer import InvoiceSerializer
+from datosLsApp.serializer.invoiceSerializer import InvoiceSerializer
 from logicaVentasApp.context.user_context import UserContext
 from logicaVentasApp.services.invoice import Invoice
 from logicaVentasApp.services.valitadionApp import ValitadionApp
@@ -55,6 +55,7 @@ class InvoiceView(View):
     def post_route_map(self):
         return {
             '/ventas/obtener-ventas': self.get_sales_view,
+            '/ventas/duplicar-documento': self.duplicate_in_document,
         }
 
 
@@ -64,6 +65,7 @@ class InvoiceView(View):
             '/ventas/consulta-ventas': self.sales_consultation,
             '/ventas/lista-ventas': self.sales_list_view,
             '/ventas/detalles-ventas': self.sales_details_view,
+
         }
     
     def sales_consultation(self, request):
@@ -102,7 +104,22 @@ class InvoiceView(View):
         print("data_sales_serializer", data_sales_serializer)
         return JsonResponse(data_sales_serializer, safe=False)
     
-    
+
+    def duplicate_in_document(self, request):
+        if request.method == "POST":
+            try:
+                data = json.loads(request.body)
+
+                print("data", data)
+                lineas_procesadas = InvoiceSerializer.serialize_invoice_lines(data)
+                print("lineas_procesadas", lineas_procesadas)
+                # Procesar duplicación u otras tareas
+                
+                return JsonResponse({"status": "ok", "lineas": lineas_procesadas})
+            except Exception as e:
+                return JsonResponse({"status": "error", "message": str(e)}, status=400)
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
 
 
         

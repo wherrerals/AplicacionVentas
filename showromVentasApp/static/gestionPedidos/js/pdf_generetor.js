@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const selectElement = document.getElementById("direcciones_despacho");
         const direccion2 = selectElement.value;
 
-        const contactoCliente = document.getElementById("contactos_cliete");
+        const contactoCliente = document.getElementById("contactos_cliete") || document.getElementById("idContact");
         const contacto = contactoCliente.value;
         const sucursal = document.getElementById("sucursal").textContent.trim();
         const observaciones = document.getElementById("Observaciones-1").value; //selecionando observaciones por fila de producto por medio de id

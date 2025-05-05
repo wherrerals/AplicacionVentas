@@ -43,10 +43,10 @@
         <div class="dropdown">
           <button class="btn btn-outline-primary dropdown-toggle fw-bold" aria-expanded="false" data-bs-toggle="dropdown" type="button"> Acciones&nbsp; </button>
           <div class="dropdown-menu">
-            <a class="dropdown-item" href="#" id="">Copiar en Cotización</a>
-            <a class="dropdown-item" href="#" id="copiar-ODV">Copiar en Orden de Venta</a>
-            <a class="dropdown-item" href="#" id="">Copiar en Solicitud Devolución</a>
-            <a class="dropdown-item" href="#" id="">Imprimir / Descargar PDF</a>
+            <a class="dropdown-item" href="#" id="duplicar-Cotizacion">Copiar en Cotización</a>
+            <a class="dropdown-item" href="#" id="duplicar-ODV">Copiar en Orden de Venta</a>
+            <a class="dropdown-item" href="#" id="" hidden>Copiar en Solicitud Devolución</a>
+            <a class="dropdown-item" href="#" id="generarPDF">Imprimir / Descargar PDF</a>
           </div>
         </div>
       </div>
@@ -369,6 +369,7 @@
   <script src="{% static 'gestionPedidos/js/productosInteraccion.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/cargarInfoClientes.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/load_sales.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/duplicate_in_document.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/search_data_document.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/pdf_generetor.js' %}"></script>
 
