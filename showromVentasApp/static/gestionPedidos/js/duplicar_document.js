@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
     // Mostrar overlay de carga
-    showLoadingOverlay();
 
     const savedLines = sessionStorage.getItem("documentLines");
   
@@ -64,12 +63,10 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   
       sessionStorage.removeItem("documentLines");
-      hideLoadingOverlay();
   
     } else {
       console.log("No se encontraron datos en sessionStorage. Verificando URL...");
       // (opcional) puedes mantener la lógica del fetch si deseas fallback
-      hideLoadingOverlay();
     }
   });
   
