@@ -104,16 +104,24 @@ class Direccion:
         return None
     
     @staticmethod
-    def assign_bill_ship_addres(adrres, adrres2):
-        
-        if adrres == "No hay direcciones disponibles":
-            addres_bill = DireccionRepository.obtenerDireccion(adrres)
-        else:
-            addres_bill = DireccionRepository.obtenerDireccion(adrres2)
+    def assign_bill_ship_addres(address1, address2, branch):
 
-        if adrres2 == "No hay direcciones disponibles":
-            addres_ship = DireccionRepository.obtenerDireccion(adrres2)
-        else:
-            addres_ship = DireccionRepository.obtenerDireccion(adrres)
+        no_address = "No hay direcciones disponibles"
+        if address1 == no_address or address2 == no_address:
+                direcciones = Direccion.generate_store_address(branch)
+                return direcciones, direcciones
         
-        return addres_bill, addres_ship
+        billing_address = (
+            DireccionRepository.obtenerDireccion(address2) 
+            if address1 == no_address 
+            else DireccionRepository.obtenerDireccion(address1)
+        )
+        
+        # Obtener dirección de envío
+        shipping_address = (
+            DireccionRepository.obtenerDireccion(address1) 
+            if address2 == no_address 
+            else DireccionRepository.obtenerDireccion(address2)
+        )
+        
+        return billing_address, shipping_address
