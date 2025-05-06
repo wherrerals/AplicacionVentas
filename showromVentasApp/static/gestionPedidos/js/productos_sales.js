@@ -1,5 +1,5 @@
 class Producto {
-    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado) {
+    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado, totalProducto) {
         
         this.docEntry_linea = docEntry_linea;
         this.linea_documento = linea_documento;
@@ -12,6 +12,7 @@ class Producto {
         this.precioDescuento = Math.round(precioDescuento);
         this.precioSinDescuento = 0;
         this.totalProducto = precioVenta * cantidad;
+        this.totalProducto2 = totalProducto;
         this.cantidad = cantidad;
         this.sucursal = sucursal;
         this.comentario = comentario;
@@ -134,7 +135,7 @@ class Producto {
                     <input class="form-control format-number" type="number" style="font-size: 12px;width: 80px;"  id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad}" onclick="this.select()" disabled>
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
-                    <span id="precio_Venta" data-totalProductValue="${this.totalProducto}">${formatCurrency(this.totalProducto)}</span>
+                    <span id="precio_Venta" data-totalProductValue="${this.totalProducto}">${formatCurrency(this.totalProducto2)}</span>
                 </td>
             </tr> 
             <tr style="font-size: 12px;background: transparent;">
@@ -232,7 +233,7 @@ class Producto {
 }
 
 // Función global para manejar la adición de productos
-function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, descuentoAplcado) {
+function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, descuentoAplcado, totalProducto) {
     // Contador de productos
     console.log("cantidad: ", cantidad);
     console.log("sucursal: ", sucursal);
@@ -240,7 +241,7 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
     let contprod = document.querySelectorAll('#productos tbody').length + 1;
 
     // Crear una instancia de Producto
-    let producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado);
+    let producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado, totalProducto);
 
     let newRow = producto.crearFila(contprod);
 

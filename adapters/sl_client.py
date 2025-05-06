@@ -1006,7 +1006,7 @@ class APIClient:
 
     def sales_details_sl_lines(self, type_document, docEntry):
         crossJoin = (f"{type_document},{type_document}/DocumentLines,Items/ItemWarehouseInfoCollection")
-        expand = f"{type_document}/DocumentLines($select=DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
+        expand = f"{type_document}/DocumentLines($select=TreeType,DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
         filter = f"{type_document}/DocEntry eq {docEntry} and {type_document}/DocumentLines/DocEntry eq {type_document}/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq {type_document}/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq {type_document}/DocumentLines/WarehouseCode"
 
         base_url = self.base_url

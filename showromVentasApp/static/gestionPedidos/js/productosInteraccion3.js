@@ -69,13 +69,13 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
 
         console.log('Precio final:', precioFinal, 'Precio con descuento:', precioConDescuento);
 
-        let precioFinaldefinido = Math.round(precioFinal);
-        let precioConDescuentodefinido = Math.round(precioConDescuento);
+        let precioFinaldefinido = precioFinal;
+        let precioConDescuentodefinido = precioConDescuento;
 
         // Actualizar el producto en la lista
         producto.modificarPrecioFinal(precioFinal);
 
-        tdPrecioVenta.textContent = formatCurrency(precioFinaldefinido);
+        //tdPrecioVenta.textContent = formatCurrency(precioFinaldefinido);
         tdPrecioDescuento.textContent = formatCurrency(precioConDescuentodefinido);
 
         actualizarValores();
@@ -126,16 +126,14 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
         document.querySelector('#total_bruto').setAttribute('data-total-bruto', totalBruto);
 
         // Redondear los totales al final
-        totalIva = Math.round(totalIva);
-        totalBruto = Math.round(totalBruto);
-        totalNeto = Math.round(totalNeto);
+        totalIva = totalIva;
+        totalBruto = totalBruto;
+        totalNeto = totalNeto;
 
     
-        document.querySelector('#iva').textContent = formatCurrency(totalIva);
-        document.querySelector('#total_bruto').textContent = formatCurrency(totalBruto);
-        document.querySelector('#total_neto').textContent = formatCurrency(totalNeto);
-
-
+        //document.querySelector('#iva').textContent = formatCurrency(totalIva);
+        //document.querySelector('#total_bruto').textContent = formatCurrency(totalBruto);
+        //document.querySelector('#total_neto').textContent = formatCurrency(totalNeto);
     }
 
 }
@@ -143,12 +141,12 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
 
 function formatCurrency(value) {
     // Convertimos el valor a número entero
-    const integerValue = Math.floor(value);
+    const integerValue = value;
     
     // Usamos toLocaleString con minimumFractionDigits: 0 para no mostrar decimales
     let formattedValue = integerValue.toLocaleString('es-ES', {
         minimumFractionDigits: 0,
-        maximumFractionDigits: 0  // Esto asegura que no se muestren decimales
+        maximumFractionDigits: 2  // Esto asegura que no se muestren decimales
     });
 
     // Si el valor tiene 4 dígitos y no incluye un punto, lo añadimos manualmente

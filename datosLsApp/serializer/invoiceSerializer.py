@@ -62,6 +62,9 @@ class InvoiceSerializer:
             "DocumentStatus": invoice_data.get("DocumentStatus"),
             "Cancelled": invoice_data.get("Cancelled"),
             "TransportationCode": Trasnportation.get_transportation_code(invoice_data.get("TransportationCode")),
+            "DocTotalNeto": invoice_data.get("DocTotalNeto"),
+            "VatSum": invoice_data.get("VatSum"),
+            "DocTotal": invoice_data.get("DocTotal"),
         }
 
         invoice_lines = []
@@ -83,9 +86,13 @@ class InvoiceSerializer:
                     "DiscountPercent": doc_line.get("DiscountPercent"),
                     "WarehouseCode": doc_line.get("WarehouseCode"),
                     "GrossPrice": doc_line.get("GrossPrice"),
-                }
+                    "GrossTotal": doc_line.get("GrossTotal"),
 
-                invoice_lines.append(data_lines)
+                }
+                tipo = doc_line.get("TreeType")
+                
+                if tipo != "I":
+                    invoice_lines.append(data_lines)
         
         sales_data = data_bp.get('SalesPersons', {})
         sales_data_contact = data_bp.get('BusinessPartners/ContactEmployees', {})

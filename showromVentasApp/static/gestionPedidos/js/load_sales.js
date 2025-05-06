@@ -51,6 +51,25 @@ document.addEventListener("DOMContentLoaded", function () {
             const internal_code = data.Invoices.InternalCode;
             const address = data.Invoices.Address;
             const address2 = data.Invoices.Address2; 
+            const totalNeto = data.Invoices.DocTotalNeto;
+            const totalIVA = data.Invoices.VatSum;
+            const totalbruto = data.Invoices.DocTotal;
+
+            const totalnetoelemento = document.getElementById("total_neto");
+            const totalivaelemento = document.getElementById("iva");
+            const totalbrutoelemento = document.getElementById("total_bruto");
+
+            if (totalnetoelemento) {
+              totalnetoelemento.innerText = `${formatCurrency(totalNeto)}`;
+            }
+            if (totalivaelemento) { 
+              totalivaelemento.innerText = `${formatCurrency(totalIVA)}`;
+            }
+
+            if (totalbrutoelemento) {
+              totalbrutoelemento.innerText = `${formatCurrency(totalbruto)}`;
+            }
+
             const name_user_element = document.getElementById("inputCliente");
             const contact_element = document.getElementById("idContact");
 
@@ -71,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             if (name_user_element) {
-              name_user_element.innerText = name_user;
+              name_user_element.innerText = cardCode + ' - ' + name_user;
             } 
             
             if (cardCode.endsWith("C") || cardCode.endsWith("c")) {
@@ -191,10 +210,10 @@ document.addEventListener("DOMContentLoaded", function () {
               const descuentoAplcado = line.DiscountPercent;
               const sucursal = line.WarehouseCode;
               const comentario = line.FreeText;
-  
+              const totalProducto = line.GrossTotal;
               let linea_documento_real = parseInt(linea_documento);
   
-              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado);
+              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado, totalProducto);
             });
           }
   
