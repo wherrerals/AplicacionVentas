@@ -167,17 +167,19 @@ document.addEventListener("DOMContentLoaded", function () {
   
             const dueDateElement = document.getElementById("docDueDate");
             if (dueDateElement) {
-              dueDateElement.setAttribute = `${docDate}`;
-  
-              const date = new Date(docDate);
-  
-              date.setDate(date.getDate() + 10);
-  
-              const formattedDate = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
-  
+              // Split del string ISO por "-"
+              const [year, month, day] = docDate.split('-');
+            
+              // Formato final: dd/mm/yyyy
+              const formattedDate = `${day}/${month}/${year}`;
+            
+              // Setear texto visible
               dueDateElement.textContent = formattedDate;
-  
+            
+              // Si quieres guardar el valor original como atributo, puedes usar esto:
+              dueDateElement.setAttribute('data-original-date', docDate);
             }
+            
   
             const estadoElement = document.querySelector('p strong[data-estado="bost_Open"]');
             if (estadoElement) {
