@@ -1,4 +1,6 @@
 from datosLsApp.models import ComunaDB
+from rapidfuzz import fuzz
+
 
 class ComunaRepository:
     """
@@ -45,4 +47,26 @@ class ComunaRepository:
             return dato[0]
         else:
             return 0
+
+    def obtenerComunaPorNombre(nombre_comuna):
+        from logicaVentasApp.services.comuna import Comuna
+
+        nombre_normalizado = Comuna.normalizar_nombre(nombre_comuna)
+        
+        comunas = ComunaDB.objects.all()
+        mejores_resultados = []
+
+        for comuna in comunas:
+            nombre_db = Comuna.normalizar_nombre(comuna.nombre)
+            puntaje = fuzz.ratio(nombre_normalizado, nombre_db)
+            if puntaje > 20: 
+                mejores_resultados.append((comuna, puntaje))
+        
+        if mejores_resultados:
+            mejores_resultados.sort(key=lambda x: x[1], reverse=True)
+            print("mejores_resultados", mejores_resultados[0][0])
+            return mejores_resultados[0][0]
+        else:
+            return 0
+
 

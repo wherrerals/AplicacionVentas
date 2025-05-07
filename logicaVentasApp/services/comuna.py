@@ -1,4 +1,6 @@
 import json
+import re
+from unidecode import unidecode
 from django.http import JsonResponse
 from requests import request
 from datosLsApp.repositories.comunarepository import ComunaRepository
@@ -26,4 +28,11 @@ class Comuna:
 
         return JsonResponse(comunas_list, safe=False)
     
+    @staticmethod
+    def normalizar_nombre(nombre):
+        nombre = unidecode(nombre.lower())
+        nombre = re.sub(r'\d+', '', nombre)
+        nombre = re.sub(r'[^\w\s]', '', nombre)
+        nombre = nombre.strip()
+        return nombre
 

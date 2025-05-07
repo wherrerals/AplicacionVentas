@@ -16,3 +16,5 @@ redi
 pika
 weasyprint
 python-dotenv
+rapidfuzz
+unidecode

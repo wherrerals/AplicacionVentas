@@ -771,9 +771,18 @@ class SocioNegocio:
                         
             # Obtener la comuna del repositorio
             comuna = ComunaRepository().obtenerComunaPorId(id_comuna)
-                        
-            # Verificar si se obtuvo una comuna válida
-            comuna_id = comuna.codigo if comuna != 0 else direccion["region"]            
+            
+            if not comuna:
+                comuna2 = ComunaRepository.obtenerComunaPorNombre(id_comuna)
+                
+            if comuna2 != 0:
+                comuna_id = comuna2.codigo
+            elif comuna != 0:
+                comuna_id = comuna.codigo
+            else:
+                comuna_id = direccion["region"]
+
+            #comuna_id = comuna.codigo if comuna != 0 else direccion["region"]            
             
             # Crear la dirección asociada
             DireccionRepository.crearDireccion(
