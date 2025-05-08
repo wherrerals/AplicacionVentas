@@ -775,10 +775,10 @@ class SocioNegocio:
             if not comuna:
                 comuna2 = ComunaRepository.obtenerComunaPorNombre(id_comuna)
                 
-            if comuna2 != 0:
-                comuna_id = comuna2.codigo
-            elif comuna != 0:
+            if comuna != 0:
                 comuna_id = comuna.codigo
+            elif comuna2 != 0:
+                comuna_id = comuna2.codigo
             else:
                 comuna_id = direccion["region"]
 
