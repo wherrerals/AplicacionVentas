@@ -1,234 +1,787 @@
-
 <!DOCTYPE html>
-<html lang="es">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <title>Cotización</title>
-    <style>
-        /* General */
-        body {
-            font-family: 'Arial', sans-serif;
-            font-size: 12px;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            line-height: 1.4;
-        }
+  <meta charset="UTF-8" />
+  <title>PDF Cotización</title>
+  <style>
+    /* Estilos generales */
 
-        /* Encabezado */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: black;
-            padding: 20px;
-            border-bottom: 3px solid #947b3a;
-        }
+    @page {
+      size: letter;
+      /* Tamaño de la hoja */
+      margin: 0;
+      counter-reset: none;
+      /* Elimina márgenes */
+    }
 
-        .header .logo {
-            max-width: 200px;
-        }
+    /* Estilo cuerpo de html */
+    body {
+      font-size: 12px;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      line-height: 1.4;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: normal;
+      /* Por defecto, sin negrita */
+      text-indent: 0;
+      letter-spacing: normal;
+      word-spacing: normal;
+    }
 
-        .header .cotizacion {
-            background-color: #947b3a;
-            color: #fff;
-            padding: 10px 20px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 5px;
-        }
+    .th-product {
+      display: table-cell;
+      vertical-align: inherit;
+      font-weight: bold;
+      /* Esto ya aplica negrita */
+      text-align: -internal-center;
+      unicode-bidi: isolate;
+    }
 
-        /* Información del cliente y detalles de cotización */
-        .info-section {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px;
-            margin-bottom: 10px;
-        }
+    /* Estilos de las tablas */
+    .terminos-titulo {
+      font-size: 14px;
+      font-weight: bold;
+    }
 
-        .info-box {
-            width: 48%;
-            font-size: 12px;
-        }
+    .terminos-contenido {
+      font-size: 10px;
+    }
 
-        .info-box h3 {
-            font-size: 14px;
-            color: #004085;
-            margin-bottom: 8px;
-        }
+    header {
+      position: fixed;
+      top: 0;
+      margin-right: 0;
+    }
 
-        .info-box p {
-            margin: 2px 0;
-        }
+    footer {
+      /* position: fixed; */
+      bottom: 0;
+      margin-top: 300px;
+      position: absolute;
+      text-align: center; /* Centra el contenido horizontalmente */
+      width: 100%;
 
-        /* Tabla de productos */
-        .table-container {
-            margin: 0 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            overflow: hidden;
-        }
 
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
+    }
 
-        .table th {
-            background-color: black;
-            color: white;
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #ccc;
-        }
+    /* Estilos de la cabecera */
+    .header-logo {
+      width: 391px;
+      height: 50px;
+      padding: 10px;
+      background-color: #000000;
+      text-align: center;
+    }
 
-        .table td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
+    .img-logo {
+      max-width: 231px;
+      height: auto;
+    }
 
-        .table .image {
-            max-width: 50px;
-            max-height: 50px;
-            object-fit: contain;
-        }
+    .header-number {
+      background-color: #caaa74;
+      text-align: center;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: bold;
+      width: 470px;
+      height: 50px;
+      padding: 10px;
+    }
 
-        /* Resumen */
-        .summary {
-            margin: 20px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 12px;
-        }
+    /* Estilos de las tablas */
+    .main-table {
+      width: 792px;
+      border: 0;
+      margin: 0 auto;
+      border-spacing: 0;
+      padding: 3px;
+    }
 
-        .summary .totals {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 10px;
-        }
+    .spacer2 {
+      height: 20px;
+      margin-top: 50px;
+    }
 
-        .summary .totals div {
-            text-align: right;
-            padding: 5px 0;
-        }
+    .spacer3 {
+      height: 10px;
+      margin-top: 28px;
+    }
 
-        .summary .totals .highlight {
-            font-weight: bold;
-            font-size: 14px;
-            background-color: #004085;
-            color: #fff;
-            padding: 5px 10px;
-            border-radius: 3px;
-        }
+    .spacer4 {
+      height: 80px;
+      margin-top: 250px;
+    }
 
-        /* Información bancaria */
-        .bank-info {
-            margin: 20px;
-            font-size: 12px;
-            line-height: 1.6;
-        }
+    .spacer {
+      height: 5px;
+      margin-top: 0px;
+    }
 
-        .bank-info h3 {
-            color: black;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
+    .content-table {
+      width: 700px;
+      border: 0;
+      margin: 0 auto;
+      padding: 3px;
+    }
 
-        /* Footer */
-        .footer {
-            margin: 20px;
-            font-size: 10px;
-            text-align: center;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
-            color: #555;
-        }
+    .detail-table {
+      width: 300px;
+      border: 1px solid black;
+      /* Borde alrededor de la tabla */
+      border-collapse: collapse;
+      /* Colapsar los bordes para que no haya espacio entre ellos */
+      margin: 0 auto;
+      font-size: 12px;
+    }
 
-        .footer p {
-            margin: 5px 0;
-        }
+    
+    .detail-table2 {
+      width: 300px;
+      border: 1px solid white;
+      /* Borde alrededor de la tabla */
+      border-collapse: collapse;
+      /* Colapsar los bordes para que no haya espacio entre ellos */
+      margin: 0 auto;
+      font-size: 12px;
+    }
 
-        .footer .page-info {
-            font-size: 9px;
-            color: #888;
-        }
-    </style>
+    .data-table {
+      width: 750px;
+      border: 2px solid black;
+      /* Borde alrededor de la tabla */
+      border-collapse: collapse;
+      /* Colapsar los bordes para que no haya espacio entre ellos */
+      margin: 0 auto;
+    }
+
+    .data-table td,
+    .data-table th {
+      padding: 6px;
+      margin: auto;
+      width: 100px;
+      /* Añadir un poco de padding para que el contenido no esté pegado a los bordes */
+      font-family: 'Arial MT', Arial, sans-serif;
+      font-weight: bold;
+      font-size: 10px;
+    }
+    
+    /* Asegurar que las celdas hereden el ancho de sus encabezados */
+    .data-table td {
+      width: inherit;
+    }
+
+    .data-table tr {
+      border: none; 
+      /* Eliminar los bordes de las filas */
+    }
+
+    .total-table {
+      border-collapse: collapse;
+      margin: 0 auto;
+      font-size: 11px;
+    }
+
+    /* Estilos de texto */
+    .section-title {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .regular-text {
+      font-size: 9px;
+    }
+
+    .regular-text2 {
+      font-size: 13px;
+    }
+
+    .header-text {
+      font-size: 18px;
+    }
+
+    /* Estilos específicos */
+    .product-header {
+      background-color: #000000;
+      color: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: bold;
+      align-items: center;
+
+    }
+
+    .product-comment {
+      color: #9a999e;
+    }
+
+    .total-row {
+      background-color: #000000;
+      color: #ffffff;
+      margin: 0;
+      font-weight: bold;
+    }
+
+    .total-row2 {
+      background-color: white;
+      color: #ffffff;
+      margin: 0;
+      font-weight: bold;
+    }
+    
+    .border-bottom {
+      border-bottom: 1px solid black;
+    }
+
+    /* Alineaciones */
+    .text-center {
+      text-align: center;
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    .valign-top {
+      vertical-align: top;
+    }
+
+    /* Espaciados */
+    .spacer {
+      height: 20px;
+    }
+
+    .img-footer {
+      max-width: 744px;
+      height: auto;
+      display: block; /* Asegura que la imagen se comporte como un bloque */
+      margin: 0 auto; /* Centra la imagen horizontalmente */
+    }
+
+    .img-product {
+      max-width: 40px;
+      max-height: 40px;
+      object-fit: contain;
+    }
+
+    .content-table-info {
+      page-break-before: always;
+      /* Fuerza un salto de página antes de este div */
+      margin-top: 1cm;
+      /* Espacio opcional antes del contenido */
+    }
+  </style>
 </head>
 
 <body>
-    <!-- Encabezado -->
-    <div class="header">
-        {% load static %}
-        <img src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/a156f0f3-157a-40f7-b3b9-848ec960ed5a___19c4cc248f9416bc9d534b43493bd501.png" alt="LED Studio Logo" class="logo">
-        <div class="cotizacion">COTIZACIÓN N°{{ cotizacion.numero }}</div>
-    </div>
-    <!-- Información del cliente y detalles de la cotización -->
-    <div class="info-section">
-        <div class="info-box">
-            <h3>Datos del cliente</h3>
-            <p>RUT: {{ cotizacion.cliente.rut }}</p>
-            <p>{{ cotizacion.cliente.nombre }} ({{ cotizacion.cliente.tipo }})</p>
-            <p>Dirección: {{ cotizacion.cliente.direccion }}</p>
-            <p>Teléfono: {{ cotizacion.cliente.telefono }}</p>
-            <p>Email: {{ cotizacion.cliente.email }}</p>
-        </div>
-        <div class="info-box">
-            <h3>Detalles de la Cotización</h3>
-            <p>Fecha: {{ cotizacion.fecha }}</p>
-            <p>Válido hasta: {{ cotizacion.validez }}</p>
-            <p>Vendedor: {{ cotizacion.vendedor.nombre }}</p>
-            <p>Email: {{ cotizacion.vendedor.email }}</p>
-            <p>Teléfono: {{ cotizacion.vendedor.telefono }}</p>
-            <p>Showroom: LED STUDIO TIENDA DE ILUMINACION</p>
-        </div>
-    </div>
-    
-    <!-- Productos -->
-    <div class="table-container">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>N°</th>
-                    <th>SKU</th>
-                    <th>Descripción</th>
-                    <th>Cantidad</th>
-                    <th>Valor DEscuento</th>
-                    <th>% Descuento</th>
-                    <th>Subtotal Neto</th>
-                </tr>
-            </thead>
+  <header class="header">
+    <table class="main-table">
+      <tbody>
+        <tr class="header-text">
+          <td class="header-logo">
+            <img class="img-logo"
+              src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/a156f0f3-157a-40f7-b3b9-848ec960ed5a___19c4cc248f9416bc9d534b43493bd501.png" />
+          </td>
+          <td class="header-number">{{ cotizacion.tipo_documento }} Nº{{ cotizacion.numero }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </header>
+
+  <div class="spacer2"></div>
+
+  <table class="content-table">
+    <tbody>
+      <tr class="section-title">
+        <td>Datos del Cliente</td>
+        <td>&nbsp;</td>
+        <td>Detalles de la Cotización</td>
+      </tr>
+      <tr class="regular-text2">
+        <td>
+          {{ cotizacion.cliente.rut }} <br /> 
+          {{ cotizacion.cliente.nombre }} <br />{{cotizacion.cliente.giro}}
+          <br />{{ cotizacion.cliente.direccion}}<br />Contacto: {{ cotizacion.cliente.contacto}}
+           <br />Teléfono: {{ cotizacion.cliente.telefono }} <br />Email: {{ cotizacion.cliente.email }}
+        </td>
+        <td>&nbsp;</td>
+        <td>
+          Fecha: {{ cotizacion.fecha }} <br />Válido hasta: {{ cotizacion.validez }} <br />Vendedor: {{ cotizacion.vendedor.nombre }} <br />Email: {{ cotizacion.vendedor.email }}
+          <br />Teléfono: {{ cotizacion.vendedor.telefono }} <br /> Sucursal: {{ cotizacion.cliente.sucursal }}<br />Observaciones: {{ cotizacion.observaciones }}
+        </td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="data-table">
+    <tbody>
+      <tr class="product-header">
+        <th class="th-product">Nº</th>
+        <th>&nbsp;</th>
+        <th class="th-product">SKU</th>
+        <th class="th-product">Descripción</th>
+        <th class="th-product">Precio Neto</th>
+        <th class="th-product">%Dscto</th>
+        <th class="th-product">Precio con Dscto</th>
+        <th class="th-product">Cantidad</th>
+        <th class="th-product">Subtotal Neto</th>
+      </tr>
+      {% for producto in cotizacion.productos %}
+      {% if forloop.counter|divisibleby:8 and not forloop.first %}
+    </tbody>
+    </table>
+    <footer align="center">
+      <img class="img-footer"
+        src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/fec8d6e3-34b0-42e1-b753-383cae1d49fa___df4e95879003eb4069f404088f2e21cc.jpg"
+        alt="" />
+    </footer>
+    <div style="page-break-before: always;"></div>
+    <div class="spacer3"></div>
+    <div class="spacer3"></div>
+
+    <table class="data-table">
+      <tbody>    
+      <tr class="product-header">
+        <th>Nº</th>
+        <th>&nbsp;</th>
+        <th>SKU</th>
+        <th>Descripción</th>
+        <th>Precio Neto</th>
+        <th>%Dscto</th>
+        <th>Precio con Dscto</th>
+        <th>Cantidad</th>
+        <th class="Subtotal">Subtotal Neto</th>
+      </tr>
+      {% endif %}
+      <tr>
+        <td rowspan="2" class="border-bottom">{{ forloop.counter }}.</td>
+        <td rowspan="2" class="border-bottom">
+          <img class="img-product" src="{{ producto.imagen }}" alt="{{ producto.descripcion }}" class="image" />
+        </td>
+        <td class="text-align">{{ producto.sku }}</td>
+        <td class="nowrap">{{ producto.descripcion }}</td>
+        <td class="text-center nowrap">{{ cotizacion.lineas.precio_linea_neto }}</td>
+        <td class="text-center">{{ producto.porcentaje_descuento }} %</td>
+        <td class="text-center nowrap">{{ cotizacion.lineas.precio_descuento_neto }}</td>
+        <td class="text-center">{{ producto.cantidad }}</td>
+        <td class="text-align nowrap">{{ cotizacion.lineas.total_linea_neto }}</td>
+      </tr>
+      <tr class="product-comment">
+        <td class="border-bottom"></td>
+        <td colspan="6" class="border-bottom">
+          Comentario: {{ producto.comentarios }}
+        </td>
+      </tr>
+      <footer align="center">
+        <img class="img-footer"
+          src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/fec8d6e3-34b0-42e1-b753-383cae1d49fa___df4e95879003eb4069f404088f2e21cc.jpg"
+          alt="" />
+      </footer>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Si hay exactamente 7 productos, agregar un salto de línea -->
+  {% if cotizacion.productos|length == 7 %}
+  <tr style="page-break-before: always;">
+    <td colspan="9"></td>
+  </tr>
+  <tr>
+    <td colspan="9">
+      <div class="spacer4"></div>
+    </td>
+  </tr>
+  {% endif %}
+
+  {% if cotizacion.tiene_descuento %}
+  <table class="content-table">
+    <tbody class="regular-text">
+      <tr>
+        <td colspan="3">&nbsp;</td>
+      </tr>
+      <tr>
+        <td class="valign-top">
+          <table class="detail-table">
             <tbody>
-                {% for producto in cotizacion.productos %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ producto.sku }}
-                        <img src="{{ producto.imagen }}" alt="{{ producto.descripcion }}" class="image">
-                    </td>
-                    <td>
-                        {{ producto.descripcion }}<br>
-                        <span style="font-size: 10px; color: gray;">Entrega: {{ producto.entrega }}</span>
-                    </td>
-                    <td>{{ producto.cantidad }}</td>
-                    <td>${{ producto.descuento }}</td>
-                    <td>{{ producto.porcentaje_descuento }}%</td>
-                    <td>${{ producto.subtotal_neto }}</td>
-                </tr>
-                {% endfor %}
+              <tr>
+                <td colspan="3">
+                  <b>Detalle de los descuentos</b>
+                </td>
+              </tr>
+              <tr>
+                <td>Total sin Descuento Valor Neto</td>
+                <td>$</td>
+                <td class="text-right">{{ cotizacion.totales.total_sin_descuento_neto }}</td>
+              </tr>
+              <tr>
+                <td>Total Descuento Valor Neto</td>
+                <td>$</td>
+                <td class="text-right">{{ cotizacion.totales.total_descuento_neto }}</td>
+              </tr>
+              <tr class="total-row">
+                <td>Total Valor Neto</td>
+                <td>$</td>
+                <td class="text-right">{{ cotizacion.totales.total_valor_neto }}</td>
+              </tr>
+              <tr>
+                <td>Total sin Descuento con IVA</td>
+                <td>$</td>
+                <td class="text-right">{{ cotizacion.totales.total_sin_descuento_bruto }}</td>
+              </tr>
+              <tr>
+                <td>Total Descuento con IVA</td>
+                <td>$</td>
+                <td class="text-right">{{ cotizacion.totales.total_descuento_bruto }}</td>
+              </tr>
+              <tr class="total-row">
+                <td>Total a pagar con IVA</td>
+                <td>$</td>
+                <td class="text-right">{{ cotizacion.totales.total_valor_bruto }}</td>
+              </tr>
             </tbody>
-        </table>
-    </div>
-    
-    <!-- Totales -->
-    <div class="totals">
-        <h3>Totales</h3>
-        <p>Total Neto: {{ cotizacion.totalNeto }}</p>
-        <p>IVA (19%): {{ cotizacion.iva }}</p>
-        <p><strong>Total a Pagar: {{ cotizacion.totalbruto }}</strong></p>
-    </div>
+          </table>
+        </td>
+        {% elif cotizacion.tiene_descuento == False %}
+        <table class="content-table">
+          <tbody class="regular-text">
+            <tr>
+              <td colspan="3">&nbsp;</td>
+            </tr>
+            <tr>
+              <td class="valign-top">
+                <table class="detail-table2">
+                  <tbody>
+                    <tr>
+                      <td colspan="3">
+                        <b></b>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td></td>
+                      <td class="text-right"></td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td></td>
+                      <td class="text-right"></td>
+                    </tr>
+                    <tr class="total-row2">
+                      <td></td>
+                      <td></td>
+                      <td class="text-right"></td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td></td>
+                      <td class="text-right"></td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td></td>
+                      <td class="text-right"></td>
+                    </tr>
+                    <tr class="total-row2">
+                      <td></td>
+                      <td></td>
+                      <td class="text-right"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+        {% endif %}
+        <td>&nbsp;</td>
+        <td>
+          <table class="total-table">
+            <tbody>
+              <tr class="medium-text">
+                <td>Subtotal Neto</td>
+                <td>$</td>
+                <td class="text-right">{{ cotizacion.totalNeto }}</td>
+              </tr>
+              <tr class="medium-text">
+                <td>IVA 19%</td>
+                <td>$</td>
+                <td class="text-right">{{ cotizacion.iva }}</td>
+              </tr>
+              <tr class="total-row medium-text">
+                <td>Total a Pagar</td>
+                <td>$</td>
+                <td class="text-right">{{ cotizacion.totalbruto }}</td>
+              </tr>
+              <tr class="small-text">
+                <td colspan="3">
+                  <b>Datos para transferencia:</b><br />
+                  Nombre: Studio Group SPA.<br />
+                  Rut: 76.927.160-0<br />
+                  Email comprobante: cobranza@ledstudio.cl<br />
+                  Showroom Renca: Banco Scotiabank: N° Cta.Cte.
+                  280096717<br />
+                  Showroom Las Condes: Banco Scotiabank: N° Cta.Cte.
+                  1640022721<br />
+                  Showroom Vitacura: Banco Scotiabank: N° Cta.Cte.
+                  1070003742<br />
+                  Todos los Showroom: Banco Santander N° Cta.Cte.
+                  0-000-6618926-0
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="3">&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
+  <footer align="center">
+    <img class="img-footer"
+      src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/fec8d6e3-34b0-42e1-b753-383cae1d49fa___df4e95879003eb4069f404088f2e21cc.jpg"
+      alt="" />
+  </footer>
+  <div class="content-table-info">
+    <div class="spacer"></div>
+    <table class="content-table">
+      <tbody>
+        <tr>
+          <td colspan="6">&nbsp;</td>
+        </tr>
+        <tr class="section-title">
+          <td colspan="6">Horarios de Atención y Retiro de Productos</td>
+        </tr>
+        <tr class="regular-text valign-top">
+          <td>
+            <b>Showroom Las Condes</b><br />
+            Av. Las Condes 7363, Las Condes<br />
+            Horario de Atención:<br />
+            Lunes a viernes: 9:30 a 19:00 Hrs.<br />
+            Sábados: 10:00 a 14:00 Hrs.<br />
+            Teléfono: (56) 2 2385 3700
+          </td>
+          <td>&nbsp;</td>
+          <td>
+            <b>Showroom Vitacura</b><br />
+            Av. Padre Hurtado Norte 1199, Vitacura<br />
+            Horario de Atención:<br />
+            Lunes a viernes: 9:30 a 19:00 Hrs.<br />
+            Sábados: 10:00 a 14:00 Hrs.<br />
+            Teléfono: (56) 2 2385 3600
+          </td>
+          <td>&nbsp;</td>
+          <td>
+            <b>Showroom Patio Panal</b><br />
+            Av. Pdte Eduardo Frei Montalva 550, Mod 2, Renca<br />
+            Horario de Atención:<br />
+            Lunes a viernes: 8:30 a 18:00 Hrs.<br />
+            Teléfono: (56) 2 2385 3500
+          </td>
+          <td>
+            <b>¡PRONTO EN REÑACA!<br />
+              Showroom Reñaca</b><br />
+            Av. Reñaca Norte 25, Edificio 2, Viña del Mar<br />
+          </td>
+        </tr>
+        <tr>
+          <td colspan="6">&nbsp;</td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="content-table">
+      <tbody>
+        <tr class="section-title">
+          <td>Políticas de Garantía, Devolución y Cambio</td>
+        </tr>
+        <tr class="regular-text">
+          <td>
+            <b>Estimado Cliente:</b> Con su preferencia usted ha adquirido
+            equipos de alta calidad, que bajo condiciones normales, operan en
+            forma ininterrumpida por muchos años.<br /><br />
+            <ul class="policy-list">
+              <li>
+                LED Studio no garantiza la existencia del stock cotizado en el
+                momento de hacer efectiva la compra.
+              </li>
+              <li>
+                Esta cotización tiene una vigencia de 10 días corridos desde el
+                día de su creación.
+              </li>
+              <li>
+                LED Studio garantiza sus productos, siempre y cuando sean
+                instalados y utilizados adecuadamente.
+              </li>
+              <li>
+                LED Studio velará por el cumplimiento en la entrega de productos
+                hasta la recepción conforme del cliente por la empresa de
+                transporte, basado en la Ley de Consumidor Nº 19.496 y N°21.398.
+              </li>
+              <li>
+                LED Studio te recuerda revisar tus productos en cuanto los
+                recibas, ya sea por una entrega en la tienda o por despacho a
+                través de Courier, solo responderemos por daños o
+                disconformidades hasta 48 horas después de recibidos los
+                productos.
+              </li>
+              <li>
+                LED Studio acepta las siguientes formas de pago: tarjetas de
+                débito / crédito (Transbank), transferencias y efectivo. No se
+                aceptan cheques.
+              </li>
+              <li>
+                LED Studio en cada compra con factura, solicitará siempre la
+                presentación del Rut de la empresa de forma física o e-Rut
+                (nuevo Rut electrónico) junto a la Cédula de identidad del
+                usuario.
+              </li>
+              <li>
+                LED Studio no se hace responsable por daños y perjuicios como
+                resultado de la instalación y uso de nuestros equipos por
+                personal externo a la empresa. En estos casos LED Studio no
+                asumirá el costo del transporte, siendo así este costo
+                responsabilidad del cliente.
+              </li>
+              <li>
+                LED Studio no realiza devoluciones de dinero por desistimiento
+                de compra.
+              </li>
+              <li>
+                LED Studio cuenta con Servicio Técnico y Reparación, estos
+                costos se detallarán una vez que el producto sea revisado por
+                nuestro servicio técnico y se haga un reporte de la falla que
+                presenta el mismo.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="regular-text">
+          <td>
+            <b>NOTA IMPORTANTE:</b> Las notas de crédito deben ser utilizadas en
+            su totalidad de una sola vez. No está permitido el uso parcializado
+            de las mismas; es decir, debe ser utilizada en una misma compra de
+            igual o mayor valor. No se realizan cambios ni devoluciones los días
+            sábado.<br />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <table class="content-table">
+      <tbody>
+        <tr class="section-title">
+          <td>Garantía Legal y Voluntaria</td>
+        </tr>
+        <tr class="regular-text">
+          <td>
+            <ul class="warranty-list">
+              <li>
+                Garantía legal 6 meses: Cliente dispone de 6 meses para optar
+                por cualquiera de estas 3 opciones: devolución de dinero, cambio
+                de producto o reparación gratuita, siempre y cuando; sea un
+                producto nuevo que este defectuoso, le falten piezas o partes,
+                no es apto para el uso que fue destinado, que fue anteriormente
+                arreglado, pero sus deficiencias persisten o presenta nuevas
+                fallas, entre otras situaciones que menciona la Ley del
+                Consumidor Nº 19.496 y N°21.398.
+              </li>
+              <li>
+                Garantía extendida 6 meses más: donde pasando el tiempo de la
+                garantía Legal, LED STUDIO se hace cargo de los 6 meses restante
+                ofreciendo solo REPARACIÓN O CAMBIO del mismo producto. Para
+                realizar cualquier tipo de cambio, es imprescindible la
+                presentación del producto sin uso y con su embalaje original
+                (caja, bolsas, manuales, accesorios, etc.) junto con el respaldo
+                de la boleta, factura de compra.
+              </li>
+              <li>
+                Garantías en regiones: cliente debe enviar foto o video de la
+                falla de su producto, y en relación a esto se le indicará cómo
+                proceder con el cambio o garantía.
+              </li>
+              <li>Verificar el período de garantía.</li>
+              <li>
+                Revisión del producto en Servicio Técnico (3 días hábiles).
+              </li>
+              <li>Productos en liquidación no cuentan con garantía.</li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="terminos-titulo">
+          <td>Costo de Servicio Técnico y Reparación</td>
+        </tr>
+        <tr class="terminos-contenido">
+          <td>
+            <ul>
+              <li>
+                En caso que no corresponda el uso de la Garantía, el producto
+                podrá ser entregado a nuestro Servicio Técnico Especializado. El
+                costo de reparación se detallará una vez que el producto sea
+                revisado por nuestro servicio técnico y se haga un reporte de la
+                falla que presenta el mismo.<br />
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="terminos-titulo">
+          <td>Devolución y Cambio</td>
+        </tr>
+        <tr class="terminos-contenido">
+          <td>
+            <ul>
+              <li>
+                Cambios de lunes a viernes (sábados no) y dentro de los primeros
+                tres periodos desde la fecha de compra, dejando saldo a favor
+                sin derecho a devolución del cliente, usando saldo en la misma
+                tienda.
+              </li>
+              <li>
+                Productos en liquidación y remate, no tienen opción de cambio.
+              </li>
+              <li>
+                Frente a fallas de producto, rige lo establecido en las
+                modificaciones introducidas por la Ley N° 21.398 y que reforzó
+                la Ley N° 19.496.
+              </li>
+              <li>
+                Devolución de dinero: El cliente dispone de 10 días corridos
+                desde que recibe el producto, opción solo disponible para
+                compras Online.
+              </li>
+              <li>
+                Cambios por otros productos por disconformidad: El cliente
+                dispone de 30 días corridos para emitir un cambio, por otro
+                producto.
+              </li>
+              <li>
+                En caso de compras con despacho a domicilio, se reembolsará
+                solamente el valor pagado por el producto. Es decir, no se
+                devolverá el costo del despacho.
+              </li>
+            </ul>
+          </td>
+        </tr>
+        <tr class="terminos-titulo">
+          <td>Términos y Condiciones</td>
+        </tr>
+        <tr class="terminos-contenido">
+          <td>
+            Estos Términos y Condiciones se aplicarán y se entenderán
+            incorporados en todas las compras y a todos los servicios que
+            contrates con “Studio Group Spa”, RUT 76.927.160-0, domiciliada en
+            “Avenida Las Condes 7363, Las Condes, Santiago de Chile”.
+            Representada por don Luis Pazzanese Mardones mediante los sistemas
+            de comercialización comprendidos en este sitio web.
+          </td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </body>
 
 </html>

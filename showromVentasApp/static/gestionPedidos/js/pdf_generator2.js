@@ -80,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         const documentData = {
+            "tipo_documento": "S. Devolución",
             "numero": docNum,
             "fecha": docDate,
             "valido_hasta": docDate,
@@ -101,7 +102,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const jsonData = JSON.stringify(documentData);
         console.log("JSON generado:", jsonData);
 
-        const id = 1; // Ajusta según tu lógica para el ID de cotización
+        const id = docNum;
+        ; // Ajusta según tu lógica para el ID de cotización
 
         fetch(`/ventas/cotizacion/${id}/pdf/`, {
             method: 'POST',

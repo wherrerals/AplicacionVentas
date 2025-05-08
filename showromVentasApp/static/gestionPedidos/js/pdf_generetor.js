@@ -81,6 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         const documentData = {
+            "tipo_documento": "Cotización",
             "numero": docNum,
             "fecha": docDate,
             "valido_hasta": docDueDate,
@@ -102,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const jsonData = JSON.stringify(documentData);
         console.log("JSON generado:", jsonData);
 
-        const id = 1; // Ajusta según tu lógica para el ID de cotización
+        const id = docNum;
 
         // Iniciar el proceso con los datos capturados
         generarCotizacionPDF(id, documentData, docNum);

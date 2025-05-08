@@ -52,3 +52,32 @@ class CalculadoraTotales:
             "total_a_pagar_neto_con_IVA": self.formatear_valor(total_a_pagar_neto),
         }
     
+    def calcular_linea_neto(self):
+        precio_linea_neto = 0
+        precio_descuento_neto = 0
+        total_linea_neto = 0
+
+        for item in self.data.get("DocumentLines", []):
+            cantidad = int(item["cantidad"])
+            precio_unitario_bruto = self.limpiar_valor(item["precio_unitario"])
+            precio_descuento_bruto = self.limpiar_valor(item["descuento"])
+            precio_descuento_unitario = precio_descuento_bruto / 1.19
+            precio_unitario_neto = precio_unitario_bruto / 1.19  
+            porcentaje_descuento = float(item["porcentaje_descuento"]) / 100
+
+            subtotal_neto = cantidad * precio_unitario_neto
+            descuento_neto = subtotal_neto * porcentaje_descuento
+
+            precio_linea_neto += precio_unitario_neto
+            precio_descuento_neto += precio_descuento_unitario
+            total_linea_neto += subtotal_neto - descuento_neto
+
+        return {
+            "precio_linea_neto": self.formatear_valor(precio_linea_neto),
+            "precio_descuento_neto": self.formatear_valor(precio_descuento_neto),
+            "total_linea_neto": self.formatear_valor(total_linea_neto),
+        }
+
+
+
+

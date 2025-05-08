@@ -1144,7 +1144,7 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
                 if contactos.nombre != "1":
                     contactos = contactos.nombreCompleto
                 else:
-                    contactos = datossocio.nombre
+                    contactos = contactos.nombre
 
             sucursal = data.get('sucursal')
             datossocio = snrepo.obtenerPorCodigoSN2(codigoSn)
@@ -1214,13 +1214,15 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
 
             calculadora = CalculadoraTotales(data)
             totales = calculadora.calcular_totales()
+            linea_neto = calculadora.calcular_linea_neto()
 
             cotizacion["totales"] = totales
+            cotizacion["lineas"] = linea_neto
 
             cotizacion["tiene_descuento"] = any(cotizacion["descuento_por_producto"])
 
             # Renderizar plantilla HTML
-            html_string = render_to_string('cotizacion_template2.html', {'cotizacion': cotizacion})
+            html_string = render_to_string('cotizacion_template.html', {'cotizacion': cotizacion})
 
             # Generar PDF
             pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
@@ -1311,6 +1313,7 @@ def generar_cotizacion_pdf(request, cotizacion_id):
 
         # Construir diccionario de cotización
         cotizacion = {
+            "tipo_documento": data.get('tipo_documento'),  
             'numero': data.get('numero'),
             'fecha': fecha_documento,
             'validez': fecha,
