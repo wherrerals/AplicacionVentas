@@ -69,7 +69,7 @@ class CalculadoraTotales:
             total_neto = subtotal_neto - descuento_neto
 
             linea = {
-                "precio_linea_neto": self.formatear_valor(subtotal_neto),
+                "precio_linea_neto": self.formatear_valor(precio_unitario_neto),
                 "precio_descuento_neto": self.formatear_valor(descuento_neto),
                 "total_linea_neto": self.formatear_valor(total_neto),
                 "linea_producto": item.get("linea_producto", "Sin Línea")  # Aquí asumes que viene en los datos
