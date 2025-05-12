@@ -8,7 +8,14 @@ class CalculadoraTotales:
 
     def limpiar_valor(self, valor):
         """Convierte un string de formato '$ 100.000' a un entero."""
-        return int(re.sub(r"[^\d]", "", valor))
+        print("Valor original:", valor)
+        
+        valor = valor.replace(" ", "").replace("$", "").replace(".", "")
+        valor = valor.replace(",", ".")
+
+        return float(valor) if valor else 0.0
+
+        #return float(re.sub(r"[^\d]", "", valor))
 
     def formatear_valor(self, valor):
         """Convierte un entero a formato '$ 100.000'."""
@@ -19,6 +26,7 @@ class CalculadoraTotales:
         total_sin_descuento_neto = 0   # Precio neto * cantidad
         total_descuento_bruto = 0
         total_descuento_neto = 0
+        ciclos = 0
 
         for item in self.data.get("DocumentLines", []):
             cantidad = int(item["cantidad"])
@@ -35,12 +43,26 @@ class CalculadoraTotales:
             total_sin_descuento_neto += subtotal_neto
             total_descuento_bruto += descuento_bruto
             total_descuento_neto += descuento_neto
+            ciclos += 1
 
         total_valor_bruto = total_sin_descuento_bruto - total_descuento_bruto
         total_valor_neto = total_sin_descuento_neto - total_descuento_neto
         total_a_pagar_bruto = int(total_valor_bruto * (1 + self.iva_porcentaje))
         total_a_pagar_neto = int(total_valor_neto * (1 + self.iva_porcentaje))
 
+        dic = {
+            "total_sin_descuento_bruto": self.formatear_valor(total_sin_descuento_bruto),
+            "total_sin_descuento_neto": self.formatear_valor(total_sin_descuento_neto),
+            "total_descuento_bruto": self.formatear_valor(total_descuento_bruto),
+            "total_descuento_neto": self.formatear_valor(total_descuento_neto),
+            "total_valor_bruto": self.formatear_valor(total_valor_bruto),
+            "total_valor_neto": self.formatear_valor(total_valor_neto),
+            "ciclos": ciclos,
+        }
+
+        print("Total calculado:", dic)
+
+        
         return {
             "total_sin_descuento_bruto": self.formatear_valor(total_sin_descuento_bruto),
             "total_sin_descuento_neto": self.formatear_valor(total_sin_descuento_neto),
@@ -48,8 +70,6 @@ class CalculadoraTotales:
             "total_descuento_neto": self.formatear_valor(total_descuento_neto),
             "total_valor_bruto": self.formatear_valor(total_valor_bruto),
             "total_valor_neto": self.formatear_valor(total_valor_neto),
-            "total_a_pagar_bruto_con_IVA": self.formatear_valor(total_a_pagar_bruto),
-            "total_a_pagar_neto_con_IVA": self.formatear_valor(total_a_pagar_neto),
         }
     
     def calcular_linea_neto(self):
