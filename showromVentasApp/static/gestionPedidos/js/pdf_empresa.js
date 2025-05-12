@@ -7,7 +7,23 @@ document.addEventListener("DOMContentLoaded", function () {
         // Obtener valores iniciales
         const fechaSolo = new Date().toISOString().split('T')[0];
         const rut = document.getElementById("inputCliente").getAttribute("data-codigosn");
-        const docNum = document.getElementById("numero_cotizacion").textContent.trim();
+        let docNumElement = document.getElementById("numero_cotizacion");
+        let docNum = docNumElement?.textContent.trim();
+        
+        // Si no hay número de cotización, usar número de orden
+        if (!docNum) {
+            docNumElement = document.getElementById("numero_orden");
+            docNum = docNumElement?.textContent.trim();
+        }
+        
+        // Obtener el tipo de documento desde el atributo data-type del elemento encontrado
+        const docType = docNumElement?.getAttribute("data-type") || "tipo_desconocido";
+        
+        console.log("Número de documento:", docNum);
+        console.log("Tipo de documento:", docType);
+        
+
+
         const docDate = fechaSolo;
         const codigoVendedor = document.getElementById("vendedor_data").getAttribute("data-codeVen");
         const totalNeto = document.querySelector("#total_neto").textContent;
@@ -55,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         const documentData = {
-            "tipo_documento": "S. Devolución",
+            "tipo_documento": docType,
             "numero": docNum,
             "fecha": docDate,
             "valido_hasta": docDate,

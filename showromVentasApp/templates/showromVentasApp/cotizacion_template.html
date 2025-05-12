@@ -366,11 +366,11 @@
         </td>
         <td class="text-align">{{ producto.sku }}</td>
         <td class="nowrap">{{ producto.descripcion }}</td>
-        <td class="text-center nowrap">{{ cotizacion.lineas.precio_linea_neto }}</td>
+        <td class="text-center nowrap">{{ producto.linea_neto.precio_linea_neto }}</td>
         <td class="text-center">{{ producto.porcentaje_descuento }} %</td>
-        <td class="text-center nowrap">{{ cotizacion.lineas.precio_descuento_neto }}</td>
+        <td class="text-center nowrap">{{ producto.linea_neto.precio_descuento_neto }}</td>
         <td class="text-center">{{ producto.cantidad }}</td>
-        <td class="text-align nowrap">{{ cotizacion.lineas.total_linea_neto }}</td>
+        <td class="text-align nowrap">{{ producto.linea_neto.total_linea_neto }}</td>
       </tr>
       <tr class="product-comment">
         <td class="border-bottom"></td>

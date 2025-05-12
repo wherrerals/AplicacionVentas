@@ -1115,6 +1115,16 @@ def onbtenerImgProducto(request):
 
 #ignorar crf token
 
+def obtener_nombre_documento(dato):
+    if dato == 'COTI':
+        return 'Cotización'
+    elif dato == 'ODV':
+        return 'Orden de Venta'
+    elif dato == 'DEVO':
+        return 'S. de Devolución'
+    else:
+        return 'Documento Desconocido'
+
 @csrf_exempt
 def generar_cotizacion_pdf_2(request, cotizacion_id):
     if request.method == 'POST':
@@ -1176,6 +1186,7 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
 
             # Datos generales
             cotizacion = {
+                "tipo_documento": obtener_nombre_documento(data.get('tipo_documento')),  
                 'numero': data.get('numero'),
                 'fecha': fecha,
                 'validez': fecha,
@@ -1216,9 +1227,19 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
             totales = calculadora.calcular_totales()
             linea_neto = calculadora.calcular_linea_neto()
 
-            cotizacion["totales"] = totales
-            cotizacion["lineas"] = linea_neto
+            # Crear instancia de calculadora y obtener valores por línea
+            calculadora = CalculadoraTotales(data)
+            totales = calculadora.calcular_totales()
+            lineas_neto = calculadora.calcular_linea_neto()
 
+            # Asociar cada línea neta al producto correspondiente
+            productos = data.get("DocumentLines", [])
+            for i, producto in enumerate(productos):
+                producto["linea_neto"] = lineas_neto[i]
+
+            # Asignar productos actualizados al cotizacion
+            cotizacion["productos"] = productos
+            cotizacion["totales"] = totales
             cotizacion["tiene_descuento"] = any(cotizacion["descuento_por_producto"])
 
             # Renderizar plantilla HTML
