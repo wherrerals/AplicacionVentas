@@ -328,24 +328,24 @@ class OrdenVenta(Documento):
             jsonData = SerializerDocument.document_serializer(data)
             client = APIClient()
 
-            hay_receta = any(item.get('TreeType') == 'iSalesTree' for item in jsonData.get('DocumentLines', []))
+            #hay_receta = any(item.get('TreeType') == 'iSalesTree' for item in jsonData.get('DocumentLines', []))
 
-            if hay_receta:
-                json_data = SerializerDocument.document_serializer(data)
-                json_sin_linea_uno = json_data
+            #if hay_receta:
+            json_data = SerializerDocument.document_serializer(data)
+            json_sin_linea_uno = json_data
 
-                if json_sin_linea_uno['DocumentLines']:
-                    json_sin_linea_uno['DocumentLines'].clear()
-                    json_sin_linea_uno['DocumentLines'] = [{
-                    
-                            "ItemCode": "LM",
-                            "Quantity": 1,
-                            "UnitPrice": 0,
-                            "TreeType": "iNotATree"
-                    }]
+            if json_sin_linea_uno['DocumentLines']:
+                json_sin_linea_uno['DocumentLines'].clear()
+                json_sin_linea_uno['DocumentLines'] = [{
+                
+                        "ItemCode": "LM",
+                        "Quantity": 1,
+                        "UnitPrice": 0,
+                        "TreeType": "iNotATree"
+                }]
 
-                    print(f"json sin linea uno {json_sin_linea_uno}")
-                    response = client.actualizarODVSL(docentry, json_sin_linea_uno)
+                print(f"json sin linea uno {json_sin_linea_uno}")
+                response = client.actualizarODVSL(docentry, json_sin_linea_uno)
 
             response = client.actualizarODVSL(int(docentry), jsonData)
 

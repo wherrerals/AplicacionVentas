@@ -259,24 +259,25 @@ class Cotizacion(Documento):
             docentry = int(docentry)
             jsonData = SerializerDocument.document_serializer(data)
 
-            hay_receta = any(item.get('TreeType') == 'iSalesTree' for item in jsonData.get('DocumentLines', []))
+            #hay_receta = any(item.get('TreeType') == 'iSalesTree' for item in jsonData.get('DocumentLines', []))
+            #if hay_receta:
+            json_data = SerializerDocument.document_serializer(data)
+            json_sin_linea_uno = json_data
 
-            if hay_receta:
-                json_data = SerializerDocument.document_serializer(data)
-                json_sin_linea_uno = json_data
+            if json_sin_linea_uno['DocumentLines']:
+                json_sin_linea_uno['DocumentLines'].clear()
+                json_sin_linea_uno['DocumentLines'] = [{
+                
+                        "ItemCode": "LM",
+                        "Quantity": 1,
+                        "UnitPrice": 0,
+                        "TreeType": "iNotATree"
+                }]
 
-                if json_sin_linea_uno['DocumentLines']:
-                    json_sin_linea_uno['DocumentLines'].clear()
-                    json_sin_linea_uno['DocumentLines'] = [{
-                    
-                            "ItemCode": "LM",
-                            "Quantity": 1,
-                            "UnitPrice": 0,
-                            "TreeType": "iNotATree"
-                    }]
+                print(f"json sin linea uno {json_sin_linea_uno}")
+                response = self.client.actualizarCotizacionesSL(docentry, json_sin_linea_uno)
 
-                    print(f"json sin linea uno {json_sin_linea_uno}")
-                    response = self.client.actualizarCotizacionesSL(docentry, json_sin_linea_uno)
+                print(f"response {response}")
 
 
             print(f"json {jsonData}")
