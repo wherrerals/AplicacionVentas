@@ -77,6 +77,7 @@ function limpiarInformacionCliente() {
     $('#numero_orden').text('');
     $('#numero_orden').removeAttr('data-docentry');
     $('#rutSN').val('').removeAttr('data-rut');
+    $('#rutSN').prop('readonly', false);
     $('#inputCliente').removeAttr('data-rut').removeAttr('data-codigoSN');
     $('#resultadosClientes').empty();
     $('#nombreSN').val('');
