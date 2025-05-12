@@ -52,3 +52,34 @@ class CalculadoraTotales:
             "total_a_pagar_neto_con_IVA": self.formatear_valor(total_a_pagar_neto),
         }
     
+    def calcular_linea_neto(self):
+        lineas_calculadas = []
+
+        for item in self.data.get("DocumentLines", []):
+            cantidad = int(item["cantidad"])
+            precio_unitario_bruto = self.limpiar_valor(item["precio_unitario"])
+            porcentaje_descuento = float(item["porcentaje_descuento"]) / 100
+
+            # Convertir precio bruto a neto (sin IVA)
+            precio_unitario_neto = precio_unitario_bruto / (1 + self.iva_porcentaje)
+
+            # Calcular subtotal y descuento neto
+            subtotal_neto = cantidad * precio_unitario_neto
+            descuento_neto = subtotal_neto * porcentaje_descuento
+            total_neto = subtotal_neto - descuento_neto
+
+            linea = {
+                "precio_linea_neto": self.formatear_valor(precio_unitario_neto),
+                "precio_descuento_neto": self.formatear_valor(descuento_neto),
+                "total_linea_neto": self.formatear_valor(total_neto),
+                "linea_producto": item.get("linea_producto", "Sin Línea")  # Aquí asumes que viene en los datos
+            }
+
+            lineas_calculadas.append(linea)
+
+        return lineas_calculadas
+
+
+
+
+

@@ -97,7 +97,8 @@ document.addEventListener("DOMContentLoaded", function() {
             <a class="dropdown-item" href="#" id="duplicar-1">Duplicar</a>
             <a class="dropdown-item" href="#" id="copiar-ODV">Copiar a Orden de Venta</a>
             <!-- <a class="dropdown-item" href="solic_devolucion.html">Copiar a Solicitud de Devolución</a> -->
-            <a class="dropdown-item" href="#" id="generarPDF">Imprimir / Descargar PDF</a>
+            <a class="dropdown-item" href="#" id="generarPDF">PDF Personas</a>
+            <a class="dropdown-item" href="#" id="generar_pdf_empresa">PDF Empresas</a>
             <!-- <a class="dropdown-item" id="cerrar">Cerrar</a> -->
             <!--  <a class="dropdown-item" id="cancelar">Cancelar</a> -->
           </div>
@@ -132,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function() {
         </p>
       </div>
       <div class="col" style="text-align: left; padding-top: 12px">
-        <p id="numero_cotizacion" data-docEntry="" style="
+        <p id="numero_cotizacion" data-type="COTI" data-docEntry="" style="
               padding-bottom: 0px;
               padding-top: 0px;
               color: var(--bs-body-bg);
@@ -811,6 +812,7 @@ document.addEventListener("DOMContentLoaded", function() {
   <script src="{% static 'gestionPedidos/js/interaccionModalDirecciones.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/search_data_document.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/pdf_generetor.js' %}"></script>
+  <script src="{% static 'gestionPedidos/js/pdf_empresa.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/duplicar_document.js' %}"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

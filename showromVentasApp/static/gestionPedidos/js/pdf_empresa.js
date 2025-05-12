@@ -1,45 +1,41 @@
 document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("generarPDF").addEventListener("click", crearPDF);
+    document.getElementById("generar_pdf_empresa").addEventListener("click", crearPDF);
 
     function crearPDF() {
         showLoadingOverlay();
 
-        console.log("Generando PDF...");
-
         // Obtener valores iniciales
         const fechaSolo = new Date().toISOString().split('T')[0];
-        console.log("Fecha actual (ISO):", fechaSolo);
-
         const rut = document.getElementById("inputCliente").getAttribute("data-codigosn");
-        console.log("RUT del cliente:", rut);
+        let docNumElement = document.getElementById("numero_cotizacion");
+        let docNum = docNumElement?.textContent.trim();
+        
+        // Si no hay número de cotización, usar número de orden
+        if (!docNum) {
+            docNumElement = document.getElementById("numero_orden");
+            docNum = docNumElement?.textContent.trim();
+        }
+        
+        // Obtener el tipo de documento desde el atributo data-type del elemento encontrado
+        const docType = docNumElement?.getAttribute("data-type") || "tipo_desconocido";
+        
+        console.log("Número de documento:", docNum);
+        console.log("Tipo de documento:", docType);
+        
 
-        const docNum = document.getElementById("numero_orden").textContent.trim();
-        console.log("Número de cotización:", docNum);
 
         const docDate = fechaSolo;
-        console.log("Fecha del documento:", docDate);
-
         const codigoVendedor = document.getElementById("vendedor_data").getAttribute("data-codeVen");
-        console.log("Código del vendedor:", codigoVendedor);
-
         const totalNeto = document.querySelector("#total_neto").textContent;
-
-
         const ivaGeneral = document.querySelector("#iva").textContent;
-
-
         const totalbruto = document.querySelector("#total_bruto").textContent;
-
         const selectElement = document.getElementById("direcciones_despacho");
         const direccion2 = selectElement.value;
-
         const contactoCliente = document.getElementById("contactos_cliete");
         const contacto = contactoCliente.value;
         const sucursal = document.getElementById("sucursal").textContent.trim();
-        const observaciones = document.getElementById("Observaciones-1").value; //selecionando observaciones por fila de producto por medio de id
+        const observaciones = document.getElementById("Observaciones-1").value;
 
-
-        // Construir líneas del documento
         const lines = [];
         const productRows = document.querySelectorAll('.product-row');
         console.log("Número de filas de productos:", productRows.length);
@@ -52,11 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const porcentaje_descuento = row.querySelector("#agg_descuento").value.trim();
             const discountspan = row.querySelector("#Precio_Descuento").textContent;
             const totalspan = row.querySelector("#precio_Venta").textContent;
-            const comentarios = row.querySelector("#comentarios-1").value; //selecionando comentarios por fila de producto por medio de id
-                    // Obtener el elemento <select>
-
-            
-            // capturar imagen de etiqueta imagen con id img_productox
+            const comentarios = row.querySelector("#comentarios-1").value; 
             const img = row.querySelector("#img_productox").src;
 
             const total = totalspan;
@@ -75,12 +67,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 "subtotal_neto": total,
             };
 
-            console.log("Línea de producto:", line);
             lines.push(line);
         });
 
         const documentData = {
-            "tipo_documento": "S. Devolución",
+            "tipo_documento": docType,
             "numero": docNum,
             "fecha": docDate,
             "valido_hasta": docDate,
@@ -96,14 +87,9 @@ document.addEventListener("DOMContentLoaded", function () {
             "observaciones": observaciones,
         };
 
-        console.log("Datos del documento:", documentData);
-
         // Convertir a JSON
         const jsonData = JSON.stringify(documentData);
-        console.log("JSON generado:", jsonData);
-
         const id = docNum;
-        ; // Ajusta según tu lógica para el ID de cotización
 
         fetch(`/ventas/cotizacion/${id}/pdf/`, {
             method: 'POST',
@@ -142,7 +128,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
-    // Función para obtener el token CSRF (si usas Django)
     function getCSRFToken() {
         return document.querySelector('[name=csrfmiddlewaretoken]').value;
     }
