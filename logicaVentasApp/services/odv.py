@@ -14,6 +14,7 @@ from logicaVentasApp.services.documento import Documento
 import logging
 
 from logicaVentasApp.services.stcokService import StockService
+from logs.services.documentlog import DocumentsLogs
 logger = logging.getLogger(__name__)
 
 class OrdenVenta(Documento):
@@ -351,6 +352,11 @@ class OrdenVenta(Documento):
 
             # Verificar respuesta de la API
             if response.get('success'):
+                doc_num = docnum
+                doc_entry = docentry
+                # Guardar el log de la cotización
+                DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='ODV', url="", json=jsonData, response=response, estate='Update')
+
                 return {
                     'success': 'Orden Venta actualizada exitosamente',
                     'docNum': docnum,
@@ -358,6 +364,7 @@ class OrdenVenta(Documento):
                 }
 
         except Exception as e:
+            DocumentsLogs.register_logs(docNum=docnum, docEntry=docentry, tipoDoc='ODV', url="", json=jsonData, response=response, estate='UpdateError')
             logger.error(f"Error al actualizar la cotización: {str(e)}")
             return {'error': str(e)}
 
@@ -405,6 +412,8 @@ class OrdenVenta(Documento):
                     doc_entry = response.get('DocEntry')
                     salesPersonCode = response.get('SalesPersonCode')
                     name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
+                    DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='ODV', url="", json=jsonData, response=response, estate='Creado')
+
                     return {
                         'success': 'Orden Venta creada exitosamente',
                         'docNum': doc_num,
@@ -413,6 +422,7 @@ class OrdenVenta(Documento):
                         'salesPersonName': name_vendedor
                     }
                 elif 'error' in response:
+                    DocumentsLogs.register_logs(docNum=None, docEntry=None, tipoDoc='ODV', url="", json=jsonData, response=response, estate='Error')
                     return {'error': f"Error: {response.get('error', 'Error desconocido')}"}
                 else:
                     return {'error': 'Respuesta inesperada de la API.'}

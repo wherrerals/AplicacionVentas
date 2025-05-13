@@ -286,14 +286,19 @@ class Cotizacion(Documento):
             response = self.client.actualizarCotizacionesSL(docentry, jsonData)
 
             if 'success' in response:
+                print(f"response {response}")
+                doc_num = docnum
+                doc_entry = docentry
+                # Guardar el log de la cotización
+                DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Update')
                 return {
                     'success': 'Cotización creada exitosamente',
                     'docNum': docnum,
                     'docEntry': docentry
                 }
 
-        
         except Exception as e:
+            DocumentsLogs.register_logs(docNum=docnum, docEntry=docentry, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='UpdateError')
             logger.error(f"Error al actualizar la cotización: {str(e)}")
             return {'error': str(e)}
 
@@ -328,7 +333,7 @@ class Cotizacion(Documento):
                     salesPersonCode = response.get('SalesPersonCode')
                     name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
                     # Guardar el log de la cotización
-                    DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Creado')
+                    DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Create')
                     
                     return {
                         'success': 'Cotización creada exitosamente',
@@ -340,7 +345,7 @@ class Cotizacion(Documento):
                 
                 # Si contiene un mensaje de error, manejarlo
                 elif 'error' in response:
-                    DocumentsLogs.register_logs(docNum=None, docEntry=None, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Error')
+                    DocumentsLogs.register_logs(docNum=None, docEntry=None, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='CreateError')
                     error_message = response.get('error', 'Error desconocido')
                     return {'error': f"Error: {error_message}"}
                 else:
