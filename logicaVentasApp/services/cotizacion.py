@@ -276,17 +276,11 @@ class Cotizacion(Documento):
                         "TreeType": "iNotATree"
                 }]
 
-                print(f"json sin linea uno {json_sin_linea_uno}")
                 response = self.client.actualizarCotizacionesSL(docentry, json_sin_linea_uno)
 
-                print(f"response {response}")
-
-
-            print(f"json {jsonData}")
             response = self.client.actualizarCotizacionesSL(docentry, jsonData)
 
             if 'success' in response:
-                print(f"response {response}")
                 doc_num = docnum
                 doc_entry = docentry
                 # Guardar el log de la cotización
