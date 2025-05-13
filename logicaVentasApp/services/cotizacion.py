@@ -12,6 +12,8 @@ from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from datosLsApp.serializer.documentSerializer import SerializerDocument
 from logicaVentasApp.services.documento import Documento
 import logging
+
+from logs.services.documentlog import DocumentsLogs
 logger = logging.getLogger(__name__)
 
 class Cotizacion(Documento):
@@ -325,6 +327,9 @@ class Cotizacion(Documento):
                     doc_entry = response.get('DocEntry')
                     salesPersonCode = response.get('SalesPersonCode')
                     name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
+                    # Guardar el log de la cotización
+                    DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Creado')
+                    
                     return {
                         'success': 'Cotización creada exitosamente',
                         'docNum': doc_num,
@@ -335,6 +340,7 @@ class Cotizacion(Documento):
                 
                 # Si contiene un mensaje de error, manejarlo
                 elif 'error' in response:
+                    DocumentsLogs.register_logs(docNum=None, docEntry=None, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Error')
                     error_message = response.get('error', 'Error desconocido')
                     return {'error': f"Error: {error_message}"}
                 else:
