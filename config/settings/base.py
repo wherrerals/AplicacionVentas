@@ -25,6 +25,7 @@ LOCAL_APPS = [
     "logicaVentasApp",
     "showromVentasApp",
     "taskApp",
+    "logs",
 ]
 
 THIRD_APPS = []
