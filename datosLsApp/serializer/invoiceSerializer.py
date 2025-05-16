@@ -99,7 +99,11 @@ class InvoiceSerializer:
 
         if sales_data_contact:
             invoice_bp["InternalCode"] = sales_data_contact.get("InternalCode")
-            invoice_bp["FirstName"] = re.sub(r'.*-\s*','',sales_data_contact.get("FirstName"))
+            name = sales_data_contact.get("FirstName")
+            if name != None:
+                invoice_bp["FirstName"] = re.sub(r'.*-\s*','',sales_data_contact.get("FirstName"))
+            else:
+                invoice_bp["FirstName"] = invoice_data.get("CardName")
 
         if sales_data:
             invoice_bp["SalesEmployeeCode"] = sales_data.get("SalesEmployeeCode")
