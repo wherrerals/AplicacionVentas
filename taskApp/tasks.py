@@ -192,6 +192,17 @@ def generar_pdf_async(cotizacion_id, cotizacion_data, absolute_uri):
         logger.error(f"Error generando PDF para cotización {cotizacion_id}: {str(e)}")
         # Re-raise the exception to mark the task as failed
         raise
+def update_components_task(self, doc_entry, type_document):
+
+    try:
+        print("Actualizando componentes...")
+        service = Producto()
+        result_message = service.update_components_sl(doc_entry, type_document)
+        return result_message
+    except Exception as e:
+        print(f"Error al actualizar componentes: {str(e)}")
+
+
 
 """ 
 pdf_options = {

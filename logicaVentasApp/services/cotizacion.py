@@ -11,6 +11,7 @@ from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepositor
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from datosLsApp.serializer.documentSerializer import SerializerDocument
 from logicaVentasApp.services.documento import Documento
+from taskApp.tasks import update_components_task
 import logging
 
 from logs.services.documentlog import DocumentsLogs
@@ -317,6 +318,8 @@ class Cotizacion(Documento):
             
             # Realizar la solicitud a la API
             response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
+
+            print("response", response)
             
             # Verificar si response es un diccionario
             if isinstance(response, dict):
@@ -327,6 +330,8 @@ class Cotizacion(Documento):
                     salesPersonCode = response.get('SalesPersonCode')
                     name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
                     # Guardar el log de la cotización
+
+                    self.update_components(data, doc_entry, 'Cotizacion')
                     DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Create')
                     
                     return {
@@ -352,7 +357,15 @@ class Cotizacion(Documento):
             # Manejo de excepciones generales
             logger.error(f"Error al crear la cotización: {str(e)}")
             return {'error': str(e)}
-
+    
+    def update_components(self, data, doc_entry, type_document):
+        if 'TreeType' in data:
+            if data['TreeType'] == 'iSalesTree':
+                try:
+                    update_components_task.delay(doc_entry, type_document)
+                except Exception as e:
+                    logger.error(f"Error al encolar la tarea de actualización de componentes: {str(e)}")
+        
     def validarDatosCotizacion(self, data):
         """
         Verifica que los datos de la cotización sean correctos.

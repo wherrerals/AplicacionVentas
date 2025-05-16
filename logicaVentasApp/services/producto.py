@@ -275,12 +275,12 @@ class Producto:
         return filters
 
     @staticmethod
-    def update_recipe_ingredients(docEntry):
+    def update_recipe_ingredients(docEntry, type_document):
 
         serviceLayer = APIClient()
-        
-        document_lines = serviceLayer.detalleCotizacionLineas(docEntry=docEntry)
-
+        document_lines = serviceLayer.lines_details(docEntry="225364", type_document='Quotations')
         print(f"Document lines: {document_lines}")
+        # serializar los datos
 
-        return document_lines
+        # enviar actualizacion a SL 
+

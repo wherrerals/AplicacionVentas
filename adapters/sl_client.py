@@ -1024,3 +1024,31 @@ class APIClient:
             next_link = data.get("odata.nextLink")
             url = f"{base_url}/{next_link}" if next_link else None  
         return {"value": all_data}
+
+
+    def lines_details(self, docEntry, type_document):
+        crossJoin = (
+            f"{type_document},{type_document}/DocumentLines,Items/ItemWarehouseInfoCollection"
+        )
+        
+        expand = f"{type_document}/DocumentLines($select=DocEntry,LineNum,ItemCode,TreeType,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
+        filter = f"{type_document}/DocEntry eq {docEntry} and {type_document}/DocumentLines/DocEntry eq {type_document}/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq {type_document}/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq {type_document}/DocumentLines/WarehouseCode"
+
+        base_url = self.base_url # Asegura que no haya doble "/"
+        url = f"{base_url}/$crossjoin({crossJoin})?$expand={expand}&$filter={filter}"
+
+        all_data = []  # Lista para almacenar todos los valores
+
+        while url:
+            response = self.session.get(url, verify=False)
+            response.raise_for_status()
+            data = response.json()
+
+            # Agregar los resultados actuales a la lista acumulada
+            all_data.extend(data.get("value", []))
+
+            # Obtener el próximo enlace si existe
+            next_link = data.get("odata.nextLink")
+            url = f"{base_url}/{next_link}" if next_link else None  # Agregar base_url si es necesario
+
+        return {"value": all_data}
