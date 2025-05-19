@@ -14,6 +14,7 @@ from logicaVentasApp.services.documento import Documento
 from taskApp.tasks import update_components_task
 import logging
 
+
 from logs.services.documentlog import DocumentsLogs
 logger = logging.getLogger(__name__)
 
@@ -261,7 +262,7 @@ class Cotizacion(Documento):
         try:
             docentry = int(docentry)
             jsonData = SerializerDocument.document_serializer(data)
-
+            print("jsonData", jsonData)
             #hay_receta = any(item.get('TreeType') == 'iSalesTree' for item in jsonData.get('DocumentLines', []))
             #if hay_receta:
             json_data = SerializerDocument.document_serializer(data)
@@ -285,6 +286,9 @@ class Cotizacion(Documento):
                 doc_num = docnum
                 doc_entry = docentry
                 # Guardar el log de la cotización
+
+                rise = self.update_components(jsonData, doc_entry, type_document='Quotations')
+                print("rise", rise)
                 DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Update')
                 return {
                     'success': 'Cotización creada exitosamente',
@@ -318,8 +322,6 @@ class Cotizacion(Documento):
             
             # Realizar la solicitud a la API
             response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
-
-            print("response", response)
             
             # Verificar si response es un diccionario
             if isinstance(response, dict):
@@ -330,8 +332,8 @@ class Cotizacion(Documento):
                     salesPersonCode = response.get('SalesPersonCode')
                     name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
                     # Guardar el log de la cotización
-
-                    self.update_components(data, doc_entry, 'Cotizacion')
+                    self.update_components(response, doc_entry, type_document='Quotations')
+    
                     DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Create')
                     
                     return {
@@ -359,12 +361,15 @@ class Cotizacion(Documento):
             return {'error': str(e)}
     
     def update_components(self, data, doc_entry, type_document):
-        if 'TreeType' in data:
-            if data['TreeType'] == 'iSalesTree':
-                try:
-                    update_components_task.delay(doc_entry, type_document)
-                except Exception as e:
-                    logger.error(f"Error al encolar la tarea de actualización de componentes: {str(e)}")
+        document_line = data.get('DocumentLines')
+        print("document_line", document_line)
+
+        if 'TreeType' in document_line[0]:
+            print("Enviando tarea para actualizar componentes...")
+            try:
+                return update_components_task.delay(doc_entry, type_document)
+            except Exception as e:
+                logger.error(f"Error al encolar la tarea de actualización de componentes: {str(e)}")
         
     def validarDatosCotizacion(self, data):
         """

@@ -1052,3 +1052,31 @@ class APIClient:
             url = f"{base_url}/{next_link}" if next_link else None  # Agregar base_url si es necesario
 
         return {"value": all_data}
+
+
+    # usando patch actualizar las cotizaciones
+    def update_recipe_ingredients_sl(self, docEntry, data, type_document):
+        self.__login()
+        url = f"{self.base_url}{type_document}({docEntry})"
+
+        headers = {
+            "Content-Type": "application/json",  # Asegúrate de incluir este encabezado si es necesario
+            "Cookie": f"B1SESSION={self.session_id}",  # <- Aquí agregas la cookie
+        }
+
+        try:
+            response = self.session.patch(url, json=data, headers=headers, verify=False)
+            
+            if response.status_code == 204:
+            
+                return {
+                    "success": True,
+                    "message": "Cotización actualizada correctamente.",
+                }
+            
+            else:
+                response.raise_for_status()
+                return response.json()
+        except requests.exceptions.HTTPError as e:
+            if "response" in locals() and response is not None:
+                print(f"Cuerpo de la respuesta del servidor: {response.text}")

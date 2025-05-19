@@ -192,12 +192,16 @@ def generar_pdf_async(cotizacion_id, cotizacion_data, absolute_uri):
         logger.error(f"Error generando PDF para cotización {cotizacion_id}: {str(e)}")
         # Re-raise the exception to mark the task as failed
         raise
-def update_components_task(self, doc_entry, type_document):
+
+@shared_task(queue='update_recipe_comp')
+def update_components_task(doc_entry, type_document):
 
     try:
         print("Actualizando componentes...")
         service = Producto()
-        result_message = service.update_components_sl(doc_entry, type_document)
+        result_message = service.update_recipe_ingredients(doc_entry, type_document)
+        print("Componentes actualizados")
+        print(result_message)
         return result_message
     except Exception as e:
         print(f"Error al actualizar componentes: {str(e)}")

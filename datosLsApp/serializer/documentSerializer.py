@@ -139,3 +139,44 @@ class SerializerDocument:
                 "StateB": ship.get('region', ''),
                 "CountryB": ship.get('pais', 'CL'),
             }
+
+
+    @staticmethod
+    def serialize_recipe_ingredients(document_lines):
+        lines = document_lines.get("value", [])
+        result = {"DocumentLines": []}
+
+        # Ordenar por LineNum
+        parsed_lines = sorted(
+            [line.get("Quotations/DocumentLines", {}) for line in lines],
+            key=lambda x: x.get("LineNum", 0)
+        )
+
+        current_recipe = None
+
+        for line in parsed_lines:
+            tree_type = line.get("TreeType")
+            warehouse = line.get("WarehouseCode")
+
+            if tree_type == "S":
+                # Nueva receta activa
+                current_recipe = {
+                    "LineNum": line["LineNum"],
+                    "ItemCode": line["ItemCode"],
+                    "WarehouseCode": warehouse,
+                    "TreeType": "iSalesTree"
+                }
+                result["DocumentLines"].append(current_recipe)
+
+            elif tree_type == "I" and current_recipe:
+                # Ingrediente válido para la receta activa
+                result["DocumentLines"].append({
+                    "LineNum": line["LineNum"],
+                    "ItemCode": line["ItemCode"],
+                    "WarehouseCode": current_recipe["WarehouseCode"],
+                    "TreeType": "iIngredient"
+                })
+
+            # TreeType == "N" o sin receta activa: ignorar
+
+        return result

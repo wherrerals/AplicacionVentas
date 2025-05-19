@@ -1435,7 +1435,7 @@ def verificar_estado_pdf(request, task_id):
 def probandoActualizador(request):
     try:
         # Llamar a la función de actualización de productos
-        prueba = Producto.update_recipe_ingredients(docEntry=218077, )
+        prueba = Producto.update_recipe_ingredients(docEntry="225364", type_document='Quotations')
 
         return JsonResponse({'status': 'Actualización completada', 'data': prueba}, status=200)
     except Exception as e:
