@@ -281,7 +281,7 @@ class Producto:
         serviceLayer = APIClient()
         document_lines = serviceLayer.lines_details(docEntry, type_document)
         # serializar los datos
-        serialized = SerializerDocument.serialize_recipe_ingredients(document_lines)
+        serialized = SerializerDocument.serialize_recipe_ingredients(document_lines, type_document)
         # enviar actualizacion a SL
         update_recipe = serviceLayer.update_recipe_ingredients_sl(docEntry, serialized, type_document)
         # verificar si la actualizacion fue exitosa
