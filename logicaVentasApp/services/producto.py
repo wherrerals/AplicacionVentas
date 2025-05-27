@@ -1,6 +1,7 @@
 from adapters.serializador import Serializador
 from adapters.sl_client import APIClient
 from datosLsApp.repositories.productorepository import ProductoRepository
+from datosLsApp.serializer.documentSerializer import SerializerDocument
 from taskApp.models import SyncState
 from django.db import transaction
 import math
@@ -275,12 +276,14 @@ class Producto:
         return filters
 
     @staticmethod
-    def update_recipe_ingredients(docEntry):
-
+    def update_recipe_ingredients(docEntry, type_document):
+        print("Actualizando ingredientes de la receta...")
         serviceLayer = APIClient()
-        
-        document_lines = serviceLayer.detalleCotizacionLineas(docEntry=docEntry)
+        document_lines = serviceLayer.lines_details(docEntry, type_document)
+        # serializar los datos
+        serialized = SerializerDocument.serialize_recipe_ingredients(document_lines, type_document)
+        # enviar actualizacion a SL
+        update_recipe = serviceLayer.update_recipe_ingredients_sl(docEntry, serialized, type_document)
+        # verificar si la actualizacion fue exitosa
+        print("Update recipe response:", update_recipe)
 
-        print(f"Document lines: {document_lines}")
-
-        return document_lines

@@ -193,6 +193,21 @@ def generar_pdf_async(cotizacion_id, cotizacion_data, absolute_uri):
         # Re-raise the exception to mark the task as failed
         raise
 
+@shared_task(queue='update_recipe_comp')
+def update_components_task(doc_entry, type_document):
+
+    try:
+        print("Actualizando componentes...")
+        service = Producto()
+        result_message = service.update_recipe_ingredients(doc_entry, type_document)
+        print("Componentes actualizados")
+        print(result_message)
+        return result_message
+    except Exception as e:
+        print(f"Error al actualizar componentes: {str(e)}")
+
+
+
 """ 
 pdf_options = {
     'quiet': True,  # Reduce logging output

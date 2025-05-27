@@ -15,6 +15,7 @@ import logging
 
 from logicaVentasApp.services.stcokService import StockService
 from logs.services.documentlog import DocumentsLogs
+from taskApp.tasks import update_components_task
 logger = logging.getLogger(__name__)
 
 class OrdenVenta(Documento):
@@ -355,6 +356,7 @@ class OrdenVenta(Documento):
                 doc_num = docnum
                 doc_entry = docentry
                 # Guardar el log de la cotización
+                rise = self.update_components(jsonData, doc_entry, type_document='Orders')
                 DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='ODV', url="", json=jsonData, response=response, estate='Update')
 
                 return {
@@ -412,6 +414,8 @@ class OrdenVenta(Documento):
                     doc_entry = response.get('DocEntry')
                     salesPersonCode = response.get('SalesPersonCode')
                     name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
+                    self.update_components(response, doc_entry, type_document='Orders')
+
                     DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='ODV', url="", json=jsonData, response=response, estate='Creado')
 
                     return {
@@ -438,6 +442,16 @@ class OrdenVenta(Documento):
 
             return {'error': str(e)}
 
+    def update_components(self, data, doc_entry, type_document):
+        document_line = data.get('DocumentLines')
+        print("document_line", document_line)
+
+        if 'TreeType' in document_line[0]:
+            print("Enviando tarea para actualizar componentes...")
+            try:
+                return update_components_task.delay(doc_entry, type_document)
+            except Exception as e:
+                logger.error(f"Error al encolar la tarea de actualización de componentes: {str(e)}")
             
 
     def validarDatosODV(self, data):

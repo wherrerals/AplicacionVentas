@@ -139,3 +139,88 @@ class SerializerDocument:
                 "StateB": ship.get('region', ''),
                 "CountryB": ship.get('pais', 'CL'),
             }
+
+
+
+    @staticmethod
+    def serialize_recipe_ingredients(document_lines, type_document):
+        lines = document_lines.get("value", [])
+
+        print(f"lines {lines}")
+        result = {"DocumentLines": []}
+
+        # Ordenar por LineNum
+        parsed_lines = [line.get(f"{type_document}/DocumentLines", {}) for line in lines]
+
+        current_warehouse = None
+        current_line_num = None
+
+        for line in parsed_lines:
+            tree_type = line.get("TreeType")
+            warehouse = line.get("WarehouseCode")
+            item_code = line.get("ItemCode")
+            line_num = line.get("LineNum")
+
+            if tree_type == "S":
+                # Guardar la bodega actual para futuras líneas I
+                current_warehouse = warehouse
+                current_line_num = line_num
+
+                result["DocumentLines"].append({
+                    "LineNum": line_num,
+                    "ItemCode": item_code,
+                    "WarehouseCode": current_warehouse,
+                    "TreeType": "iSalesTree"
+                })
+
+            elif tree_type == "I" and current_warehouse is not None:
+                # Usar la bodega asociada a la última línea S
+                result["DocumentLines"].append({
+                    "LineNum": line_num,
+                    "ItemCode": item_code,
+                    "WarehouseCode": current_warehouse,
+                    "TreeType": "iIngredient"
+                })
+
+            # Si es "N" o sin TreeType válido, ignorar
+
+        return result
+
+""" 
+    @staticmethod
+    def serialize_recipe_ingredients(document_lines, type_document):
+        lines = document_lines.get("value", [])
+        result = {"DocumentLines": []}
+
+        # Ordenar por LineNum
+        parsed_lines = [line.get(f"{type_document}/DocumentLines", {}) for line in lines]
+
+
+        current_recipe = None
+
+        for line in parsed_lines:
+            tree_type = line.get("TreeType")
+            warehouse = line.get("WarehouseCode")
+
+            if tree_type == "S":
+                # Nueva receta activa
+                current_recipe = {
+                    "LineNum": line["LineNum"],
+                    "ItemCode": line["ItemCode"],
+                    "WarehouseCode": warehouse,
+                    "TreeType": "iSalesTree"
+                }
+                result["DocumentLines"].append(current_recipe)
+
+            elif tree_type == "I" and current_recipe:
+                # Ingrediente válido para la receta activa
+                result["DocumentLines"].append({
+                    "LineNum": line["LineNum"],
+                    "ItemCode": line["ItemCode"],
+                    "WarehouseCode": current_recipe["WarehouseCode"],
+                    "TreeType": "iIngredient"
+                })
+
+            # TreeType == "N" o sin receta activa: ignorar
+
+        return result """
