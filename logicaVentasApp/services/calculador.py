@@ -85,7 +85,8 @@ class CalculadoraTotales:
 
             # Calcular subtotal y descuento neto
             subtotal_neto = cantidad * precio_unitario_neto
-            descuento_neto = subtotal_neto * porcentaje_descuento
+            descuento = precio_unitario_neto * porcentaje_descuento
+            descuento_neto = precio_unitario_neto - descuento
             total_neto = subtotal_neto - descuento_neto
 
             linea = {
