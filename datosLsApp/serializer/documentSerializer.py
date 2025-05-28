@@ -5,6 +5,7 @@ from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.productorepository import ProductoRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
+from logicaVentasApp.services.calculador import CalculadoraTotales
 from logicaVentasApp.services.direccion import Direccion
 from logicaVentasApp.services.typeofsale import TypeOfSale
 from logicaVentasApp.services.vendedor import Seller
@@ -14,6 +15,7 @@ class SerializerDocument:
 
     @staticmethod
     def document_serializer(doc_data):
+        doc_total = CalculadoraTotales.calculate_docTotal(doc_data)
         
         type_sales = Seller.tipoVentaTipoVendedor(doc_data.get('SalesPersonCode'))
         
@@ -25,17 +27,13 @@ class SerializerDocument:
         branch_code = VendedorRepository.get_sucursal(doc_data.get('SalesPersonCode'))
                     
         addres_bill, address_ship = Direccion.assign_bill_ship_addres(doc_data.get('Address'), doc_data.get('Address2'), branch_code)
-        print(type(addres_bill) )
-        print(type(address_ship) )
-
-        print(f"addres_bill {addres_bill}")
-        print(f"address_ship {address_ship}")
 
         cabecera = {
             'DocDate': doc_data.get('DocDate'),
             'DocDueDate': doc_data.get('DocDueDate'),
             'TaxDate': doc_data.get('TaxDate'),
-            'DocTotal': doc_data.get('DocTotal'),
+            #'DocTotal': doc_data.get('DocTotal'),
+            'DocTotal': f'{doc_total}',
             'CardCode': doc_data.get('CardCode'),
             'NumAtCard': doc_data.get('NumAtCard'),
             'Comments': doc_data.get('Comments'),

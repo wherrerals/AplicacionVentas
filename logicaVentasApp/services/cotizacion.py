@@ -262,7 +262,6 @@ class Cotizacion(Documento):
         try:
             docentry = int(docentry)
             jsonData = SerializerDocument.document_serializer(data)
-            print("jsonData", jsonData)
             #hay_receta = any(item.get('TreeType') == 'iSalesTree' for item in jsonData.get('DocumentLines', []))
             #if hay_receta:
             json_data = SerializerDocument.document_serializer(data)
@@ -279,7 +278,7 @@ class Cotizacion(Documento):
                 }]
 
                 response = self.client.actualizarCotizacionesSL(docentry, json_sin_linea_uno)
-
+            print("json", jsonData)
             response = self.client.actualizarCotizacionesSL(docentry, jsonData)
 
             if 'success' in response:
@@ -332,7 +331,7 @@ class Cotizacion(Documento):
                     salesPersonCode = response.get('SalesPersonCode')
                     name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
                     # Guardar el log de la cotización
-                    self.update_components(response, doc_entry, type_document='Quotations')
+                    #self.update_components(response, doc_entry, type_document='Quotations')
     
                     DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Create')
                     

@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const linenum = row.querySelector("#indixe_producto").getAttribute('data-linenum'); //listo
         const itemCode = row.querySelector("[name='sku_producto']").innerText;
         const quantity = row.querySelector("[name='cantidad']").value;
+        const price_line = row.querySelector("#precio_Venta").textContent.trim();
         const discount = row.querySelector("#agg_descuento").value;
         const fechaentregaLineas = row.querySelector("#fecha_entrega_lineas").value;
         const bodegaSelect = row.querySelector(".bodega-select");
@@ -77,6 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
           DocEntry_line: docentryLinea,
           ItemCode: itemCode,
           Quantity: parseFloat(quantity),
+          line_price: price_line,
           ShipDate: fechaentregaLineas,
           FreeText: comentarios,
           DiscountPercent: parseFloat(discount),

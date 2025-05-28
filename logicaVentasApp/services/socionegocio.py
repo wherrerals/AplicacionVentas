@@ -230,8 +230,6 @@ class SocioNegocio:
                     'contactos': contactos_formateados
                 })
 
-            print("resultados_formateados", resultados_formateados)
-
             return resultados_formateados
         
         except Exception as e:

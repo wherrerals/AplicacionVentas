@@ -127,5 +127,18 @@ services:
     environment:
       CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
 
+  celery-update-recipes-components:
+    build:
+      context: .
+      dockerfile: ./docker/dockerfile.app
+    command: sh -c "celery -A config worker -Q update_recipe_comp -l info -E"
+    depends_on:
+      - rabbitmq
+      - db
+    volumes:
+      - .:/app
+    environment:
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+
 volumes:
   mysql_data:

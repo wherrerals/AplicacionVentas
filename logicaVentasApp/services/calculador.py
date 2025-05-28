@@ -99,6 +99,20 @@ class CalculadoraTotales:
             lineas_calculadas.append(linea)
 
         return lineas_calculadas
+    
+    @staticmethod
+    def calculate_docTotal(doc_data):
+        """
+        Calcula el total del documento a partir de los datos del documento.
+        """
+        total = 0
+
+        for linea in doc_data.get('DocumentLines', []):
+            line_price = linea.get('line_price', 0)
+            line_price_clean = line_price.replace("$", "").replace(" ", "").replace(".", "")
+            total += float(line_price_clean)
+        
+        return total
 
 
 
