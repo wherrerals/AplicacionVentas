@@ -85,13 +85,13 @@ class CalculadoraTotales:
 
             # Calcular subtotal y descuento neto
             subtotal_neto = cantidad * precio_unitario_neto
-            descuento = precio_unitario_neto * porcentaje_descuento
-            descuento_neto = precio_unitario_neto - descuento
+            descuento_neto = subtotal_neto * porcentaje_descuento
+            precio_unitario_neto_descuento_aplicado = precio_unitario_neto * (1 - porcentaje_descuento)
             total_neto = subtotal_neto - descuento_neto
 
             linea = {
                 "precio_linea_neto": self.formatear_valor(precio_unitario_neto),
-                "precio_descuento_neto": self.formatear_valor(descuento_neto),
+                "precio_descuento_neto": self.formatear_valor(precio_unitario_neto_descuento_aplicado),
                 "total_linea_neto": self.formatear_valor(total_neto),
                 "linea_producto": item.get("linea_producto", "Sin Línea")  # Aquí asumes que viene en los datos
             }
