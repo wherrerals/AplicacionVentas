@@ -85,7 +85,6 @@ class SocioNegocio:
         
         else:
             # Si no existe en SAP, se crea un nuevo socio de negocio
-            print("no existe en sap")
             SocioNegocioDB.objects.filter(rut=datosCliente.rut).delete()
             self.process_new_bp(cardcode, newData)
             return JsonResponse({'success': True, 'message': 'Cliente actualizado exitosamente'})
@@ -182,12 +181,10 @@ class SocioNegocio:
             if buscar_por_nombre:
                 # Si se busca por nombre, usa el repositorio que busca por nombre
                 resultados_clientes = SocioNegocioRepository.buscarClientesPorNombre(identificador)
-                print("resultados_clientesXXX", resultados_clientes)
             else:
                 # Si no, se busca por rut (número)
                 
                 resultados_clientes = SocioNegocioRepository.buscarClientesPorRut(identificador)
-                print("resultados_clientes", resultados_clientes)
 
             if not resultados_clientes:
                 logging.info(f"No se encontraron resultados para el identificador: {identificador}")
@@ -351,7 +348,6 @@ class SocioNegocio:
 
 
     def create_sap_bp(self, json_data_bp):
-        print("create sap bp")
         
         api_conection = APIClient()
         
@@ -932,7 +928,6 @@ class SocioNegocio:
 
         if not data_bp.get('direcciones'):
                 data_bp['direcciones'] = Direccion.generate_store_address(sales_branch)
-                print(f"Direcciones: {data_bp['direcciones']}")
 
                 # convert data to json, and create the business partner in SAP
         json_data_bp = BusinessPartnerSerializer.serializer_bp(data_bp, card_code)

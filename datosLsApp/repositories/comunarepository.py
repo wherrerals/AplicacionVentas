@@ -64,7 +64,6 @@ class ComunaRepository:
         
         if mejores_resultados:
             mejores_resultados.sort(key=lambda x: x[1], reverse=True)
-            print("mejores_resultados", mejores_resultados[0][0])
             return mejores_resultados[0][0]
         else:
             return 0

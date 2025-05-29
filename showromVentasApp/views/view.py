@@ -1132,8 +1132,6 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
         
         try:
             data = json.loads(request.body)
-
-            print(f"datos recibidos: {data}")
             
             codigoSn = data.get('rut')
             
@@ -1275,8 +1273,6 @@ def generar_cotizacion_pdf(request, cotizacion_id):
         codigoSn = data.get('rut')
         snrepo = SocioNegocioRepository()
         datossocio = snrepo.obtenerPorCodigoSN2(codigoSn)
-
-        print(f"Datos del socio: {datossocio}")
 
         email_socio = datossocio.email.lower()
         if email_socio == 'null':

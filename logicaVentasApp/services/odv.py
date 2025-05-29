@@ -346,7 +346,6 @@ class OrdenVenta(Documento):
                         "TreeType": "iNotATree"
                 }]
 
-                print(f"json sin linea uno {json_sin_linea_uno}")
                 response = client.actualizarODVSL(docentry, json_sin_linea_uno)
 
             response = client.actualizarODVSL(int(docentry), jsonData)

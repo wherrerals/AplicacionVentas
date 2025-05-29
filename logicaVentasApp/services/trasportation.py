@@ -4,8 +4,6 @@ class Trasnportation:
 
     def get_transportation_code(transportation_code):
 
-        print("transportation_code", transportation_code)
-
         match transportation_code:
             case 1:
                 return "Directa"

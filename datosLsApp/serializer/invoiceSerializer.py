@@ -40,8 +40,6 @@ class InvoiceSerializer:
     
     def serializer_sales_details(data_bp, data_lines):
 
-        print("data_bp", data_bp)
-
         if not data_bp or not data_lines:
             return {}
         
@@ -119,7 +117,6 @@ class InvoiceSerializer:
 
     @staticmethod
     def serialize_invoice_lines(json_data, salesperson):
-        print("json_data", json_data)
         document_lines = []
         vendedor_repo = VendedorRepository()
         tipo_vendedor = vendedor_repo.obtenerTipoVendedor(salesperson)
@@ -172,5 +169,4 @@ class InvoiceSerializer:
             if document_line.get("Quantity", 1) > 0:
                 document_lines.append(document_line)
 
-        print(f"document_lines {document_lines}")
         return document_lines

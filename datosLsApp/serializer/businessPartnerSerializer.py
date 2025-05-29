@@ -5,7 +5,6 @@ class BusinessPartnerSerializer:
 
     @staticmethod
     def serializer_bp(data_bp, card_code):
-        print(f"serializarBP: {data_bp}")
         client_data = data_bp
         giro =  client_data.get("giroSN", "")
 
@@ -103,5 +102,4 @@ class BusinessPartnerSerializer:
 
                 serialized_data["ContactEmployees"].append(serialized_contact)
 
-        print(f"Datos serializados: {serialized_data}")
         return serialized_data

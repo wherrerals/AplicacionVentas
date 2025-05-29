@@ -9,7 +9,6 @@ class BatchProduct:
     @staticmethod
     def generate_batch(listItems):
         boundary = BatchProduct.generate_boundary()
-        print(f"Boundary: {boundary}")
         changeset_boundary = "changeset_77162fcd-b8da-41ac-a9f8-9357efbbd"
 
         body_parts = []

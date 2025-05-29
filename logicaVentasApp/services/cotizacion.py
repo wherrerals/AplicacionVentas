@@ -278,7 +278,6 @@ class Cotizacion(Documento):
                 }]
 
                 response = self.client.actualizarCotizacionesSL(docentry, json_sin_linea_uno)
-            print("json", jsonData)
             response = self.client.actualizarCotizacionesSL(docentry, jsonData)
 
             if 'success' in response:
@@ -286,8 +285,7 @@ class Cotizacion(Documento):
                 doc_entry = docentry
                 # Guardar el log de la cotización
 
-                rise = self.update_components(jsonData, doc_entry, type_document='Quotations')
-                print("rise", rise)
+                self.update_components(jsonData, doc_entry, type_document='Quotations')
                 DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Update')
                 return {
                     'success': 'Cotización creada exitosamente',
@@ -331,7 +329,7 @@ class Cotizacion(Documento):
                     salesPersonCode = response.get('SalesPersonCode')
                     name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
                     # Guardar el log de la cotización
-                    #self.update_components(response, doc_entry, type_document='Quotations')
+                    self.update_components(response, doc_entry, type_document='Quotations')
     
                     DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Create')
                     

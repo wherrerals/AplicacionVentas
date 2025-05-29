@@ -301,12 +301,9 @@ class APIClient:
     def verificarCliente(self, endpoint, cardCode):
         self.__login()
 
-        print(cardCode)
         select = "CardCode"
         url = f"{self.base_url}{endpoint}('{cardCode}')?$select={select}"
         response = self.session.get(url, verify=False)
-        print(f"URL: {url}")
-        print(f"status_code: {response.status_code}")
         
         # Si la respuesta no fue exitosa, imprime los detalles del error
         if response.status_code != 200:
@@ -351,8 +348,6 @@ class APIClient:
 
         details = f"BusinessPartners?$select=CardCode,CardName,CardType,Phone1,EmailAddress,Notes,GroupCode,FederalTaxID,BPAddresses,ContactEmployees&$filter=CardCode eq '{card_code}' or CardCode eq '{card_code_min}'"
         url = f"{self.base_url}{details}"
-
-        print(f"URL: {url}")
         
         try:
             response = self.session.get(url, verify=False)
@@ -724,11 +719,6 @@ class APIClient:
             "Cookie": f"B1SESSION={self.session_id}",  # <- Aquí agregas la cookie
         }
 
-        print(f"URL: {url}")
-        print(f"Headers: {headers}")
-
-        print(f"Data: {data}")
-
         try:
 
             response = self.session.patch(url, json=data, headers=headers, verify=False)
@@ -935,7 +925,6 @@ class APIClient:
 
         url = f"{self.base_url}$crossjoin({cross_join})?$expand={expand}&$filter=Invoices/SalesPersonCode eq SalesPersons/SalesEmployeeCode and {filter}"
 
-        print(f"URL: {url}")
         response = self.session.get(url, verify=False)
 
         response.raise_for_status()
@@ -949,13 +938,7 @@ class APIClient:
 
         headers = {"Content-Type": f"multipart/mixed;boundary={boundary}"}
 
-        print("body:", body)
-
         batch_response = self.session.post(f"{self.base_url}/$batch", data=body, headers=headers, verify=False)     
-
-        print("Status:", batch_response.status_code)
-        print("Content-Type:", batch_response.headers.get("Content-Type"))
-        print("Text:", batch_response.text)
 
         if batch_response.status_code == 202:
             print("Batch process completed successfully.")
@@ -968,10 +951,7 @@ class APIClient:
         url = f"{self.base_url}{type_document}?{select}"
 
         response = self.session.get(url, verify=False)
-        
-        print(f"URL: {url}")
-        print(f"Response: {response.status_code}")
-        # Verificar si la respuesta fue exitosa
+
         if response.status_code == 200:
             data = response.json()
             if 'value' in data and len(data['value']) > 0:

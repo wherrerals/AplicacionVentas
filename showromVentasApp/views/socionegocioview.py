@@ -90,9 +90,6 @@ class SocioNegocioView(FormView):
 
             response = json.loads(business_partner.create_or_update_bp().content)
 
-            print("Response:", response)  # Para depuración
-            print(response.get('success'))  # Para depuración
-
             if response.get('success'):
                 return JsonResponse({
                         'success': True,
@@ -132,9 +129,7 @@ class SocioNegocioView(FormView):
                 if numero:
                     # Limpiar la "C" al final del número si existe
                     numero = numero.replace('C', '').replace('c', '')
-                    
-                    print("Número:", numero)  # Para depuración
-                    
+                                        
                     resultados_por_numero = SocioNegocio.buscarSocioNegocio(numero)
                     resultados.extend(resultados_por_numero)
 
@@ -205,11 +200,9 @@ class SocioNegocioView(FormView):
             socio_negocio_service = SocioNegocio(request)
             #cardCode = socio_negocio_service.generarCardCode(rut)
             if socio_negocio_service.verificarSocioDB(rut):
-                print("Socio de negocio ya existe en la base de datos")
                 return socio_negocio_service.responderInfoCliente(rut)
             
             else:
-                print("Socio de negocio no existe en la base de datos")
                 return socio_negocio_service.crearYresponderCliente(rut, rut)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)

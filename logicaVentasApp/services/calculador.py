@@ -8,7 +8,6 @@ class CalculadoraTotales:
 
     def limpiar_valor(self, valor):
         """Convierte un string de formato '$ 100.000' a un entero."""
-        print("Valor original:", valor)
         
         valor = valor.replace(" ", "").replace("$", "").replace(".", "")
         valor = valor.replace(",", ".")
@@ -59,8 +58,6 @@ class CalculadoraTotales:
             "total_valor_neto": self.formatear_valor(total_valor_neto),
             "ciclos": ciclos,
         }
-
-        print("Total calculado:", dic)
 
         
         return {

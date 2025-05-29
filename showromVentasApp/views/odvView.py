@@ -149,7 +149,6 @@ class OdvView(View):
             odv = OrdenVenta()
             if docEntry:
                 actualizacion = odv.actualizarDocumento(docnum, docEntry, data)
-                print(actualizacion)
                 return JsonResponse(actualizacion, status=200)
             
             else:
@@ -178,8 +177,6 @@ class OdvView(View):
         }
     
     def validar_vendedor(self, vendedor1, vendedor2):
-        print(vendedor1)
-        print(vendedor2)
         if vendedor1 == vendedor2:
             return True
         else:
