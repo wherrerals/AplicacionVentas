@@ -13,6 +13,7 @@ from django.db import transaction
 from django.http import JsonResponse, HttpResponse
 from weasyprint import HTML
 #Modulos Diseñados
+from datosLsApp.models.confiDescuentosDB import ConfiDescuentosDB
 from datosLsApp.models.sucursaldb import SucursalDB
 from datosLsApp.models.usuariodb import User 
 from datosLsApp.models import (ProductoDB, SocioNegocioDB, UsuarioDB, RegionDB, GrupoSNDB, TipoSNDB, TipoClienteDB, DireccionDB, ComunaDB, ContactoDB)
@@ -833,22 +834,53 @@ def busquedaProductos(request):
         return JsonResponse({'error': 'No se proporcionó un número válido'})
     
 
-def limitar_descuento(producto, users_data):
-    """
-    Limita el descuento máximo según el tipo de producto.
-    Si el producto es LST y el descuento es mayor que 15%, lo ajusta a 15%.
-    Para otros productos, si el descuento es mayor que 10%, lo ajusta a 10%.
-    """
+""" def limitar_descuento(producto, users_data):
+
     if users_data['tipoVendedor'] == 'P':
         if producto.marca == 'LST':
-            return math.floor(min(producto.dsctoMaxTienda * 100, 25))
+            #codigo = 2 
+            return math.floor(min(producto.dsctoMaxTienda * 100, 91)) #25
         else:
-            return math.floor(min(producto.dsctoMaxTienda * 100, 15))
+            # codigo = 4
+            return math.floor(min(producto.dsctoMaxTienda * 100, 91)) #15
     else:
         if producto.marca == 'LST':
-            return math.floor(min(producto.dsctoMaxTienda * 100, 15))
+            #codigo = 1 
+            return math.floor(min(producto.dsctoMaxTienda * 100, 91)) #15
         else:
-            return math.floor(min(producto.dsctoMaxTienda * 100, 10))
+            #codigo = 3
+            return math.floor(min(producto.dsctoMaxTienda * 100, 91)) #10 """
+
+def limitar_descuento(producto, users_data):
+    """
+    Limita el descuento máximo según el tipo de producto y tipo de vendedor.
+    El valor límite se obtiene desde la base de datos ConfiDescuentosDB según un código:
+        - codigo = '1' → vendedor NO 'P' y marca 'LST'
+        - codigo = '2' → vendedor 'P' y marca 'LST'
+        - codigo = '3' → vendedor NO 'P' y otra marca
+        - codigo = '4' → vendedor 'P' y otra marca
+    """
+    # Determinar el código de configuración
+    if users_data['tipoVendedor'] == 'P':
+        if producto.marca == 'LST':
+            codigo = '2'  # vendedor 'P' y marca 'LST'
+        else:
+            codigo = '4'  # vendedor 'P' y otra marca
+    else:
+        if producto.marca == 'LST':
+            codigo = '1'  # vendedor distinto de 'P' y marca 'LST'
+        else:
+            codigo = '3'  # vendedor distinto de 'P' y otra marca
+
+    # Buscar el límite desde la base de datos
+    try:
+        confi = ConfiDescuentosDB.objects.get(codigo=codigo)
+        limite = confi.limiteDescuentoMaximo
+    except ConfiDescuentosDB.DoesNotExist:
+        # Si no se encuentra la configuración, usar un valor por defecto
+        limite = 0
+    return math.floor(min(producto.dsctoMaxTienda * 100, limite))
+
 
 
 def validar_contrasena(password):
