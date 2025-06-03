@@ -271,9 +271,8 @@ class Cotizacion(Documento):
                 json_sin_linea_uno['DocumentLines'].clear()
                 json_sin_linea_uno['DocumentLines'] = [{
                 
-                        "ItemCode": "LM",
+                        "ItemCode": "C10000002",
                         "Quantity": 1,
-                        "UnitPrice": 0,
                         "TreeType": "iNotATree"
                 }]
 
