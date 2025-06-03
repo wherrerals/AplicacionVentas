@@ -15,7 +15,7 @@ class SerializerDocument:
 
     @staticmethod
     def document_serializer(doc_data):
-        #doc_total = CalculadoraTotales.calculate_docTotal(doc_data)
+        doc_total = CalculadoraTotales.calculate_docTotal(doc_data)
         
         type_sales = Seller.tipoVentaTipoVendedor(doc_data.get('SalesPersonCode'))
         
@@ -32,8 +32,8 @@ class SerializerDocument:
             'DocDate': doc_data.get('DocDate'),
             'DocDueDate': doc_data.get('DocDueDate'),
             'TaxDate': doc_data.get('TaxDate'),
-            'DocTotal': doc_data.get('DocTotal'),
-            #'DocTotal': f'{doc_total}',
+            #'DocTotal': doc_data.get('DocTotal'),
+            'DocTotal': f'{doc_total}',
             'CardCode': doc_data.get('CardCode'),
             'NumAtCard': doc_data.get('NumAtCard'),
             'Comments': doc_data.get('Comments'),
@@ -144,7 +144,6 @@ class SerializerDocument:
     def serialize_recipe_ingredients(document_lines, type_document):
         lines = document_lines.get("value", [])
 
-        print(f"lines {lines}")
         result = {"DocumentLines": []}
 
         # Ordenar por LineNum

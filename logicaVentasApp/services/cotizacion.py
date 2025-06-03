@@ -268,12 +268,11 @@ class Cotizacion(Documento):
             json_sin_linea_uno = json_data
 
             if json_sin_linea_uno['DocumentLines']:
-                print(json_sin_linea_uno)
                 json_sin_linea_uno['DocTotal'] = ""
                 json_sin_linea_uno['DocumentLines'].clear()
                 json_sin_linea_uno['DocumentLines'] = [{
                 
-                        "ItemCode": "C10000002",
+                        "ItemCode": "LM",
                         "Quantity": 1,
                         "TreeType": "iNotATree"
                 }]
@@ -300,15 +299,6 @@ class Cotizacion(Documento):
             return {'error': str(e)}
 
     def crearDocumento(self, data):
-        """
-        Crea una nueva cotización y maneja las excepciones según el código de respuesta.
-
-        Args:
-            data (dict): Datos de la cotización.
-
-        Returns:
-            dict: Respuesta de la API.
-        """
         try:
             # Verificar los datos antes de preparar el JSON
             errores = self.validarDatosCotizacion(data)
