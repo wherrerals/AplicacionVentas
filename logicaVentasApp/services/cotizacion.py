@@ -268,6 +268,8 @@ class Cotizacion(Documento):
             json_sin_linea_uno = json_data
 
             if json_sin_linea_uno['DocumentLines']:
+                print(json_sin_linea_uno)
+                json_sin_linea_uno['DocTotal'] = ""
                 json_sin_linea_uno['DocumentLines'].clear()
                 json_sin_linea_uno['DocumentLines'] = [{
                 
