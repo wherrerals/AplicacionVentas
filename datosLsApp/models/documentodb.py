@@ -1,5 +1,6 @@
 from django.db import models
 from datosLsApp.models.lineadb import LineaDB
+from datosLsApp.models.socionegociodb import SocioNegocioDB
 from datosLsApp.models.vendedordb import VendedorDB
 from datosLsApp.models.condicionpagodb import CondicionPagoDB
 from datosLsApp.models.tipodoctributariodb import TipoDocTributarioDB
@@ -19,6 +20,8 @@ class DocumentoDB(models.Model):
     folio = models.IntegerField(null = False)
     fechaDocumento = models.DateField(null = False)
     fechaEntrega = models.DateField(null = False)
+    direccionEntrega = models.CharField(max_length=255, null = True)
+    direccionDespacho = models.CharField(max_length=255, null = True)
     horarioEntrega = models.DateTimeField(null = False)
     referencia = models.CharField(max_length=255)
     comentario = models.CharField(max_length=255)
@@ -33,6 +36,9 @@ class DocumentoDB(models.Model):
     tipoobjetoSap = models.ForeignKey(TipoObjetoSapDB, on_delete=models.CASCADE, default=1)    
     tipoVenta = models.ForeignKey(TipoVentaDB, on_delete=models.CASCADE, default=1)
     document_lineas = models.ManyToManyField(LineaDB, related_name='documentos')
+    socio_negocio = models.ForeignKey(SocioNegocioDB, on_delete=models.CASCADE, default=1)
+
+
     
     def __str__(self):
         return f'Documento {self.docNum} - Tipo: {self.tipo_documento.nombre} - Vendedor: {self.nombre_vendedor.nombre}'

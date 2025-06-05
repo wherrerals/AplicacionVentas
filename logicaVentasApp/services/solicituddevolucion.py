@@ -2,6 +2,7 @@ from venv import logger
 from adapters.sl_client import APIClient
 from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
+from datosLsApp.repositories.documentorepository import DocumentoRepository
 from datosLsApp.repositories.productorepository import ProductoRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from logicaVentasApp.services.documento import Documento
@@ -383,6 +384,8 @@ class SolicitudesDevolucion(Documento):
             dict: Respuesta de la API.
         """
         try:
+            print(f"Datos de la cotización: {data}")  # Para depuración
+
             # Verificar los datos antes de preparar el JSON
             errores = self.validarDatosCotizacion(data)
             if errores:
@@ -390,6 +393,12 @@ class SolicitudesDevolucion(Documento):
 
             # Preparar el JSON para la cotización
             jsonData = self.prepararJsonDevoluciones(data)
+
+            DocumentoRepository.create_document_db(jsonData)  # Guardar en la base de datos
+
+            print(f"JSON Data: {jsonData}")  # Para depuración
+
+            return True
             
             # Realizar la solicitud a la API
             response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
