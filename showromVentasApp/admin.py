@@ -22,6 +22,9 @@ from datosLsApp.models import (
     GrupoSNDB,
     TipoSNDB,
     TipoClienteDB,
+    TipoEntregaDB,
+    TipoObjetoSapDB,
+
 )
 
 from datosLsApp.models.regiondb import RegionDB
@@ -38,12 +41,17 @@ logger = logging.getLogger(__name__)
 admin.site.site_header = "Led Studio"
 admin.site.site_title = "Led Studio Admin"
 admin.site.index_title = "Aplicacion Ventas Led Studio"
-
+ 
 
 # Mejora interfaz modelos
 class TipoDocTributarioDBper(admin.ModelAdmin):
     list_display = ("codigo", "nombre")
 
+class TipoEntregaDBper(admin.ModelAdmin):
+    list_display = ("codigo", "nombre")
+
+class TipoObjetoSapDBper(admin.ModelAdmin):
+    list_display = ("codigo", "nombre", "descripcion")
 
 class SucursalDBper(admin.ModelAdmin):
     list_display = ("codigo", "nombre")
@@ -280,3 +288,5 @@ admin.site.register(RegionDB, RegionDBper)
 admin.site.register(StockBodegasDB, stockBodegasDBper)
 admin.site.register(ConfiDescuentosDB, ConfiDescuentosDBper)
 admin.site.register(ConfiEmpresaDB, ConfiEmpresaDBper)
+admin.site.register(TipoEntregaDB, TipoEntregaDBper)
+admin.site.register(TipoObjetoSapDB, TipoObjetoSapDBper)

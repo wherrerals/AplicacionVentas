@@ -14,12 +14,11 @@ class DocumentoDB(models.Model):
         verbose_name = 'Documento'
         verbose_name_plural = 'Documento' 
 
-
-    docEntry = models.IntegerField(null = False)
-    docNum = models.IntegerField(null = False)
-    folio = models.IntegerField(null = False)
+    docEntry = models.IntegerField(null = True)
+    docNum = models.IntegerField(null = True)
+    folio = models.IntegerField(null = True)
     fechaDocumento = models.DateField(null = False)
-    fechaEntrega = models.DateField(null = False)
+    fechaEntrega = models.DateField(null = True)
     direccionEntrega = models.CharField(max_length=255, null = True)
     direccionDespacho = models.CharField(max_length=255, null = True)
     horarioEntrega = models.DateTimeField(null = False)
@@ -41,4 +40,4 @@ class DocumentoDB(models.Model):
 
     
     def __str__(self):
-        return f'Documento {self.docNum} - Tipo: {self.tipo_documento.nombre} - Vendedor: {self.nombre_vendedor.nombre}'
+        return f'Documento {self.docNum} - Tipo: {self.tipo_documento.nombre} - Vendedor: {self.vendedor.nombre}'
