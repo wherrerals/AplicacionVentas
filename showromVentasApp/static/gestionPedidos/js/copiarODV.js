@@ -202,6 +202,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   comentario,
                   descuentoAplcado,
                   line.Quantity,
+                  cantidadCoti,
                   precioCoti,
                   
               );
