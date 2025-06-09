@@ -15,6 +15,13 @@ class SerializerDocument:
 
     @staticmethod
     def document_serializer(doc_data):
+
+        prueba_line = doc_data.get('DocumentLines', [])
+
+        for line in prueba_line:
+            print(f"SKU de la linea: {line.get('ItemCode', 'No hay SKU')}")
+            print(f"Cantidad de la Linea: {line.get('Quantity', 'No hay lineas')}")
+
         doc_total = CalculadoraTotales.calculate_docTotal(doc_data)
         
         type_sales = Seller.tipoVentaTipoVendedor(doc_data.get('SalesPersonCode'))
@@ -74,6 +81,7 @@ class SerializerDocument:
             }
 
             lineas_json.append(nueva_linea)
+
         # validar si es una lista o un class el tipo de addres_bill y address_ship
         if not isinstance(addres_bill, list) and not isinstance(address_ship, list):
             taxExtension = {
@@ -182,42 +190,3 @@ class SerializerDocument:
             # Si es "N" o sin TreeType válido, ignorar
 
         return result
-
-""" 
-    @staticmethod
-    def serialize_recipe_ingredients(document_lines, type_document):
-        lines = document_lines.get("value", [])
-        result = {"DocumentLines": []}
-
-        # Ordenar por LineNum
-        parsed_lines = [line.get(f"{type_document}/DocumentLines", {}) for line in lines]
-
-
-        current_recipe = None
-
-        for line in parsed_lines:
-            tree_type = line.get("TreeType")
-            warehouse = line.get("WarehouseCode")
-
-            if tree_type == "S":
-                # Nueva receta activa
-                current_recipe = {
-                    "LineNum": line["LineNum"],
-                    "ItemCode": line["ItemCode"],
-                    "WarehouseCode": warehouse,
-                    "TreeType": "iSalesTree"
-                }
-                result["DocumentLines"].append(current_recipe)
-
-            elif tree_type == "I" and current_recipe:
-                # Ingrediente válido para la receta activa
-                result["DocumentLines"].append({
-                    "LineNum": line["LineNum"],
-                    "ItemCode": line["ItemCode"],
-                    "WarehouseCode": current_recipe["WarehouseCode"],
-                    "TreeType": "iIngredient"
-                })
-
-            # TreeType == "N" o sin receta activa: ignorar
-
-        return result """

@@ -91,6 +91,7 @@ class StockService:
     def actualizar_stock_total(self, sku):
         """ Actualiza el stock total sumando los stocks de todas las bodegas del producto """
         print(f"Actualizando stock total para SKU {sku}")
+        
         stock_total = StockBodegasDB.objects.filter(idProducto__codigo=sku).aggregate(total=Sum('stock'))['total'] or 0
 
         producto = ProductoDB.objects.filter(codigo=sku).first()

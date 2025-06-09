@@ -380,41 +380,39 @@ class OrdenVenta(Documento):
             if errores:
                 return {'error': errores}
 
-
             stock_service = StockService()
             sl = APIClient()
-
-            
-            stock_inicial = []  # Para rollback en caso de error
+            stock_inicial = [] 
 
             for item in data['DocumentLines']:
                 sku = item['ItemCode']
                 bodega_id = item['WarehouseCode']
                 cantidad = item['Quantity']
 
-                # Capturar el stock inicial antes de descontarlo
-                stock_actual = StockBodegasDB.objects.filter(idProducto__codigo=sku, idBodega=bodega_id).values_list('stock', flat=True).first() or 0
-
+                stock_actual = StockBodegasDB.objects.filter(idProducto__codigo=sku, idBodega=bodega_id).values_list('stock', flat=True).first() or 0 # Capturar el stock inicial antes de descontarl
                 stock_inicial.append((sku, bodega_id, stock_actual))  # Guardar para rollback
+                stock_service.actualizar_stock(sku, bodega_id, -cantidad, stock_actual) # Descontar stock
 
-                # Descontar stock
-                stock_service.actualizar_stock(sku, bodega_id, -cantidad, stock_actual)
-
-            # Preparar el JSON para la cotización
-            jsonData = SerializerDocument.document_serializer(data)
-
-            # Realizar la solicitud a la API
+            jsonData = SerializerDocument.document_serializer(data) # Preparar el JSON para la cotización
             response = sl.crearODV(jsonData)
 
+            descento_porcentaje = response.get('DiscountPercent', 0)
+            print ("descento_porcentaje", descento_porcentaje)
+
+            # validar si el descuento es un porcentaje válido
+
+            if descento_porcentaje < 0 or descento_porcentaje > 100:
+                print("Descuento no válido")
             
             if isinstance(response, dict):
+
                 if 'DocEntry' in response:
                     doc_num = response.get('DocNum')
                     doc_entry = response.get('DocEntry')
                     salesPersonCode = response.get('SalesPersonCode')
                     name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
-                    self.update_components(response, doc_entry, type_document='Orders')
 
+                    self.update_components(response, doc_entry, type_document='Orders')
                     DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='ODV', url="", json=jsonData, response=response, estate='Creado')
 
                     return {
@@ -424,6 +422,7 @@ class OrdenVenta(Documento):
                         'salesPersonCode': salesPersonCode,
                         'salesPersonName': name_vendedor
                     }
+                
                 elif 'error' in response:
                     DocumentsLogs.register_logs(docNum=None, docEntry=None, tipoDoc='ODV', url="", json=jsonData, response=response, estate='Error')
                     return {'error': f"Error: {response.get('error', 'Error desconocido')}"}
@@ -434,7 +433,6 @@ class OrdenVenta(Documento):
 
         except Exception as e:
             logger.error(f"Error al crear la cotización: {str(e)}")
-
             # Rollback del stock si algo falla
             for sku, bodega_id, stock_original in stock_inicial:
                 StockBodegasDB.objects.filter(idProducto__codigo=sku, idBodega=bodega_id).update(stock=stock_original)

@@ -753,6 +753,9 @@ function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre
                 cantidadInput.value = 0;
                 mostrarAlerta('No contamos con stock disponible para esta bodega.');
             }
+
+            cantidadInput.dispatchEvent(new Event('input', { bubbles: true }));
+
             
             // Calcular la diferencia de cantidad y corregir el stock total
             let diferenciaCantidad = nuevaCantidad - cantidadActual;
