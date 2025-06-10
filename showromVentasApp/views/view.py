@@ -1182,7 +1182,7 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
             contactos = ''
             if contacto_id and contacto_id != 'No hay contactos disponibles':
                 contacto = ContactoRepository.obtenerContacto(contacto_id)
-                contactos = contacto.nombreCompleto if contacto.nombre != "1" else datossocio.nombre
+                contactos = contacto.nombreCompleto if contacto.nombre != "1" else ""
 
             sucursal = data.get('sucursal')
             datossocio = snrepo.obtenerPorCodigoSN2(codigoSn)
@@ -1251,9 +1251,6 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
                 },
             }
 
-            calculadora = CalculadoraTotales(data)
-            totales = calculadora.calcular_totales()
-            linea_neto = calculadora.calcular_linea_neto()
 
             # Crear instancia de calculadora y obtener valores por línea
             calculadora = CalculadoraTotales(data)
