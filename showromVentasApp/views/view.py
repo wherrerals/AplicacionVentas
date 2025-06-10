@@ -1251,9 +1251,6 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
                 },
             }
 
-            calculadora = CalculadoraTotales(data)
-            totales = calculadora.calcular_totales()
-            linea_neto = calculadora.calcular_linea_neto()
 
             # Crear instancia de calculadora y obtener valores por línea
             calculadora = CalculadoraTotales(data)
