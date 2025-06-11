@@ -67,6 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const linenum = row.querySelector("#indixe_producto").getAttribute('data-linenum'); //listo
             const itemCode = row.querySelector("[name='sku_producto']").innerText;
             const quantity = row.querySelector("[name='cantidad']").value;
+            const unitPrice = row.querySelector("[name='precio_venta']").getAttribute('data-preciounitario');
             const price_line = row.querySelector("#precio_Venta").textContent.trim();
             const discount = row.querySelector("#agg_descuento").value;
             // Capturar el valor seleccionado en el select de bodega
@@ -91,6 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "DocEntry_line": docentryLinea,
                 "ItemCode": itemCode,
                 "Quantity": parseFloat(quantity),
+                "UnitePrice": parseFloat(unitPrice), // precio unitario
                 "line_price": price_line, // precio de venta
                 "ShipDate": docDueDate, //shipDate,
                 "FreeText": comentarios,
