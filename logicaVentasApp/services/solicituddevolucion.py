@@ -394,7 +394,15 @@ class SolicitudesDevolucion(Documento):
             # Preparar el JSON para la cotización
             jsonData = self.prepararJsonDevoluciones(data)
 
-            DocumentoRepository.create_document_db(jsonData)  # Guardar en la base de datos
+            create_rr = DocumentoRepository.create_document_db(jsonData)  # Guardar en la base de datos
+
+            if create_rr:
+                
+                return {'success': 'Devolución guardada en la base de datos correctamente.',
+                        'docNum': "No DocNum",
+                        'docEntry': "No DocEntry",
+                  }
+
 
             print(f"JSON Data: {jsonData}")  # Para depuración
 
