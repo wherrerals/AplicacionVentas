@@ -16,12 +16,6 @@ class SerializerDocument:
     @staticmethod
     def document_serializer(doc_data):
 
-        prueba_line = doc_data.get('DocumentLines', [])
-
-        for line in prueba_line:
-            print(f"SKU de la linea: {line.get('ItemCode', 'No hay SKU')}")
-            print(f"Cantidad de la Linea: {line.get('Quantity', 'No hay lineas')}")
-
         doc_total = CalculadoraTotales.calculate_docTotal(doc_data)
         
         type_sales = Seller.tipoVentaTipoVendedor(doc_data.get('SalesPersonCode'))
@@ -54,8 +48,6 @@ class SerializerDocument:
 
         repo_producto = ProductoRepository()
         lineas_json = []
-
-        print(f"document line: {doc_data.get('DocumentLines', [])}")
 
         for linea in doc_data.get('DocumentLines', []):
             item_code = linea.get('ItemCode')
