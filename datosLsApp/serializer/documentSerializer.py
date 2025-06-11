@@ -55,6 +55,8 @@ class SerializerDocument:
         repo_producto = ProductoRepository()
         lineas_json = []
 
+        print(f"document line: {doc_data.get('DocumentLines', [])}")
+
         for linea in doc_data.get('DocumentLines', []):
             item_code = linea.get('ItemCode')
             
@@ -62,13 +64,18 @@ class SerializerDocument:
                 treeType = 'iSalesTree'
             else:
                 treeType = 'iNotATree'
+
+            unit_price = linea.get('UnitePrice')
+            unit_price_neto = unit_price / 1.19 
+            print(f"Precio unitario neto: {unit_price_neto}")
             
             warehouseCode = linea.get('WarehouseCode')
 
             nueva_linea = {
                 'ItemCode': item_code,
                 'Quantity': linea.get('Quantity'),
-                'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
+                #'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
+                'UnitPrice': round(unit_price_neto, 4),
                 'ShipDate': linea.get('ShipDate'),
                 'FreeText': linea.get('FreeText'),
                 'DiscountPercent': linea.get('DiscountPercent'),

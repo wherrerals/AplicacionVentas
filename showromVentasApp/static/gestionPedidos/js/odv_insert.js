@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const linenum = row.querySelector("#indixe_producto").getAttribute('data-linenum'); //listo
         const itemCode = row.querySelector("[name='sku_producto']").innerText;
         const quantity = row.querySelector("[name='cantidad']").value;
+        const unitPrice = row.querySelector("[name='precio_venta']").getAttribute('data-preciounitario');
         const price_line = row.querySelector("#precio_Venta").textContent.trim();
         const discount = row.querySelector("#agg_descuento").value;
         const fechaentregaLineas = row.querySelector("#fecha_entrega_lineas").value;
@@ -78,6 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
           DocEntry_line: docentryLinea,
           ItemCode: itemCode,
           Quantity: parseFloat(quantity),
+          UnitePrice: parseFloat(unitPrice),
           line_price: price_line,
           ShipDate: fechaentregaLineas,
           FreeText: comentarios,
@@ -89,6 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
           CostingCode2: costingCode2,
           COGSCostingCode2: cogsCostingCode2,
           CantidadInicialSAP: cantidadInicialSAP,
+          
         };
         
         lines.push(line);
