@@ -28,13 +28,14 @@ class DocumentoDB(models.Model):
     descuento = models.FloatField(default=0) 
     totalDocumento = models.FloatField(null = False)
     codigoVenta = models.IntegerField(null = False)
+    estado_documento = models.CharField(max_length=50, null = False, default='Borrador')
+    # Relaciones con otros modelos
     tipo_documento = models.ForeignKey(TipoDocTributarioDB, on_delete=models.CASCADE)
     vendedor = models.ForeignKey(VendedorDB, on_delete=models.CASCADE, default=1)
     condi_pago = models.ForeignKey(CondicionPagoDB, on_delete=models.CASCADE, default=1)
     tipoentrega = models.ForeignKey(TipoEntregaDB, on_delete=models.CASCADE, default=1)
     tipoobjetoSap = models.ForeignKey(TipoObjetoSapDB, on_delete=models.CASCADE, default=1)    
     tipoVenta = models.ForeignKey(TipoVentaDB, on_delete=models.CASCADE, default=1)
-    document_lineas = models.ManyToManyField(LineaDB, related_name='documentos')
     socio_negocio = models.ForeignKey(SocioNegocioDB, on_delete=models.CASCADE, default=1)
 
 

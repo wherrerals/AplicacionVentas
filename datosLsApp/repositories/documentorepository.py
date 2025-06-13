@@ -43,89 +43,68 @@ class DocumentoRepository:
         except DocumentoDB.DoesNotExist:
             return None
 
+ 
     @staticmethod
     def create_document_db(data):
 
         business_partner = SocioNegocioDB.objects.get(codigoSN=data['CardCode'])
         document_type = TipoDocTributarioDB.objects.get(codigo=data['U_LED_TIPDOC'])
         seller = VendedorDB.objects.get(codigo=data['SalesPersonCode'])
-        tipo_venta = TipoVentaDB.objects.get(codigo='PROY') #TipoVentaDB.objects.get(codigo=data['U_LED_TIPVTA'])
-        tipo_entrega = TipoEntregaDB.objects.get(codigo='1')#(codigo=data['U_LED_FORENV'])
+        tipo_venta = TipoVentaDB.objects.get(codigo='PROY')  # puedes cambiar esto si luego usas el dato dinámico
+        tipo_entrega = TipoEntregaDB.objects.get(codigo='1')
         condicion_pago = CondicionPagoDB.objects.get(codigo=data['PaymentGroupCode'])
         tipo_objeto = TipoObjetoSapDB.objects.get(codigo="1")
 
-
+        # Crear el documento
         document = DocumentoDB.objects.create(
-            docEntry = 0,
-            docNum = 0,
-            folio = 0,
-            fechaDocumento = data['DocDate'],
-            fechaEntrega = data['DocDate'],
-            direccionEntrega = data['TaxExtension']['StreetS'],
-            direccionDespacho = data['TaxExtension']['StreetB'],
-            horarioEntrega = datetime.now(),
+            docEntry=0,
+            docNum=0,
+            folio=0,
+            fechaDocumento=data['DocDate'],
+            fechaEntrega=data['DocDate'],
+            direccionEntrega=data['TaxExtension']['StreetS'],
+            direccionDespacho=data['TaxExtension']['StreetB'],
+            horarioEntrega=datetime.now(),
             referencia=data.get('NumAtCard', ''),
             comentario=data.get('Comments', ''),
             totalAntesDelDescuento=data['DocTotal'],
             descuento=0,
             totalDocumento=data['DocTotal'],
             codigoVenta=data['SalesPersonCode'],
-            tipo_documento= document_type, 
-            vendedor= seller,
-            condi_pago= condicion_pago,
-            tipoentrega= tipo_entrega,
-            tipoobjetoSap= tipo_objeto, # 
-            tipoVenta=  tipo_venta, #
+            tipo_documento=document_type,
+            vendedor=seller,
+            condi_pago=condicion_pago,
+            tipoentrega=tipo_entrega,
+            tipoobjetoSap=tipo_objeto,
+            tipoVenta=tipo_venta,
             socio_negocio=business_partner,
         )
 
-    # Crear líneas
-        linea_num = 0
-        for linea in data['DocumentLines']:
-
+        # Crear líneas relacionadas al documento
+        for linea_num, linea in enumerate(data['DocumentLines'], start=1):
             item_code = ProductoDB.objects.get(codigo=linea['ItemCode'])
 
-            nueva_linea = LineaDB.objects.create(
-                producto= item_code,
-                numLinea = linea_num + 1,
+            LineaDB.objects.create(
+                documento=document,  # ¡Aquí se establece la relación!
+                producto=item_code,
+                numLinea=linea_num,
                 descuento=linea['DiscountPercent'],
                 cantidad=linea['Quantity'],
-                totalBrutoLinea = item_code.precioVenta * linea['Quantity'],
-                totalNetoLinea= (item_code.precioVenta * linea['Quantity']) - (item_code.precioVenta * linea['Quantity'] * linea['DiscountPercent'] / 100),
+                precioUnitario=linea['UnitPrice'],
+                totalBrutoLinea=item_code.precioVenta * linea['Quantity'],
+                totalNetoLinea=(item_code.precioVenta * linea['Quantity']) - 
+                                (item_code.precioVenta * linea['Quantity'] * linea['DiscountPercent'] / 100),
                 comentario=linea['FreeText'],
                 fechaEntrega=linea['ShipDate'],
                 docEntryBase=0,
                 numLineaBase=0,
                 direccionEntrega=data['TaxExtension']['StreetS'],
-                tipoentrega = tipo_entrega,
-                tipoobjetoSap = tipo_objeto,
+                tipoentrega=tipo_entrega,
+                tipoobjetoSap=tipo_objeto,
             )
-            
-            document.document_lineas.add(nueva_linea)
 
         return document
 
-
-
-
-
-
-
-
-
-
-
-
-
-            
-
-
-
-
-
-
-
-    
     @staticmethod
     def buscarDocumentosPorNombre(nombre):
         """

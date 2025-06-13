@@ -9,3 +9,6 @@ class TipoObjetoSapDB(models.Model):
     codigo = models.IntegerField(null = False)
     nombre = models.CharField(max_length=50,null = False)
     descripcion = models.CharField(max_length=255,null = False)
+
+    def __str__(self):
+        return f'{self.nombre}'

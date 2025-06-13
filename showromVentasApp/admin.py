@@ -75,11 +75,12 @@ class VendedorDBper(admin.ModelAdmin):
 
 class DocumentoDBper(admin.ModelAdmin):
     list_display = (
+        "id",
         "docEntry",
         "folio",
         "totalAntesDelDescuento",
         "totalDocumento",
-        "vendedor",
+        "socio_negocio",
     )
 
 
@@ -198,7 +199,7 @@ class Productosper(admin.ModelAdmin):
 
 
 class LineaDBper(admin.ModelAdmin):
-    list_display = ("producto", "cantidad", "descuento")
+    list_display = ("producto", "cantidad", "precioUnitario", "totalNetoLinea", "totalBrutoLinea")
 
 
 class SocioNegocioDBper(admin.ModelAdmin):

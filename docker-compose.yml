@@ -16,6 +16,9 @@ services:
     build:
       context: .
       dockerfile: ./docker/dockerfile.app
+    # production image
+    image: studio-go:prod
+    container_name: studio-go
     command: >
       sh -c "
       rm -rf staticfiles/ &&
@@ -52,6 +55,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/dockerfile.app
+    image: c-beat:prod
+    container_name: c-beat
     command: celery -A config beat --loglevel=info
     depends_on:
       - rabbitmq
@@ -65,6 +70,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/dockerfile.app
+    image: cw-products:prod
+    container_name: cw-products
     command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in
     depends_on:
       - rabbitmq
@@ -79,6 +86,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/dockerfile.app
+    image: cw-recetas:prod
+    container_name: cw-recetas
     command: celery -A config worker --loglevel=info --concurrency=4 -Q q_products_in_receta
     depends_on:
       - rabbitmq
@@ -92,6 +101,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/dockerfile.app
+    image: cw-importados:prod
+    container_name: cw-products-importados
     command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in_importado
     depends_on:
       - rabbitmq
@@ -105,6 +116,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/dockerfile.app
+    image: cw-users:prod
+    container_name: cw-users
     command: celery -A config worker --loglevel=info --concurrency=2 -Q q_clients_in
     depends_on:
       - rabbitmq
@@ -118,6 +131,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/dockerfile.app  # Asegúrate de que este Dockerfile esté configurado correctamente
+    image: cw-pdf:prod
+    container_name: cw-pdf
     command: celery -A config worker -Q q_pdf_generation -l info -E
     depends_on:
       - rabbitmq
@@ -131,6 +146,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/dockerfile.app
+    image: cw-update-components:prod
+    container_name: cw-update-components
     command: sh -c "celery -A config worker -Q update_recipe_comp -l info -E"
     depends_on:
       - rabbitmq

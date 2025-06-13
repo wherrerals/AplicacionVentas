@@ -70,6 +70,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const inputPrecioVenta = row.querySelector('#precio_venta2'); 
 
             const warehouseCode = bodegaSelect ? bodegaSelect.value : null;
+            const unitPrice = row.querySelector("#precio_venta2").value; // Capturar el precio de venta del producto
+            const price_line = row.querySelector("#precio_Venta").textContent.trim();
 
             const costingCode = warehouseCode; //capturar bodega
             const cogsCostingCode = warehouseCode;
@@ -86,7 +88,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 "LineNum": index,
                 "ItemCode": itemCode,
                 "Quantity": parseFloat(quantity),
+                "UnitePrice": parseFloat(unitPrice),
                 "ShipDate": fechaentrega, //shipDate,
+                "line_price": price_line, // precio de venta
                 "FreeText": comentarios,
                 "DiscountPercent": parseFloat(discount),//pendiente porcentaje de descuento
                 "WarehouseCode": warehouseCode, //pendiente bodega
@@ -153,7 +157,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     const titulo = esActualizacion ? 'Devolución actualizada' : 'Devolución creada';
                     const mensaje = esActualizacion
                         ? `La Devolución fue actualizada exitosamente. N°: ${data.docNum}`
-                        : `La Devolución fue creada exitosamente. N°: ${data.docNum}`;
+                        : `Solicitud Creada Pendiente por Aprobar. N°: ${data.id_solicitud}`; // Cambiar el mensaje según sea necesario
+                        //: `La Devolución fue creada exitosamente. N°: ${data.docNum}`;
 
                     // Mostrar el mensaje dinámico en el popup
                     Swal.fire({
