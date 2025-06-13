@@ -8,6 +8,7 @@ from datosLsApp.models.tipoentregadb import TipoEntregaDB
 from datosLsApp.models.tipoobjetosapdb import TipoObjetoSapDB
 from datosLsApp.models.tipoventadb import TipoVentaDB
 from datosLsApp.models.vendedordb import VendedorDB
+from django.db import transaction
 from datetime import datetime
 
 
@@ -137,3 +138,58 @@ class DocumentoRepository:
             return DocumentoDB.objects.get(codigoDocumento=codigoDocumento)
         except DocumentoDB.DoesNotExist:
             return None
+
+
+@staticmethod
+@transaction.atomic
+def update_document_db(docEntry, data):
+    try:
+        document = DocumentoDB.objects.get(docEntry=docEntry)
+    except DocumentoDB.DoesNotExist:
+        raise ValueError(f"Documento con docEntry={docEntry} no existe")
+
+    # Actualiza campos del documento
+    document.fechaDocumento = data.get('DocDate', document.fechaDocumento)
+    document.fechaEntrega = data.get('DocDate', document.fechaEntrega)
+    document.direccionEntrega = data['TaxExtension']['StreetS']
+    document.direccionDespacho = data['TaxExtension']['StreetB']
+    document.referencia = data.get('NumAtCard', document.referencia)
+    document.comentario = data.get('Comments', document.comentario)
+    document.totalAntesDelDescuento = data.get('DocTotal', document.totalAntesDelDescuento)
+    document.totalDocumento = data.get('DocTotal', document.totalDocumento)
+    
+    # Actualiza relaciones si cambia el vendedor o condición de pago
+    if 'SalesPersonCode' in data:
+        document.vendedor = VendedorDB.objects.get(codigo=data['SalesPersonCode'])
+
+    if 'PaymentGroupCode' in data:
+        document.condi_pago = CondicionPagoDB.objects.get(codigo=data['PaymentGroupCode'])
+
+    document.save()
+
+    # Borrar líneas anteriores y recrearlas (opcional, o puedes hacer update por ID si las tienes)
+    LineaDB.objects.filter(documento=document).delete()
+
+    for linea_num, linea in enumerate(data['DocumentLines'], start=1):
+        item_code = ProductoDB.objects.get(codigo=linea['ItemCode'])
+
+        LineaDB.objects.create(
+            documento=document,
+            producto=item_code,
+            numLinea=linea_num,
+            descuento=linea['DiscountPercent'],
+            cantidad=linea['Quantity'],
+            precioUnitario=linea['UnitPrice'],
+            totalBrutoLinea=item_code.precioVenta * linea['Quantity'],
+            totalNetoLinea=(item_code.precioVenta * linea['Quantity']) - 
+                            (item_code.precioVenta * linea['Quantity'] * linea['DiscountPercent'] / 100),
+            comentario=linea['FreeText'],
+            fechaEntrega=linea['ShipDate'],
+            docEntryBase=0,
+            numLineaBase=0,
+            direccionEntrega=data['TaxExtension']['StreetS'],
+            tipoentrega=document.tipoentrega,
+            tipoobjetoSap=document.tipoobjetoSap,
+        )
+
+    return document
