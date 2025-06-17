@@ -241,15 +241,66 @@ class DocumentoRepository:
 
             documentos.append({
                 'id': doc.id,
-                'CardCode': doc.socio_negocio.codigoSN,  # Este campo es usado en la segunda columna del JS
+                'CardCode': doc.socio_negocio.codigoSN,
                 'nombre_cliente': nombre,
-                'SalesEmployeeName': doc.vendedor.codigo,  # Ajusta según modelo
+                'SalesEmployeeName': doc.vendedor.codigo,
                 'fechaEntrega': doc.fechaEntrega,
                 'estado_documento': doc.estado_documento,
                 'totalDocumento': doc.totalDocumento,
             })
 
+        return documentos 
+
+    @staticmethod
+    def get_document_data_lines(filtro_id=None):
+        queryset = DocumentoDB.objects.select_related(
+            'socio_negocio', 'vendedor', 'tipoentrega', 'tipo_documento'
+        ).prefetch_related('lineas__producto')
+
+        if filtro_id:
+            queryset = queryset.filter(id=filtro_id)
+
+        documentos = []
+        for doc in queryset:
+            lineas_serializadas = []
+            for linea in doc.lineas.all():
+                lineas_serializadas.append({
+                    "producto_codigo": linea.producto.codigo,
+                    "producto_nombre": linea.producto.nombre,
+                    "precio_unitario": linea.precioUnitario,
+                    "total_bruto": linea.totalBrutoLinea,
+                    "descuento": linea.descuento,
+                    "comentario": linea.comentario,
+                    "fecha_entrega": str(linea.fechaEntrega),
+                    "tipo_entrega_codigo": linea.tipoentrega.codigo,
+                    "num_linea": linea.numLinea,
+                    "imagen_url": linea.producto.imagen,
+                    "warehouse": linea.direccionEntrega,
+                })
+
+            documentos.append({
+                "id": doc.id,
+                "docNum": doc.docNum,
+                "fechaEntrega": str(doc.fechaEntrega),
+                "estado_documento": doc.estado_documento,
+                "CardCode": doc.socio_negocio.codigoSN,
+                "nombre_cliente": (
+                    f"{doc.socio_negocio.nombre} {doc.socio_negocio.apellido}"
+                    if doc.socio_negocio.grupoSN.codigo == "105"
+                    else doc.socio_negocio.razonSocial
+                ),
+                "referencia": doc.referencia,
+                "comentario": doc.comentario,
+                "SalesEmployeeName": doc.vendedor.nombre,
+                "SalesEmployeeCode": doc.vendedor.codigo,
+                "U_LED_SUCURS": "LC", #doc.socio_negocio.sucursal,
+                "TransportationCode": doc.tipoentrega.codigo,
+                "U_LED_TIPDOC": doc.tipo_documento.codigo,
+                "lineas": lineas_serializadas
+            })
+
         return documentos
+
 
 
 

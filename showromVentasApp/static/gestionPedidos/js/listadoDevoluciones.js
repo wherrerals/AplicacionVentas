@@ -25,10 +25,14 @@ document.addEventListener("DOMContentLoaded", function () {
         // Guardar los filtros activos para que funcionen con la paginación
         activeFilters = filters;
 
+        const csrfToken = getCookie('csrftoken');
+
+
         fetch('/ventas/listado_solicitudes_devolucion/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
             },
             body: JSON.stringify(filterData),
         })
@@ -379,4 +383,23 @@ showLoadingOverlay();
       applyFiltersAndFetchData(filters);
     }
 
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+
+                // Verifica si esta cookie comienza con el nombre que buscamos
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
 });
+

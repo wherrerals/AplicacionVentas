@@ -11,6 +11,7 @@ from adapters.sl_client import APIClient
 from datosLsApp.models.regiondb import RegionDB
 from datosLsApp.models.usuariodb import UsuarioDB
 from datosLsApp.repositories.documentorepository import DocumentoRepository
+from datosLsApp.serializer.documentSerializer import SerializerDocument
 from logicaVentasApp.services.cotizacion import Cotizacion
 import json
 import requests
@@ -69,6 +70,7 @@ class ReturnsView(View):
         return {
             '/': self.filtrarCotizaciones,
             '/ventas/detalles_devolucion': self.detallesDevolucion,
+            '/ventas/detalles_devolucion_pendiente': self.details_rr_pending,
 
 
         }
@@ -163,6 +165,7 @@ class ReturnsView(View):
             rr = SolicitudesDevolucion()
             lines_data = rr.formatearDatos(data)
             return JsonResponse(lines_data, safe=False)
+        
 
     @csrf_exempt
     def crearOActualizarDevoluciones(self, request):
@@ -260,3 +263,22 @@ class ReturnsView(View):
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
+    
+
+    def details_rr_pending(self, request):
+        """
+        Maneja la solicitud para obtener los detalles de una solicitud de devolución pendiente desde la base de datos.
+        """
+        id = request.GET.get('id')
+
+        print("ID from request:", id)
+
+        documents_data = DocumentoRepository.get_document_data_lines(filtro_id=id)
+
+        print("Documents data:", documents_data)
+
+        serilized_data = SerializerDocument.serialize_documento_completo(documents_data)
+
+        print("Documents data:", serilized_data)
+
+        return JsonResponse(serilized_data, safe=False)

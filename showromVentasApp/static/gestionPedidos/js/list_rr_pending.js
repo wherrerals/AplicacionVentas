@@ -127,7 +127,7 @@ const displayDocuments = (docs) => {
   docs.forEach((doc) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td><a href="#" class="docentry-link" data-docentry="${doc.id}">${doc.id}</a></td>
+      <td><a href="#" class="id-link" data-id="${doc.id}">${doc.id}</a></td>
       <td><a href="#" class="cliente-link" data-cadcode="${doc.CardCode}">${doc.CardCode} - ${doc.nombre_cliente || 'Cliente Desconocido'}
       </a></td>
       <td>${doc.SalesEmployeeName || 'N/A'}</td>
@@ -140,14 +140,14 @@ const displayDocuments = (docs) => {
   });
 
   // Agregar eventos después de insertar los elementos
-  document.querySelectorAll('.docentry-link').forEach(link => {
+  document.querySelectorAll('.id-link').forEach(link => {
     link.addEventListener('click', (event) => {
       event.preventDefault();
-      const docEntry = event.target.getAttribute('data-docentry');
+      const id = event.target.getAttribute('data-id');
 
-      if (docEntry) {
+      if (id) {
         showLoadingOverlay();
-        window.location.href = `/ventas/solicitudes_devolucion/?docentry=${docEntry}`;
+        window.location.href = `/ventas/solicitudes_devolucion/?id=${id}`;
       } else {
         hideLoadingOverlay();
         alert("No se pudo obtener el DocEntry de la cotización.");

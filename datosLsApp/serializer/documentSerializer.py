@@ -189,3 +189,58 @@ class SerializerDocument:
             # Si es "N" o sin TreeType válido, ignorar
 
         return result
+    
+
+    @staticmethod
+    def serialize_documento_completo(documentos: list[dict]):
+        if not documentos:
+            return {}
+
+        doc = documentos[0]  # solo debería venir uno si filtraste por ID
+
+        cliente = {
+            "SalesPersons": {
+                "SalesEmployeeName": doc['SalesEmployeeName'],
+                "SalesEmployeeCode": "",  # si necesitas agregarlo, debes incluirlo en el queryset
+                "U_LED_SUCURS": "",       # idem arriba
+            },
+            "ReturnRequest": {
+                "DocNum": doc.get("docNum", ""),
+                "DocDate": doc.get("fechaEntrega", ""),
+                "Cancelled": "N" if doc.get("estado_documento") != "Cancelado" else "Y",
+                "CardCode": doc.get("CardCode", ""),
+                "DocumentStatus": "O" if doc.get("estado_documento") == "Borrador" else "C",
+                "DocEntry": doc.get("id", ""),
+                "CardName": doc.get("nombre_cliente", ""),
+                "TransportationCode": "",  # si lo necesitas, inclúyelo en get_document_data_lines
+                "U_LED_TIPDOC": "",        # idem
+                "NumAtCard": doc.get("referencia", ""),
+                "Comments": doc.get("comentario", "")
+            },
+            "ContactEmployee": {
+                "Contactos": []  # si usas contactos, debes agregarlos
+            }
+        }
+
+        lines = []
+        for linea in doc.get('lineas', []):
+            lines.append({
+                "LineNum": 0,  # si no tienes línea real, deja en 0 o agrégalo en el repo
+                "DocEntry": doc.get("id", ""),
+                "ItemCode": linea['producto_codigo'],
+                "ItemDescription": linea['producto_nombre'],
+                "imagen": "",  # si hay imágenes, debes traer la URL en get_document_data_lines
+                "PriceAfterVAT": linea['precio_unitario'],
+                "GrossPrice": linea['total_bruto'],
+                "DiscountPercent": linea['descuento'],
+                "WarehouseCode": "",  # sucursal, si aplica
+                "FreeText": linea.get('comentario', ''),
+                "ShippingMethod": "",  # si aplica, lo puedes añadir
+                "ShipDate": linea.get('fecha_entrega', ""),
+            })
+
+        return {
+            "Cliente": cliente,
+            "DocumentLines": lines
+        }
+
