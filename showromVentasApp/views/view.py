@@ -369,6 +369,37 @@ def lista_solic_devoluciones(request):
     return render(request, "lista_solic_devoluciones.html", context)
 
 @login_required
+def return_request_pending(request):
+    """
+    Renderiza la página de devoluciones 
+    
+    Args: 
+        request (HttpsRequest): La peticion HTTP recibida
+    
+    Returns:
+        HttpResponse: renderiza el template 'lista_solic_devoluciones.html'
+    """
+    if request.user.is_authenticated:
+        username = request.user.username
+
+        try:
+            usuario = UsuarioDB.objects.get(usuarios=request.user)
+            nombreUser = usuario.nombre
+
+
+        except UsuarioDB.DoesNotExist:
+            return JsonResponse({'error': 'No se encontró el usuario relacionado con el usuario autenticado'}, status=404)
+        
+
+        
+        context = {
+            'username': username,
+            'nombreuser': nombreUser,
+        }
+
+    return render(request, "pending_rr.html", context)
+
+@login_required
 def lista_clientes(request):
     """
     Renderiza la página de Listado de clientes

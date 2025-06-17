@@ -10,6 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from adapters.sl_client import APIClient
 from datosLsApp.models.regiondb import RegionDB
 from datosLsApp.models.usuariodb import UsuarioDB
+from datosLsApp.repositories.documentorepository import DocumentoRepository
 from logicaVentasApp.services.cotizacion import Cotizacion
 import json
 import requests
@@ -76,6 +77,7 @@ class ReturnsView(View):
         return {
             '/ventas/listado_solicitudes_devolucion': self.filtrarCotizaciones,
             '/ventas/crear_devolucion': self.crearOActualizarDevoluciones,
+            '/ventas/solicitudes_pendientes': self.rr_pending_list,
         }
     
     def handle_invalid_route(self, request):
@@ -89,10 +91,11 @@ class ReturnsView(View):
         logger.exception("Unexpected error")
         return JsonResponse({'error': 'Error interno del servidor'}, status=500)
 
-
+    @csrf_exempt
     def get_endpoint(self):
         return 'ReturnRequest'
-
+    
+    @csrf_exempt
     def filtrarCotizaciones(self, request):
         """
         Maneja la solicitud para filtrar cotizaciones, delegando la lógica de construcción de filtros a una función separada.
@@ -120,7 +123,8 @@ class ReturnsView(View):
             return JsonResponse({'data': data}, safe=False)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
-
+    
+    @csrf_exempt
     def detallesDevolucion(self, request):
         # Obtener el parámetro 'docentry' de la solicitud
         docentry = request.GET.get('docentry')
@@ -210,3 +214,49 @@ class ReturnsView(View):
             return True
         else:
             return False
+    
+    def rr_pending_list(self, request):
+        print("Entrando a rr_pending_list")
+        print("Request body:", request.body)
+        try:
+            data = json.loads(request.body)
+            filters = data.get('filters', {})
+            page = data.get('page', 1)
+            limit = data.get('top', 20)
+            offset = (page - 1) * limit
+
+            print("Filters:", filters)
+
+            # Primero obtener el total de registros sin paginación
+            total_records = DocumentoRepository.get_total_documents(
+                filtro_id=filters.get('id', None),
+                filtro_nombre=filters.get('nombre', None),
+                filtro_sucursal=filters.get('sucursal', None),
+                filtro_estado=filters.get('estado', None)
+            )
+
+            print("Total records:", total_records)
+
+            # Luego obtener los productos paginados
+            documents = DocumentoRepository.get_document(
+                filtro_id=filters.get('id', None),
+                filtro_nombre=filters.get('nombre', None),
+                filtro_sucursal=filters.get('sucursal', None),
+                filtro_estado=filters.get('estado', None),
+                offset=offset,
+                limite=limit
+            )
+
+            print("Documents:", documents)
+
+            return JsonResponse({
+                "data": {
+                    "value": documents,
+                },
+                "totalRecords": total_records,  # Usar el total real de registros
+                "page": page,
+                "limit": limit
+            }, safe=False)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
