@@ -36,17 +36,16 @@ document.addEventListener("DOMContentLoaded", function () {
             const salesPersonCode = data.Cliente.SalesPersons.SalesEmployeeCode;
             const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
             const numCotizacion = data.Cliente.ReturnRequest.DocNum;
+            const id = data.Cliente.ReturnRequest.id;
             const docDate = data.Cliente.ReturnRequest.DocDate;
             const canceled = data.Cliente.ReturnRequest.Cancelled;
             let cardCode = data.Cliente.ReturnRequest.CardCode;
             const DocumentStatus = data.Cliente.ReturnRequest.DocumentStatus;
             const docEntry = data.Cliente.ReturnRequest.DocEntry;
-            const razonSocial = data.Cliente.ReturnRequest.CardName;
             const tipoentrega = data.Cliente.ReturnRequest.TransportationCode;
             const tipoFactura = data.Cliente.ReturnRequest.U_LED_TIPDOC;
             const referencia = data.Cliente.ReturnRequest.NumAtCard;
             const comentarios = data.Cliente.ReturnRequest.Comments;
-            const contactos = data.Cliente.ContactEmployee.Contactos;            
             
             if (cardCode.endsWith("C") || cardCode.endsWith("c")) {
               cardCode = cardCode.slice(0, -1);
@@ -111,6 +110,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const numeroCotizacionElement = document.getElementById("numero_orden");
             if (numeroCotizacionElement) {
               numeroCotizacionElement.textContent = `${numCotizacion}`;
+            }
+
+            const id_documento = document.getElementById("id_documento");
+            if (id_documento) {
+              id_documento.textContent = `${id}`;
             }
   
             const dueDateElement = document.getElementById("fecha_entrega");

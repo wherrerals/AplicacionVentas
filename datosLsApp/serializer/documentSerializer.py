@@ -200,9 +200,9 @@ class SerializerDocument:
 
         cliente = {
             "SalesPersons": {
-                "SalesEmployeeName": doc['SalesEmployeeName'],
-                "SalesEmployeeCode": "",  # si necesitas agregarlo, debes incluirlo en el queryset
-                "U_LED_SUCURS": "",       # idem arriba
+                "SalesEmployeeName": f"{doc['U_LED_SUCURS']} - {doc['SalesEmployeeName']}",
+                "SalesEmployeeCode": doc['SalesEmployeeCode'],
+                "U_LED_SUCURS": doc['U_LED_SUCURS'],
             },
             "ReturnRequest": {
                 "DocNum": doc.get("docNum", ""),
@@ -210,7 +210,7 @@ class SerializerDocument:
                 "Cancelled": "N" if doc.get("estado_documento") != "Cancelado" else "Y",
                 "CardCode": doc.get("CardCode", ""),
                 "DocumentStatus": "O" if doc.get("estado_documento") == "Borrador" else "C",
-                "DocEntry": doc.get("id", ""),
+                "id": doc.get("id", ""),
                 "CardName": doc.get("nombre_cliente", ""),
                 "TransportationCode": "",  # si lo necesitas, inclúyelo en get_document_data_lines
                 "U_LED_TIPDOC": "",        # idem
@@ -230,7 +230,7 @@ class SerializerDocument:
                 "ItemCode": linea['producto_codigo'],
                 "ItemDescription": linea['producto_nombre'],
                 "imagen": "",  # si hay imágenes, debes traer la URL en get_document_data_lines
-                "PriceAfterVAT": linea['precio_unitario'],
+                "PriceAfterVAT": round(linea['precio_unitario'] * 1.19),  # asumiendo que el precio ya incluye IVA
                 "GrossPrice": linea['total_bruto'],
                 "DiscountPercent": linea['descuento'],
                 "WarehouseCode": "",  # sucursal, si aplica
@@ -239,8 +239,10 @@ class SerializerDocument:
                 "ShipDate": linea.get('fecha_entrega', ""),
             })
 
-        return {
+        resultado = {
             "Cliente": cliente,
             "DocumentLines": lines
         }
+        
+        return resultado
 

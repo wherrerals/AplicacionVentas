@@ -7,6 +7,7 @@ from datosLsApp.models.tipodoctributariodb import TipoDocTributarioDB
 from datosLsApp.models.tipoentregadb import TipoEntregaDB
 from datosLsApp.models.tipoobjetosapdb import TipoObjetoSapDB
 from datosLsApp.models.tipoventadb import TipoVentaDB
+from datosLsApp.models import UsuarioDB
 from datosLsApp.models.vendedordb import VendedorDB
 from django.db import connection, transaction
 from datetime import datetime
@@ -243,13 +244,17 @@ class DocumentoRepository:
                 'id': doc.id,
                 'CardCode': doc.socio_negocio.codigoSN,
                 'nombre_cliente': nombre,
-                'SalesEmployeeName': doc.vendedor.codigo,
+                'SalesEmployeeCode': doc.vendedor.codigo,
+                'SalesEmployeeName': doc.vendedor.nombre,
                 'fechaEntrega': doc.fechaEntrega,
                 'estado_documento': doc.estado_documento,
                 'totalDocumento': doc.totalDocumento,
             })
 
+        print(f"documentos: {documentos}")
+
         return documentos 
+
 
     @staticmethod
     def get_document_data_lines(filtro_id=None):
@@ -261,7 +266,16 @@ class DocumentoRepository:
             queryset = queryset.filter(id=filtro_id)
 
         documentos = []
+
         for doc in queryset:
+            sucursal_codigo = ""
+            try:
+                usuario = UsuarioDB.objects.select_related('sucursal', 'vendedor').get(vendedor__codigo=doc.vendedor.codigo)
+                sucursal_codigo = usuario.sucursal.codigo
+
+            except UsuarioDB.DoesNotExist:
+                pass
+
             lineas_serializadas = []
             for linea in doc.lineas.all():
                 lineas_serializadas.append({
@@ -293,14 +307,13 @@ class DocumentoRepository:
                 "comentario": doc.comentario,
                 "SalesEmployeeName": doc.vendedor.nombre,
                 "SalesEmployeeCode": doc.vendedor.codigo,
-                "U_LED_SUCURS": "LC", #doc.socio_negocio.sucursal,
+                "U_LED_SUCURS": sucursal_codigo,
                 "TransportationCode": doc.tipoentrega.codigo,
                 "U_LED_TIPDOC": doc.tipo_documento.codigo,
                 "lineas": lineas_serializadas
             })
 
         return documentos
-
 
 
 
