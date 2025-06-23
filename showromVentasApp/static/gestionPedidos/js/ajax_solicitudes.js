@@ -1,29 +1,30 @@
+function debounce(func, delay) {
+    let timeout;
+    return function () {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, arguments), delay);
+    };
+}
+
 $(document).ready(function () {
-    $('#inputNumero').on('input', function () { // escucha el evento de entrada en input con #inputNumero
+    $('#inputNumero').on('input', debounce(function () {
         let numero = $(this).val();
         let tipoDoucmento = $('.tipoDocumento').text().trim();
-        if (numero.length >= 3) { // si la longitud del número es mayor a 0
-            
-            let buscarProductosUrl = '/ventas/buscarproductos/'; // URL para buscar productos
-            $.ajax({ // realiza una solicitud ajax al servidor a la url buscar/
-                url: buscarProductosUrl,
-                data: {
-                    'numero': numero // envia los datos ingresados por el usuario al servidor (sku)
-                },
-                dataType: 'json', // indica el formato en el que espera los datos
-                success: function (data) { // si la respuesta del servidor es exitosa se ejecuta la funcion
-                    $('#resultados').empty(); // limpia resultados anteriores
-                    if (data.resultados && data.resultados.length > 0) { // comprueba si hay resultados y si estos son mayores que 0
-                        data.resultados.forEach(function (resultado) { // si se obtienen resultados itera sobre estos para realizar:
-                            // Convertir valores a números si son cadenas
+        if (numero.length >= 3) {
+            $.ajax({
+                url: '/ventas/buscarproductos/',
+                data: { 'numero': numero },
+                dataType: 'json',
+                success: function (data) {
+                    $('#resultados').empty();
+                    if (data.resultados && data.resultados.length > 0) {
+                        data.resultados.forEach(function (resultado) {
                             resultado.precio = parseFloat(resultado.precio);
                             resultado.precioAnterior = resultado.precioAnterior;
                             resultado.maxDescuento = parseFloat(resultado.maxDescuento);
                             resultado.stockTotal = parseInt(resultado.stockTotal);
                             const sucursal = $('#sucursal').text().trim();
-                            
 
-                            // Agregar elementos al resultado
                             var productoElemento = document.createElement('p');
                             productoElemento.className = 'agregar_productos';
                             productoElemento.setAttribute('data-codigo', resultado.codigo);
@@ -35,7 +36,6 @@ $(document).ready(function () {
                             productoElemento.setAttribute('data-maxDescuento', resultado.maxDescuento);
                             productoElemento.textContent = `${resultado.codigo} | ${resultado.nombre} | Stock Total: ${resultado.stockTotal}`;
 
-                            // Agregar evento de clic al elemento
                             productoElemento.addEventListener('click', function () {
                                 let codigo = this.getAttribute('data-codigo');
                                 let nombre = this.getAttribute('data-nombre');
@@ -44,41 +44,30 @@ $(document).ready(function () {
                                 let stockTotal = parseInt(this.getAttribute('data-stockTotal'));
                                 let precioLista = parseFloat(this.getAttribute('data-precioAnterior'));
                                 let precioDescuento = parseFloat(this.getAttribute('data-maxDescuento'));
+                                let cantidad = stockTotal > 0 ? 1 : 0;
 
-                                if (stockTotal <= 0) {
-                                   cantidad = 0;
-                                } else {
-                                      cantidad = 1;
-                                  } 
-
-                                  if (tipoDoucmento == 'Cotización' || tipoDoucmento == 'Solicitud Devolución' || tipoDoucmento == 'Orden de Venta') {
+                                if (tipoDoucmento == 'Cotización' || tipoDoucmento == 'Solicitud Devolución' || tipoDoucmento == 'Orden de Venta') {
                                     cantidad = 1;
-                                    
-                                    console.log('Cotización:', cantidad);
-                                    }
+                                }
 
-                                console.log('Producto seleccionado:',lineaDocumento=null, codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento);
-                                
-                                agregarProducto(docEntry_linea='null', lineaDocumento=null, codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal); // Ejecuta la función agregar producto
+                                const sucursal = $('#sucursal').text().trim();
+                                agregarProducto('null', null, codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal);
 
-                                // Limpia el input #inputNumero al seleccionar un producto
                                 $('#inputNumero').val('');
                             });
 
-                            $('#resultados').append(productoElemento); // Agrega los resultados en el contenedor
-
+                            $('#resultados').append(productoElemento);
                             $('#resultados').on('click', '*', function () {
-                                // Limpiar el div #resultados al hacer clic en cualquier elemento dentro de él
                                 $('#resultados').empty();
                             });
                         });
                     } else {
-                        $('#resultados').text('No se encontraron resultados'); // Si no encuentra resultados muestra el mensaje
+                        $('#resultados').text('No se encontraron resultados');
                     }
                 }
             });
         } else {
-            $('#resultados').empty(); // Si el usuario elimina el número borra todos los resultados.
+            $('#resultados').empty();
         }
-    });
+    }, 300)); // debounce de 300ms
 });
