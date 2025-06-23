@@ -18,6 +18,7 @@ import requests
 from requests.exceptions import RequestException
 import urllib3
 
+from logicaVentasApp.services.documento import Documento
 from logicaVentasApp.services.socionegocio import SocioNegocio
 from logicaVentasApp.services.solicituddevolucion import SolicitudesDevolucion
 
@@ -173,9 +174,20 @@ class ReturnsView(View):
             data = json.loads(request.body)
             users_data = self.user_data(request)
             
+            print("Data received:", data)
+
             docEntry = data.get('DocEntry')
             docnum = data.get('DocNum')
+            id_docu = data.get('id_documento')
             rr = SolicitudesDevolucion()
+            doc = Documento
+
+            print("id_documento:", id_docu)
+
+            #validar su el camnpo id es '' eb en el caso de que no se envie
+            if id_docu == 'null':
+                create_db = doc.create_document_db(data)
+                return JsonResponse(create_db, status=201)
 
             if docEntry:
                 if self.validar_vendedor(users_data['vendedor'], data['SalesPersonCode']) == True:

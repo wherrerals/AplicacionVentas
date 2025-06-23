@@ -12,6 +12,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         const docNum = document.getElementById("numero_orden").textContent; //listo
+
+        let id_documento = document.getElementById("id_documento").textContent
+
+        // enviar null si el documento no tiene un id 
+
+        if (id_documento === "None") {
+            id_documento = null;
+        } else {
+            id_documento = id_documento;
+        }
+
         const docEntry = document.getElementById("numero_orden").getAttribute("data-docEntry")
         const docTotal = document.getElementById("total_bruto").getAttribute("data-total-bruto");
         const docDate = fechaSolo; //listo 
@@ -107,6 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Crea el objeto final que será enviado en formato JSON
         const documentData = {
             "DocNum": docNum,
+            "id_documento": id_documento, // ID del documento
             "DocEntry": docEntry,
             "DocDate": docDate,
             'DocTotal': docTotal,
@@ -160,6 +172,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         : `Solicitud Creada Pendiente por Aprobar. N°: ${data.id_solicitud}`; // Cambiar el mensaje según sea necesario
                         //: `La Devolución fue creada exitosamente. N°: ${data.docNum}`;
 
+                    const id_documento = document.getElementById("id_documento");
+                    // Actualizar el ID del documento si es necesario
+                    if (id_documento) {
+                        id_documento.textContent = data.id_solicitud; // Actualizar el ID del documento
+                    }
+                    
                     // Mostrar el mensaje dinámico en el popup
                     Swal.fire({
                         icon: 'success',

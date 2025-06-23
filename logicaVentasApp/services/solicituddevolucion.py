@@ -182,6 +182,8 @@ class SolicitudesDevolucion(Documento):
         except Exception as e:
             logger.error(f"Error al actualizar la cotización: {str(e)}")
             return {'error': str(e)}
+        
+
 
     def crearDocumento(self, data):
 
@@ -191,21 +193,6 @@ class SolicitudesDevolucion(Documento):
                 return {'error': errores}
 
             jsonData = SerializerDocument.document_serializer(data)
-            create_rr = DocumentoRepository.create_document_db(jsonData) 
-
-            if create_rr:
-                id_solicitud = create_rr.id
-
-                return {
-                        'success': 'true', 
-                        'id_solicitud': id_solicitud, 
-                        'docNum': "",
-                        'docEntry': ""
-                        }
-
-            return True
-            
-            # Realizar la solicitud a la API
             response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
             
             # Verificar si response es un diccionario
@@ -216,6 +203,7 @@ class SolicitudesDevolucion(Documento):
                     doc_entry = response.get('DocEntry')
                     salesPersonCode = response.get('SalesPersonCode')
                     name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
+
                     return {
                         'success': 'Devolución creada exitosamente',
                         'docNum': doc_num,
@@ -224,7 +212,6 @@ class SolicitudesDevolucion(Documento):
                         'salesPersonName': name_vendedor
                     }
                 
-                # Si contiene un mensaje de error, manejarlo
                 elif 'error' in response:
                     error_message = response.get('error', 'Error desconocido')
                     return {'error': f"Error: {error_message}"}
@@ -235,7 +222,6 @@ class SolicitudesDevolucion(Documento):
                 return {'error': 'La respuesta de la API no es válida.'}
         
         except Exception as e:
-            # Manejo de excepciones generales
             logger.error(f"Error al crear la cotización: {str(e)}")
             return {'error': str(e)}
 

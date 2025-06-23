@@ -4,7 +4,9 @@ import logging
 from adapters.sl_client import APIClient
 from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
+from datosLsApp.repositories.documentorepository import DocumentoRepository
 from datosLsApp.repositories.productorepository import ProductoRepository
+from datosLsApp.serializer.documentSerializer import SerializerDocument
 
 logger = logging.getLogger(__name__)
 
@@ -148,3 +150,29 @@ class Documento(ABC):
         Debe ser implementado por las clases hijas.
         """
         pass
+
+    def create_document_db(self, data):
+        
+        try:
+            errores = self.validarDatosCotizacion(data)
+            if errores:
+                return {'error': errores}
+
+            jsonData = SerializerDocument.document_serializer(data)
+            create_rr = DocumentoRepository.create_document_db(jsonData) 
+
+            if create_rr:
+                id_solicitud = create_rr.id
+
+                return {
+                        'success': 'true', 
+                        'id_solicitud': id_solicitud, 
+                        'docNum': "",
+                        'docEntry': ""
+                        }
+
+            return True
+        
+        except Exception as e:
+            logger.error(f"Error al crear la cotización: {str(e)}")
+            return {'error': str(e)}
