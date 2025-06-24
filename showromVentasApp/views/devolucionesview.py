@@ -166,7 +166,7 @@ class ReturnsView(View):
             rr = SolicitudesDevolucion()
             lines_data = rr.formatearDatos(data)
             return JsonResponse(lines_data, safe=False)
-        
+
 
     @csrf_exempt
     def crearOActualizarDevoluciones(self, request):
@@ -225,15 +225,14 @@ class ReturnsView(View):
             'vendedor': codigoVendedor
         }
     
-    def validar_vendedor(self, vendedor1, vendedor2):
+    def validar_vendedor(self, vendedor1, vendedor2):   
         if vendedor1 == vendedor2:
             return True
         else:
             return False
     
     def rr_pending_list(self, request):
-        print("Entrando a rr_pending_list")
-        print("Request body:", request.body)
+
         try:
             data = json.loads(request.body)
             filters = data.get('filters', {})
@@ -241,9 +240,6 @@ class ReturnsView(View):
             limit = data.get('top', 20)
             offset = (page - 1) * limit
 
-            print("Filters:", filters)
-
-            # Primero obtener el total de registros sin paginación
             total_records = DocumentoRepository.get_total_documents(
                 filtro_id=filters.get('id', None),
                 filtro_nombre=filters.get('nombre', None),
@@ -251,9 +247,6 @@ class ReturnsView(View):
                 filtro_estado=filters.get('estado', None)
             )
 
-            print("Total records:", total_records)
-
-            # Luego obtener los productos paginados
             documents = DocumentoRepository.get_document(
                 filtro_id=filters.get('id', None),
                 filtro_nombre=filters.get('nombre', None),
@@ -263,13 +256,11 @@ class ReturnsView(View):
                 limite=limit
             )
 
-            print("Documents:", documents)
-
             return JsonResponse({
                 "data": {
                     "value": documents,
                 },
-                "totalRecords": total_records,  # Usar el total real de registros
+                "totalRecords": total_records,
                 "page": page,
                 "limit": limit
             }, safe=False)
@@ -279,19 +270,9 @@ class ReturnsView(View):
     
 
     def details_rr_pending(self, request):
-        """
-        Maneja la solicitud para obtener los detalles de una solicitud de devolución pendiente desde la base de datos.
-        """
+
         id = request.GET.get('id')
-
-        print("ID from request:", id)
-
         documents_data = DocumentoRepository.get_document_data_lines(filtro_id=id)
-
-        print("Documents data:", documents_data)
-
         serilized_data = SerializerDocument.serialize_documento_completo(documents_data)
-
-        print("Documents data:", serilized_data)
-
+        
         return JsonResponse(serilized_data, safe=False)

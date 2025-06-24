@@ -40,7 +40,8 @@ class SerializerDocument:
             'Comments': doc_data.get('Comments'),
             'PaymentGroupCode': doc_data.get('PaymentGroupCode'),
             'SalesPersonCode': doc_data.get('SalesPersonCode'),
-            'TransportationCode': doc_data.get('TransportationCode'),
+            'TransportationCode': doc_data.get('TransportationCode', 1),
+            'U_LED_TIPDEV': doc_data.get('U_LED_TIPDEV', ''),
             'U_LED_TIPVTA': type_sales,
             'U_LED_TIPDOC': doc_data.get('U_LED_TIPDOC'),
             'U_LED_FORENV': doc_data.get('TransportationCode'),
@@ -196,7 +197,7 @@ class SerializerDocument:
         if not documentos:
             return {}
 
-        doc = documentos[0]  # solo debería venir uno si filtraste por ID
+        doc = documentos[0]
 
         cliente = {
             "SalesPersons": {
@@ -204,38 +205,42 @@ class SerializerDocument:
                 "SalesEmployeeCode": doc['SalesEmployeeCode'],
                 "U_LED_SUCURS": doc['U_LED_SUCURS'],
             },
+            
             "ReturnRequest": {
-                "DocNum": doc.get("docNum", ""),
+                "DocNum": doc.get("docNum", "") if doc.get("docNum") != 0 else "",
+                "DocEntry": doc.get("docEntry", "") if doc.get("docEntry") != 0 else "",
                 "DocDate": doc.get("fechaEntrega", ""),
                 "Cancelled": "N" if doc.get("estado_documento") != "Cancelado" else "Y",
                 "CardCode": doc.get("CardCode", ""),
                 "DocumentStatus": "O" if doc.get("estado_documento") == "Borrador" else "C",
                 "id": doc.get("id", ""),
                 "CardName": doc.get("nombre_cliente", ""),
-                "TransportationCode": "",  # si lo necesitas, inclúyelo en get_document_data_lines
-                "U_LED_TIPDOC": "",        # idem
+                "TransportationCode": "",
+                "U_LED_TIPDOC": "",
                 "NumAtCard": doc.get("referencia", ""),
                 "Comments": doc.get("comentario", "")
             },
+
             "ContactEmployee": {
-                "Contactos": []  # si usas contactos, debes agregarlos
+                "Contactos": []
             }
         }
 
         lines = []
         for linea in doc.get('lineas', []):
             lines.append({
-                "LineNum": 0,  # si no tienes línea real, deja en 0 o agrégalo en el repo
+                "LineNum": 0,
                 "DocEntry": doc.get("id", ""),
                 "ItemCode": linea['producto_codigo'],
                 "ItemDescription": linea['producto_nombre'],
-                "imagen": "",  # si hay imágenes, debes traer la URL en get_document_data_lines
-                "PriceAfterVAT": round(linea['precio_unitario'] * 1.19),  # asumiendo que el precio ya incluye IVA
-                "GrossPrice": linea['total_bruto'],
+                "Quantity": linea['cantidad'],
+                "imagen": linea['imagen_url'],
+                "PriceAfterVAT": round(linea['precio_unitario'] * 1.19),
+                "GrossPrice": linea['precio_lista'],
                 "DiscountPercent": linea['descuento'],
-                "WarehouseCode": "",  # sucursal, si aplica
+                "WarehouseCode": "",
                 "FreeText": linea.get('comentario', ''),
-                "ShippingMethod": "",  # si aplica, lo puedes añadir
+                "ShippingMethod": "",
                 "ShipDate": linea.get('fecha_entrega', ""),
             })
 

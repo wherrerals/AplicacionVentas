@@ -56,13 +56,13 @@
                 {% if 'Administrador' in grupos_usuario %}
 
                 <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-page="lista_solic_devoluciones,solicitudes_devolucion">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-page="lista_solic_devoluciones,solicitudes_devolucion,pending_rr">
                             Solicitudes de Devolución
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'lista_solic_devoluciones' %}">Lista de Solicitudes</a></li>
                             <li><a class="dropdown-item" href="{% url 'solicitudes_devolucion' %}">Crear Solicitud</a></li>
-                            <li><a class="dropdown-item" href="{% url 'pending_rr' %}">Solicitudes Pendientes</a></li>
+                            <li><a class="dropdown-item" href="{% url 'pending_rr' %}">Listado D. Pendientes</a></li>
+                            <li><a class="dropdown-item" href="{% url 'lista_solic_devoluciones' %}">Listado Devoluciones</a></li>
                         </ul>
                 </li>
                 {% endif %}

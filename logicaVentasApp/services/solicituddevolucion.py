@@ -163,7 +163,7 @@ class SolicitudesDevolucion(Documento):
 
         return resultado
 
-    def actualizarDocumento(self,docnum, docentry, data):
+    def actualizarDocumento(self, docnum, docentry, data):
         docentry = docentry
 
         try:
@@ -173,11 +173,12 @@ class SolicitudesDevolucion(Documento):
 
             if 'success' in response:
                 return {
-                    'success': 'Devolución creada exitosamente',
+                    'success': False,
+                    'title': 'Devolución Actualizada en SAP',
+                    'message': f'Devolución Actualizada exitosamente. N°: {docnum}',
                     'docNum': docnum,
                     'docEntry': docentry
                 }
-
         
         except Exception as e:
             logger.error(f"Error al actualizar la cotización: {str(e)}")
@@ -193,6 +194,8 @@ class SolicitudesDevolucion(Documento):
                 return {'error': errores}
 
             jsonData = SerializerDocument.document_serializer(data)
+
+            print("JSON Data:", jsonData)  # Debugging line to check the JSON data
             response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
             
             # Verificar si response es un diccionario
@@ -205,7 +208,9 @@ class SolicitudesDevolucion(Documento):
                     name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
 
                     return {
-                        'success': 'Devolución creada exitosamente',
+                        'success': True,
+                        'title': 'Devolución creada',
+                        'message': f'Devolución creada exitosamente. N°: {doc_num}',
                         'docNum': doc_num,
                         'docEntry': doc_entry,
                         'salesPersonCode': salesPersonCode,

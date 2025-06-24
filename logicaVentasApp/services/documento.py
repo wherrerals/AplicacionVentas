@@ -162,7 +162,9 @@ class Documento(ABC):
                 id_solicitud = create_rr.id
 
                 return {
-                        'success': 'true', 
+                        'success': True,
+                        'title': 'Solicitud D. Creada',
+                        'message': f'Solicitud D. Creada, Pendiente. N°: {id_solicitud}',
                         'id_solicitud': id_solicitud, 
                         'docNum': "",
                         'docEntry': ""
@@ -185,7 +187,9 @@ class Documento(ABC):
                 id_solicitud = update_rr.id
 
                 return {
-                        'success': 'true', 
+                        'success': True, 
+                        'title': 'Solicitud D. Actualizada',
+                        'message': f'Solicitud D. Actualizada, Borrador. N°: {id_solicitud}',
                         'id_solicitud': id_solicitud, 
                         'docNum': "",
                         'docEntry': ""
@@ -195,4 +199,4 @@ class Documento(ABC):
         
         except Exception as e:
             logger.error(f"Error al actualizar el documento: {str(e)}")
-            return {'error': str(e)}
+            return {'error': str(e)} 

@@ -280,9 +280,11 @@ class DocumentoRepository:
             lineas_serializadas = []
             for linea in doc.lineas.all():
                 lineas_serializadas.append({
+                    "cantidad": linea.cantidad,
                     "producto_codigo": linea.producto.codigo,
                     "producto_nombre": linea.producto.nombre,
                     "precio_unitario": linea.precioUnitario,
+                    "precio_lista": linea.producto.precioLista,
                     "total_bruto": linea.totalBrutoLinea,
                     "descuento": linea.descuento,
                     "comentario": linea.comentario,
@@ -296,6 +298,7 @@ class DocumentoRepository:
             documentos.append({
                 "id": doc.id,
                 "docNum": doc.docNum,
+                "docEntry": doc.docEntry,
                 "fechaEntrega": str(doc.fechaEntrega),
                 "estado_documento": doc.estado_documento,
                 "CardCode": doc.socio_negocio.codigoSN,

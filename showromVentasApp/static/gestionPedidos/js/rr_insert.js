@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "CardCode": cardCode,
             "PaymentGroupCode": pgc,
             "SalesPersonCode": spc,
-            "TransportationCode": trnasp,
+            "U_LED_TIPDEV": trnasp,
             "U_LED_TIPDOC": ultd,
             "U_LED_FORENV": ulfen,
             "Approve": approve,
@@ -191,8 +191,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     // Mostrar el mensaje dinámico en el popup
                     Swal.fire({
                         icon: 'success',
-                        title: titulo,
-                        text: mensaje,
+                        title: data.title,
+                        text: data.message,
                         confirmButtonText: 'Aceptar'
                     });
 
