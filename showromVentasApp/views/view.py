@@ -806,7 +806,7 @@ def user_data(request):
     }
     
 
-@login_required
+""" @login_required
 def busquedaProductos(request):
     if request.method == 'GET' and 'numero' in request.GET:
         
@@ -831,8 +831,39 @@ def busquedaProductos(request):
 
         return JsonResponse({'resultados': resultados_formateados})
     else:
+        return JsonResponse({'error': 'No se proporcionó un número válido'}) """
+
+def busquedaProductos(request):
+    if request.method == 'GET' and 'numero' in request.GET:
+        numero = request.GET.get('numero', '').strip()
+
+        users_data = user_data(request)
+
+        resultados = ProductoDB.objects.filter(
+            Q(codigo__icontains=numero) | Q(nombre__icontains=numero)
+        ).only(
+            'codigo', 'nombre', 'imagen', 'precioVenta', 'stockTotal',
+            'precioLista', 'descontinuado', 'inactivo'
+        )[:20]
+
+        resultados_formateados = [
+            {
+                'codigo': p.codigo,
+                'nombre': p.nombre + " (Descontinuado)" if p.descontinuado == "1" else p.nombre,
+                'imagen': p.imagen,
+                'precio': p.precioVenta,
+                'stockTotal': p.stockTotal,
+                'precioAnterior': p.precioLista,
+                'maxDescuento': limitar_descuento(p, users_data),
+            }
+            for p in resultados
+            if p.precioVenta > 0 and p.inactivo != "tYES"
+        ]
+
+        return JsonResponse({'resultados': resultados_formateados})
+    else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
-    
+
 
 """ def limitar_descuento(producto, users_data):
 
