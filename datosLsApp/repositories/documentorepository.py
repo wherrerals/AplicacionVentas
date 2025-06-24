@@ -143,11 +143,12 @@ class DocumentoRepository:
 
     @staticmethod
     @transaction.atomic
-    def update_document_db(docEntry, data):
+    def update_document_db(id, data):
+        print(f"Actualizando documento con id: {id} y datos: {data}")
         try:
-            document = DocumentoDB.objects.get(docEntry=docEntry)
+            document = DocumentoDB.objects.get(id=id)
         except DocumentoDB.DoesNotExist:
-            raise ValueError(f"Documento con docEntry={docEntry} no existe")
+            raise ValueError(f"Documento con docEntry={id} no existe")
 
         # Actualiza campos del documento
         document.fechaDocumento = data.get('DocDate', document.fechaDocumento)

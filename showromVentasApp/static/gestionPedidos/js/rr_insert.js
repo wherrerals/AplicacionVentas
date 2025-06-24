@@ -5,6 +5,15 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("saveButton").addEventListener("click", submitForm);
     document.getElementById("saveButton2").addEventListener("click", submitForm);
 
+    let approve = 0; // valor por defecto
+
+    document.getElementById("aprobar-1").addEventListener("click", function (e) {
+        e.preventDefault();
+        approve = 1;         // solo cuando aprueba
+        submitForm();        // dispara el envío
+    });
+
+
     function submitForm() {
         showLoadingOverlay();
         // Capturar los datos del documento
@@ -134,6 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "TransportationCode": trnasp,
             "U_LED_TIPDOC": ultd,
             "U_LED_FORENV": ulfen,
+            "Approve": approve,
             "DocumentLines": lines
         };
 

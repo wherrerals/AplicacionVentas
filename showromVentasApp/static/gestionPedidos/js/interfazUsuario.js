@@ -47,7 +47,8 @@ function formatCurrency(value) {
 document.addEventListener('DOMContentLoaded', function () {
     const elementosMonitoreados = [
         document.getElementById('numero_cotizacion'),
-        document.getElementById('numero_orden')
+        document.getElementById('numero_orden'),
+        document.getElementById('id_documento'),
     ].filter(elemento => elemento); // Filtra elementos nulos o indefinidos
 
     const botonAcciones = document.querySelector('.btn.btn-primary.dropdown-toggle');

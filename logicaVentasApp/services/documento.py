@@ -152,11 +152,8 @@ class Documento(ABC):
         pass
 
     def create_document_db(self, data):
-        
+        print("Creating document in database with data:", data)
         try:
-            errores = self.validarDatosCotizacion(data)
-            if errores:
-                return {'error': errores}
 
             jsonData = SerializerDocument.document_serializer(data)
             create_rr = DocumentoRepository.create_document_db(jsonData) 
@@ -175,4 +172,27 @@ class Documento(ABC):
         
         except Exception as e:
             logger.error(f"Error al crear la cotización: {str(e)}")
+            return {'error': str(e)}
+
+
+    def update_document_db(self, id, data):
+        print("Updating document in database with data:", data)
+        try:
+            jsonData = SerializerDocument.document_serializer(data)
+            update_rr = DocumentoRepository.update_document_db(id, jsonData)
+
+            if update_rr:
+                id_solicitud = update_rr.id
+
+                return {
+                        'success': 'true', 
+                        'id_solicitud': id_solicitud, 
+                        'docNum': "",
+                        'docEntry': ""
+                        }
+
+            return True
+        
+        except Exception as e:
+            logger.error(f"Error al actualizar el documento: {str(e)}")
             return {'error': str(e)}

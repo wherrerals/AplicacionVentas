@@ -173,35 +173,36 @@ class ReturnsView(View):
         try:
             data = json.loads(request.body)
             users_data = self.user_data(request)
-            
-            print("Data received:", data)
-
             docEntry = data.get('DocEntry')
             docnum = data.get('DocNum')
             id_docu = data.get('id_documento')
+            aprobacion = data.get('Approve')
+
+            doc = Documento()
             rr = SolicitudesDevolucion()
-            doc = Documento
 
-            print("id_documento:", id_docu)
-
-            #validar su el camnpo id es '' eb en el caso de que no se envie
-            if id_docu == 'null':
-                create_db = doc.create_document_db(data)
-                return JsonResponse(create_db, status=201)
-
-            if docEntry:
-                if self.validar_vendedor(users_data['vendedor'], data['SalesPersonCode']) == True:
-                    actualizacion = rr.actualizarDocumento(docnum, docEntry, data)
-                    return JsonResponse(actualizacion, status=200)
-        
+            if aprobacion != 1:
+                if id_docu != '':
+                    update_db = doc.update_document_db(id_docu, data)
+                    return JsonResponse(update_db, status=200)
+                
                 else:
-                    #actualizar el SalesPersonCode
-                    data['SalesPersonCode'] = users_data['vendedor']
+                    create_db = doc.create_document_db(data)
+                    return JsonResponse(create_db, status=201)
+                
+            else:
+                if docEntry:
+                    if self.validar_vendedor(users_data['vendedor'], data['SalesPersonCode']) == True:
+                        actualizacion = rr.actualizarDocumento(docnum, docEntry, data)
+                        return JsonResponse(actualizacion, status=200)
+            
+                    else:
+                        data['SalesPersonCode'] = users_data['vendedor']
+                        creacion = rr.crearDocumento(data)
+                        return JsonResponse(creacion, status=201)
+                else:
                     creacion = rr.crearDocumento(data)
                     return JsonResponse(creacion, status=201)
-            else:
-                creacion = rr.crearDocumento(data)
-                return JsonResponse(creacion, status=201)
 
         except json.JSONDecodeError:
             return JsonResponse({'error': 'JSON inválido'}, status=400)
