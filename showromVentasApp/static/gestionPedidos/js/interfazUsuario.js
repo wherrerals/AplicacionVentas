@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const elementosMonitoreados = [
     document.getElementById("numero_cotizacion"),
     document.getElementById("numero_orden"),
-    document.getElementById("id_documento").getAttribute("data-id"),
+    document.getElementById("id_documento"),
   ].filter((elemento) => elemento); // Filtra elementos nulos o indefinidos
 
   const botonAcciones = document.querySelector(
@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Ocultar "Aprobar" si existe numero_orden y su atributo data-docEntry no está vacío
     if (
-      numeroOrden !== ""
+      numeroOrden == ""
     ) {
       aprobar.style.display = "none";
     } else {
