@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const docNum = document.getElementById("numero_orden").textContent; //listo
 
-        let id_documento = document.getElementById("id_documento").textContent
+        let id_documento = document.getElementById("id_documento").getAttribute("data-id"); //listo
 
         // enviar null si el documento no tiene un id 
 

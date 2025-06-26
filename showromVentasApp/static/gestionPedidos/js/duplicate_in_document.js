@@ -1,6 +1,6 @@
-document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion").forEach((button) => {
+document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solicitud").forEach((button) => {
     button.addEventListener("click", function (event) {
-        const botonPresionado = event.target.id; // "duplicar-ODV" o "duplicar-Cotizacion"
+        const botonPresionado = event.target.id; // "duplicar-ODV", "duplicar-Cotizacion", o "duplicar-Solicitud"
 
         const lines = [];
 
@@ -38,8 +38,11 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion").forEach((button
 
         console.log("Líneas a enviar:", lines);
 
-        // Puedes usar esta variable si el backend necesita saber qué botón se presionó
-        const tipoDocumento = botonPresionado === "duplicar-ODV" ? "ODV" : "Cotizacion";
+        // Determina el tipo de documento
+        let tipoDocumento = "";
+        if (botonPresionado === "duplicar-ODV") tipoDocumento = "ODV";
+        else if (botonPresionado === "duplicar-Cotizacion") tipoDocumento = "Cotizacion";
+        else if (botonPresionado === "duplicar-Solicitud") tipoDocumento = "Solicitud";
 
         fetch("/ventas/duplicar-documento/", {
             method: "POST",
@@ -49,7 +52,7 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion").forEach((button
             },
             body: JSON.stringify({
                 DocumentLine: { value: lines },
-                tipo: tipoDocumento, // lo mandas si el backend lo necesita
+                tipo: tipoDocumento,
             }),
         })
             .then((response) => response.json())
@@ -58,13 +61,22 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion").forEach((button
                 console.log(data.lineas);
                 if (data.status === "ok") {
                     sessionStorage.setItem("documentLines", JSON.stringify(data.lineas));
-                    if (botonPresionado === "duplicar-ODV") {
-                        sessionStorage.setItem("tipoDocumento", "ODV");
+                    sessionStorage.setItem("tipoDocumento", tipoDocumento);
+
+                    if (tipoDocumento === "ODV") {
                         window.location.href = `/ventas/ordenesVentas/`;
-                    }
-                    if (botonPresionado === "duplicar-Cotizacion") {
-                        sessionStorage.setItem("tipoDocumento", "Cotizacion");
+                    } else if (tipoDocumento === "Cotizacion") {
                         window.location.href = `/ventas/generar_cotizacion/`;
+                    } else if (tipoDocumento === "Solicitud") {
+                        const clienteElement = document.getElementById("inputCliente");
+                        const fullText = clienteElement?.innerText || "";
+                        const cardCode = fullText.split("C")[0].trim();  // Esto captura "76820314C"
+                        
+                        // Puedes guardar solo esto si no necesitas más
+                        sessionStorage.setItem("cardCode", cardCode);
+
+                        // Redirigir a la siguiente vista
+                        window.location.href = `/ventas/solicitudes_devolucion/`;
                     }
                 } else {
                     alert("Error al duplicar el documento: " + data.message);
@@ -75,6 +87,7 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion").forEach((button
             });
     });
 });
+
 
 // Función CSRF sin cambios
 function getCSRFToken() {

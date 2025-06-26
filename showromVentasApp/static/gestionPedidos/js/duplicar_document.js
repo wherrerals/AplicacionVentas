@@ -2,8 +2,22 @@ document.addEventListener("DOMContentLoaded", function () {
     // Mostrar overlay de carga
 
     const savedLines = sessionStorage.getItem("documentLines");
+    const cardCode = sessionStorage.getItem("cardCode");
+    const tipoDocumento = sessionStorage.getItem("tipoDocumento");
+
+    if (tipoDocumento == 'Solicitud'){
+
+      console.log("Tipo de documento desde sessionStorage:", tipoDocumento);
+      console.log("Card Code desde sessionStorage:", cardCode);
+      traerInformacionCliente(cardCode);
+      // ✅ Eliminar después de usar  
+      sessionStorage.removeItem("cardCode");
+    }
+
+
   
     if (savedLines) {
+
       const documentLines = JSON.parse(savedLines);
       console.log("Usando líneas desde sessionStorage:", documentLines);
   

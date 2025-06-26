@@ -114,7 +114,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const id_documento = document.getElementById("id_documento");
             if (id_documento) {
-              id_documento.textContent = `${id}`;
+              id_documento.textContent = `Borrador: ${id}`;
+              id_documento.setAttribute("data-id", id);
             }
   
             const dueDateElement = document.getElementById("fecha_entrega");
