@@ -185,7 +185,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     const id_documento = document.getElementById("id_documento");
                     // Actualizar el ID del documento si es necesario
                     if (id_documento) {
-                        id_documento.textContent = data.id_solicitud; // Actualizar el ID del documento
+                        id_documento.textContent = `Borrador: ${data.id_solicitud}`; // Actualizar el ID del documento
+                        id_documento.setAttribute("data-id", data.id_solicitud); // Actualizar el atributo data-id
                     }
                     
                     // Mostrar el mensaje dinámico en el popup
