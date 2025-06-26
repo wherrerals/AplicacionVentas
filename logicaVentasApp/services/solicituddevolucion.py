@@ -169,11 +169,12 @@ class SolicitudesDevolucion(Documento):
         try:
             docentry = int(docentry)
             jsonData = SerializerDocument.document_serializer(data)
+            print("JSON Data:", jsonData)  # Debugging line to check the JSON data
             response = self.client.actualizarDevolucionesSL(docentry, jsonData)
 
             if 'success' in response:
                 return {
-                    'success': False,
+                    'success': True,
                     'title': 'Devolución Actualizada en SAP',
                     'message': f'Devolución Actualizada exitosamente. N°: {docnum}',
                     'docNum': docnum,

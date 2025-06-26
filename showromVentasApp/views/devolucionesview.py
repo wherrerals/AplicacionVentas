@@ -180,6 +180,11 @@ class ReturnsView(View):
 
             doc = Documento()
             rr = SolicitudesDevolucion()
+            
+            print("docEntry:", docEntry)
+
+            if docEntry != '':
+                aprobacion = 1
 
             if aprobacion != 1:
                 if id_docu != '':
@@ -193,7 +198,12 @@ class ReturnsView(View):
             else:
                 if docEntry:
                     if self.validar_vendedor(users_data['vendedor'], data['SalesPersonCode']) == True:
+                        
                         actualizacion = rr.actualizarDocumento(docnum, docEntry, data)
+                        
+                        print("Actualización de documento:", actualizacion)
+
+
                         return JsonResponse(actualizacion, status=200)
             
                     else:

@@ -92,7 +92,10 @@
             <a class="dropdown-item" href="#" id="saveButton2">Guardar</a>
             <!-- boton Aprobar -->
 
-            <a class="dropdown-item" href="#" id="aprobar-1">Aprobar</a>
+            {% if 'Supervisor' in grupos_usuario %}
+              <a class="dropdown-item" href="#" id="aprobar-1">Aprobar</a>
+            {% endif %}
+
             <a class="dropdown-item" href="#" id="duplicar-1">Duplicar</a>
             <a class="dropdown-item" href="#" id="copiar-ODV" hidden>Copiar a Orden de Venta</a>
             <a class="dropdown-item" href="#" id="generarPDF" hidden>Imprimir / Descargar PDF</a>
@@ -607,6 +610,19 @@
       </div>
     </form>
   </div>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const numeroOrden = document.getElementById("numero_orden");
+    const aprobarBtn = document.getElementById("aprobar-1");
+
+    // Verifica si el atributo data-docEntry no está vacío
+    if (numeroOrden.getAttribute("data-docEntry") !== "") {
+      aprobarBtn.style.display = "none";
+    }
+  });
+</script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="{% static 'gestionPedidos/js/loader.js' %}"></script>

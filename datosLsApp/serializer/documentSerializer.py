@@ -29,7 +29,7 @@ class SerializerDocument:
                     
         addres_bill, address_ship = Direccion.assign_bill_ship_addres(doc_data.get('Address'), doc_data.get('Address2'), branch_code)
 
-        cabecera = {
+        raw_cabecera  = {
             'DocDate': doc_data.get('DocDate'),
             'DocDueDate': doc_data.get('DocDueDate'),
             'TaxDate': doc_data.get('TaxDate'),
@@ -46,6 +46,9 @@ class SerializerDocument:
             'U_LED_TIPDOC': doc_data.get('U_LED_TIPDOC'),
             'U_LED_FORENV': doc_data.get('TransportationCode'),
         }
+
+        cabecera = {k: v for k, v in raw_cabecera.items() if v not in (None, '')}
+
 
         repo_producto = ProductoRepository()
         lineas_json = []
