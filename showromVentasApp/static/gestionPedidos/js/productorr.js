@@ -199,7 +199,7 @@ class Producto {
             }
         });
 
-        this.limitarMaxDescuento(newRow);
+        //this.limitarMaxDescuento(newRow);
         return newRow;
     }
 

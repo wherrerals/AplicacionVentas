@@ -236,7 +236,7 @@ class SerializerDocument:
                 "Quantity": linea['cantidad'],
                 "imagen": linea['imagen_url'],
                 "PriceAfterVAT": round(linea['precio_unitario'] * 1.19),
-                "GrossPrice": linea['precio_lista'],
+                "GrossPrice": int(linea['precio_lista']),
                 "DiscountPercent": linea['descuento'],
                 "WarehouseCode": "",
                 "FreeText": linea.get('comentario', ''),

@@ -158,8 +158,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 const fechaEntrega = line.ShipDate;
 
                 let linea_documento_real = parseInt(linea_documento);
+
+                              console.log("Agregando producto con datos:", {
+                productoCodigo,
+                nombre,
+                imagen,
+                precioVenta,
+                stockTotal,
+                precioLista,
+                precioDescuento,
+                sucursal,
+                comentario
+              });
   
-              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, tipoentrega2, fechaEntrega);
+              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, precioDescuento);
             });
           }
   

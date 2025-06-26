@@ -181,10 +181,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         ? `La Devolución fue actualizada exitosamente. N°: ${data.docNum}`
                         : `Solicitud Creada Pendiente por Aprobar. N°: ${data.id_solicitud}`; // Cambiar el mensaje según sea necesario
                         //: `La Devolución fue creada exitosamente. N°: ${data.docNum}`;
-
-                    const id_documento = document.getElementById("id_documento");
+                    
+                    let existe_documento = data.id_solicitud
                     // Actualizar el ID del documento si es necesario
-                    if (id_documento) {
+                    if (existe_documento && existe_documento !== '') {
+
+                        const id_documento = document.getElementById("id_documento");
                         id_documento.textContent = `Borrador: ${data.id_solicitud}`; // Actualizar el ID del documento
                         id_documento.setAttribute("data-id", data.id_solicitud); // Actualizar el atributo data-id
                     }
