@@ -136,13 +136,15 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("Visible");
     }
 
-    // Ocultar "Aprobar" si existe numero_orden y su atributo data-docEntry no está vacío
-    if (
-      numeroOrden == ""
-    ) {
+    const numeroOrdenTexto = numeroOrden.textContent.trim();
+
+    // Ocultar botón "aprobar" si numeroOrden tiene contenido
+    if (numeroOrdenTexto !== "") {
       aprobar.style.display = "none";
+      console.log("Oculto botón Aprobar");
     } else {
       aprobar.style.display = "block";
+      console.log("Mostrar botón Aprobar");
     }
   }
 

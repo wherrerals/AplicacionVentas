@@ -320,5 +320,22 @@ class DocumentoRepository:
         return documentos
 
 
+    @staticmethod
+    def update_document_status(id, doc_num,doc_entry, estado):
+        """
+        actualiza el estado de un documento, su docNum y docEntry por su id
+        """
+        print(f"Actualizando estado del documento con id: {id}, docNum: {doc_num}, docEntry: {doc_entry}, estado: {estado}")
+        try:
+            document = DocumentoDB.objects.get(id=id)
+        except DocumentoDB.DoesNotExist:
+            raise ValueError(f"Documento con id={id} no existe")
+
+        document.estado_documento = estado
+        document.docNum = doc_num
+        document.docEntry = doc_entry
+        document.save()
+
+        return True
 
 

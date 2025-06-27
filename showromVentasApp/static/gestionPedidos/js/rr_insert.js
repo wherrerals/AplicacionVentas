@@ -211,6 +211,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (vendedorData != undefined) {
                         vendedor.textContent = `${data.salesPersonName}`;
                         vendedor.setAttribute('data-codeVen', `${data.salesPersonCode}`);
+
+                        const id_documento = document.getElementById("id_documento");
+
+                        id_documento.textContent = ""; // Actualizar el ID del documento
+                        id_documento.setAttribute("data-id", ""); // Actualizar el atributo data-id
+
                     }
 
                     console.log("Numero de cotizacion:", data.docNum);

@@ -177,6 +177,7 @@ class ReturnsView(View):
             docnum = data.get('DocNum')
             id_docu = data.get('id_documento')
             aprobacion = data.get('Approve')
+            document_db = DocumentoRepository()
 
             doc = Documento()
             rr = SolicitudesDevolucion()
@@ -196,22 +197,43 @@ class ReturnsView(View):
                     return JsonResponse(create_db, status=201)
                 
             else:
-                if docEntry:
+                if docEntry != '':
+                    print("Actualizando documento existente con DocEntry:", docEntry)
                     if self.validar_vendedor(users_data['vendedor'], data['SalesPersonCode']) == True:
                         
                         actualizacion = rr.actualizarDocumento(docnum, docEntry, data)
                         
                         print("Actualización de documento:", actualizacion)
 
+                        if id_docu != '':
+                            if actualizacion.get('success') == True:
+                                docEntry = actualizacion.get('docNum')
+                                docnum = actualizacion.get('docEntry')
+                                document_db.update_document_status(id_docu, docEntry, docnum, 'Aprobado')
+
+                        print("Actualización exitosa:", actualizacion)
 
                         return JsonResponse(actualizacion, status=200)
             
                     else:
                         data['SalesPersonCode'] = users_data['vendedor']
                         creacion = rr.crearDocumento(data)
+                        print("Creación de documento:", creacion)
+                        if id_docu != '':
+                            if creacion.get('success') == True:
+                                docEntry = creacion.get('docNum')
+                                docnum = creacion.get('docEntry')
+                                document_db.update_document_status(id_docu, docEntry, docnum, 'Aprobado')
                         return JsonResponse(creacion, status=201)
                 else:
                     creacion = rr.crearDocumento(data)
+                    print("Creación de documento:", creacion)
+                    if id_docu != '':
+                        if creacion.get('success') == True:
+                            docEntry = creacion.get('docNum')
+                            docnum = creacion.get('docEntry')
+                            document_db.update_document_status(id_docu, docEntry, docnum, 'Aprobado')
+
                     return JsonResponse(creacion, status=201)
 
         except json.JSONDecodeError:
