@@ -6,6 +6,7 @@ from datosLsApp.repositories.documentorepository import DocumentoRepository
 from datosLsApp.repositories.productorepository import ProductoRepository
 from datosLsApp.repositories.vendedorRepository import VendedorRepository
 from datosLsApp.serializer.documentSerializer import SerializerDocument
+from datosLsApp.serializer.returnRequestSerializer import RertunrRequestSerializer
 from logicaVentasApp.services.documento import Documento
 
 
@@ -170,7 +171,7 @@ class SolicitudesDevolucion(Documento):
 
         try:
             docentry = int(docentry)
-            jsonData = SerializerDocument.document_serializer(data)
+            jsonData = RertunrRequestSerializer.document_serializer(data)
             print("JSON Data:", jsonData)  # Debugging line to check the JSON data
             response = self.client.actualizarDevolucionesSL(docentry, jsonData)
 
@@ -196,7 +197,7 @@ class SolicitudesDevolucion(Documento):
             if errores:
                 return {'error': errores}
 
-            jsonData = SerializerDocument.document_serializer(data)
+            jsonData = RertunrRequestSerializer.document_serializer(data)
 
             print("JSON Data:", jsonData)  # Debugging line to check the JSON data
             response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
