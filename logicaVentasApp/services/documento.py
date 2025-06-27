@@ -154,7 +154,10 @@ class Documento(ABC):
     def create_document_db(self, data):
         print("Creating document in database with data:", data)
         try:
-
+            errores = self.validar_datos_de_documentos(data)
+            if errores:
+                return {'error': errores}
+            
             jsonData = SerializerDocument.document_serializer(data)
             create_rr = DocumentoRepository.create_document_db(jsonData) 
 
@@ -180,6 +183,11 @@ class Documento(ABC):
     def update_document_db(self, id, data):
         print("Updating document in database with data:", data)
         try:
+
+            errores = self.validar_datos_de_documentos(data)
+            if errores:
+                return {'error': errores}
+            
             jsonData = SerializerDocument.document_serializer(data)
             update_rr = DocumentoRepository.update_document_db(id, jsonData)
 
@@ -200,3 +208,37 @@ class Documento(ABC):
         except Exception as e:
             logger.error(f"Error al actualizar el documento: {str(e)}")
             return {'error': str(e)} 
+
+    def validar_datos_de_documentos(self, data):
+        errores = []
+
+        # Verificar que el cardcode esté presente
+        if not data.get('CardCode'):
+            errores.append("No se a ingresado cliente para la Cotizacion.")
+
+        if not data.get('DocumentLines'):
+            errores.append("La cotización debe tener al menos una línea de documento.")
+
+        # Verificar que la cantidad sea válida (mayor que cero)
+        for item in data.get('DocumentLines', []):
+            cantidad = item.get('Quantity', 0)
+            if cantidad <= 0:
+                errores.append(f"La cantidad del artículo {item.get('ItemCode')} debe ser mayor a cero.")
+
+        # Verificar que otros campos importantes estén presentes (esto depende de los campos requeridos)
+        if not data.get('DocDate'):
+            errores.append("La fecha del documento es obligatoria.")
+
+        """ 
+        if not data.get('DocDueDate'):
+            errores.append("La fecha de vencimiento es obligatoria.")
+
+        """
+        
+        tipo_devolucion = data.get('U_LED_TIPDEV')
+        folio = data.get('Folio')
+        if tipo_devolucion != 'INTE' and (not folio or folio.strip() == ''):
+            errores.append(f"Folio no ingresado para el tipo de {tipo_devolucion} seleccionado.")
+
+        # Si hay errores, retornarlos como una cadena
+        return ' '.join(errores)

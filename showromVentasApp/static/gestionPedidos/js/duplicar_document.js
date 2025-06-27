@@ -4,14 +4,26 @@ document.addEventListener("DOMContentLoaded", function () {
     const savedLines = sessionStorage.getItem("documentLines");
     const cardCode = sessionStorage.getItem("cardCode");
     const tipoDocumento = sessionStorage.getItem("tipoDocumento");
+    const folio_cotizacion = sessionStorage.getItem("folio");
 
     if (tipoDocumento == 'Solicitud'){
 
       console.log("Tipo de documento desde sessionStorage:", tipoDocumento);
       console.log("Card Code desde sessionStorage:", cardCode);
       traerInformacionCliente(cardCode);
+
+      // agregar folio en el input folio_cotizacion
+      
+      const folioInput = document.getElementById("folio_referencia");
+
+      if (folioInput && folio_cotizacion) {
+        folioInput.value = folio_cotizacion;
+      }
+
+
       // ✅ Eliminar después de usar  
       sessionStorage.removeItem("cardCode");
+      sessionStorage.removeItem("folio");
     }
 
 

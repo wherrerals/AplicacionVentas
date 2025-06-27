@@ -18,9 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
         showroomElement.innerText = "Cargando...";
         estadoElement.innerText = "Cargando...";
       }
-  
-      showLoadingOverlay();
-  
+    
   
       fetch(`/ventas/detalles_devolucion_pendiente/?id=${id}`)
         .then(response => {
@@ -42,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
             let cardCode = data.Cliente.ReturnRequest.CardCode;
             const DocumentStatus = data.Cliente.ReturnRequest.DocumentStatus;
             const docEntry = data.Cliente.ReturnRequest.DocEntry;
-            const tipoentrega = data.Cliente.ReturnRequest.TransportationCode;
+            const tipo_devolucion = data.Cliente.ReturnRequest.U_LED_TIPDEV;
             const tipoFactura = data.Cliente.ReturnRequest.U_LED_TIPDOC;
             const referencia = data.Cliente.ReturnRequest.NumAtCard;
             const comentarios = data.Cliente.ReturnRequest.Comments;
@@ -85,12 +83,12 @@ document.addEventListener("DOMContentLoaded", function () {
             }
   
             // Capturar el elemento del select
-            const tipoEntregaSelect = document.getElementById("tipoEntrega-1");
+            const tipo_devolucionSelect = document.getElementById("tipoEntrega-1");
   
             // Verificar si el elemento existe
-            if (tipoEntregaSelect) {
+            if (tipo_devolucionSelect) {
               // Ajustar el valor del select al tipo de entrega obtenido
-              tipoEntregaSelect.value = tipoentrega;
+              tipo_devolucionSelect.value = tipo_devolucion;
             }
   
             const tipoDocRadios = document.getElementsByName("tipoDocTributario");
@@ -154,7 +152,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const precioDescuento = line.DiscountPercent;
                 const sucursal = line.WarehouseCode;
                 const comentario = line.FreeText;
-                const tipoentrega2 = line.ShippingMethod;
+                const tipo_devolucion2 = line.ShippingMethod;
                 const fechaEntrega = line.ShipDate;
 
                 let linea_documento_real = parseInt(linea_documento);
@@ -175,7 +173,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
           }
   
-          hideLoadingOverlay();
         })
         
         .catch(error => {
@@ -183,12 +180,10 @@ document.addEventListener("DOMContentLoaded", function () {
           if (vendedorDataElement) {
             vendedorDataElement.innerText = "Error al cargar datos";
           }
-          hideLoadingOverlay();
   
         });
     } else {
       console.log("No se ha proporcionado un DocEntry en la URL.");
-      hideLoadingOverlay();
     }
   
     // Manejo de rutSN

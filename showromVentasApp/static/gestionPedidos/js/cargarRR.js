@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
   
             // Extracción de datos principales
             const salesEmployeeName = data.Cliente.SalesPersons.SalesEmployeeName;
+            const folio = data.Cliente.SalesPersons.U_VK_Folio;
             const salesPersonCode = data.Cliente.SalesPersons.SalesEmployeeCode;
             const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
             const numCotizacion = data.Cliente.ReturnRequest.DocNum;
@@ -41,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const DocumentStatus = data.Cliente.ReturnRequest.DocumentStatus;
             const docEntry = data.Cliente.ReturnRequest.DocEntry;
             const razonSocial = data.Cliente.ReturnRequest.CardName;
-            const tipoentrega = data.Cliente.ReturnRequest.TransportationCode;
+            const tipo_devolucion = data.Cliente.ReturnRequest.U_LED_TIPDEV;
             const tipoFactura = data.Cliente.ReturnRequest.U_LED_TIPDOC;
             const referencia = data.Cliente.ReturnRequest.NumAtCard;
             const comentarios = data.Cliente.ReturnRequest.Comments;
@@ -49,10 +50,15 @@ document.addEventListener("DOMContentLoaded", function () {
   
             const contactos = data.Cliente.ContactEmployee.Contactos;
   
-  
+            const folio_element = document.getElementById("folio_referencia");
+
+            if (folio_element) {
+              folio_element.value = folio;
+            }
+
             console.log("Tipo de comentarios: ", referencia);
             console.log("Tipo de comentarios: ", comentarios);
-            console.log("Tipo de tipoEntrega: ", tipoentrega);
+            console.log("Tipo de tipo_devolucion: ", tipo_devolucion);
             
             
             if (cardCode.endsWith("C") || cardCode.endsWith("c")) {
@@ -97,12 +103,12 @@ document.addEventListener("DOMContentLoaded", function () {
             }
   
             // Capturar el elemento del select
-            const tipoEntregaSelect = document.getElementById("tipoEntrega-1");
+            const tipo_devolucionSelect = document.getElementById("tipoEntrega-1");
   
             // Verificar si el elemento existe
-            if (tipoEntregaSelect) {
+            if (tipo_devolucionSelect) {
               // Ajustar el valor del select al tipo de entrega obtenido
-              tipoEntregaSelect.value = tipoentrega;
+              tipo_devolucionSelect.value = tipo_devolucion;
             }
   
             const tipoDocRadios = document.getElementsByName("tipoDocTributario");
@@ -163,7 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const precioDescuento = line.DiscountPercent;
                 const sucursal = line.WarehouseCode;
                 const comentario = line.FreeText;
-                const tipoentrega2 = line.ShippingMethod;
+                const tipo_devolucion2 = line.ShippingMethod;
                 const fechaEntrega = line.ShipDate;
 
                 let linea_documento_real = parseInt(linea_documento);

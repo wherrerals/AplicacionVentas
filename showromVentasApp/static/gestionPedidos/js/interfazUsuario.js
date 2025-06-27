@@ -62,6 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
   );
   const btn = document.querySelector("#botonacciones");
   const btn2 = document.querySelector("#botonmodalcontacto");
+  const aprobar = document.getElementById("aprobar-1");
   const botonGuardado = document.querySelector("#saveButton");
   const botonGuardado2 = document.querySelector("#saveButton2");
 
@@ -103,6 +104,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // Ocultar o mostrar el botón de acciones en la vista de impresión
     btn2.style.display = noTieneTexto ? "inline-block" : "none";
 
+    // Ocultar o mostrar el botón de aprobar
+    if (aprobar) {
+      aprobar.style.display = tieneTexto ? "inline-block" : "none";
+    }
+
     ocultar();
 
     // Deshabilitar o habilitar campos
@@ -116,29 +122,29 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function ocultar() {
-    const estado = document.getElementById("estado").textContent.trim();
-    const btn = document.getElementById("copiar-ODV");
-    const btn2 = document.getElementById("botonacciones");
-    const aprobar = document.getElementById("aprobar-1");
-    const numeroOrden = document.getElementById('numero_orden');
+function ocultar() {
+  const estado = document.getElementById("estado").textContent.trim();
+  const btn = document.getElementById("copiar-ODV");
+  const btn2 = document.getElementById("botonacciones");
+  const aprobar = document.getElementById("aprobar-1");
+  const numeroOrden = document.getElementById("numero_orden");
 
+  console.log(estado);
 
-    console.log(estado);
+  if (estado === "Cerrado" || estado === "Cancelado") {
+    if (btn) btn.style.display = "none";
+    if (btn2) btn2.style.display = "none";
+    console.log("Oculto");
+  } else {
+    if (btn) btn.style.display = "block";
+    if (btn2) btn2.style.display = "block";
+    console.log("Visible");
+  }
 
-    if (estado === "Cerrado" || estado === "Cancelado") {
-      btn.style.display = "none"; // Ocultar el botón
-      btn2.style.display = "none"; // Ocultar el botón
-      console.log("Oculto");
-    } else {
-      btn.style.display = "block"; // Mostrar el botón
-      btn2.style.display = "block"; // Mostrar el botón
-      console.log("Visible");
-    }
-
+  // Verificar que ambos elementos existen antes de operar
+  if (numeroOrden && aprobar) {
     const numeroOrdenTexto = numeroOrden.textContent.trim();
 
-    // Ocultar botón "aprobar" si numeroOrden tiene contenido
     if (numeroOrdenTexto !== "") {
       aprobar.style.display = "none";
       console.log("Oculto botón Aprobar");
@@ -147,6 +153,8 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("Mostrar botón Aprobar");
     }
   }
+}
+
 
   // Verificar el estado inicial
   ocultar();

@@ -33,6 +33,7 @@ class SerializerDocument:
             'DocDate': doc_data.get('DocDate'),
             'DocDueDate': doc_data.get('DocDueDate'),
             'TaxDate': doc_data.get('TaxDate'),
+            'U_VK_Folio': doc_data.get('Folio'),
             #'DocTotal': doc_data.get('DocTotal'),
             'DocTotal': f'{doc_total}',
             'CardCode': doc_data.get('CardCode'),
@@ -218,7 +219,8 @@ class SerializerDocument:
                 "DocumentStatus": "O" if doc.get("estado_documento") == "Borrador" else "C",
                 "id": doc.get("id", ""),
                 "CardName": doc.get("nombre_cliente", ""),
-                "TransportationCode": "",
+                "TransportationCode": doc.get("TransportationCode", ""),
+                "U_LED_TIPDEV": doc.get("U_LED_TIPDEV", ""),
                 "U_LED_TIPDOC": "",
                 "NumAtCard": doc.get("referencia", ""),
                 "Comments": doc.get("comentario", "")

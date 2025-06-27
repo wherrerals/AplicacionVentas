@@ -85,6 +85,7 @@ class SolicitudesDevolucion(Documento):
             "ReturnRequest": {
                 "DocEntry": quotations.get("DocEntry"),
                 "DocNum": quotations.get("DocNum"),
+                "U_VK_Folio": quotations.get("U_VK_Folio"),
                 "CardCode": quotations.get("CardCode"),
                 "CardName": quotations.get("CardName"),
                 "TransportationCode": quotations.get("TransportationCode"),
@@ -96,6 +97,7 @@ class SolicitudesDevolucion(Documento):
                 "DocumentStatus": quotations.get("DocumentStatus"),
                 "Cancelled": quotations.get("Cancelled"),
                 "U_LED_TIPVTA": quotations.get("U_LED_TIPVTA"),
+                "U_LED_TIPDEV": quotations.get("U_LED_TIPDEV"),
                 "U_LED_TIPDOC": quotations.get("U_LED_TIPDOC"),
                 "U_LED_NROPSH": quotations.get("U_LED_NROPSH"),
                 "NumAtCard": quotations.get("NumAtCard"),

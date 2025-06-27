@@ -61,7 +61,7 @@ class DocumentoRepository:
         document = DocumentoDB.objects.create(
             docEntry=0,
             docNum=0,
-            folio=0,
+            folio=data.get('Folio', 0),
             fechaDocumento=data['DocDate'],
             fechaEntrega=data['DocDate'],
             direccionEntrega=data['TaxExtension']['StreetS'],
@@ -151,6 +151,7 @@ class DocumentoRepository:
             raise ValueError(f"Documento con docEntry={id} no existe")
 
         # Actualiza campos del documento
+        document.folio = data.get('Folio', document.folio)
         document.fechaDocumento = data.get('DocDate', document.fechaDocumento)
         document.fechaEntrega = data.get('DocDate', document.fechaEntrega)
         document.direccionEntrega = data['TaxExtension']['StreetS']
@@ -313,6 +314,7 @@ class DocumentoRepository:
                 "SalesEmployeeCode": doc.vendedor.codigo,
                 "U_LED_SUCURS": sucursal_codigo,
                 "TransportationCode": doc.tipoentrega.codigo,
+                "U_LED_TIPDEV": doc.tipoentrega.nombre,
                 "U_LED_TIPDOC": doc.tipo_documento.codigo,
                 "lineas": lineas_serializadas
             })

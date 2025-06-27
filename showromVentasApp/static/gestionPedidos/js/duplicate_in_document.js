@@ -72,8 +72,13 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
                         const fullText = clienteElement?.innerText || "";
                         const cardCode = fullText.split("C")[0].trim();  // Esto captura "76820314C"
                         
+                        const folio_element = document.getElementById("folio_cotizacion");
+                        const folio = folio_element ? folio_element.textContent.trim() : "";
+
+
                         // Puedes guardar solo esto si no necesitas más
                         sessionStorage.setItem("cardCode", cardCode);
+                        sessionStorage.setItem("folio", folio);
 
                         // Redirigir a la siguiente vista
                         window.location.href = `/ventas/solicitudes_devolucion/`;

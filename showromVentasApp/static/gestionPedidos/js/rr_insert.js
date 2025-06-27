@@ -32,10 +32,12 @@ document.addEventListener("DOMContentLoaded", function () {
             id_documento = id_documento;
         }
 
-        const docEntry = document.getElementById("numero_orden").getAttribute("data-docEntry")
+        const docEntry = document.getElementById("numero_orden").getAttribute("data-docEntry")        
         const docTotal = document.getElementById("total_bruto").getAttribute("data-total-bruto");
         const docDate = fechaSolo; //listo 
         const fechaentrega = document.getElementById("fecha_entrega").value;
+        const folio_number = document.getElementById("folio_referencia").value;
+        const refereciaDocentry = document.getElementById("folio_referencia").getAttribute("data-refDocEntr");
         const taxDate = fechaSolo; // listo
         const rut = document.getElementById("inputCliente").getAttribute("data-codigoSN"); //listo
         const cardCode = rut;//listo
@@ -129,6 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "DocNum": docNum,
             "id_documento": id_documento, // ID del documento
             "DocEntry": docEntry,
+            "Folio": folio_number, // Folio de la orden de compra
             "DocDate": docDate,
             'DocTotal': docTotal,
             "NumAtCard": referencia,
@@ -144,6 +147,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "U_LED_TIPDOC": ultd,
             "U_LED_FORENV": ulfen,
             "Approve": approve,
+            "RefDocEntr": refereciaDocentry, // Referencia al documento de entrada
             "DocumentLines": lines
         };
 
