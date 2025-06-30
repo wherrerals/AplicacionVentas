@@ -15,15 +15,19 @@ document.addEventListener("DOMContentLoaded", function () {
       // agregar folio en el input folio_cotizacion
       
       const folioInput = document.getElementById("folio_referencia");
+      const docentry_in_folio = sessionStorage.getItem("docentry_in_folio");
 
       if (folioInput && folio_cotizacion) {
         folioInput.value = folio_cotizacion;
+        folioInput.setAttribute("data-refdocentr", docentry_in_folio); // Agregar el atributo data-docentry
       }
 
 
       // ✅ Eliminar después de usar  
       sessionStorage.removeItem("cardCode");
       sessionStorage.removeItem("folio");
+      // folio in sessionStorage
+      sessionStorage.removeItem("docentry_in_folio");
     }
 
 

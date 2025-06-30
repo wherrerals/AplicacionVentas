@@ -75,7 +75,10 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
                         const folio_element = document.getElementById("folio_cotizacion");
                         const folio = folio_element ? folio_element.textContent.trim() : "";
 
+                        // obtener tambien el data-docentry 
 
+                        const docentry_in_folio = document.getElementById("numero_cotizacion").getAttribute("data-docentry");
+                        sessionStorage.setItem("docentry_in_folio", docentry_in_folio);
                         // Puedes guardar solo esto si no necesitas más
                         sessionStorage.setItem("cardCode", cardCode);
                         sessionStorage.setItem("folio", folio);
