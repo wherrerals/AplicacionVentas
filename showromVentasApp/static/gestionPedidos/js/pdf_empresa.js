@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Obtener valores iniciales
         const fechaSolo = new Date().toISOString().split('T')[0];
+        const fechaObj = new Date(fechaSolo);
+        fechaObj.setDate(fechaObj.getDate() + 9);
+        const valido_hasta = fechaObj.toISOString().split('T')[0];
         const rut = document.getElementById("inputCliente").getAttribute("data-codigosn");
         let docNumElement = document.getElementById("numero_cotizacion");
         let docNum = docNumElement?.textContent.trim();
@@ -74,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "tipo_documento": docType,
             "numero": docNum,
             "fecha": docDate,
-            "valido_hasta": docDate,
+            "valido_hasta": valido_hasta,
             "rut": rut,
             "vendedor": codigoVendedor,
             "DocumentLines": lines,

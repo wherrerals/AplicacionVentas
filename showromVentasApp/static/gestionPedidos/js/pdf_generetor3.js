@@ -4,31 +4,19 @@ document.addEventListener("DOMContentLoaded", function () {
     function crearPDF() {
         showLoadingOverlay();
 
-        console.log("Generando PDF...");
-
-        // Obtener valores iniciales
         const fechaSolo = new Date().toISOString().split('T')[0];
-        console.log("Fecha actual (ISO):", fechaSolo);
-
+        const fechaObj = new Date(fechaSolo);
+        fechaObj.setDate(fechaObj.getDate() + 9);
+        const valido_hasta = fechaObj.toISOString().split('T')[0];
         const rut = document.getElementById("inputCliente").getAttribute("data-codigosn");
-        console.log("RUT del cliente:", rut);
-
         const docNum = document.getElementById("numero_orden").textContent.trim();
-        console.log("Número de cotización:", docNum);
-
         const docDate = fechaSolo;
-        console.log("Fecha del documento:", docDate);
-
         const codigoVendedor = document.getElementById("vendedor_data").getAttribute("data-codeVen");
-        console.log("Código del vendedor:", codigoVendedor);
-
         const totalNeto = document.querySelector("#total_neto").textContent;
         const ivaGeneral = document.querySelector("#iva").textContent;
         const totalbruto = document.querySelector("#total_bruto").textContent;
-
         const selectElement = document.getElementById("direcciones_despacho");
         const direccion2 = selectElement.value;
-
         const contactoCliente = document.getElementById("contactos_cliete");
         const contacto = contactoCliente.value;
         const sucursal = document.getElementById("sucursal").textContent.trim();
@@ -74,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "tipo_documento": "Orden de Venta",
             "numero": docNum,
             "fecha": docDate,
-            "valido_hasta": docDate,
+            "valido_hasta": valido_hasta,
             "rut": rut,
             "vendedor": codigoVendedor,
             "DocumentLines": lines,
