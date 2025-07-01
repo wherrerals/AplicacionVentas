@@ -34,7 +34,7 @@ from logicaVentasApp.services.socionegocio import SocioNegocio
 import requests
 import json
 import math
-from datetime import date
+from datetime import date, timedelta
 
 from logicaVentasApp.services.comuna import Comuna
 from datosLsApp.models.stockbodegasdb import StockBodegasDB
@@ -1221,16 +1221,14 @@ def obtener_nombre_documento(dato):
 
 @csrf_exempt
 def generar_cotizacion_pdf_2(request, cotizacion_id):
-    if request.method == 'POST':
-        # Parsear datos JSON recibidos
-        
+    if request.method == 'POST':        
         try:
             data = json.loads(request.body)
-            
-            codigoSn = data.get('rut')
-            
-            snrepo = SocioNegocioRepository()
 
+            print("Datos recibidos:", data)
+
+            codigoSn = data.get('rut')
+            snrepo = SocioNegocioRepository()
 
             # Obtener dirección
             id_direccion = data.get('direccion')
@@ -1251,8 +1249,6 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
 
             detalle_sucursal = SucursalDB.objects.filter(codigo=sucursal).first()
 
-
-
             if datossocio.grupoSN.codigo == "105":
                 name_user = datossocio.nombre
                 last_name = datossocio.apellido or ""
@@ -1262,24 +1258,26 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
                 name = datossocio.razonSocial
 
             usuarios = UsuarioDB.objects.get(vendedor__codigo=data.get('vendedor'))
-            fecha = data.get('valido_hasta'),
+            fecha = data.get('fecha'),
+            validez = data.get('valido_hasta'),
+            print("Fecha de validez:", fecha)
             if fecha != None:
                 fecha = fecha[0].split("-")
                 fecha = fecha[2] + "-" + fecha[1] + "-" + fecha[0]
+                validez = validez[0].split("-")
+                validez = validez[2] + "-" + validez[1] + "-" + validez[0]
+
             else:
+                print("No se ha ingresado una fecha de validez, se asignará una por defecto")
                 today = date.today()
-                fecha = f"{today.day}-{today.month}-{today.year}"
+                nueva_fecha = today + timedelta(days=9)
+                fecha = f"{nueva_fecha.day}-{nueva_fecha.month}-{nueva_fecha.year}"
 
-
-            # Datos generales
-            
-
-            # Datos generales
             cotizacion = {
                 "tipo_documento": obtener_nombre_documento(data.get('tipo_documento')),  
                 'numero': data.get('numero'),
                 'fecha': fecha,
-                'validez': fecha,
+                'validez': validez,
                 'totalNeto': data.get('totalNeto'),
                 'iva': data.get('iva'),
                 'totalbruto': data.get('totalbruto'),
@@ -1378,46 +1376,43 @@ def generar_cotizacion_pdf(request, cotizacion_id):
             telefono_socio = datossocio.telefono
         
 
-        # Obtener dirección
         id_direccion = data.get('direccion')
         address = ''
         if id_direccion and id_direccion != 'No hay direcciones disponibles':
             direcciones = DireccionRepository.obtenerDireccionesID(id_direccion)
             address = f"{direcciones.calleNumero}, {direcciones.comuna.nombre}"
 
-        # Obtener contacto
         contacto_id = data.get('contacto')
         contactos = ''
         if contacto_id and contacto_id != 'No hay contactos disponibles':
             contacto = ContactoRepository.obtenerContacto(contacto_id)
             contactos = contacto.nombreCompleto if contacto.nombre != "1" else datossocio.nombre
 
-        # Obtener sucursal
         sucursal = data.get('sucursal')
         detalle_sucursal = SucursalDB.objects.filter(codigo=sucursal).first()
 
-        # Obtener nombre del cliente
         name = f"{datossocio.nombre} {datossocio.apellido}" if datossocio.grupoSN.codigo == "105" else datossocio.razonSocial
 
-        # Obtener datos del vendedor
         vendedor_codigo = data.get('vendedor')
         usuarios = UsuarioDB.objects.get(vendedor__codigo=vendedor_codigo)
 
-        # Formatear fecha
         fecha = data.get('valido_hasta')
         fecha_documento = data.get('fecha')
+
+
         if fecha:
+            print("Se ha proporcionado una fecha de validez.")
             fecha = fecha.split("-")
             fecha = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
             fecha_documento = fecha_documento.split("-")
             fecha_documento = f"{fecha_documento[2]}-{fecha_documento[1]}-{fecha_documento[0]}"
 
         else:
+            print("No se ha proporcionado una fecha de validez, se establecerá una por defecto.")
             today = date.today()
-            fecha = f"{today.day}-{today.month}-{today.year}"
-            fecha_documento = f"{today.day}-{today.month}-{today.year}"
+            nueva_fecha = today + timedelta(days=9)
+            fecha = f"{nueva_fecha.day}-{nueva_fecha.month}-{nueva_fecha.year}"
 
-        # Construir diccionario de cotización
         cotizacion = {
             "tipo_documento": data.get('tipo_documento'),  
             'numero': data.get('numero'),
@@ -1447,20 +1442,16 @@ def generar_cotizacion_pdf(request, cotizacion_id):
             'productos': data.get('DocumentLines', []),
         }
 
-        # Calcular totales
         calculadora = CalculadoraTotales(data)
         cotizacion["totales"] = calculadora.calcular_totales()
         cotizacion["tiene_descuento"] = any(float(item.get('porcentaje_descuento', 0)) for item in data.get('DocumentLines', []))
 
-        # Obtener URL absoluta
         absolute_uri = request.build_absolute_uri()
 
-        # Validar número de cotización
         idCoti = data.get("numero")
         if not idCoti or not str(idCoti).isdigit():
             return JsonResponse({"error": "Número de cotización inválido."}, status=400)
 
-        # Iniciar tarea asíncrona
         task = generar_pdf_async.delay(idCoti, cotizacion, absolute_uri)
         logger.info(f"Tarea de generación de PDF iniciada: {task.id}")
 

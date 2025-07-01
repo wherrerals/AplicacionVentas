@@ -8,38 +8,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Obtener valores iniciales
         const fechaSolo = new Date().toISOString().split('T')[0];
-        console.log("Fecha actual (ISO):", fechaSolo);
-
+        const fechaObj = new Date(fechaSolo);
+        fechaObj.setDate(fechaObj.getDate() + 9);
+        const valido_hasta = fechaObj.toISOString().split('T')[0];
         const rut = document.getElementById("inputCliente").getAttribute("data-codigosn");
-        console.log("RUT del cliente:", rut);
-
         const docNum = document.getElementById("numero_orden").textContent.trim();
-        console.log("Número de cotización:", docNum);
-
         const docDate = fechaSolo;
-        console.log("Fecha del documento:", docDate);
-
         const codigoVendedor = document.getElementById("vendedor_data").getAttribute("data-codeVen");
-        console.log("Código del vendedor:", codigoVendedor);
-
         const totalNeto = document.querySelector("#total_neto").textContent;
-
-
         const ivaGeneral = document.querySelector("#iva").textContent;
-
-
         const totalbruto = document.querySelector("#total_bruto").textContent;
-
         const selectElement = document.getElementById("direcciones_despacho");
         const direccion2 = selectElement.value;
-
         const contactoCliente = document.getElementById("contactos_cliete");
         const contacto = contactoCliente.value;
         const sucursal = document.getElementById("sucursal").textContent.trim();
-        const observaciones = document.getElementById("Observaciones-1").value; //selecionando observaciones por fila de producto por medio de id
-
-
-        // Construir líneas del documento
+        const observaciones = document.getElementById("Observaciones-1").value;
         const lines = [];
         const productRows = document.querySelectorAll('.product-row');
         console.log("Número de filas de productos:", productRows.length);
@@ -52,13 +36,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const porcentaje_descuento = row.querySelector("#agg_descuento").value.trim();
             const discountspan = row.querySelector("#Precio_Descuento").textContent;
             const totalspan = row.querySelector("#precio_Venta").textContent;
-            const comentarios = row.querySelector("#comentarios-1").value; //selecionando comentarios por fila de producto por medio de id
-                    // Obtener el elemento <select>
-
-            
-            // capturar imagen de etiqueta imagen con id img_productox
+            const comentarios = row.querySelector("#comentarios-1").value;            
             const img = row.querySelector("#img_productox").src;
-
             const total = totalspan;
             const discount = discountspan;
 
@@ -75,7 +54,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 "subtotal_neto": total,
             };
 
-            console.log("Línea de producto:", line);
             lines.push(line);
         });
 
@@ -83,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "tipo_documento": "S. Devolución",
             "numero": docNum,
             "fecha": docDate,
-            "valido_hasta": docDate,
+            "valido_hasta": valido_hasta,
             "rut": rut,
             "vendedor": codigoVendedor,
             "DocumentLines": lines,
