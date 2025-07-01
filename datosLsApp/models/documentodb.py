@@ -29,6 +29,7 @@ class DocumentoDB(models.Model):
     totalDocumento = models.FloatField(null = False)
     codigoVenta = models.IntegerField(null = False)
     estado_documento = models.CharField(max_length=50, null = False, default='Borrador')
+    docEntryReferencia = models.IntegerField(null = True, blank=True, default=None)
     # Relaciones con otros modelos
     tipo_documento = models.ForeignKey(TipoDocTributarioDB, on_delete=models.CASCADE)
     vendedor = models.ForeignKey(VendedorDB, on_delete=models.CASCADE, default=1)

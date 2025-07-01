@@ -1,30 +1,21 @@
-// Crear un nuevo documento de ventas
 document.addEventListener("DOMContentLoaded", function () {
 
-    // Asignar el evento 'click' a ambos botones
     document.getElementById("saveButton").addEventListener("click", submitForm);
     document.getElementById("saveButton2").addEventListener("click", submitForm);
 
-    let approve = 0; // valor por defecto
+    let approve = 0;
 
     document.getElementById("aprobar-1").addEventListener("click", function (e) {
         e.preventDefault();
-        approve = 1;         // solo cuando aprueba
-        submitForm();        // dispara el envío
+        approve = 1;
+        submitForm();
     });
-
 
     function submitForm() {
         showLoadingOverlay();
-        // Capturar los datos del documento
-        const fechaSolo = new Date().toISOString().split('T')[0]; // Salida en formato YYYY-MM-DD
-
-
-        const docNum = document.getElementById("numero_orden").textContent; //listo
-
-        let id_documento = document.getElementById("id_documento").getAttribute("data-id"); //listo
-
-        // enviar null si el documento no tiene un id 
+        const fechaSolo = new Date().toISOString().split('T')[0];
+        const docNum = document.getElementById("numero_orden").textContent;
+        let id_documento = document.getElementById("id_documento").getAttribute("data-id");
 
         if (id_documento === "None") {
             id_documento = null;
@@ -34,112 +25,91 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const docEntry = document.getElementById("numero_orden").getAttribute("data-docEntry")        
         const docTotal = document.getElementById("total_bruto").getAttribute("data-total-bruto");
-        const docDate = fechaSolo; //listo 
+        const docDate = fechaSolo;
         const fechaentrega = document.getElementById("fecha_entrega").value;
         const folio_number = document.getElementById("folio_referencia").value;
         const refereciaDocentry = document.getElementById("folio_referencia").getAttribute("data-refDocEntr");
-        const taxDate = fechaSolo; // listo
-        const rut = document.getElementById("inputCliente").getAttribute("data-codigoSN"); //listo
-        const cardCode = rut;//listo
-        const pgc = -1; //listo
-        const spcInt = document.getElementById("vendedor_data").getAttribute("data-codeVen"); //listo
-        const spc = parseInt(spcInt, 10); //listo Convertir a entero con base 10
-        const trnasp = document.getElementById("tipoEntrega-1").value; //listo
-        const ulfen = 1; //document.getElementById("uledforenv").value;
-        const referencia = document.getElementById("referencia").value; //listo
-        const observaciones = document.getElementById("Observaciones-1").value; //selecionando observaciones por fila de producto por medio de id
+        const taxDate = fechaSolo;
+        const rut = document.getElementById("inputCliente").getAttribute("data-codigoSN");
+        const cardCode = rut;
+        const pgc = -1;
+        const spcInt = document.getElementById("vendedor_data").getAttribute("data-codeVen");
+        const spc = parseInt(spcInt, 10);
+        const trnasp = document.getElementById("tipoEntrega-1").value;
+        const ulfen = 1;
+        const referencia = document.getElementById("referencia").value; 
+        const observaciones = document.getElementById("Observaciones-1").value;
 
         // Obtener el elemento <select>
         const selectElement = document.getElementById("direcciones_despacho");
         const direccion2 = selectElement.value;
-
-        console.log("Valor seleccionado:", direccion2);
-
         const selectElement2 = document.getElementById("direcciones_facturacion");
         const direccion = selectElement2.value;
-        console.log("Valor seleccionado:", direccion);
-
         const contactoCliente = document.getElementById("contactos_cliete");
         const contacto = contactoCliente.value;
-
-        console.log('contacto seleccionado:', contacto);
-
-
 
         const tipoDocElement = document.querySelector("[name='tipoDocTributario']:checked");
         if (!tipoDocElement) {
             console.error("No se seleccionó un tipo de documento tributario.");
             return;
         }
-        const ultd = tipoDocElement.value; //listo
+        const ultd = tipoDocElement.value;
 
-        console.log('Fecha del documento:', docDate);
-        console.log('tipo de entrega:', trnasp);
-        // Captura las líneas del documento
         const lines = [];
 
-        // Selecciona todas las líneas de cada producto
         const productRows = document.querySelectorAll('.product-row');
 
         productRows.forEach((row, index) => {
             const itemCode = row.querySelector("[name='sku_producto']").innerText;
             const quantity = row.querySelector("[name='cantidad']").value;
-            //const shipDate = row.querySelector("[name='fecha_envio']").value;
             const discount = row.querySelector("#agg_descuento").value;
-            // Capturar el valor seleccionado en el select de bodega
-            const bodegaSelect = row.querySelector(".bodega-select"); // Selecciona el <select> dentro de la fila
-            const comentarios = row.querySelector("#comentarios-1").value; //selecionando comentarios por fila de producto por medio de id
+            const bodegaSelect = row.querySelector(".bodega-select");
+            const comentarios = row.querySelector("#comentarios-1").value;
             const inputPrecioVenta = row.querySelector('#precio_venta2'); 
-
             const warehouseCode = bodegaSelect ? bodegaSelect.value : null;
-            const unitPrice = row.querySelector("#precio_venta2").value; // Capturar el precio de venta del producto
+            const unitPrice = row.querySelector("#precio_venta2").value;
             const price_line = row.querySelector("#precio_Venta").textContent.trim();
-
-            const costingCode = warehouseCode; //capturar bodega
+            const costingCode = warehouseCode;
             const cogsCostingCode = warehouseCode;
             const costingCode2 = "AV";
             const cogsCostingCode2 = "AV";
+            const checkbox = row.querySelector(".estado-checkbox");  // Asegúrate que esta clase esté en cada checkbox
+            const checkboxEstado = checkbox && checkbox.checked ? 1 : 0;
 
-            console.log('warehouseCode:', warehouseCode);
-
-
-
-
-            // Crea un objeto con los datos de la línea
             const line = {
                 "LineNum": index,
                 "ItemCode": itemCode,
                 "Quantity": parseFloat(quantity),
                 "UnitePrice": parseFloat(unitPrice),
-                "ShipDate": fechaentrega, //shipDate,
-                "line_price": price_line, // precio de venta
+                "ShipDate": fechaentrega,
+                "line_price": price_line,
                 "FreeText": comentarios,
-                "DiscountPercent": parseFloat(discount),//pendiente porcentaje de descuento
-                "WarehouseCode": warehouseCode, //pendiente bodega
-                "CostingCode": costingCode, // Pendiente código de sucursal, lc, Ph, gr, rs
-                "ShippingMethod": trnasp, // entrega en tienda, retiro en tienda, despacho a domicilio
-                "COGSCostingCode": cogsCostingCode, //pendiente 
-                "CostingCode2": costingCode2, // Pendiente código de sucursal, lc, Ph, gr, rs
+                "DiscountPercent": parseFloat(discount),
+                "WarehouseCode": warehouseCode,
+                "CostingCode": costingCode,
+                "ShippingMethod": trnasp,
+                "COGSCostingCode": cogsCostingCode,
+                "CostingCode2": costingCode2,
                 "COGSCostingCode2": cogsCostingCode2,
-                "Price": parseFloat(inputPrecioVenta.value)
+                "Price": parseFloat(inputPrecioVenta.value),
+                "EstadoCheck": checkboxEstado
             };
             lines.push(line);
         });
 
-        // Crea el objeto final que será enviado en formato JSON
         const documentData = {
             "DocNum": docNum,
-            "id_documento": id_documento, // ID del documento
+            "id_documento": id_documento,
             "DocEntry": docEntry,
-            "Folio": folio_number, // Folio de la orden de compra
+            "Folio": folio_number,
             "DocDate": docDate,
             'DocTotal': docTotal,
             "NumAtCard": referencia,
             "Comments": observaciones,
             "TaxDate": taxDate,
             "ContactPersonCode": contacto,
-            "Address": direccion, // direccion de facturacion
-            "Address2": direccion2, // direccion de  despacho
+            "Address": direccion,
+            "Address2": direccion2,
             "CardCode": cardCode,
             "PaymentGroupCode": pgc,
             "SalesPersonCode": spc,
@@ -147,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "U_LED_TIPDOC": ultd,
             "U_LED_FORENV": ulfen,
             "Approve": approve,
-            "RefDocEntr": refereciaDocentry, // Referencia al documento de entrada
+            "RefDocEntr": refereciaDocentry,
             "DocumentLines": lines
         };
 

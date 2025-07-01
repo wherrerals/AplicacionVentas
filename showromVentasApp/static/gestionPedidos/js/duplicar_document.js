@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const cantidad = cantidadCoti;
         const sucursal = line.WarehouseCode;
         const comentario = line.FreeText;
-        const descuentoAplcado = line.descuentoMax;
+        const descuentoAplcado = line.DiscountPercent;
         const tipoentrega2 = line.ShippingMethod;
   
         // Opcional: si no tienes stock ni imagen, se puede dejar en null o ajustar
@@ -72,6 +72,30 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }, 100);
 
+  if (tipoDocumento == 'Solicitud'){
+      //(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado)
+      agregarProducto(
+          docEntry_linea,
+          linea_documento,
+          productoCodigo,
+          nombre,
+          imagen,
+          precioVenta,
+          stockTotal,
+          precioLista,
+          precioDescuento,
+          cantidad,
+          cantidad,
+          sucursal,
+          comentario,
+          descuentoAplcado,
+          cantidadCoti,
+          precioCoti,
+          // pasando el total de parametros = 16
+        );
+
+  } else {
+      //(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado)
         agregarProducto(
           docEntry_linea,
           linea_documento,
@@ -87,9 +111,10 @@ document.addEventListener("DOMContentLoaded", function () {
           comentario,
           descuentoAplcado,
           cantidadCoti,
-          precioCoti
-          // pasando el total de parametros = 16
+          precioCoti       
         );
+    }
+
       });
   
       sessionStorage.removeItem("documentLines");

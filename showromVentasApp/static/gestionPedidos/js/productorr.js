@@ -1,5 +1,5 @@
 class Producto {
-    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado) {
+    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, cantidadOriginal,sucursal, comentario, descuentoAplcado) {
         
         this.docEntry_linea = docEntry_linea;
         this.linea_documento = linea_documento;
@@ -13,6 +13,7 @@ class Producto {
         this.precioSinDescuento = 0;
         this.totalProducto = precioVenta * cantidad;
         this.cantidad = cantidad;
+        this.cantidadOriginal = cantidadOriginal; // Si no se proporciona, usar la cantidad por defecto
         this.sucursal = sucursal;
         this.comentario = comentario;
         this.descuentoAplcado = descuentoAplcado ?? 0;
@@ -28,6 +29,7 @@ class Producto {
             precioLista: this.precioLista,
             precioDescuento: this.precioDescuento,
             cantidad: this.cantidad,
+            cantidadOriginal: this.cantidadOriginal,
             sucursal: this.sucursal,
             comentario: this.comentario,
             descuentoAplcado: this.descuentoAplcado
@@ -156,7 +158,7 @@ class Producto {
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${formatCurrency(this.precioSinDescuento)}</td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
-                    <input class="form-control format-number" type="number" style="font-size: 12px;width: 80px;"  id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad}" onclick="this.select()">
+                    <input class="form-control format-number" type="number" style="font-size: 12px;width: 80px;"  id="calcular_cantidad" name="cantidad" min="1" max="${this.cantidadOriginal}" value="${this.cantidad}" onclick="this.select()">
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
                     <span id="precio_Venta" data-totalProductValue="${this.totalProducto}">${formatCurrency(this.totalProducto)}</span>
@@ -168,7 +170,11 @@ class Producto {
                 </td>
                 <td style="background: transparent;padding-top: 8px;padding-left: 50px;border-style: none;padding-bottom: 0px;">
                     <a class="navbar-brand d-flex align-items-center" href="#" style="width: 18px;">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="eliminarp" class="bi bi-trash" style="width: 18px;height: 18px;">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
+                        <label class="form-check-label" for="switchCheckDefault"></label>
+                    </div>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="eliminarp" class="bi bi-trash" style="width: 18px;height: 18px;" hidden>
                         <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"> </path>
                         <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"> </path>
                       </svg>
@@ -257,7 +263,7 @@ class Producto {
 }
 
 // Función global para manejar la adición de productos
-function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, descuentoAplcado) {
+function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, cantidadOriginal, sucursal, comentario, descuentoAplcado) {
     // Contador de productos
     console.log("cantidad: ", cantidad);
     console.log("sucursal: ", sucursal);
@@ -265,7 +271,7 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
     let contprod = document.querySelectorAll('#productos tbody').length + 1;
 
     // Crear una instancia de Producto
-    let producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado);
+    let producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, cantidadOriginal, sucursal, comentario, descuentoAplcado);
 
     let newRow = producto.crearFila(contprod);
 

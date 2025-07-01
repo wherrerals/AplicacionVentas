@@ -14,6 +14,7 @@ class LineaDB(models.Model):
     numLinea = models.IntegerField()
     descuento = models.FloatField(default=0)
     cantidad = models.IntegerField(default=0)
+    cantidad_solicitada = models.IntegerField(default=0) # Cantidad solicitada para las devoluciones
     precioUnitario = models.FloatField(null = False)
     totalNetoLinea = models.FloatField(null = False)
     totalBrutoLinea = models.FloatField(null = False)
@@ -24,7 +25,8 @@ class LineaDB(models.Model):
     fechaEntrega = models.DateField(null = False)
     direccionEntrega = models.CharField(max_length=255)
     tipoentrega = models.ForeignKey(TipoEntregaDB, on_delete=models.CASCADE, default=1)
-    tipoobjetoSap = models.ForeignKey(TipoObjetoSapDB, on_delete=models.CASCADE, default=1)
+    estado_devolucion = models.IntegerField(null = True, blank=True, default=None)
+    tipoobjetoSap = models.ForeignKey(TipoObjetoSapDB, on_delete=models.CASCADE, default=1) # 1 = Activo, 0 = Devolución
     documento = models.ForeignKey('DocumentoDB', on_delete=models.CASCADE, related_name='lineas', default=None)
   
 

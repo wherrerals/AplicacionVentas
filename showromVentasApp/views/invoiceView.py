@@ -13,6 +13,7 @@ from adapters.sl_client import APIClient
 from datosLsApp.serializer.invoiceSerializer import InvoiceSerializer
 from logicaVentasApp.context.user_context import UserContext
 from logicaVentasApp.services.invoice import Invoice
+from logicaVentasApp.services.socionegocio import SocioNegocio
 from logicaVentasApp.services.usuario import User
 from logicaVentasApp.services.valitadionApp import ValitadionApp
 
@@ -102,7 +103,21 @@ class InvoiceView(View):
         sales_data_bp = api_service_layer.sales_details_sl_bp(type_document='Invoices', docEntry=docEntry)
         sales_data_lines = api_service_layer.sales_details_sl_lines(type_document='Invoices', docEntry=docEntry)
         data_sales_serializer = InvoiceSerializer.serializer_sales_details(sales_data_bp, sales_data_lines)
+
+        print("Datos de ventas serializados:", data_sales_serializer)
+
+        socio_negocio_data = data_sales_serializer.get('Invoices')
+        if socio_negocio_data:
+            card_code = socio_negocio_data.get('CardCode')
+            tax_id = socio_negocio_data.get('FederalTaxID')
+
+            if card_code and tax_id:
+                sn = SocioNegocio(request)
+                if not sn.verificarSocioDB(card_code):
+                    sn.crearYresponderCliente(card_code, tax_id)
+
         return JsonResponse(data_sales_serializer, safe=False)
+
     
 
     def duplicate_in_document(self, request):

@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 comentario
               });
   
-              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, precioDescuento);
+              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, line.cantidadOriginal, sucursal, comentario, precioDescuento);
             });
           }
   
