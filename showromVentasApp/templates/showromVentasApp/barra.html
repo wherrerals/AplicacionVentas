@@ -60,7 +60,7 @@
                             Solicitudes de Devolución
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'solicitudes_devolucion' %}">Crear Solicitud Devolución</a></li>
+                            <li><a class="dropdown-item" href="{% url 'solicitudes_devolucion' %}" hidden>Crear Solicitud Devolución</a></li> <!-- Hidden for Admins -->
                             <li><a class="dropdown-item" href="{% url 'pending_rr' %}">Solicitudes Devolución (Pendientes)</a></li>
                             <li><a class="dropdown-item" href="{% url 'lista_solic_devoluciones' %}">Solicitudes Devolución (Aprobadas)</a></li>
                         </ul>

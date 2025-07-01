@@ -110,9 +110,15 @@ class InvoiceView(View):
             try:
                 data = json.loads(request.body)
 
+                print("Datos recibidos para duplicar documento:", data)
+
+                tipo_documento = data.get('tipo', 'NA')
+
                 sales_person_code = User.user_data(request)['vendedor']
-                lineas_procesadas = InvoiceSerializer.serialize_invoice_lines(data, sales_person_code)
+                lineas_procesadas = InvoiceSerializer.serialize_invoice_lines(data, sales_person_code, tipo_documento)
                 # Procesar duplicación u otras tareas
+
+                print("Líneas procesadas Duplicar Documento:", lineas_procesadas)
                 
                 return JsonResponse({"status": "ok", "lineas": lineas_procesadas})
             except Exception as e:

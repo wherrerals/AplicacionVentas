@@ -15,6 +15,7 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
             const warehouseSelect = row.querySelector(".bodega-select");
             const warehouseCode = warehouseSelect ? warehouseSelect.value : null;
             const docentryLinea = row.getAttribute("data-docentryLinea");
+            const price = row.querySelector("[name='precio_venta']")?.innerText;
 
             const docDueDate = new Date().toISOString().split("T")[0];
             const trnasp = "retiro"; // o cambiar dinámicamente si hace falta
@@ -31,6 +32,7 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
                 CostingCode: warehouseCode,
                 ShippingMethod: trnasp,
                 COGSCostingCode: warehouseCode,
+                Price: price,
             };
 
             lines.push(line);

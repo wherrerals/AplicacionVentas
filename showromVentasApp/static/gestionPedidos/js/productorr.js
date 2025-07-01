@@ -17,8 +17,21 @@ class Producto {
         this.comentario = comentario;
         this.descuentoAplcado = descuentoAplcado ?? 0;
 
-        console.log("Producto descuentoAplcado:", this.descuentoAplcado);
-        console.log("Producto descuentoAplcado:", this.descuentoAplcado);
+        console.log("Producto creado:", {
+            docEntry_linea: this.docEntry_linea,
+            linea_documento: this.linea_documento,
+            productoCodigo: this.productoCodigo,
+            nombre: this.nombre,
+            imagen: this.imagen,
+            precioVenta: this.precioVenta,
+            stockTotal: this.stockTotal,
+            precioLista: this.precioLista,
+            precioDescuento: this.precioDescuento,
+            cantidad: this.cantidad,
+            sucursal: this.sucursal,
+            comentario: this.comentario,
+            descuentoAplcado: this.descuentoAplcado
+        });
     }
     
 
@@ -119,7 +132,7 @@ class Producto {
                 </td>
                 <td style="background: transparent;border-style: none;padding-bottom: 0px;" rowspan="2">
                     <div style="font-size: 12px;">
-                        <input class="form-control format-number" type="number" id="precio_venta2" style="font-size: 12px;width: 100px;" data-precioUnitario="${this.precioVenta}" min="1" max="999999999" value="${this.precioVenta}">
+                        <input class="form-control format-number" type="number" id="precio_venta2" style="font-size: 12px;width: 100px;" data-precioUnitario="${this.precioVenta}" min="1" max="999999999" value="${this.precioVenta}" readonly disabled>
                     </div>
                     <div style="font-size: 11px;">
                         <small class="numeric-value" style="color: rgb(153,153,153);" name="precio_lista">${formatCurrency(this.precioLista)}</small>

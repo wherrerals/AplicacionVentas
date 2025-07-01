@@ -116,10 +116,13 @@ class InvoiceSerializer:
         }
 
     @staticmethod
-    def serialize_invoice_lines(json_data, salesperson):
+    def serialize_invoice_lines(json_data, salesperson, tipo_documento):
         document_lines = []
         vendedor_repo = VendedorRepository()
         tipo_vendedor = vendedor_repo.obtenerTipoVendedor(salesperson)
+
+        print("Tipo Documento:", tipo_documento)
+
 
         for line_info in json_data["DocumentLine"]["value"]:
             line = line_info  # <-- Ya está todo en line_info
@@ -130,7 +133,10 @@ class InvoiceSerializer:
             marca = ProductoRepository.obtenerMarcaProducto(sku)
             descuentoMax = ProductoRepository.descuentoMax(sku)
             priceList = ProductoRepository.obtenerPrecioLista(sku)
+            precio_venta_normal = line.get("Price").replace("$", "").replace(" ", "").replace(".", "").replace(",", ".")
             precioVenta = ProductoRepository.obtenerPrecioVenta(sku)
+            print("primer price", precio_venta_normal)
+            print("Precio Venta:", precioVenta)
 
             if tipo_vendedor == 'P':
                 if marca == "LST":
@@ -161,9 +167,9 @@ class InvoiceSerializer:
                 "ShippingMethod": line.get("ShippingMethod"),
                 "imagen": imagen,
                 "marca": marca,
-                "descuentoMax": descuentoMax,
-                "PriceList": priceList,
-                "Price": precioVenta,
+                "descuentoMax": descuentoMax if tipo_documento != "Solicitud" else line.get("DiscountPercent"),
+                "PriceList": priceList if tipo_documento != "Solicitud" else precio_venta_normal,
+                "Price": precioVenta if tipo_documento != "Solicitud" else precio_venta_normal,
             }
 
             if document_line.get("Quantity", 1) > 0:

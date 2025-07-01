@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const cantidad = cantidadCoti;
         const sucursal = line.WarehouseCode;
         const comentario = line.FreeText;
-        const descuentoAplcado =0;
+        const descuentoAplcado = line.descuentoMax;
         const tipoentrega2 = line.ShippingMethod;
   
         // Opcional: si no tienes stock ni imagen, se puede dejar en null o ajustar
