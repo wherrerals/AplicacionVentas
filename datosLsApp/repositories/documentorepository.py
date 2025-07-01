@@ -103,6 +103,7 @@ class DocumentoRepository:
                 direccionEntrega=data['TaxExtension']['StreetS'],
                 tipoentrega=tipo_entrega,
                 tipoobjetoSap=tipo_objeto,
+                estado_devolucion=linea['EstadoCheck'],
             )
 
         return document

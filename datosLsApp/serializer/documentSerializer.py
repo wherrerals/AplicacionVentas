@@ -81,7 +81,8 @@ class SerializerDocument:
                 'ShippingMethod': linea.get('ShippingMethod'),
                 'COGSCostingCode': linea.get('COGSCostingCode'),
                 'CostingCode2': linea.get('CostingCode2'),
-                'TreeType': treeType
+                'TreeType': treeType,
+                'EstadoCheck': linea.get('EstadoCheck', '0'),
             }
 
             lineas_json.append(nueva_linea)
