@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", function () {
         filters: {
             id: filters.id || null,
             nombre: filters.nombre || null,
+            sucursal: filters.sucursal || null,
+
         }
     };
 
@@ -191,9 +193,13 @@ const displayDocuments = (docs) => {
 
 
   const getFilterData = () => {
+    // Buscar el campo de sucursal (puede ser input o select)
+    const sucursalField = document.querySelector('#sucursal_filter') || document.querySelector('[name="sucursal"]');
+    
     return {
         id: document.querySelector('[name="docNum"]').value,
         nombre: document.querySelector('[name="cardName"]').value,
+        sucursal: sucursalField ? sucursalField.value : null
     };
 };
 
@@ -279,10 +285,27 @@ const displayDocuments = (docs) => {
 
 const fetchAndDisplayData = (page = 1) => {
     console.log('Obteniendo datos para página:', page); // Para debug
+    
+    // Si no hay filtros activos, usar los filtros por defecto
+    if (Object.keys(activeFilters).length === 0) {
+        const defaultFilters = getFilterData();
+        activeFilters = defaultFilters;
+    }
+    
     applyFiltersAndFetchData(activeFilters, page);
     window.scrollTo(0, 0);
 };
-  // Llamar a la función para cargar la primera página con filtros activos al inicio
+  // Inicializar filtros por defecto (la sucursal ya viene del backend)
+  const initializeDefaultFilters = () => {
+    // Simplemente obtener los filtros actuales (la sucursal ya está establecida desde el backend)
+    const filters = getFilterData();
+    activeFilters = filters; // Establecer los filtros activos iniciales
+    console.log('Filtros iniciales:', filters); // Para debug
+    return filters;
+  };
+
+  // Llamar a la función para cargar la primera página con filtros por defecto
+  const defaultFilters = initializeDefaultFilters();
   fetchAndDisplayData(currentPage);
 
   // Escuchar el evento 'keydown' para capturar "Enter" en los campos de entrada
@@ -324,12 +347,18 @@ const fetchAndDisplayData = (page = 1) => {
   const urlParams = new URLSearchParams(window.location.search);
   const nombre = urlParams.get("nombre") || "";
   const id = urlParams.get("id") || "";
+  const sucursal = urlParams.get("sucursal") || "";
+
 
   // Si hay parámetros en la URL, aplicarlos automáticamente
-  if (nombre || id) {
+  if (nombre || id || sucursal) {
     // Colocar los valores en los campos correspondientes
     if (id) document.querySelector('[name="docNum"]').value = id;
     if (nombre) document.querySelector('[name="cardName"]').value = nombre;
+    if (sucursal) {
+      const sucursalField = document.querySelector('#sucursal_filter') || document.querySelector('[name="sucursal"]');
+      if (sucursalField) sucursalField.value = sucursal;
+    }
 
     // Aplicar los filtros automáticamente
     const filters = getFilterData();

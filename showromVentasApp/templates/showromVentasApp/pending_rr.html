@@ -103,18 +103,12 @@
                   </th>
                   <th style="background: transparent;color: var(--bs-table-bg);">
                     <div><span>Sucursal</span></div>
-                    <div><select class="form-select" id="filtro_vendedor" name="salesEmployeeName" style="width: 90px;font-size: 12px;">
-                        <optgroup label="--">
-                          {% if 'Vendedor' in grupos_usuario  or 'Administrador' in grupos_usuario%}
-                            {% if username %}
-                          <option value="{{codigo_vendedor}}" selected=""></option>
-                            {% endif %}
-                          {% endif %}
-                          {% if 'Administrador' in grupos_usuario %}
-                          <option value="">Todos</option>
-                          {% endif %}
-                        </optgroup>
-                      </select></div>
+                    <div>                        
+                    <div>
+                        {% if 'Supervisor' in grupos_usuario  or 'Administrador' in grupos_usuario%}
+                            <input class="form-control" type="search" id="sucursal_filter" name="sucursal" style="width: 100%;font-size: 12px;" value="{{sucursal}}" readonly disabled>
+                        {% endif %}
+                    </div>
                   </th>
                   <th style="background: transparent;color: var(--bs-table-bg);">
                     <div><span>Fecha</span></div>
@@ -123,24 +117,21 @@
                   </th>
                   <th style="background: transparent;color: var(--bs-table-bg);">
                     <div><span>Estado</span></div>
-                    <div><select class="form-select" id="filtro_estado" name="DocumentStatus" style="width: 100px;font-size: 12px;">
+                    <div><select class="form-select" id="filtro_estado" name="DocumentStatus" style="width: 100px;font-size: 12px;" disabled>
                         <optgroup label="Estado">
-                          <option value="" selected="">Todos</option>
-                          <option value="12" >Abierto</option>
-                          <option value="13">Cerrado</option>
-                          <option value="14">Cancelado</option>
+                          <option value="" selected="">Borrador</option>
                         </optgroup>
                       </select></div>
                   </th>
                   <th style="background: transparent;color: var(--bs-table-bg);">
                     <div><span>Neto</span></div>
                     <div><input class="form-control" type="search" id="buscar_neto" name="docNeto"
-                        style="width: 100%;font-size: 12px;"></div> 
+                        style="width: 100%;font-size: 12px;" disabled></div> 
                   </th>
                   <th style="background: transparent;color: var(--bs-table-bg);">
                     <div><span>Bruto</span></div>
                     <div><input class="form-control" type="search" id="buscar_bruto" name="docTotal"
-                        style="width: 100%;font-size: 12px;"></div>
+                        style="width: 100%;font-size: 12px;" disabled></div>
                   </th>
                 </tr>
               </thead>

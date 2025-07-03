@@ -11,6 +11,8 @@ from datosLsApp.models import UsuarioDB
 from datosLsApp.models.vendedordb import VendedorDB
 from django.db import connection, transaction
 from datetime import datetime
+from django.db.models import Subquery
+
 
 
 class DocumentoRepository:
@@ -188,6 +190,7 @@ class DocumentoRepository:
                 numLinea=linea_num,
                 descuento=linea['DiscountPercent'],
                 cantidad=linea['Quantity'],
+                estado_devolucion=linea['EstadoCheck'],
                 precioUnitario=linea['UnitPrice'],
                 totalBrutoLinea=item_code.precioVenta * linea['Quantity'],
                 totalNetoLinea=(item_code.precioVenta * linea['Quantity']) - 
@@ -205,6 +208,15 @@ class DocumentoRepository:
 
     @staticmethod
     def get_total_documents(filtro_id=None, filtro_nombre=None, filtro_sucursal=None, filtro_estado=None):
+
+        # Obtener los vendedores que tengan usuarios con esa sucursal
+        if filtro_sucursal:
+            vendedores_en_sucursal = UsuarioDB.objects.filter(
+                sucursal=filtro_sucursal
+            ).values('vendedor')
+
+        print("Vendedores en sucursal:", vendedores_en_sucursal)
+
         queryset = DocumentoDB.objects.filter(
             tipoobjetoSap_id=1,
             estado_documento='Borrador'
@@ -215,11 +227,16 @@ class DocumentoRepository:
         if filtro_nombre:
             queryset = queryset.filter(referencia__icontains=filtro_nombre)
         if filtro_sucursal:
-            queryset = queryset.filter(sucursal=filtro_sucursal)
+            queryset = queryset.filter(vendedor__in=Subquery(vendedores_en_sucursal))
         if filtro_estado:
             queryset = queryset.filter(estado_documento=filtro_estado)
 
         return queryset.count()
+
+
+
+
+
 
 
     @staticmethod
@@ -234,11 +251,17 @@ class DocumentoRepository:
         if filtro_nombre:
             queryset = queryset.filter(referencia__icontains=filtro_nombre)
         if filtro_sucursal:
-            queryset = queryset.filter(socio_negocio__sucursal=filtro_sucursal)  # Ajusta si no aplica
+            vendedores_en_sucursal = UsuarioDB.objects.filter(
+                sucursal=filtro_sucursal
+            ).values('vendedor')
+            queryset = queryset.filter(vendedor__in=Subquery(vendedores_en_sucursal))
         if filtro_estado:
             queryset = queryset.filter(estado_documento=filtro_estado)
 
-        queryset = queryset.select_related('socio_negocio', 'socio_negocio__grupoSN')[offset:offset + limite]
+        queryset = queryset.select_related(
+            'socio_negocio', 
+            'socio_negocio__grupoSN'
+        )[offset:offset + limite]
 
         documentos = []
         for doc in queryset:
@@ -261,7 +284,8 @@ class DocumentoRepository:
 
         print(f"documentos: {documentos}")
 
-        return documentos 
+        return documentos
+
 
 
     @staticmethod
@@ -288,6 +312,7 @@ class DocumentoRepository:
             for linea in doc.lineas.all():
                 lineas_serializadas.append({
                     "cantidad": linea.cantidad,
+                    "cantidad_original": linea.cantidad_solicitada,
                     "producto_codigo": linea.producto.codigo,
                     "producto_nombre": linea.producto.nombre,
                     "precio_unitario": linea.precioUnitario,
@@ -298,6 +323,7 @@ class DocumentoRepository:
                     "fecha_entrega": str(linea.fechaEntrega),
                     "tipo_entrega_codigo": linea.tipoentrega.codigo,
                     "num_linea": linea.numLinea,
+                    "linea_base": linea.numLineaBase,
                     "imagen_url": linea.producto.imagen,
                     "warehouse": linea.direccionEntrega,
                     "estate_rr_line": linea.estado_devolucion,

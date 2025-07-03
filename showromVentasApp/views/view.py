@@ -354,6 +354,7 @@ def lista_solic_devoluciones(request):
         try:
             usuario = UsuarioDB.objects.get(usuarios=request.user)
             nombreUser = usuario.nombre
+            sucursal = usuario.sucursal.codigo  # Accede a la sucursal a través del modelo UsuarioDB
 
 
         except UsuarioDB.DoesNotExist:
@@ -364,6 +365,8 @@ def lista_solic_devoluciones(request):
         context = {
             'username': username,
             'nombreuser': nombreUser,
+            'sucursal': sucursal,
+
         }
 
     return render(request, "lista_solic_devoluciones.html", context)
@@ -385,6 +388,8 @@ def return_request_pending(request):
         try:
             usuario = UsuarioDB.objects.get(usuarios=request.user)
             nombreUser = usuario.nombre
+            sucursal = usuario.sucursal.codigo  # Accede a la sucursal a través del modelo UsuarioDB
+
 
 
         except UsuarioDB.DoesNotExist:
@@ -395,7 +400,11 @@ def return_request_pending(request):
         context = {
             'username': username,
             'nombreuser': nombreUser,
+            'sucursal': sucursal,
         }
+
+
+        print("Contexto para pending_rr:", context)  # Debugging line to check context
 
     return render(request, "pending_rr.html", context)
 

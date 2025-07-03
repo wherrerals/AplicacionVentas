@@ -97,13 +97,14 @@ class ReturnsView(View):
     @csrf_exempt
     def get_endpoint(self):
         return 'ReturnRequest'
-    
+    """
     @csrf_exempt
     def filtrarCotizaciones(self, request):
-        """
-        Maneja la solicitud para filtrar cotizaciones, delegando la lógica de construcción de filtros a una función separada.
-        """        
         client = APIClient()
+        user_data = self.user_data(request)
+        sucursal = user_data.get('sucursal', None)
+        print("Sucursal:", sucursal)
+
 
         try:
             data = json.loads(request.body)
@@ -123,9 +124,73 @@ class ReturnsView(View):
         # Manejar la solicitud de datos
         try:
             data = client.getData(endpoint=self.get_endpoint(), top=top, skip=skip, filters=filters)
+            print("Data from API:", data)
+            sales_employee_name = data['value'][0]['SalesPersons']['SalesEmployeeName']
+            sucursal_2 = sales_employee_name.split('-')[0].strip() if sales_employee_name else None
+            print("Sucursal from Sales Employee Name:", sucursal_2)
+
             return JsonResponse({'data': data}, safe=False)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
+    """
+
+    @csrf_exempt
+    def filtrarCotizaciones(self, request):
+        """
+        Maneja la solicitud para filtrar cotizaciones, delegando la lógica de construcción de filtros a una función separada.
+        """        
+        client = APIClient()
+        user_data = self.user_data(request)
+        sucursal_usuario = user_data.get('sucursal', None)
+
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError as e:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+        # Construir filtros usando la lógica de negocio
+        filters = SolicitudesDevolucion.construirSolicitudesDevolucion(data)
+
+        # Validar los parámetros de paginación
+        try:
+            top = int(data.get('top', 20))
+            skip = int(data.get('skip', 0))
+        except ValueError:
+            return JsonResponse({'error': 'Invalid parameters'}, status=400)
+
+        try:
+            data = client.getData(endpoint=self.get_endpoint(), top=top, skip=skip, filters=filters)
+            print("Data from API:", data)
+
+            if data['value']:
+                sales_employee_name = data['value'][0].get('SalesPersons', {}).get('SalesEmployeeName')
+                sucursal_vendedor = sales_employee_name.split('-')[0].strip() if sales_employee_name else None
+            else:
+                sucursal_vendedor = None
+
+            print("Sucursal vendedor:", sucursal_vendedor)
+
+            sucursal_filtro = sucursal_vendedor or sucursal_usuario
+
+            data_filtrada = []
+            for item in data['value']:
+                sales_employee_name_item = item.get('SalesPersons', {}).get('SalesEmployeeName')
+                sucursal_item = sales_employee_name_item.split('-')[0].strip() if sales_employee_name_item else None
+
+                if sucursal_item == sucursal_filtro:
+                    data_filtrada.append(item)
+
+            print(f"Total registros filtrados: {len(data_filtrada)}")
+
+            # SUSTITUYES SOLO EL 'value' del dict original:
+            data['value'] = data_filtrada
+
+            return JsonResponse({'data': data}, safe=False)
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+
     
     @csrf_exempt
     def detallesDevolucion(self, request):
@@ -245,6 +310,7 @@ class ReturnsView(View):
         user = request.user
 
         codigoVendedor = UsuarioDB.objects.get(usuarios=user).vendedor.codigo
+        sucursal = UsuarioDB.objects.get(usuarios=user).sucursal.nombre
 
         return {
             'username': user.username,
@@ -254,7 +320,8 @@ class ReturnsView(View):
             'is_staff': user.is_staff,
             'is_superuser': user.is_superuser,
             'is_active': user.is_active,
-            'vendedor': codigoVendedor
+            'vendedor': codigoVendedor,
+            'sucursal': sucursal
         }
     
     def validar_vendedor(self, vendedor1, vendedor2):   
@@ -272,12 +339,16 @@ class ReturnsView(View):
             limit = data.get('top', 20)
             offset = (page - 1) * limit
 
+            print("Filters:", filters)
+
             total_records = DocumentoRepository.get_total_documents(
                 filtro_id=filters.get('id', None),
                 filtro_nombre=filters.get('nombre', None),
                 filtro_sucursal=filters.get('sucursal', None),
                 filtro_estado=filters.get('estado', None)
             )
+
+            print("Total Records:", total_records)
 
             documents = DocumentoRepository.get_document(
                 filtro_id=filters.get('id', None),
@@ -306,8 +377,6 @@ class ReturnsView(View):
 
         id = request.GET.get('id')
         documents_data = DocumentoRepository.get_document_data_lines(filtro_id=id)
-        print("Documents Data:", documents_data)
         serilized_data = SerializerDocument.serialize_documento_completo(documents_data)
-        print("Serialized Data:", serilized_data)
         
         return JsonResponse(serilized_data, safe=False)

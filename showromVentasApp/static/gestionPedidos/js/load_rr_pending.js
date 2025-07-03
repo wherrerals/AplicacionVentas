@@ -162,25 +162,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 const precioDescuento = line.DiscountPercent;
                 const sucursal = line.WarehouseCode;
                 const comentario = line.FreeText;
+                const cantidad = line.Quantity;
                 const checked = line.estate_rr_line; // Convertir a 1 o 0
                 const tipo_devolucion2 = line.ShippingMethod;
                 const fechaEntrega = line.ShipDate;
 
                 let linea_documento_real = parseInt(linea_documento);
 
-                              console.log("Agregando producto con datos:", {
-                productoCodigo,
-                nombre,
-                imagen,
-                precioVenta,
-                stockTotal,
-                precioLista,
-                precioDescuento,
-                sucursal,
-                comentario
-              });
+
+              if(cantidad > 0) {
   
-              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, line.cantidadOriginal, sucursal, comentario, precioDescuento, checked);
+              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, line.Quantity2, sucursal, comentario, precioDescuento, checked);
+              }
+              
             });
           }
   

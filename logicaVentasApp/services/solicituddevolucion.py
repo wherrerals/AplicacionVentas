@@ -187,8 +187,15 @@ class SolicitudesDevolucion(Documento):
         except Exception as e:
             logger.error(f"Error al actualizar la cotización: {str(e)}")
             return {'error': str(e)}
-        
-
+    
+    @staticmethod
+    def validar_check(data):
+        errores = []
+        for item in data.get('DocumentLines', []):
+            #validar que almenos una de las lineas tenga marcado el EstadoCheck
+            if item.get('EstadoCheck'):
+                errores.append("Debe marcar al menos un producto para la devolucion.")
+        return ' '.join(errores)
 
     def crearDocumento(self, data):
 

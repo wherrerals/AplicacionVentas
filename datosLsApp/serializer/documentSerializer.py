@@ -242,10 +242,12 @@ class SerializerDocument:
         for linea in doc.get('lineas', []):
             lines.append({
                 "LineNum": 0,
+                "linea_base": linea.get('linea_base'),
                 "DocEntry": doc.get("id", ""),
                 "ItemCode": linea['producto_codigo'],
                 "ItemDescription": linea['producto_nombre'],
                 "Quantity": linea['cantidad'],
+                "Quantity2": linea.get('cantidad_original'),
                 "imagen": linea['imagen_url'],
                 "PriceAfterVAT": round(linea['precio_unitario'] * 1.19),
                 "GrossPrice": int(linea['precio_lista']),

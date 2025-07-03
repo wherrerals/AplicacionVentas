@@ -154,10 +154,24 @@ class Documento(ABC):
         """
         pass
 
+    def validar_check(self, data):
+        tiene_marcado = False
+
+        for item in data.get('DocumentLines', []):
+            if item.get('EstadoCheck') == 1:
+                tiene_marcado = True
+                break
+
+        if not tiene_marcado:
+            return "Debe marcar al menos un producto para la devolución."
+        return ""
+
     def create_document_db(self, data):
         print("Creating document in database with data:", data)
         try:
             errores = self.validar_datos_de_documentos(data)
+            errores += self.validar_check(data)
+
             if errores:
                 return {'error': errores}
             
@@ -188,6 +202,8 @@ class Documento(ABC):
         try:
 
             errores = self.validar_datos_de_documentos(data)
+            errores += self.validar_check(data)
+
             if errores:
                 return {'error': errores}
             
@@ -210,7 +226,8 @@ class Documento(ABC):
         
         except Exception as e:
             logger.error(f"Error al actualizar el documento: {str(e)}")
-            return {'error': str(e)} 
+            return {'error': str(e)}
+        
 
     def validar_datos_de_documentos(self, data):
         errores = []
@@ -259,9 +276,15 @@ class Documento(ABC):
             raise Exception("No hay líneas asociadas a estos criterios.")
 
         cantidad_original = lineas.values_list('cantidad_solicitada', flat=True).first()
+
+        print(f"Cantidad original para {producto_codigo} en línea {numLinea}: {cantidad_original}")
         total_devuelto = lineas.aggregate(total=Sum('cantidad'))['total'] or 0
 
+        print(f"Total devuelto para {producto_codigo} en línea {numLinea}: {total_devuelto}")
+
         saldo = cantidad_original - total_devuelto
+
+        print(f"Saldo disponible para {producto_codigo} en línea {numLinea}: {saldo}")
         return saldo
 
 

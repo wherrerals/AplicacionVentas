@@ -91,9 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
             sucursal,
             comentario,
             descuentoAplcado,
-            cantidadCoti,
-            precioCoti,
-            // pasando el total de parametros = 16
+            estadoCheck = 0,
           );
 
         } else {

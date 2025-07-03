@@ -113,7 +113,7 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
                         window.location.href = `/ventas/solicitudes_devolucion/`;
                     }
                 } else {
-                    alert("Error al duplicar el documento: " + data.message);
+                    alert("Error al duplicar el documento: Documento sin Folio " + "Mensaje de sistema: " + data.message);
                 }
             })
             .catch((error) => {

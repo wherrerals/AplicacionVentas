@@ -441,7 +441,6 @@ class OrdenVenta(Documento):
 
     def update_components(self, data, doc_entry, type_document):
         document_line = data.get('DocumentLines')
-        print("document_line", document_line)
 
         if 'TreeType' in document_line[0]:
             print("Enviando tarea para actualizar componentes...")
