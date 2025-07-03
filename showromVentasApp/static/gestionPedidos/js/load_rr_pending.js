@@ -35,6 +35,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
             const numCotizacion = data.Cliente.ReturnRequest.DocNum;
             const id = data.Cliente.ReturnRequest.id;
+            const folio = data.Cliente.ReturnRequest.Folio;
+            const refDocEntr = data.Cliente.ReturnRequest.RefDocEntr;
             const docDate = data.Cliente.ReturnRequest.DocDate;
             const canceled = data.Cliente.ReturnRequest.Cancelled;
             let cardCode = data.Cliente.ReturnRequest.CardCode;
@@ -44,7 +46,15 @@ document.addEventListener("DOMContentLoaded", function () {
             const tipoFactura = data.Cliente.ReturnRequest.U_LED_TIPDOC;
             const referencia = data.Cliente.ReturnRequest.NumAtCard;
             const comentarios = data.Cliente.ReturnRequest.Comments;
-            
+            // Verificar si cardCode es undefined o null
+
+            const folioInput = document.getElementById("folio_referencia");
+            if (folioInput && folio) {
+              folioInput.value = folio; // Asigna el valor capturado al input
+              folioInput.setAttribute("data-refdocentr", refDocEntr); // Agregar el atributo data-docentry
+            }
+
+
             if (cardCode.endsWith("C") || cardCode.endsWith("c")) {
               cardCode = cardCode.slice(0, -1);
             }
@@ -152,6 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const precioDescuento = line.DiscountPercent;
                 const sucursal = line.WarehouseCode;
                 const comentario = line.FreeText;
+                const checked = line.estate_rr_line; // Convertir a 1 o 0
                 const tipo_devolucion2 = line.ShippingMethod;
                 const fechaEntrega = line.ShipDate;
 
@@ -169,7 +180,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 comentario
               });
   
-              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, line.cantidadOriginal, sucursal, comentario, precioDescuento);
+              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, line.cantidadOriginal, sucursal, comentario, precioDescuento, checked);
             });
           }
   

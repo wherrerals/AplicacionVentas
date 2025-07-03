@@ -14,7 +14,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class Documento(View, ABC):
+class Documento_View(View, ABC):
     
     @method_decorator(csrf_exempt)
     @method_decorator(login_required)

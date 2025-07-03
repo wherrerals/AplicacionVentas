@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
 import logging
 
+from django.db.models import Sum
+
 from adapters.sl_client import APIClient
+from datosLsApp.models.lineadb import LineaDB
 from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.documentorepository import DocumentoRepository
@@ -242,3 +245,23 @@ class Documento(ABC):
 
         # Si hay errores, retornarlos como una cadena
         return ' '.join(errores)
+    
+
+
+    def saldo_disponible_linea(docentry_ref, producto_codigo, numLinea):
+        lineas = LineaDB.objects.filter(
+            docEntryBase=docentry_ref,
+            producto__codigo=producto_codigo,
+            numLineaBase=numLinea
+        )
+
+        if not lineas.exists():
+            raise Exception("No hay líneas asociadas a estos criterios.")
+
+        cantidad_original = lineas.values_list('cantidad_solicitada', flat=True).first()
+        total_devuelto = lineas.aggregate(total=Sum('cantidad'))['total'] or 0
+
+        saldo = cantidad_original - total_devuelto
+        return saldo
+
+

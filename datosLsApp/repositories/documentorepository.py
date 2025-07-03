@@ -48,7 +48,7 @@ class DocumentoRepository:
  
     @staticmethod
     def create_document_db(data):
-
+        print(f"Creando documento con datos: {data}")
         business_partner = SocioNegocioDB.objects.get(codigoSN=data['CardCode'])
         document_type = TipoDocTributarioDB.objects.get(codigo=data['U_LED_TIPDOC'])
         seller = VendedorDB.objects.get(codigo=data['SalesPersonCode'])
@@ -61,7 +61,7 @@ class DocumentoRepository:
         document = DocumentoDB.objects.create(
             docEntry=0,
             docNum=0,
-            folio=data.get('Folio', 0),
+            folio=data['U_VK_Folio'],
             fechaDocumento=data['DocDate'],
             fechaEntrega=data['DocDate'],
             direccionEntrega=data['TaxExtension']['StreetS'],
@@ -72,6 +72,7 @@ class DocumentoRepository:
             totalAntesDelDescuento=data['DocTotal'],
             descuento=0,
             totalDocumento=data['DocTotal'],
+            docEntry_relacionado=data['RefDocEntr'],
             codigoVenta=data['SalesPersonCode'],
             tipo_documento=document_type,
             vendedor=seller,
@@ -86,20 +87,24 @@ class DocumentoRepository:
         for linea_num, linea in enumerate(data['DocumentLines'], start=1):
             item_code = ProductoDB.objects.get(codigo=linea['ItemCode'])
 
+            # Condición para cantidad
+            cantidad = 0 if linea['EstadoCheck'] == 0 else linea['Quantity']
+
             LineaDB.objects.create(
                 documento=document,  # ¡Aquí se establece la relación!
                 producto=item_code,
                 numLinea=linea_num,
                 descuento=linea['DiscountPercent'],
-                cantidad=linea['Quantity'],
+                cantidad=cantidad, # Asignar cantidad solicitada
+                cantidad_solicitada=linea['Quantity2'],  
                 precioUnitario=linea['UnitPrice'],
                 totalBrutoLinea=item_code.precioVenta * linea['Quantity'],
                 totalNetoLinea=(item_code.precioVenta * linea['Quantity']) - 
                                 (item_code.precioVenta * linea['Quantity'] * linea['DiscountPercent'] / 100),
                 comentario=linea['FreeText'],
                 fechaEntrega=linea['ShipDate'],
-                docEntryBase=0,
-                numLineaBase=0,
+                docEntryBase=linea['DocEntryBase'],
+                numLineaBase=linea['LineNum'],
                 direccionEntrega=data['TaxExtension']['StreetS'],
                 tipoentrega=tipo_entrega,
                 tipoobjetoSap=tipo_objeto,
@@ -152,7 +157,7 @@ class DocumentoRepository:
             raise ValueError(f"Documento con docEntry={id} no existe")
 
         # Actualiza campos del documento
-        document.folio = data.get('Folio', document.folio)
+        document.folio = data.get('U_VK_Folio', document.folio)
         document.fechaDocumento = data.get('DocDate', document.fechaDocumento)
         document.fechaEntrega = data.get('DocDate', document.fechaEntrega)
         document.direccionEntrega = data['TaxExtension']['StreetS']
@@ -295,14 +300,17 @@ class DocumentoRepository:
                     "num_linea": linea.numLinea,
                     "imagen_url": linea.producto.imagen,
                     "warehouse": linea.direccionEntrega,
+                    "estate_rr_line": linea.estado_devolucion,
                 })
 
             documentos.append({
                 "id": doc.id,
                 "docNum": doc.docNum,
                 "docEntry": doc.docEntry,
+                "folio": doc.folio,
                 "fechaEntrega": str(doc.fechaEntrega),
                 "estado_documento": doc.estado_documento,
+                "RefDocEntr": doc.docEntry_relacionado,
                 "CardCode": doc.socio_negocio.codigoSN,
                 "nombre_cliente": (
                     f"{doc.socio_negocio.nombre} {doc.socio_negocio.apellido}"

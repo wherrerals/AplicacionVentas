@@ -13,8 +13,8 @@ class LineaDB(models.Model):
     producto = models.ForeignKey(ProductoDB, on_delete=models.CASCADE)  # Relación uno a uno con Producto
     numLinea = models.IntegerField()
     descuento = models.FloatField(default=0)
-    cantidad = models.IntegerField(default=0)
-    cantidad_solicitada = models.IntegerField(default=0) 
+    cantidad = models.IntegerField(default=0) # cantidad solicitada
+    cantidad_solicitada = models.IntegerField(default=0) #cantidad original pendiente por cambiar nombre a cantidad_original
     precioUnitario = models.FloatField(null = True, blank=True, default=None)  # Puede ser nulo si no se ha definido
     totalNetoLinea = models.FloatField(null = False)
     totalBrutoLinea = models.FloatField(null = False)

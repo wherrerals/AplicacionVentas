@@ -1,6 +1,26 @@
 document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solicitud").forEach((button) => {
     button.addEventListener("click", function (event) {
         const botonPresionado = event.target.id; // "duplicar-ODV", "duplicar-Cotizacion", o "duplicar-Solicitud"
+        const folio_element = document.getElementById("folio_cotizacion");
+        const numero_cotizacion = document.getElementById("numero_cotizacion");
+        let folio = 0
+        let docEntry = 0;
+
+        if (numero_cotizacion) {
+            // Obtener el valor del atributo data-docentry
+            docEntry = numero_cotizacion.getAttribute("data-docentry");
+            console.log("DocEntry obtenido:", docEntry);
+        } else {
+            console.error("No se encontró el elemento con id 'numero_cotizacion'. Asegúrate de que exista en el DOM.");
+        }
+
+        if (folio_element){
+            folio = folio_element.textContent.trim(); // Obtener el texto del elemento y eliminar espacios
+
+            console.log("Folio obtenido:", folio);
+        }else{
+            console.error("No se encontró el elemento con id 'folio_cotizacion'. Asegúrate de que exista en el DOM.");
+        }
 
         const lines = [];
 
@@ -8,6 +28,7 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
 
         productRows.forEach((row) => {
             const itemCode = row.querySelector("[name='sku_producto']")?.innerText;
+            const line_num = row.querySelector("#indixe_producto").getAttribute("data-linenum");
             const ItemDescription = row.querySelector("[name='nombre_producto']")?.innerText;
             const quantity = row.querySelector("[name='cantidad']")?.value;
             const discount = row.querySelector("#agg_descuento")?.value;
@@ -22,6 +43,7 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
 
             const line = {
                 ItemCode: itemCode,
+                LineNum: line_num,
                 ItemDescription: ItemDescription,
                 Quantity: parseFloat(quantity),
                 DocEntry_line: docentryLinea,
@@ -55,6 +77,8 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
             body: JSON.stringify({
                 DocumentLine: { value: lines },
                 tipo: tipoDocumento,
+                folio: folio,
+                docEntry: docEntry,
             }),
         })
             .then((response) => response.json())

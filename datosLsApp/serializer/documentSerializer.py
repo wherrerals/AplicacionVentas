@@ -46,6 +46,7 @@ class SerializerDocument:
             'U_LED_TIPVTA': type_sales,
             'U_LED_TIPDOC': doc_data.get('U_LED_TIPDOC'),
             'U_LED_FORENV': doc_data.get('TransportationCode'),
+            'RefDocEntr': doc_data.get('RefDocEntr'),
         }
 
         cabecera = {k: v for k, v in raw_cabecera.items() if v not in (None, '')}
@@ -70,7 +71,10 @@ class SerializerDocument:
 
             nueva_linea = {
                 'ItemCode': item_code,
+                'DocEntryBase': linea.get('DocEntry_line', 0),
+                'LineNum': linea.get('LineNum'),
                 'Quantity': linea.get('Quantity'),
+                'Quantity2': linea.get('Quantity2', 0),
                 #'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
                 'UnitPrice': round(unit_price_neto, 4),
                 'ShipDate': linea.get('ShipDate'),
@@ -215,9 +219,11 @@ class SerializerDocument:
                 "DocNum": doc.get("docNum", "") if doc.get("docNum") != 0 else "",
                 "DocEntry": doc.get("docEntry", "") if doc.get("docEntry") != 0 else "",
                 "DocDate": doc.get("fechaEntrega", ""),
+                "Folio": doc.get("folio", ""),
                 "Cancelled": "N" if doc.get("estado_documento") != "Cancelado" else "Y",
                 "CardCode": doc.get("CardCode", ""),
                 "DocumentStatus": "O" if doc.get("estado_documento") == "Borrador" else "C",
+                "RefDocEntr": doc.get("RefDocEntr", ""),
                 "id": doc.get("id", ""),
                 "CardName": doc.get("nombre_cliente", ""),
                 "TransportationCode": doc.get("TransportationCode", ""),
@@ -248,6 +254,7 @@ class SerializerDocument:
                 "FreeText": linea.get('comentario', ''),
                 "ShippingMethod": "",
                 "ShipDate": linea.get('fecha_entrega', ""),
+                "estate_rr_line": linea.get('estate_rr_line'),
             })
 
         resultado = {

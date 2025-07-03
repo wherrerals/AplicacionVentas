@@ -60,8 +60,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const productRows = document.querySelectorAll('.product-row');
 
         productRows.forEach((row, index) => {
+
+            const docEntryLinea = row.dataset.docentrylinea;
+
             const itemCode = row.querySelector("[name='sku_producto']").innerText;
+            const line_num = row.querySelector("#indixe_producto").getAttribute("data-linenum");
             const quantity = row.querySelector("[name='cantidad']").value;
+            const quantity2 = row.querySelector("[name='cantidad']").getAttribute("data-cantOriginal");
             const discount = row.querySelector("#agg_descuento").value;
             const bodegaSelect = row.querySelector(".bodega-select");
             const comentarios = row.querySelector("#comentarios-1").value;
@@ -73,13 +78,18 @@ document.addEventListener("DOMContentLoaded", function () {
             const cogsCostingCode = warehouseCode;
             const costingCode2 = "AV";
             const cogsCostingCode2 = "AV";
-            const checkbox = row.querySelector(".estado-checkbox");  // Asegúrate que esta clase esté en cada checkbox
-            const checkboxEstado = checkbox && checkbox.checked ? 1 : 0;
+            const checkbox = row.querySelector("#switchCheckDefault");  // Asegúrate que esta clase esté en cada checkbox
+
+            console.log("checkbox:", checkbox);
+            const checkboxEstado = checkbox?.checked ? 1 : 0;
+            console.log("checkboxEstado:", checkboxEstado);
 
             const line = {
-                "LineNum": index,
+                "LineNum": line_num,
                 "ItemCode": itemCode,
+                "DocEntry_line": docEntryLinea,
                 "Quantity": parseFloat(quantity),
+                "Quantity2": parseFloat(quantity2),
                 "UnitePrice": parseFloat(unitPrice),
                 "ShipDate": fechaentrega,
                 "line_price": price_line,

@@ -1,5 +1,5 @@
 class Producto {
-    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, cantidadOriginal,sucursal, comentario, descuentoAplcado) {
+    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, cantidadOriginal,sucursal, comentario, descuentoAplcado, estadoCheck) {
         
         this.docEntry_linea = docEntry_linea;
         this.linea_documento = linea_documento;
@@ -17,6 +17,8 @@ class Producto {
         this.sucursal = sucursal;
         this.comentario = comentario;
         this.descuentoAplcado = descuentoAplcado ?? 0;
+        this.estadoCheck = estadoCheck === 1; // Lo convierte en true o false
+
 
         console.log("Producto creado:", {
             docEntry_linea: this.docEntry_linea,
@@ -32,7 +34,9 @@ class Producto {
             cantidadOriginal: this.cantidadOriginal,
             sucursal: this.sucursal,
             comentario: this.comentario,
-            descuentoAplcado: this.descuentoAplcado
+            descuentoAplcado: this.descuentoAplcado,
+            estadoCheck: this.estadoCheck
+
         });
     }
     
@@ -153,12 +157,12 @@ class Producto {
                 </td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <div>
-                        <input class="form-control format-number" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="${this.descuentoAplcado ?? 0}" onclick="this.select()">
+                        <input class="form-control format-number" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="${this.descuentoAplcado ?? 0}" onclick="this.select()" readonly disabled>
                     </div>
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${formatCurrency(this.precioSinDescuento)}</td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
-                    <input class="form-control format-number" type="number" style="font-size: 12px;width: 80px;"  id="calcular_cantidad" name="cantidad" min="1" max="${this.cantidadOriginal}" value="${this.cantidad}" onclick="this.select()">
+                    <input class="form-control format-number" type="number" style="font-size: 12px;width: 80px;"  id="calcular_cantidad" name="cantidad" min="1" max="${this.cantidadOriginal}" data-cantOriginal="${this.cantidadOriginal}" value="${this.cantidad}" onclick="this.select()">
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
                     <span id="precio_Venta" data-totalProductValue="${this.totalProducto}">${formatCurrency(this.totalProducto)}</span>
@@ -171,7 +175,7 @@ class Producto {
                 <td style="background: transparent;padding-top: 8px;padding-left: 50px;border-style: none;padding-bottom: 0px;">
                     <a class="navbar-brand d-flex align-items-center" href="#" style="width: 18px;">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
+                        <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault" ${this.estadoCheck ? 'checked' : ''}>
                         <label class="form-check-label" for="switchCheckDefault"></label>
                     </div>
                       <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="eliminarp" class="bi bi-trash" style="width: 18px;height: 18px;" hidden>
@@ -263,7 +267,7 @@ class Producto {
 }
 
 // Función global para manejar la adición de productos
-function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, cantidadOriginal, sucursal, comentario, descuentoAplcado) {
+function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, cantidadOriginal, sucursal, comentario, descuentoAplcado, estadoCheck) {
     // Contador de productos
     console.log("cantidad: ", cantidad);
     console.log("sucursal: ", sucursal);
@@ -271,7 +275,7 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
     let contprod = document.querySelectorAll('#productos tbody').length + 1;
 
     // Crear una instancia de Producto
-    let producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, cantidadOriginal, sucursal, comentario, descuentoAplcado);
+    let producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, cantidadOriginal, sucursal, comentario, descuentoAplcado, estadoCheck);
 
     let newRow = producto.crearFila(contprod);
 

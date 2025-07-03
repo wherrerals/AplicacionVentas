@@ -287,7 +287,8 @@ class ReturnsView(View):
                 offset=offset,
                 limite=limit
             )
-
+            print("Documents:", documents)
+            print("Total Records:", total_records)
             return JsonResponse({
                 "data": {
                     "value": documents,
@@ -305,6 +306,8 @@ class ReturnsView(View):
 
         id = request.GET.get('id')
         documents_data = DocumentoRepository.get_document_data_lines(filtro_id=id)
+        print("Documents Data:", documents_data)
         serilized_data = SerializerDocument.serialize_documento_completo(documents_data)
+        print("Serialized Data:", serilized_data)
         
         return JsonResponse(serilized_data, safe=False)

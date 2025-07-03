@@ -10,8 +10,10 @@ from django.contrib.auth.decorators import login_required
 
 # Importing modules
 from adapters.sl_client import APIClient
+from datosLsApp.models.documentodb import DocumentoDB
 from datosLsApp.serializer.invoiceSerializer import InvoiceSerializer
 from logicaVentasApp.context.user_context import UserContext
+from logicaVentasApp.services.documento import Documento
 from logicaVentasApp.services.invoice import Invoice
 from logicaVentasApp.services.socionegocio import SocioNegocio
 from logicaVentasApp.services.usuario import User
@@ -142,4 +144,49 @@ class InvoiceView(View):
 
 
 
-        
+    def duplicate_in_document(self, request):
+        if request.method == "POST":
+            try:
+                data = json.loads(request.body)
+                print("Datos recibidos para duplicar documento:", data)
+
+                tipo_documento = data.get('tipo', 'NA')
+                sales_person_code = User.user_data(request)['vendedor']
+                lineas_procesadas = InvoiceSerializer.serialize_invoice_lines(data, sales_person_code, tipo_documento)
+
+                folio = data.get('folio')
+                dict_entry = data.get('docEntry')
+
+                existe_folio = DocumentoDB.objects.filter(folio=folio).exists()
+
+                if existe_folio:
+                    for linea in lineas_procesadas:
+                        producto_codigo = linea.get('ItemCode')
+                        num_linea = int(linea.get('LineNum'))
+
+                        try:
+                            saldo = Documento.saldo_disponible_linea(
+                                docentry_ref=dict_entry,
+                                producto_codigo=producto_codigo,
+                                numLinea=num_linea
+                            )
+
+                            linea['Quantity'] = saldo
+
+                        except Exception as e:
+                            print(f"No se pudo calcular saldo para {producto_codigo} Linea {num_linea}: {str(e)}")
+                else:
+                    print(f"No existe folio base {folio}. Se usan cantidades originales.")
+
+                print("Líneas procesadas Duplicar Documento:", lineas_procesadas)
+
+                return JsonResponse({
+                    "status": "ok",
+                    "message": "Documento duplicado correctamente",
+                    "lineas": lineas_procesadas
+                })
+
+            except Exception as e:
+                return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
+        return JsonResponse({"error": "Método no permitido"}, status=405)
