@@ -6,7 +6,7 @@ class RertunrRequestSerializer(SerializerDocument):
     @staticmethod
     def document_serializer(doc_data):
         # Llamar a la versión base para mantener toda la lógica existente
-        base_data = SerializerDocument.document_serializer(doc_data)
+        base_data = SerializerDocument.document_serializer2(doc_data)
         
         # Construir el bloque DocumentReferences
         ref_doc_entr = doc_data.get('RefDocEntr', None)
