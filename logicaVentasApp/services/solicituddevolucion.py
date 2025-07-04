@@ -178,8 +178,8 @@ class SolicitudesDevolucion(Documento):
             if 'success' in response:
                 return {
                     'success': True,
-                    'title': 'Devolución Actualizada en SAP',
-                    'message': f'Devolución Actualizada exitosamente. N°: {docnum}',
+                    'title': 'Solicitud de Devolución Actualizada en SAP',
+                    'message': f'Solicitud Devolución Actualizada exitosamente. N°: {docnum}',
                     'docNum': docnum,
                     'docEntry': docentry
                 }
@@ -220,8 +220,8 @@ class SolicitudesDevolucion(Documento):
 
                     return {
                         'success': True,
-                        'title': 'Devolución creada',
-                        'message': f'Devolución creada exitosamente. N°: {doc_num}',
+                        'title': 'Solicitud de Devolución creada',
+                        'message': f'Solicitud de Devolución creada exitosamente. N°: {doc_num}',
                         'docNum': doc_num,
                         'docEntry': doc_entry,
                         'salesPersonCode': salesPersonCode,

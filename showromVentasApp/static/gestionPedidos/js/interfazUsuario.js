@@ -122,38 +122,57 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-function ocultar() {
-  const estado = document.getElementById("estado").textContent.trim();
-  const btn = document.getElementById("copiar-ODV");
-  const btn2 = document.getElementById("botonacciones");
-  const aprobar = document.getElementById("aprobar-1");
-  const numeroOrden = document.getElementById("numero_orden");
+  function ocultar() {
+    const estado = document.getElementById("estado").textContent.trim();
+    const btn = document.getElementById("copiar-ODV");
+    const btn2 = document.getElementById("botonacciones");
+    const aprobar = document.getElementById("aprobar-1");
+    const numeroOrden = document.getElementById("numero_orden");
 
-  console.log(estado);
+    console.log(estado);
 
-  if (estado === "Cerrado" || estado === "Cancelado") {
-    if (btn) btn.style.display = "none";
-    if (btn2) btn2.style.display = "none";
-    console.log("Oculto");
-  } else {
-    if (btn) btn.style.display = "block";
-    if (btn2) btn2.style.display = "block";
-    console.log("Visible");
-  }
-
-  // Verificar que ambos elementos existen antes de operar
-  if (numeroOrden && aprobar) {
-    const numeroOrdenTexto = numeroOrden.textContent.trim();
-
-    if (numeroOrdenTexto !== "") {
-      aprobar.style.display = "none";
-      console.log("Oculto botón Aprobar");
+    if (estado === "Cerrado" || estado === "Cancelado") {
+      if (btn) btn.style.display = "none";
+      if (btn2) btn2.style.display = "none";
+      console.log("Oculto");
     } else {
-      aprobar.style.display = "block";
-      console.log("Mostrar botón Aprobar");
+      if (btn) btn.style.display = "block";
+      if (btn2) btn2.style.display = "block";
+      console.log("Visible");
     }
+
+    // Verificar que ambos elementos existen antes de operar
+    if (numeroOrden && aprobar) {
+      const numeroOrdenTexto = numeroOrden.textContent.trim();
+
+      if (numeroOrdenTexto !== "") {
+        aprobar.style.display = "none";
+        console.log("Oculto botón Aprobar");
+      } else {
+        aprobar.style.display = "block";
+        console.log("Mostrar botón Aprobar");
+      }
+    }
+
+    if (aprobar) {
+      const estadoElemento = document.getElementById("estado");
+      const botonAcciones = document.querySelector(".btn.btn-primary.dropdown-toggle");
+
+      if (estadoElemento && botonAcciones) {
+        const estado = estadoElemento.textContent.trim();
+        const esEstadoInvalido = estado === "Cerrado" || estado === "Cancelado";
+
+        if (esEstadoInvalido) {
+          botonAcciones.style.display = "none";
+          console.log("Botón Acciones oculto porque estado es:", estado);
+        } else {
+          botonAcciones.style.display = "inline-block";
+          console.log("Botón Acciones visible porque estado es:", estado);
+        }
+      }
+    }
+
   }
-}
 
 
   // Verificar el estado inicial
