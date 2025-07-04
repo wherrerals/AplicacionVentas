@@ -54,7 +54,8 @@ class DocumentoRepository:
         business_partner = SocioNegocioDB.objects.get(codigoSN=data['CardCode'])
         document_type = TipoDocTributarioDB.objects.get(codigo=data['U_LED_TIPDOC'])
         seller = VendedorDB.objects.get(codigo=data['SalesPersonCode'])
-        tipo_venta = TipoVentaDB.objects.get(codigo='PROY')  # puedes cambiar esto si luego usas el dato dinámico
+        print(data['U_LED_TIPVTA'])
+        tipo_venta = TipoVentaDB.objects.get(codigo=data['U_LED_TIPVTA'])  # puedes cambiar esto si luego usas el dato dinámico
         tipo_entrega = TipoEntregaDB.objects.get(codigo='1')
         condicion_pago = CondicionPagoDB.objects.get(codigo=data['PaymentGroupCode'])
         tipo_objeto = TipoObjetoSapDB.objects.get(codigo="1")

@@ -175,7 +175,7 @@ class Documento(ABC):
             if errores:
                 return {'error': errores}
             
-            jsonData = SerializerDocument.document_serializer(data)
+            jsonData = SerializerDocument.document_serializer2(data)
             create_rr = DocumentoRepository.create_document_db(jsonData) 
 
             if create_rr:
@@ -207,7 +207,7 @@ class Documento(ABC):
             if errores:
                 return {'error': errores}
             
-            jsonData = SerializerDocument.document_serializer(data)
+            jsonData = SerializerDocument.document_serializer2(data)
             update_rr = DocumentoRepository.update_document_db(id, jsonData)
 
             if update_rr:
