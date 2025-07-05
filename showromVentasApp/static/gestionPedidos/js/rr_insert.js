@@ -39,8 +39,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const ulfen = 1;
         const referencia = document.getElementById("referencia").value; 
         const observaciones = document.getElementById("Observaciones-1").value;
-
-        // Obtener el elemento <select>
         const selectElement = document.getElementById("direcciones_despacho");
         const direccion2 = selectElement.value;
         const selectElement2 = document.getElementById("direcciones_facturacion");
@@ -78,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const cogsCostingCode = warehouseCode;
             const costingCode2 = "AV";
             const cogsCostingCode2 = "AV";
-            const checkbox = row.querySelector("#switchCheckDefault");  // Asegúrate que esta clase esté en cada checkbox
+            const checkbox = row.querySelector("#switchCheckDefault");
 
             console.log("checkbox:", checkbox);
             const checkboxEstado = checkbox?.checked ? 1 : 0;
@@ -131,64 +129,64 @@ document.addEventListener("DOMContentLoaded", function () {
             "DocumentLines": lines
         };
 
-        // Convertir a JSON
         const jsonData = JSON.stringify(documentData);
 
-        // Enviar los datos al backend usando fetch
         fetch('/ventas/crear_devolucion/', {
-            method: 'POST', // Método POST para enviar datos
+            method: 'POST',
             headers: {
-                'Content-Type': 'application/json', // Indica que el cuerpo es JSON
-                'X-CSRFToken': getCSRFToken() // Obtener el token CSRF si es necesario en Django
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
             },
-            body: jsonData // Datos en formato JSON
+            body: jsonData
         })
 
             .then(response => {
                 if (response.ok) {
-                    return response.json(); // Procesar respuesta si es exitosa
+                    return response.json();
                 } else {
                     throw new Error('Error en la creación del documento');
                 }
             })
             .then(data => {
                 console.log('Operación exitosa:', data);
-                // Puedes hacer algo aquí como redirigir al usuario o mostrar un mensaje de éxito
                 if (data.success) {
                     const numeroCotizacion = document.getElementById('numero_orden');
-                    const esActualizacion = numeroCotizacion && numeroCotizacion.getAttribute('data-docentry');
                     const vendedor= document.getElementById("vendedor_data")
 
-                    // Determinar si es creación o actualización
-                    const titulo = esActualizacion ? 'Devolución actualizada' : 'Devolución creada';
-                    const mensaje = esActualizacion
-                        ? `La Devolución fue actualizada exitosamente. N°: ${data.docNum}`
-                        : `Solicitud Creada Pendiente por Aprobar. N°: ${data.id_solicitud}`; // Cambiar el mensaje según sea necesario
-                        //: `La Devolución fue creada exitosamente. N°: ${data.docNum}`;
-                    
                     let existe_documento = data.id_solicitud
-                    // Actualizar el ID del documento si es necesario
                     if (existe_documento && existe_documento !== '') {
 
                         const id_documento = document.getElementById("id_documento");
-                        id_documento.textContent = `Borrador: ${data.id_solicitud}`; // Actualizar el ID del documento
-                        id_documento.setAttribute("data-id", data.id_solicitud); // Actualizar el atributo data-id
+                        id_documento.textContent = `Borrador: ${data.id_solicitud}`; 
+                        id_documento.setAttribute("data-id", data.id_solicitud);
                     }
                     
-                    // Mostrar el mensaje dinámico en el popup
                     Swal.fire({
                         icon: 'success',
                         title: data.title,
                         text: data.message,
                         confirmButtonText: 'Aceptar'
-                    });
+                    })
+                    
+                    .then(() => {
+                        const baseUrl = `/ventas/solicitudes_devolucion/`;
+
+                        if (data.docEntry){
+                            const url = `${baseUrl}?docentry=${data.docEntry}`;
+                            window.location.href = url;
+                        }
+                        else {
+                            const url = `${baseUrl}?id=${data.id_solicitud}`;
+                            window.location.href = url;
+                        }
+                    })
+                    ;
 
                     if (numeroCotizacion) {
                         numeroCotizacion.textContent = `${data.docNum}`;
                         numeroCotizacion.setAttribute('data-docEntry', `${data.docEntry}`);
                     }
 
-                    // actualizar los datos del vendedor 
 
                     const vendedorData = data.salesPersonCode;
 
@@ -198,18 +196,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         const id_documento = document.getElementById("id_documento");
 
-                        id_documento.textContent = ""; // Actualizar el ID del documento
-                        id_documento.setAttribute("data-id", ""); // Actualizar el atributo data-id
+                        id_documento.textContent = "";
+                        id_documento.setAttribute("data-id", "");
 
                     }
-
-                    console.log("Numero de cotizacion:", data.docNum);
-                    console.log("Numero de docEntry:", data.docEntry);
 
                     bloquearCampos();
 
                 } else {
-                    // Mostrar el mensaje de error en un popup
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -223,12 +217,10 @@ document.addEventListener("DOMContentLoaded", function () {
             })
 
             .finally(() => {
-                // Ocultar el overlay en cualquier caso
                 hideLoadingOverlay();
             });
     }
 
-    // Función para obtener el token CSRF (si usas Django)
     function getCSRFToken() {
         return document.querySelector('[name=csrfmiddlewaretoken]').value;
     }

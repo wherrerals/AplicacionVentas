@@ -44,6 +44,7 @@ class SolicitudesDevolucion(Documento):
 
         if data.get('carData'):
             car_data = data.get('carData')
+            car_data = car_data.replace("C", "").replace('c', '').strip()
             
             if car_data.isdigit(): 
                 filters['contains(ReturnRequest/CardCode,'] = f"'{car_data}')"
@@ -51,8 +52,12 @@ class SolicitudesDevolucion(Documento):
                 filters['(contains(ReturnRequest/CardName,'] = f"'{name_mayus}') or contains(ReturnRequest/CardName, '{name_minus}') or contains(ReturnRequest/CardName, '{name_title}'))"
 
         if data.get('salesEmployeeName'):
-            numecode = int(data.get('salesEmployeeName'))
-            filters['contains(SalesPersons/SalesEmployeeCode,'] = f"{numecode})" 
+            value = data.get('salesEmployeeName')
+            
+            if str(value).isdigit():
+                filters['contains(SalesPersons/SalesEmployeeCode,'] = f"{value})" 
+            else:
+                filters['contains(SalesPersons/SalesEmployeeName,'] = f"'{value}')"
         
         if data.get('DocumentStatus'):
             document_status = data.get('DocumentStatus')
@@ -171,9 +176,10 @@ class SolicitudesDevolucion(Documento):
 
         try:
             docentry = int(docentry)
-            jsonData = RertunrRequestSerializer.document_serializer(data)
-            print("JSON Data:", jsonData)  # Debugging line to check the JSON data
-            response = self.client.actualizarDevolucionesSL(docentry, jsonData)
+            jsonData = RertunrRequestSerializer.document_serializer2(data)
+            json_lineas_ok = self.elimnar_lineas_no_check(jsonData)
+
+            response = self.client.actualizarDevolucionesSL(docentry, json_lineas_ok)
 
             if 'success' in response:
                 return {
@@ -197,6 +203,18 @@ class SolicitudesDevolucion(Documento):
                 errores.append("Debe marcar al menos un producto para la devolucion.")
         return ' '.join(errores)
 
+
+    def elimnar_lineas_no_check(self, data):
+
+        lineas_filtradas = [
+            linea for linea in data.get('DocumentLines', [])
+            if linea.get('EstadoCheck') != 0
+        ]
+
+        data['DocumentLines'] = lineas_filtradas
+
+        return data
+
     def crearDocumento(self, data):
 
         try:
@@ -204,14 +222,11 @@ class SolicitudesDevolucion(Documento):
             if errores:
                 return {'error': errores}
 
-            jsonData = RertunrRequestSerializer.document_serializer(data)
-
-            print("JSON Data:", jsonData)  # Debugging line to check the JSON data
-            response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
+            jsonData = RertunrRequestSerializer.document_serializer2(data)
+            json_lineas_ok = self.elimnar_lineas_no_check(jsonData)
+            response = self.client.crearCotizacionSL(self.get_endpoint(), json_lineas_ok)
             
-            # Verificar si response es un diccionario
             if isinstance(response, dict):
-                # Si contiene DocEntry, es un éxito
                 if 'DocEntry' in response:
                     doc_num = response.get('DocNum')
                     doc_entry = response.get('DocEntry')
@@ -238,21 +253,19 @@ class SolicitudesDevolucion(Documento):
                 return {'error': 'La respuesta de la API no es válida.'}
         
         except Exception as e:
-            logger.error(f"Error al crear la cotización: {str(e)}")
+            logger.error(f"{str(e)}")
             return {'error': str(e)}
 
     def validarDatosCotizacion(self, data):
 
         errores = []
 
-        # Verificar que el cardcode esté presente
         if not data.get('CardCode'):
             errores.append("No se a ingresado cliente para la Cotizacion.")
 
         if not data.get('DocumentLines'):
             errores.append("La cotización debe tener al menos una línea de documento.")
 
-        # Verificar que la cantidad sea válida (mayor que cero)
         for item in data.get('DocumentLines', []):
             cantidad = item.get('Quantity', 0)
             if cantidad <= 0:

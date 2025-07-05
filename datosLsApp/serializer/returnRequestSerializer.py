@@ -4,7 +4,7 @@ from datosLsApp.serializer.documentSerializer import SerializerDocument
 class RertunrRequestSerializer(SerializerDocument):
 
     @staticmethod
-    def document_serializer(doc_data):
+    def document_serializer2(doc_data):
         # Llamar a la versión base para mantener toda la lógica existente
         base_data = SerializerDocument.document_serializer2(doc_data)
         

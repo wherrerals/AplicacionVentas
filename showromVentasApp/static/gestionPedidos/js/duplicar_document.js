@@ -5,29 +5,37 @@ document.addEventListener("DOMContentLoaded", function () {
   const cardCode = sessionStorage.getItem("cardCode");
   const tipoDocumento = sessionStorage.getItem("tipoDocumento");
   const folio_cotizacion = sessionStorage.getItem("folio");
+  const name_vendedor = sessionStorage.getItem("nombreVendedor");
+  const code_vendedor = sessionStorage.getItem("codigoVendedor");
+  const sucursal = sessionStorage.getItem("sucursal");
 
   if (tipoDocumento == 'Solicitud') {
 
     console.log("Tipo de documento desde sessionStorage:", tipoDocumento);
     console.log("Card Code desde sessionStorage:", cardCode);
     traerInformacionCliente(cardCode);
-
-    // agregar folio en el input folio_cotizacion
-
     const folioInput = document.getElementById("folio_referencia");
     const docentry_in_folio = sessionStorage.getItem("docentry_in_folio");
-
     if (folioInput && folio_cotizacion) {
       folioInput.value = folio_cotizacion;
       folioInput.setAttribute("data-refdocentr", docentry_in_folio); // Agregar el atributo data-docentry
     }
 
+    const vendedor_element = document.getElementById("vendedor_data");
+    const sucursalElement = document.getElementById("sucursal");
 
-    // ✅ Eliminar después de usar  
+    if (vendedor_element) {
+        vendedor_element.textContent = name_vendedor;
+        vendedor_element.setAttribute("data-codeven", code_vendedor);
+        sucursalElement.textContent = sucursal;
+    }
+
     sessionStorage.removeItem("cardCode");
     sessionStorage.removeItem("folio");
-    // folio in sessionStorage
     sessionStorage.removeItem("docentry_in_folio");
+    sessionStorage.removeItem("nombreVendedor");
+    sessionStorage.removeItem("codigoVendedor");
+    sessionStorage.removeItem("sucursal");
   }
 
 

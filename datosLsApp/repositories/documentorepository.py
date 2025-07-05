@@ -11,6 +11,7 @@ from datosLsApp.models import UsuarioDB
 from datosLsApp.models.vendedordb import VendedorDB
 from django.db import connection, transaction
 from datetime import datetime
+from django.db.models import Q
 from django.db.models import Subquery
 
 
@@ -91,14 +92,14 @@ class DocumentoRepository:
             item_code = ProductoDB.objects.get(codigo=linea['ItemCode'])
 
             # Condición para cantidad
-            cantidad = 0 if linea['EstadoCheck'] == 0 else linea['Quantity']
+            #cantidad = 0 if linea['EstadoCheck'] == 0 else linea['Quantity']
 
             LineaDB.objects.create(
                 documento=document,  # ¡Aquí se establece la relación!
                 producto=item_code,
                 numLinea=linea_num,
                 descuento=linea['DiscountPercent'],
-                cantidad=cantidad, # Asignar cantidad solicitada
+                cantidad=linea['Quantity'], # Asignar cantidad solicitada
                 cantidad_solicitada=linea['Quantity2'],  
                 precioUnitario=linea['UnitPrice'],
                 totalBrutoLinea=item_code.precioVenta * linea['Quantity'],
@@ -226,7 +227,10 @@ class DocumentoRepository:
         if filtro_id:
             queryset = queryset.filter(id=filtro_id)
         if filtro_nombre:
-            queryset = queryset.filter(referencia__icontains=filtro_nombre)
+            queryset = queryset.filter(
+                Q(socio_negocio__nombre__icontains=filtro_nombre) |
+                Q(socio_negocio__codigoSN__icontains=filtro_nombre)
+            )
         if filtro_sucursal:
             queryset = queryset.filter(vendedor__in=Subquery(vendedores_en_sucursal))
         if filtro_estado:
@@ -250,7 +254,11 @@ class DocumentoRepository:
         if filtro_id:
             queryset = queryset.filter(id=filtro_id)
         if filtro_nombre:
-            queryset = queryset.filter(referencia__icontains=filtro_nombre)
+            queryset = queryset.filter(
+                Q(socio_negocio__nombre__icontains=filtro_nombre) |
+                Q(socio_negocio__codigoSN__icontains=filtro_nombre)
+            )
+            
         if filtro_sucursal:
             vendedores_en_sucursal = UsuarioDB.objects.filter(
                 sucursal=filtro_sucursal
