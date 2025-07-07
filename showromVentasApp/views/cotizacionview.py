@@ -115,6 +115,8 @@ class CotizacionView(View):
         # Construir filtros usando la lógica de negocio
         filters = Cotizacion.construirFiltrosCotizaciones(data)
 
+        print("Filters:", filters)
+
         # Validar los parámetros de paginación
         try:
             top = int(data.get('top', 20))

@@ -1,11 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Función para obtener parámetros de la URL
     function getQueryParam(param) {
       const urlParams = new URLSearchParams(window.location.search);
       return urlParams.get(param);
     }
   
-    // Manejo de docEntry
     const docEntry = getQueryParam('docentry');
     if (docEntry) {
       const vendedorDataElement = document.querySelector("#vendedor_data");
@@ -28,11 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(data => {
           if (data.Cliente && data.Cliente.SalesPersons) {
-            console.log("Datos de la cotización:", data);
   
-            // Extracción de datos principales
             const salesEmployeeName = data.Cliente.SalesPersons.SalesEmployeeName;
-            const folio = data.Cliente.SalesPersons.U_VK_Folio;
+            const folio = data.Cliente.ReturnRequest.U_VK_Folio;
             const salesPersonCode = data.Cliente.SalesPersons.SalesEmployeeCode;
             const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
             const numCotizacion = data.Cliente.ReturnRequest.DocNum;
@@ -41,25 +37,16 @@ document.addEventListener("DOMContentLoaded", function () {
             let cardCode = data.Cliente.ReturnRequest.CardCode;
             const DocumentStatus = data.Cliente.ReturnRequest.DocumentStatus;
             const docEntry = data.Cliente.ReturnRequest.DocEntry;
-            const razonSocial = data.Cliente.ReturnRequest.CardName;
             const tipo_devolucion = data.Cliente.ReturnRequest.U_LED_TIPDEV;
             const tipoFactura = data.Cliente.ReturnRequest.U_LED_TIPDOC;
             const referencia = data.Cliente.ReturnRequest.NumAtCard;
             const comentarios = data.Cliente.ReturnRequest.Comments;
-            
-  
-            const contactos = data.Cliente.ContactEmployee.Contactos;
-  
+
             const folio_element = document.getElementById("folio_referencia");
 
             if (folio_element) {
               folio_element.value = folio;
             }
-
-            console.log("Tipo de comentarios: ", referencia);
-            console.log("Tipo de comentarios: ", comentarios);
-            console.log("Tipo de tipo_devolucion: ", tipo_devolucion);
-            
             
             if (cardCode.endsWith("C") || cardCode.endsWith("c")) {
               cardCode = cardCode.slice(0, -1);
@@ -73,15 +60,11 @@ document.addEventListener("DOMContentLoaded", function () {
               vendedorDataElement.setAttribute("data-codeven", salesPersonCode);
             }
   
-            
-  
             const showroomElement = document.getElementById("sucursal");
             if (showroomElement) {
               showroomElement.innerText = sucursal;
             }
-  
-            //capturando referencia
-  
+    
             if (referencia) {
               const referenciaInput = document.getElementById("referencia");
               if (referenciaInput) {
@@ -90,9 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.warn("No se encontró el elemento con id 'referencia'.");
               }
             }
-  
-            // Capturando comentarios
-  
+    
             if (comentarios) {
               const comentariotxt = document.getElementById("Observaciones-1");
               if (comentariotxt) {
@@ -102,21 +83,15 @@ document.addEventListener("DOMContentLoaded", function () {
               }
             }
   
-            // Capturar el elemento del select
             const tipo_devolucionSelect = document.getElementById("tipoEntrega-1");
-  
-            // Verificar si el elemento existe
             if (tipo_devolucionSelect) {
-              // Ajustar el valor del select al tipo de entrega obtenido
               tipo_devolucionSelect.value = tipo_devolucion;
             }
   
             const tipoDocRadios = document.getElementsByName("tipoDocTributario");
-  
-            // Iterar sobre los radios para seleccionar el correspondiente
             tipoDocRadios.forEach(radio => {
               if (radio.value === tipoFactura) {
-                radio.checked = true; // Seleccionar el radio cuyo valor coincide con tipoFactura
+                radio.checked = true;
               }
             });
   
@@ -144,17 +119,13 @@ document.addEventListener("DOMContentLoaded", function () {
               } else if (canceled === "Y" && DocumentStatus === "C") {
                 estadoElement.textContent = "Cancelado";
               } else {
-                estadoElement.textContent = "Estado desconocido"; // Para casos no previstos
+                estadoElement.textContent = "Estado desconocido";
               }
             }
   
             traerInformacionCliente(cardCode);
-  
-            // Iteración sobre `DocumentLines` para añadir cada producto
             const documentLines = data.DocumentLines;
-
             documentLines.sort((a, b) => a.LineNum - b.LineNum);
-
 
             documentLines.forEach((line) => {
 
@@ -189,8 +160,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 sucursal,
                 comentario
               });
-                              //docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado
-              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, line.cantidadOriginal, sucursal, comentario, precioDescuento, checked=1);
+              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, line.Quantity, sucursal, comentario, precioDescuento, checked=1);
             });
           }
   
@@ -210,7 +180,6 @@ document.addEventListener("DOMContentLoaded", function () {
       hideLoadingOverlay();
     }
   
-    // Manejo de rutSN
     const rutCliente = getQueryParam("rutSN");
     const nombreCliente = getQueryParam("nombreSN");
     let grupoSN = getQueryParam("grupoSN");
@@ -222,27 +191,16 @@ document.addEventListener("DOMContentLoaded", function () {
   
   
     if (rutCliente) {
-      //console.log("RUT recibido en la página de destino:", rutCliente);
-      //console.log("Nombre recibido en la página de destino:", nombreCliente);
-      //console.log("Apellido recibido en la página de destino:", apellidoCliente);
-      //console.log("Grupo recibido en la página de destino:", grupoSN);
-      //console.log("Giro recibido en la página de destino:", giroCliente);
-      //console.log("Teléfono recibido en la página de destino:", telefonoCliente);
-      //console.log("Email recibido en la página de destino:", emailCliente);
-      traerInformacionCliente(rutCliente); // Llama a la función con el RUT
+      traerInformacionCliente(rutCliente);
   
-      // Selecciona el radio correspondiente basado en `grupoSN`.
       const radioInput = document.querySelector(`input[name="grupoSN"][value="${grupoSN}"]`);
       if (radioInput) {
         radioInput.checked = true;
-        console.log("Grupo seleccionado:", grupoSN);
-        // Ejecuta la función cambiarLabel con la opción seleccionada.
         cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow');
       } else {
         console.warn("No se encontró el input con el valor:", grupoSN);
       }
   
-      // Agregar evento onchange para que funcione dinámicamente al cambiar la selección.
       document.getElementsByName('grupoSN').forEach(radio => {
         radio.addEventListener('change', () => {
           cambiarLabel('grupoSN', 'nombreLabel', 'apellidoSN', 'apellidorow');

@@ -14,11 +14,11 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
             console.error("No se encontró el elemento con id 'numero_cotizacion'. Asegúrate de que exista en el DOM.");
         }
 
-        if (folio_element){
+        if (folio_element) {
             folio = folio_element.textContent.trim(); // Obtener el texto del elemento y eliminar espacios
 
             console.log("Folio obtenido:", folio);
-        }else{
+        } else {
             console.error("No se encontró el elemento con id 'folio_cotizacion'. Asegúrate de que exista en el DOM.");
         }
 
@@ -96,20 +96,28 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
                     } else if (tipoDocumento === "Solicitud") {
                         const clienteElement = document.getElementById("inputCliente");
                         const fullText = clienteElement?.innerText || "";
-                        const cardCode = fullText.split("C")[0].trim();  // Esto captura "76820314C"
-                        
+                        const cardCode = fullText.split("C")[0].trim();
                         const folio_element = document.getElementById("folio_cotizacion");
                         const folio = folio_element ? folio_element.textContent.trim() : "";
-
-                        // obtener tambien el data-docentry 
-
                         const docentry_in_folio = document.getElementById("numero_cotizacion").getAttribute("data-docentry");
+                        const vendedorElement = document.getElementById("vendedor_data");
+                        const sucursalElement = document.getElementById("sucursal");
+
+                        if (vendedorElement) {
+                            const codigoVendedor = vendedorElement.getAttribute("data-codeven");
+                            const nombreVendedor = vendedorElement.textContent.trim();
+                            const sucursal = sucursalElement.textContent.trim()
+
+                            sessionStorage.setItem("sucursal", sucursal);
+                            sessionStorage.setItem("codigoVendedor", codigoVendedor);
+                            sessionStorage.setItem("nombreVendedor", nombreVendedor);
+                        }
+                        
                         sessionStorage.setItem("docentry_in_folio", docentry_in_folio);
-                        // Puedes guardar solo esto si no necesitas más
                         sessionStorage.setItem("cardCode", cardCode);
                         sessionStorage.setItem("folio", folio);
 
-                        // Redirigir a la siguiente vista
+
                         window.location.href = `/ventas/solicitudes_devolucion/`;
                     }
                 } else {

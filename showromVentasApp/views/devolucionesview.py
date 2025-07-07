@@ -97,61 +97,19 @@ class ReturnsView(View):
     @csrf_exempt
     def get_endpoint(self):
         return 'ReturnRequest'
-    """
+    
     @csrf_exempt
     def filtrarCotizaciones(self, request):
         client = APIClient()
-        user_data = self.user_data(request)
-        sucursal = user_data.get('sucursal', None)
-        print("Sucursal:", sucursal)
-
-
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError as e:
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
 
-        # Construir filtros usando la lógica de negocio
         filters = SolicitudesDevolucion.construirSolicitudesDevolucion(data)
 
-        # Validar los parámetros de paginación
-        try:
-            top = int(data.get('top', 20))
-            skip = int(data.get('skip', 0))
-        except ValueError:
-            return JsonResponse({'error': 'Invalid parameters'}, status=400)
+        print("Filters:", filters)
 
-        # Manejar la solicitud de datos
-        try:
-            data = client.getData(endpoint=self.get_endpoint(), top=top, skip=skip, filters=filters)
-            print("Data from API:", data)
-            sales_employee_name = data['value'][0]['SalesPersons']['SalesEmployeeName']
-            sucursal_2 = sales_employee_name.split('-')[0].strip() if sales_employee_name else None
-            print("Sucursal from Sales Employee Name:", sucursal_2)
-
-            return JsonResponse({'data': data}, safe=False)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-    """
-
-    @csrf_exempt
-    def filtrarCotizaciones(self, request):
-        """
-        Maneja la solicitud para filtrar cotizaciones, delegando la lógica de construcción de filtros a una función separada.
-        """        
-        client = APIClient()
-        user_data = self.user_data(request)
-        sucursal_usuario = user_data.get('sucursal', None)
-
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError as e:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-
-        # Construir filtros usando la lógica de negocio
-        filters = SolicitudesDevolucion.construirSolicitudesDevolucion(data)
-
-        # Validar los parámetros de paginación
         try:
             top = int(data.get('top', 20))
             skip = int(data.get('skip', 0))
@@ -160,45 +118,16 @@ class ReturnsView(View):
 
         try:
             data = client.getData(endpoint=self.get_endpoint(), top=top, skip=skip, filters=filters)
-            print("Data from API:", data)
-
-            if data['value']:
-                sales_employee_name = data['value'][0].get('SalesPersons', {}).get('SalesEmployeeName')
-                sucursal_vendedor = sales_employee_name.split('-')[0].strip() if sales_employee_name else None
-            else:
-                sucursal_vendedor = None
-
-            print("Sucursal vendedor:", sucursal_vendedor)
-
-            sucursal_filtro = sucursal_vendedor or sucursal_usuario
-
-            data_filtrada = []
-            for item in data['value']:
-                sales_employee_name_item = item.get('SalesPersons', {}).get('SalesEmployeeName')
-                sucursal_item = sales_employee_name_item.split('-')[0].strip() if sales_employee_name_item else None
-
-                if sucursal_item == sucursal_filtro:
-                    data_filtrada.append(item)
-
-            print(f"Total registros filtrados: {len(data_filtrada)}")
-
-            # SUSTITUYES SOLO EL 'value' del dict original:
-            data['value'] = data_filtrada
-
             return JsonResponse({'data': data}, safe=False)
-
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
-
-
     
     @csrf_exempt
     def detallesDevolucion(self, request):
-        # Obtener el parámetro 'docentry' de la solicitud
-        docentry = request.GET.get('docentry')
-        client = APIClient()
 
-        # Llamar al método para obtener los detalles del cliente
+        docentry = request.GET.get('docentry')
+
+        client = APIClient()
         documentClient = client.detallesRR(docentry)
 
         if documentClient.get("odata.metadata") == "$metadata#Collection(Edm.ComplexType)" and not documentClient.get("value"):
@@ -206,29 +135,27 @@ class ReturnsView(View):
 
         documentLine = client.detallesRRlineas(docentry)
 
-        # Extraer los datos de la clave 'value', asegurándose de manejar la estructura correctamente
         quotations_data = documentClient.get('value', [{}])[0].get('ReturnRequest', {})
+
+        print("Quotations Data:", quotations_data)
+
         cardCode = quotations_data.get('CardCode')
         rut = quotations_data.get('FederalTaxID')
 
         sn = SocioNegocio(request)
-        
-        # Preparar la estructura de datos para enviar como respuesta
+        rr = SolicitudesDevolucion()
+
         data = {
             "Client": documentClient,
             "DocumentLine": documentLine
         }
 
-        # Verificar si el socio de negocio ya existe en la base de datos
         if sn.verificarSocioDB(cardCode):
-            rr = SolicitudesDevolucion()
             lines_data = rr.formatearDatos(data)
 
             return JsonResponse(lines_data, safe=False)
         else:
-            # Crear el cliente en caso de que no exista y responder
             sn.crearYresponderCliente(cardCode, rut)
-            rr = SolicitudesDevolucion()
             lines_data = rr.formatearDatos(data)
             return JsonResponse(lines_data, safe=False)
 
@@ -237,74 +164,41 @@ class ReturnsView(View):
     def crearOActualizarDevoluciones(self, request):
         try:
             data = json.loads(request.body)
-            users_data = self.user_data(request)
-            docEntry = data.get('DocEntry')
-            docnum = data.get('DocNum')
-            id_docu = data.get('id_documento')
+            docEntry = data.get('DocEntry', '')
+            docnum = data.get('DocNum', '')
+            id_docu = data.get('id_documento', '')
             aprobacion = data.get('Approve')
-            document_db = DocumentoRepository()
 
             doc = Documento()
-            rr = SolicitudesDevolucion()
-            
-            print("docEntry:", docEntry)
-
-            if docEntry != '':
-                aprobacion = 1
+            document_db = DocumentoRepository()
 
             if aprobacion != 1:
-                if id_docu != '':
-                    update_db = doc.update_document_db(id_docu, data)
-                    return JsonResponse(update_db, status=200)
-                
+                if id_docu:
+                    result = doc.update_document_db(id_docu, data)
+                    return JsonResponse(result, status=200)
                 else:
-                    create_db = doc.create_document_db(data)
-                    return JsonResponse(create_db, status=201)
-                
+                    result = doc.create_document_db(data)
+                    return JsonResponse(result, status=201)
+
+            if docEntry:
+                    repo = SolicitudesDevolucion()
+                    result = repo.actualizarDocumento(docnum, docEntry, data)
+                    if result.get('success'):
+                        document_db.update_document_status(id_docu, result.get('docNum'), result.get('docEntry'), 'Aprobado')
+                    return JsonResponse(result, status=200)
             else:
-                if docEntry != '':
-                    print("Actualizando documento existente con DocEntry:", docEntry)
-                    if self.validar_vendedor(users_data['vendedor'], data['SalesPersonCode']) == True:
-                        
-                        actualizacion = rr.actualizarDocumento(docnum, docEntry, data)
-                        
-                        print("Actualización de documento:", actualizacion)
-
-                        if id_docu != '':
-                            if actualizacion.get('success') == True:
-                                docEntry = actualizacion.get('docNum')
-                                docnum = actualizacion.get('docEntry')
-                                document_db.update_document_status(id_docu, docEntry, docnum, 'Aprobado')
-
-                        print("Actualización exitosa:", actualizacion)
-
-                        return JsonResponse(actualizacion, status=200)
-            
-                    else:
-                        data['SalesPersonCode'] = users_data['vendedor']
-                        creacion = rr.crearDocumento(data)
-                        print("Creación de documento:", creacion)
-                        if id_docu != '':
-                            if creacion.get('success') == True:
-                                docEntry = creacion.get('docNum')
-                                docnum = creacion.get('docEntry')
-                                document_db.update_document_status(id_docu, docEntry, docnum, 'Aprobado')
-                        return JsonResponse(creacion, status=201)
-                else:
-                    creacion = rr.crearDocumento(data)
-                    print("Creación de documento:", creacion)
-                    if id_docu != '':
-                        if creacion.get('success') == True:
-                            docEntry = creacion.get('docNum')
-                            docnum = creacion.get('docEntry')
-                            document_db.update_document_status(id_docu, docEntry, docnum, 'Aprobado')
-
-                    return JsonResponse(creacion, status=201)
+                repo = SolicitudesDevolucion()
+                result = repo.crearDocumento(data)
+                if result.get('success'):
+                    document_db.update_document_status(id_docu, result.get('docNum'), result.get('docEntry'), 'Aprobado')
+                return JsonResponse(result, status=201)
 
         except json.JSONDecodeError:
             return JsonResponse({'error': 'JSON inválido'}, status=400)
+
         except Exception as e:
             return JsonResponse({'error': f'Error inesperado: {str(e)}'}, status=500)
+
         
     def user_data(self, request):
         user = request.user

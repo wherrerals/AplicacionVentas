@@ -167,7 +167,7 @@ class Documento(ABC):
         return ""
 
     def create_document_db(self, data):
-        print("Creating document in database with data:", data)
+
         try:
             errores = self.validar_datos_de_documentos(data)
             errores += self.validar_check(data)
@@ -175,7 +175,7 @@ class Documento(ABC):
             if errores:
                 return {'error': errores}
             
-            jsonData = SerializerDocument.document_serializer(data)
+            jsonData = SerializerDocument.document_serializer2(data)
             create_rr = DocumentoRepository.create_document_db(jsonData) 
 
             if create_rr:
@@ -207,7 +207,7 @@ class Documento(ABC):
             if errores:
                 return {'error': errores}
             
-            jsonData = SerializerDocument.document_serializer(data)
+            jsonData = SerializerDocument.document_serializer2(data)
             update_rr = DocumentoRepository.update_document_db(id, jsonData)
 
             if update_rr:
@@ -269,22 +269,17 @@ class Documento(ABC):
         lineas = LineaDB.objects.filter(
             docEntryBase=docentry_ref,
             producto__codigo=producto_codigo,
-            numLineaBase=numLinea
+            numLineaBase=numLinea,
+            estado_devolucion=1
         )
 
         if not lineas.exists():
             raise Exception("No hay líneas asociadas a estos criterios.")
 
         cantidad_original = lineas.values_list('cantidad_solicitada', flat=True).first()
-
-        print(f"Cantidad original para {producto_codigo} en línea {numLinea}: {cantidad_original}")
         total_devuelto = lineas.aggregate(total=Sum('cantidad'))['total'] or 0
-
-        print(f"Total devuelto para {producto_codigo} en línea {numLinea}: {total_devuelto}")
-
         saldo = cantidad_original - total_devuelto
 
-        print(f"Saldo disponible para {producto_codigo} en línea {numLinea}: {saldo}")
         return saldo
 
 

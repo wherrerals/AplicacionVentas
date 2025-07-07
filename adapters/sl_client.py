@@ -80,24 +80,6 @@ class APIClient:
             self.__autehnticated = False
 
     def getData(self, endpoint="", top=20, skip=0, filters=None):
-        """
-        Recupera una lista de datos desde un endpoint específico con filtros opcionales, paginación y expansión.
-
-        Parámetros:
-            endpoint : str, opcional
-                El endpoint desde donde recuperar los datos (por defecto es '').
-            top : int, opcional
-                El número máximo de registros a recuperar (por defecto es 0, lo que recupera todos los registros).
-            skip : int, opcional
-                El número de registros a omitir desde el inicio del conjunto de resultados (por defecto es 0).
-            filters : dict, opcional
-                Un diccionario de pares clave-valor para filtrar los resultados según condiciones específicas.
-
-        Returns:
-
-            dict
-                Un diccionario con la respuesta de la API en formato JSON.
-        """
 
         self.__login()
         crossjoin = f"{endpoint},SalesPersons"
@@ -115,6 +97,8 @@ class APIClient:
 
         query_url = f"$crossjoin({crossjoin})?$expand={expand}&$orderby={order_by}&$filter={filter_condition}&$top={top}&$skip={skip}"
         url = f"{self.base_url}{query_url}"
+
+        print(f"URL Obtener Lista de {endpoint}: {url}")
 
         response = self.session.get(url, headers=headers, verify=False)
         response.raise_for_status()
@@ -220,6 +204,15 @@ class APIClient:
             response = self.session.post(url, json=data, headers=headers, verify=False)
             response.raise_for_status()
             return response.json()
+
+        except requests.exceptions.HTTPError as http_err:
+            try:
+                error_message = response.json().get("error", "Error desconocido")
+                return {"error": f"{error_message['message']['value']}"}
+            except ValueError:  # Si la respuesta no es JSON
+                error_message = response.text or "Error desconocido"
+                error_value = error_message.get("message").get("value", "Error desconocido")  
+            return {"error": f"{error_value}"}
 
         except requests.exceptions.RequestException as e:
             print(f"Error en la solicitud a la API: {e}")
