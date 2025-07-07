@@ -168,7 +168,7 @@ class SolicitudesDevolucion(Documento):
             "Cliente": cliente,
             "DocumentLines": document_lines
         }
-
+        
         return resultado
 
     def actualizarDocumento(self, docnum, docentry, data):

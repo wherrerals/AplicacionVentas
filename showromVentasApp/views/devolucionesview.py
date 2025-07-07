@@ -138,6 +138,7 @@ class ReturnsView(View):
         quotations_data = documentClient.get('value', [{}])[0].get('ReturnRequest', {})
 
         print("Quotations Data:", quotations_data)
+        print("Document Line:", documentLine)
 
         cardCode = quotations_data.get('CardCode')
         rut = quotations_data.get('FederalTaxID')

@@ -100,6 +100,7 @@ class Producto {
         newRow.setAttribute('id', contprod);
         newRow.setAttribute('data-docentryLinea', this.docEntry_linea);
         newRow.setAttribute('data-itemcode', this.productoCodigo);
+        newRow.setAttribute('data-indice', contprod); // Muy importante
 
         // Verificar si el valor de docEntry_linea es "null"
         if (this.docEntry_linea === "null") {
@@ -141,7 +142,7 @@ class Producto {
                         <input class="form-control format-number" type="number" id="precio_venta2" style="font-size: 12px;width: 100px;" data-precioUnitario="${this.precioVenta}" min="1" max="999999999" value="${this.precioVenta}" readonly disabled>
                     </div>
                     <div style="font-size: 11px;">
-                        <small class="numeric-value" style="color: rgb(153,153,153);" name="precio_lista">${formatCurrency(this.precioLista)}</small>
+                        <small class="numeric-value" style="color: rgb(153,153,153);" name="precio_lista" hidden>${formatCurrency(this.precioLista)}</small>
                     </div>
 
                     <div class="row" style="font-size: 11px;">
@@ -175,7 +176,7 @@ class Producto {
                 <td style="background: transparent;padding-top: 8px;padding-left: 50px;border-style: none;padding-bottom: 0px;">
                     <a class="navbar-brand d-flex align-items-center" href="#" style="width: 18px;">
                     <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault" ${this.estadoCheck ? 'checked' : ''}>
+                        <input class="form-check-input switch-producto" type="checkbox" role="switch" id="switchCheckDefault" ${this.estadoCheck ? 'checked' : ''}>
                         <label class="form-check-label" for="switchCheckDefault"></label>
                     </div>
                       <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="eliminarp" class="bi bi-trash" style="width: 18px;height: 18px;" hidden>

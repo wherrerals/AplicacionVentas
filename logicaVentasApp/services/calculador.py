@@ -110,6 +110,38 @@ class CalculadoraTotales:
             total += float(line_price_clean)
         
         return total
+    
+    @staticmethod
+    def calculate_docTotal_rr(doc_data):
+        """
+        Calcula el total del documento a partir de los datos del documento.
+        Suma solo líneas con EstadoCheck = 1.
+        """
+        total = 0
+
+        for linea in doc_data.get('DocumentLines', []):
+            if linea.get('EstadoCheck') == 1:
+                line_price = linea.get('line_price', 0)
+                
+                if isinstance(line_price, str):
+                    # Limpia símbolo $, espacios y puntos de miles
+                    line_price_clean = (
+                        line_price.replace("$", "")
+                        .replace(" ", "")
+                        .replace(".", "")
+                        .replace(",", ".")  # Opcional, si manejas decimales con coma
+                    )
+                else:
+                    line_price_clean = line_price
+
+                try:
+                    total += float(line_price_clean)
+                except (ValueError, TypeError):
+                    # Ignora líneas con valores no numéricos
+                    continue
+        
+        return total
+
 
 
 

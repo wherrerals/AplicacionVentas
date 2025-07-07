@@ -28,7 +28,7 @@ const productos = [];
 function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
     var inputCantidad = newRow.querySelector('#calcular_cantidad');
     var inputDescuento = newRow.querySelector('#agg_descuento');
-    var inputPrecioVenta = newRow.querySelector('#precio_venta2'); 
+    var inputPrecioVenta = newRow.querySelector('#precio_venta2');
     var tdPrecioVenta = newRow.querySelector('#precio_Venta');
     var tdPrecioDescuento = newRow.querySelector('#Precio_Descuento');
 
@@ -40,6 +40,14 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
     productos.push(producto);
 
     console.log('Producto agregado:', producto);
+
+    const switchCheckbox = newRow.querySelector('.switch-producto');
+    if (switchCheckbox) {
+        switchCheckbox.addEventListener('change', () => {
+            actualizarValores();
+            console.log(`Switch cambiado para el producto: ${codigoProducto}, Índice: ${indiceProducto}`);
+        });
+    }
 
     inputCantidad.addEventListener('input', calcularPrecioTotal);
     inputDescuento.addEventListener('input', calcularPrecioTotal);
@@ -54,7 +62,7 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
 
     function calcularPrecioTotal() {
         var cantidad = parseFloat(inputCantidad.value) || 0;
-        var precioUnitario = parseFloat(inputPrecioVenta.value) || 0; 
+        var precioUnitario = parseFloat(inputPrecioVenta.value) || 0;
         var descuento = parseFloat(inputDescuento.value) || 0;
 
         var precioTotal = cantidad * precioUnitario;
@@ -76,23 +84,23 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
 
     document.addEventListener('productoEliminado', function (event) {
         const { codigoProducto, indiceProducto } = event.detail;
-    
+
         console.log(`Producto eliminado: ${codigoProducto}, Índice: ${indiceProducto}`);
-    
+
         // Eliminar solo el producto con el índice específico
-        const index = productos.findIndex(producto => 
+        const index = productos.findIndex(producto =>
             producto.codigoProducto === codigoProducto && producto.indiceProducto == indiceProducto
         );
-    
+
         if (index > -1) {
             productos.splice(index, 1);
         }
 
-    
+
         // Actualizar los valores totales
         actualizarValores();
     });
-    
+
 
     function actualizarValores() {
         let totalIva = 0;
@@ -100,10 +108,19 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
         let totalNeto = 0;
 
         productos.forEach(producto => {
-            const valores = producto.calcularValores();
-            totalIva += valores.iva;
-            totalBruto += valores.bruto;
-            totalNeto += valores.neto;
+            // Buscar la fila del producto usando el índice
+            const filaProducto = document.querySelector(`.product-row[data-indice="${producto.indiceProducto}"]`);
+
+            // Verifica si la fila existe y si el switch está activado
+            if (filaProducto) {
+                const checkbox = filaProducto.querySelector('.switch-producto');
+                if (checkbox && checkbox.checked) {
+                    const valores = producto.calcularValores();
+                    totalIva += valores.iva;
+                    totalBruto += valores.bruto;
+                    totalNeto += valores.neto;
+                }
+            }
         });
 
         document.querySelector('#total_neto').setAttribute('data-total-neto', totalNeto);
@@ -117,13 +134,14 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
         document.querySelector('#total_bruto').textContent = formatCurrency(totalBruto);
         document.querySelector('#total_neto').textContent = formatCurrency(totalNeto);
     }
+
 }
 
 function formatCurrency(value) {
     const integerValue = Math.floor(value);
     let formattedValue = integerValue.toLocaleString('es-ES', {
         minimumFractionDigits: 0,
-        maximumFractionDigits: 0 
+        maximumFractionDigits: 0
     });
 
     if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {

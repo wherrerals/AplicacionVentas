@@ -194,9 +194,9 @@ class DocumentoRepository:
                 cantidad=linea['Quantity'],
                 estado_devolucion=linea['EstadoCheck'],
                 precioUnitario=linea['UnitPrice'],
-                totalBrutoLinea=item_code.precioVenta * linea['Quantity'],
-                totalNetoLinea=(item_code.precioVenta * linea['Quantity']) - 
-                                (item_code.precioVenta * linea['Quantity'] * linea['DiscountPercent'] / 100),
+                totalBrutoLinea=linea['UnitPrice'] * linea['Quantity'],
+                totalNetoLinea=(linea['UnitPrice'] * linea['Quantity']) - 
+                                (linea['UnitPrice'] * linea['Quantity'] * linea['DiscountPercent'] / 100),
                 comentario=linea['FreeText'],
                 fechaEntrega=linea['ShipDate'],
                 docEntryBase=0,
