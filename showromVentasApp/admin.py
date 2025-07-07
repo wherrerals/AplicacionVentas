@@ -27,6 +27,7 @@ from datosLsApp.models import (
 
 )
 
+from datosLsApp.models.couponsdb import CouponsDB
 from datosLsApp.models.regiondb import RegionDB
 from datosLsApp.models.stockbodegasdb import StockBodegasDB
 from datosLsApp.models.confiDescuentosDB import ConfiDescuentosDB
@@ -46,6 +47,25 @@ admin.site.index_title = "Aplicacion Ventas Led Studio"
 # Mejora interfaz modelos
 class TipoDocTributarioDBper(admin.ModelAdmin):
     list_display = ("codigo", "nombre")
+
+class CuponesDBper(admin.ModelAdmin):
+    list_display = (
+        "cupon_code",
+        "name",
+        "description",
+        "active",
+        "valid_from",
+        "valid_to",
+        "discount_percentage",
+        "max_uses",
+        "one_use_only",
+        "coupon_type",
+        "same_price_and_discount",
+        "last_modification",
+    )
+    search_fields = ["cupon_code", "name"]
+    list_filter = ("active", "coupon_type")
+    ordering = ("-last_modification",)
 
 class TipoEntregaDBper(admin.ModelAdmin):
     list_display = ("codigo", "nombre")
@@ -291,3 +311,4 @@ admin.site.register(ConfiDescuentosDB, ConfiDescuentosDBper)
 admin.site.register(ConfiEmpresaDB, ConfiEmpresaDBper)
 admin.site.register(TipoEntregaDB, TipoEntregaDBper)
 admin.site.register(TipoObjetoSapDB, TipoObjetoSapDBper)
+admin.site.register(CouponsDB, CuponesDBper)

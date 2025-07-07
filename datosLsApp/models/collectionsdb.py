@@ -1,5 +1,4 @@
-from django import models
-
+from django.db import models
 class CollectionsDB(models.Model):
     
     class Meta:

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ form_title }}{% endblock %}
+
+{% block content %}
+<h3>{{ form_title }}</h3>
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="row">
+    <div class="col-md-6">
+    {% include "components/form_field.html" with field=form.cupon_code %}
+    {% include "components/form_field.html" with field=form.name %}
+    {% include "components/form_field.html" with field=form.description %}
+    {% include "components/form_field.html" with field=form.valid_from %}
+    {% include "components/form_field.html" with field=form.valid_to %}
+    {% include "components/form_field.html" with field=form.discount_percentage %}
+    {% include "components/form_field.html" with field=form.max_uses %}
+    {% include "components/form_field.html" with field=form.one_use_only %}
+    {% include "components/form_field.html" with field=form.same_price_and_discount %}
+    {% include "components/form_field.html" with field=form.coupon_type %}
+    </div>
+    <div class="col-md-6">
+      <label>Rango de validez</label>
+      <div class="row">
+        <div class="col">
+          {% include "components/form_field.html" with field=form.valid_from %}
+        </div>
+        <div class="col">
+          {% include "components/form_field.html" with field=form.valid_to %}
+        </div>
+      </div>
+      {% include "components/form_field.html" with field=form.discount_percentage %}
+      {% include "components/form_field.html" with field=form.max_uses %}
+      
+      <div class="form-check form-switch mt-3">
+        {{ form.one_use_only }}
+        <label class="form-check-label" for="uso_unico">Uso Único</label>
+      </div>
+      <div class="form-check form-switch">
+        {{ form.same_price_and_discount }}
+        <label class="form-check-label" for="mismo_precio">Mismo precio y descuento</label>
+      </div>
+    </div>
+  </div>
+  <div class="mt-3">
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a href="{% url 'listar' %}" class="btn btn-secondary">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

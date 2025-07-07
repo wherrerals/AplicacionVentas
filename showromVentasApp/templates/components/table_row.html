@@ -1,0 +1,19 @@
+<tr>
+  <td>{{ cupon.codigo }}</td>
+  <td>{{ cupon.get_tipo_display }}</td>
+  <td>{{ cupon.ultima_modificacion|date:"d/m/Y" }}</td>
+  <td>{{ cupon.campania }}</td>
+  <td>{{ cupon.fuente }}</td>
+  <td>
+    <div class="dropdown text-end">
+      <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+        Opciones
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="{% url 'detalle' cupon.codigo %}">Detalles</a></li>
+        <li><a class="dropdown-item" href="{% url 'editar' cupon.codigo %}">Editar</a></li>
+        <li><a class="dropdown-item text-danger" href="#">Archivar</a></li>
+      </ul>
+    </div>
+  </td>
+</tr>

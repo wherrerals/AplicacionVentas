@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Lista de Cupones{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <!-- Formulario de búsqueda -->
+  <form class="d-flex" method="get">
+    <input class="form-control me-2" type="search" placeholder="Buscar código..." name="q" value="{{ request.GET.q }}">
+    <button class="btn btn-outline-primary">Buscar</button>
+  </form>
+
+  <!-- Botón para crear cupón -->
+  <a href="{% url 'crear' %}" class="btn btn-primary">Crear Cupón</a>
+</div>
+
+<!-- Tabla de cupones -->
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Código</th>
+      <th>Nombre</th>
+      <th>Tipo</th>
+      <th>Activo</th>
+      <th>Última modificación</th>
+      <th></th> <!-- Para botones de opciones -->
+    </tr>
+  </thead>
+  <tbody>
+    {% for cupon in cupones %}
+      <tr>
+        <td>{{ cupon.cupon_code }}</td>
+        <td>{{ cupon.name }}</td>
+        <td>{{ cupon.coupon_type }}</td>
+        <td>
+          {% if cupon.active %}
+            <span class="badge bg-success">Sí</span>
+          {% else %}
+            <span class="badge bg-secondary">No</span>
+          {% endif %}
+        </td>
+        <td>{{ cupon.last_modification|date:"d/m/Y H:i" }}</td>
+        <td>
+          <div class="dropdown">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              Opciones
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{% url 'detalle' cupon.cupon_code %}">Ver</a></li>
+              <li><a class="dropdown-item" href="{% url 'editar' cupon.cupon_code %}">Editar</a></li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6" class="text-center">No hay cupones</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

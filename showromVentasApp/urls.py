@@ -1,5 +1,6 @@
 from django.urls import path
 from showromVentasApp.views.cotizacionview import CotizacionView
+from showromVentasApp.views.cuponesView import CuponCreateView, CuponDetailView, CuponListView, CuponUpdateView
 from showromVentasApp.views.devolucionesview import ReturnsView
 from showromVentasApp.views.odvView import OdvView
 from showromVentasApp.views.invoiceView import InvoiceView
@@ -72,4 +73,11 @@ urlpatterns = [
     path('obtener-ventas/', InvoiceView.as_view(), name='obtener_ventas'),
     path('detalles-ventas/', InvoiceView.as_view(), name='detalles_ventas'),
     path('duplicar-documento/', InvoiceView.as_view(), name='duplicar_documento'),
+
+    #cupones
+
+    path('listar/', CuponListView.as_view(), name='listar'),
+    path('nuevo/', CuponCreateView.as_view(), name='crear'),
+    path('<slug:codigo>/editar/', CuponUpdateView.as_view(), name='editar'),
+    path('<slug:codigo>/', CuponDetailView.as_view(), name='detalle'),
 ]

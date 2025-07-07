@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Detalle del Cupón {{ cupon.codigo }}{% endblock %}
+
+{% block content %}
+<h3>Detalle del Cupón</h3>
+
+<div class="card">
+  <div class="card-body">
+    <dl class="row">
+      <dt class="col-sm-4">Código</dt>
+      <dd class="col-sm-8">{{ cupon.codigo }}</dd>
+
+      <dt class="col-sm-4">Fuente</dt>
+      <dd class="col-sm-8">{{ cupon.fuente }}</dd>
+
+      <dt class="col-sm-4">Campaña</dt>
+      <dd class="col-sm-8">{{ cupon.campania }}</dd>
+
+      <dt class="col-sm-4">Tipo</dt>
+      <dd class="col-sm-8">{{ cupon.get_tipo_display }}</dd>
+
+      <dt class="col-sm-4">Descripción</dt>
+      <dd class="col-sm-8">{{ cupon.descripcion|default:"—" }}</dd>
+
+      <dt class="col-sm-4">Válido desde</dt>
+      <dd class="col-sm-8">{{ cupon.valido_desde }}</dd>
+
+      <dt class="col-sm-4">Válido hasta</dt>
+      <dd class="col-sm-8">{{ cupon.valido_hasta }}</dd>
+
+      <dt class="col-sm-4">Porcentaje Descuento</dt>
+      <dd class="col-sm-8">{{ cupon.porcentaje_descuento }}%</dd>
+
+      <dt class="col-sm-4">Uso máximo</dt>
+      <dd class="col-sm-8">{{ cupon.uso_maximo }}</dd>
+
+      <dt class="col-sm-4">Uso único</dt>
+      <dd class="col-sm-8">
+        {% if cupon.uso_unico %}
+          <span class="badge bg-success">Sí</span>
+        {% else %}
+          <span class="badge bg-secondary">No</span>
+        {% endif %}
+      </dd>
+
+      <dt class="col-sm-4">Mismo precio y descuento</dt>
+      <dd class="col-sm-8">
+        {% if cupon.mismo_precio %}
+          <span class="badge bg-success">Sí</span>
+        {% else %}
+          <span class="badge bg-secondary">No</span>
+        {% endif %}
+      </dd>
+
+      <dt class="col-sm-4">Última modificación</dt>
+      <dd class="col-sm-8">{{ cupon.ultima_modificacion|date:"d/m/Y H:i" }}</dd>
+    </dl>
+
+    <div class="mt-4 d-flex justify-content-end gap-2">
+      <a href="{% url 'editar' cupon.codigo %}" class="btn btn-warning">Editar</a>
+      <a href="{% url 'listar' %}" class="btn btn-secondary">Volver</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
