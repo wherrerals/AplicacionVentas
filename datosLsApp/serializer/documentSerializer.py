@@ -108,8 +108,9 @@ class SerializerDocument:
 
     @staticmethod
     def document_serializer2(doc_data):
-
-        doc_total = CalculadoraTotales.calculate_docTotal(doc_data)
+        print(f"Datos del documento: {doc_data}")
+        doc_total = CalculadoraTotales.calculate_docTotal_rr(doc_data)
+        
         type_sales = Seller.tipoVentaTipoVendedor(doc_data.get('SalesPersonCode'))
         
         if type_sales == 'NA':
@@ -154,6 +155,7 @@ class SerializerDocument:
                 treeType = 'iNotATree'
 
             unit_price = linea.get('UnitePrice')
+            print(f"Precio unitario: {unit_price}")
             unit_price_neto = unit_price / 1.19 
             print(f"Precio unitario neto: {unit_price_neto}")
             
@@ -166,7 +168,7 @@ class SerializerDocument:
                 'Quantity': linea.get('Quantity'),
                 'Quantity2': linea.get('Quantity2', 0),
                 #'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
-                'UnitPrice': round(unit_price_neto, 4),
+                'UnitPrice': float(unit_price_neto),
                 'ShipDate': linea.get('ShipDate'),
                 'FreeText': linea.get('FreeText'),
                 'DiscountPercent': linea.get('DiscountPercent'),
@@ -178,7 +180,7 @@ class SerializerDocument:
                 'TreeType': treeType,
                 'EstadoCheck': linea.get('EstadoCheck', '0'),
             }
-
+            print(f"price: {nueva_linea.get('UnitPrice')}")
             lineas_json.append(nueva_linea)
 
         if not isinstance(addres_bill, list) and not isinstance(address_ship, list):
@@ -338,7 +340,7 @@ class SerializerDocument:
                 "Quantity": linea['cantidad'],
                 "Quantity2": linea.get('cantidad_original'),
                 "imagen": linea['imagen_url'],
-                "PriceAfterVAT": round(linea['precio_unitario'] * 1.19),
+                "PriceAfterVAT": linea['precio_unitario'] * 1.19,
                 "GrossPrice": int(linea['precio_lista']),
                 "DiscountPercent": linea['descuento'],
                 "WarehouseCode": "",
