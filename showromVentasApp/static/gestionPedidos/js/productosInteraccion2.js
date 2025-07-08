@@ -44,8 +44,14 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
     const switchCheckbox = newRow.querySelector('.switch-producto');
     if (switchCheckbox) {
         switchCheckbox.addEventListener('change', () => {
+
+            switchCheckbox.dataset.estado = switchCheckbox.checked ? "1" : "0";
+
             actualizarValores();
+            manejarSwitches();
             console.log(`Switch cambiado para el producto: ${codigoProducto}, Índice: ${indiceProducto}`);
+            console.log(`Nuevo estado data-estado: ${switchCheckbox.dataset.estado}`);
+
         });
     }
 

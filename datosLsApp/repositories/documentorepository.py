@@ -76,6 +76,7 @@ class DocumentoRepository:
             totalAntesDelDescuento=data['DocTotal'],
             descuento=0,
             totalDocumento=data['DocTotal'],
+            DoctotalBase=data['DocTotalBase'],
             docEntry_relacionado=data['RefDocEntr'],
             codigoVenta=data['SalesPersonCode'],
             tipo_documento=document_type,

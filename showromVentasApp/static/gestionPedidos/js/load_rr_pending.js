@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
             documentLines.sort((a, b) => a.LineNum - b.LineNum);
             documentLines.forEach((line) => {
 
-                const linea_documento = line.LineNum;
+                const linea_documento = line.linea_base;
                 const docEntry_linea = line.DocEntry;
                 const productoCodigo = line.ItemCode;
                 const nombre = line.ItemDescription;

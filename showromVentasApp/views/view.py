@@ -1527,3 +1527,26 @@ def probandoActualizador(request):
         return JsonResponse({'status': 'Actualización completada', 'data': prueba}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+def get_doctotal(request):
+    folio = request.GET.get('folio')
+
+    print(f"Folio recibido: {folio}")
+
+    if not folio:
+        return JsonResponse({'error': 'No folio provided'}, status=400)
+
+    try:
+        from datosLsApp.models.documentodb import DocumentoDB
+
+        documento = DocumentoDB.objects.filter(docEntry_relacionado=folio).first()
+        print(f"Documento encontrado: {documento}")
+        
+        if documento is None:
+            return JsonResponse({'error': 'Documento no encontrado'}, status=404)
+
+        print(f"Documento encontrado: {documento.folio}, DoctotalBase: {documento.DoctotalBase}")
+
+        return JsonResponse({'doctotal': documento.DoctotalBase})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

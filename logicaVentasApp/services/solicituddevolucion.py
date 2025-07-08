@@ -1,5 +1,7 @@
 from venv import logger
 from adapters.sl_client import APIClient
+from datosLsApp.models.documentodb import DocumentoDB
+from datosLsApp.models.lineadb import LineaDB
 from datosLsApp.repositories.contactorepository import ContactoRepository
 from datosLsApp.repositories.direccionrepository import DireccionRepository
 from datosLsApp.repositories.documentorepository import DocumentoRepository
@@ -291,3 +293,93 @@ class SolicitudesDevolucion(Documento):
 
         warehouses = set(linea.get('WarehouseCode') for linea in lineas)
         return 'TIEN' if len(warehouses) == 1 else 'RESE'
+
+    @staticmethod
+    def validar_lineas_documento(data):
+        """
+        data = {
+            "docEntry_relacionado": int,
+            "DocumentLines": [
+                {
+                    "producto_id": int,
+                    "numLinea": int,
+                    "cantidad": int,
+                    "EstadoCheck": int,
+                    ...
+                },
+                ...
+            ]
+        }
+        """
+
+        print("Validando líneas del documento...")
+
+        errores = []
+
+        doc_entry_relacionado = data.get('RefDocEntr')
+        if not doc_entry_relacionado:
+            errores.append("No se proporcionó docEntry_relacionado.")
+            return {"errores": errores}
+
+        try:
+            documento = DocumentoDB.objects.filter(docEntry_relacionado=doc_entry_relacionado).first()
+        except DocumentoDB.DoesNotExist:
+            errores.append(f"No existe un documento relacionado con docEntry {doc_entry_relacionado}.")
+            return {"errores": errores}
+
+        lineas_doc = LineaDB.objects.filter(documento=documento)
+
+        # Validar cada línea enviada vs base
+        lineas_enviadas = data.get('DocumentLines', [])
+
+        # Validar que todas las líneas estén marcadas como check y cantidades coherentes
+        for linea in lineas_enviadas:
+            if linea.get('EstadoCheck') != 1:
+                errores.append(f"La línea {linea.get('LineNum')} no está marcada como seleccionada.")
+
+            cantidad_enviada = linea.get('Quantity', 0)
+
+            try:
+                linea_db = lineas_doc.get(producto=linea.get('ItemCode'))
+                if cantidad_enviada > linea_db.cantidad:
+                    errores.append(
+                        f"Cantidad enviada ({cantidad_enviada}) es mayor que la cantidad original "
+                        f"({linea_db.cantidad_solicitada}) para la ItemCode {linea.get('ItemCode')}"
+                    )
+            except LineaDB.DoesNotExist:
+                errores.append(f"La línea {linea.get('ItemCode')} no existe en el documento.")
+
+        # Validar si las líneas son exactamente iguales (producto, numLinea, cantidad)
+        # Genera set DB: solo las líneas con estado_devolucion == 1
+        lineas_db_set = set(
+            (
+                l.producto.codigo,
+                str(l.numLineaBase),
+                l.cantidad,
+                )
+            for l in lineas_doc
+        )
+
+        # Genera set Enviado: solo líneas con EstadoCheck == 1
+        lineas_enviadas_set = set(
+            (
+                l.get('ItemCode'),
+                str(l.get('LineNum')),
+                l.get('Quantity'),
+            )
+            for l in lineas_enviadas if l.get('EstadoCheck') == 1
+        )
+
+        print(f"Líneas DB filtradas: {lineas_db_set}")
+        print(f"Líneas Enviadas filtradas: {lineas_enviadas_set}")
+
+        # Validación final: solo OK si todo coincide y todos cumplen condición de ambos en 1
+        if lineas_enviadas_set == lineas_db_set:
+            return {
+                "resultado": True,
+                "DoctotalBase": documento.DoctotalBase
+            }
+        else:
+            print("Errores de validación:", errores)
+            return None
+

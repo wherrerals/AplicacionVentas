@@ -109,8 +109,19 @@ class SerializerDocument:
     @staticmethod
     def document_serializer2(doc_data):
         print(f"Datos del documento: {doc_data}")
-        doc_total = CalculadoraTotales.calculate_docTotal_rr(doc_data)
-        
+
+        from logicaVentasApp.services.solicituddevolucion import SolicitudesDevolucion
+        lineas_identicas = SolicitudesDevolucion.validar_lineas_documento(doc_data)
+
+        if lineas_identicas:
+            print(f"Lineas Identicas: {lineas_identicas}")
+            doc_total = lineas_identicas.get('DoctotalBase', 0)
+        else:
+            print("Lineas no son identicas, calculando docTotal")
+            doc_total = CalculadoraTotales.calculate_docTotal_rr(doc_data)
+
+        print(f"DocTotal calculado: {doc_total}")
+            
         type_sales = Seller.tipoVentaTipoVendedor(doc_data.get('SalesPersonCode'))
         
         if type_sales == 'NA':
@@ -127,7 +138,7 @@ class SerializerDocument:
             'DocDueDate': doc_data.get('DocDueDate'),
             'TaxDate': doc_data.get('TaxDate'),
             'U_VK_Folio': doc_data.get('Folio'),
-            #'DocTotal': doc_data.get('DocTotal'),
+            'DocTotalBase': doc_data.get('docTotal_base'),
             'DocTotal': f'{doc_total}',
             'CardCode': doc_data.get('CardCode'),
             'NumAtCard': doc_data.get('NumAtCard'),

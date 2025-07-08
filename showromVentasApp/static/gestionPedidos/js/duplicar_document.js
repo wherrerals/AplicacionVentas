@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const name_vendedor = sessionStorage.getItem("nombreVendedor");
   const code_vendedor = sessionStorage.getItem("codigoVendedor");
   const sucursal = sessionStorage.getItem("sucursal");
+  const docTotal = sessionStorage.getItem("docTotal");
 
   if (tipoDocumento == 'Solicitud') {
 
@@ -19,6 +20,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (folioInput && folio_cotizacion) {
       folioInput.value = folio_cotizacion;
       folioInput.setAttribute("data-refdocentr", docentry_in_folio); // Agregar el atributo data-docentry
+    }
+
+    const totalBrutoElement = document.getElementById("total_bruto");
+    if (totalBrutoElement && docTotal) {
+      totalBrutoElement.setAttribute("data-brutobase", docTotal);
     }
 
     const vendedor_element = document.getElementById("vendedor_data");
