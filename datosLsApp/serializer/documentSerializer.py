@@ -110,16 +110,13 @@ class SerializerDocument:
     def document_serializer2(doc_data):
 
         doc_total = CalculadoraTotales.calculate_docTotal(doc_data)
-        
         type_sales = Seller.tipoVentaTipoVendedor(doc_data.get('SalesPersonCode'))
         
         if type_sales == 'NA':
             type_sales = TypeOfSale.Sale_type_line_type(doc_data.get('DocumentLines', []))
         
         type_sales = TypeOfSale.sale_type(type_sales, doc_data.get('TransportationCode'))
-
-        branch_code = VendedorRepository.get_sucursal(doc_data.get('SalesPersonCode'))
-                    
+        branch_code = VendedorRepository.get_sucursal(doc_data.get('SalesPersonCode'))      
         addres_bill, address_ship = Direccion.assign_bill_ship_addres(doc_data.get('Address'), doc_data.get('Address2'), branch_code)
 
         raw_cabecera  = {
@@ -184,7 +181,6 @@ class SerializerDocument:
 
             lineas_json.append(nueva_linea)
 
-        # validar si es una lista o un class el tipo de addres_bill y address_ship
         if not isinstance(addres_bill, list) and not isinstance(address_ship, list):
             taxExtension = {
                 "StreetS": addres_bill.calleNumero,
@@ -217,7 +213,7 @@ class SerializerDocument:
         taxExtension = {
             "StreetS": bill['direccion'],
             "CityS": bill['ciudad'],
-            "CountyS": bill['comuna'],  # Aquí puedes añadir nombre si lo tienes
+            "CountyS": bill['comuna'],
             "StateS": bill['region'],
             "CountryS": "CL",
             "StreetB": ship['direccion'],
