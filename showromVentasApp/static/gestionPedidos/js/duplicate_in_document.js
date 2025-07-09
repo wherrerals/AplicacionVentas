@@ -102,6 +102,7 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
                         const docentry_in_folio = document.getElementById("numero_cotizacion").getAttribute("data-docentry");
                         const vendedorElement = document.getElementById("vendedor_data");
                         const sucursalElement = document.getElementById("sucursal");
+                        const docTotal = document.getElementById("total_bruto").getAttribute("data-total-bruto");
 
                         if (vendedorElement) {
                             const codigoVendedor = vendedorElement.getAttribute("data-codeven");
@@ -113,6 +114,7 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
                             sessionStorage.setItem("nombreVendedor", nombreVendedor);
                         }
                         
+                        sessionStorage.setItem("docTotal", docTotal);
                         sessionStorage.setItem("docentry_in_folio", docentry_in_folio);
                         sessionStorage.setItem("cardCode", cardCode);
                         sessionStorage.setItem("folio", folio);

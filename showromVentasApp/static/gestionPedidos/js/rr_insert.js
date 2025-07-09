@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const docEntry = document.getElementById("numero_orden").getAttribute("data-docEntry")        
         const docTotal = document.getElementById("total_bruto").getAttribute("data-total-bruto");
+        const docTotal_base = document.getElementById("total_bruto").getAttribute("data-brutobase");
         const docDate = fechaSolo;
         const fechaentrega = document.getElementById("fecha_entrega").value;
         const folio_number = document.getElementById("folio_referencia").value;
@@ -112,6 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "Folio": folio_number,
             "DocDate": docDate,
             'DocTotal': docTotal,
+            "docTotal_base": docTotal_base,
             "NumAtCard": referencia,
             "Comments": observaciones,
             "TaxDate": taxDate,
