@@ -354,7 +354,7 @@ class SerializerDocument:
                 "PriceAfterVAT": linea['precio_unitario'] * 1.19,
                 "GrossPrice": int(linea['precio_lista']),
                 "DiscountPercent": linea['descuento'],
-                "WarehouseCode": "",
+                "WarehouseCode": doc['U_LED_SUCURS'],
                 "FreeText": linea.get('comentario', ''),
                 "ShippingMethod": "",
                 "ShipDate": linea.get('fecha_entrega', ""),
