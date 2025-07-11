@@ -28,6 +28,7 @@ class LineaDB(models.Model):
     estado_devolucion = models.IntegerField(null = True, blank=True, default=0)  # 1 = Activo, 0 = Devolución
     tipoobjetoSap = models.ForeignKey(TipoObjetoSapDB, on_delete=models.CASCADE)
     documento = models.ForeignKey('DocumentoDB', on_delete=models.CASCADE, related_name='lineas', default=None)
+    bodega = models.CharField(max_length=10, null=True, blank=True, default="None")  # Almacena el código de la sucursal
   
 
     def __str__(self):

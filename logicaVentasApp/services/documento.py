@@ -176,7 +176,7 @@ class Documento(ABC):
                 return {'error': errores}
             
             jsonData = SerializerDocument.document_serializer2(data)
-            create_rr = DocumentoRepository.create_document_db(jsonData) 
+            create_rr = DocumentoRepository.create_document_db(jsonData, data.get('creado_por')) 
 
             if create_rr:
                 id_solicitud = create_rr.id

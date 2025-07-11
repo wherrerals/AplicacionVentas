@@ -89,12 +89,13 @@
         <div class="dropdown">
           <button class="btn btn-primary dropdown-toggle" aria-expanded="false" data-bs-toggle="dropdown" type="button" style="font-size: 12px;">Acciones&nbsp;</button>
           <div class="dropdown-menu">
+            
+            {% if 'Supervisor' in grupos_usuario %}
+              <a class="dropdown-item text-danger fw-bold" href="#" id="aprobar-1">Aprobar (Gerente Tienda)</a>
+            {% endif %}
+
             <a class="dropdown-item" href="#" id="saveButton2">Guardar</a>
             <!-- boton Aprobar -->
-
-            {% if 'Supervisor' in grupos_usuario %}
-              <a class="dropdown-item" href="#" id="aprobar-1">Aprobar</a>
-            {% endif %}
 
             <a class="dropdown-item" href="#" id="duplicar-1" hidden>Duplicar</a>
             <a class="dropdown-item" href="#" id="copiar-ODV" hidden>Copiar a Orden de Venta</a>

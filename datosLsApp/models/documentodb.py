@@ -39,6 +39,7 @@ class DocumentoDB(models.Model):
     tipoobjetoSap = models.ForeignKey(TipoObjetoSapDB, on_delete=models.CASCADE, default=1)    
     tipoVenta = models.ForeignKey(TipoVentaDB, on_delete=models.CASCADE, default=1)
     socio_negocio = models.ForeignKey(SocioNegocioDB, on_delete=models.CASCADE, default=1)
+    creado_por = models.CharField(max_length=50, null=True, blank=True, default="None")  # Almacena el usuario que creó el documento
 
 
     
