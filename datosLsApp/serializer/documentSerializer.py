@@ -108,8 +108,6 @@ class SerializerDocument:
 
     @staticmethod
     def document_serializer2(doc_data):
-        print(f"Datos del documento: {doc_data}")
-
         from logicaVentasApp.services.solicituddevolucion import SolicitudesDevolucion
         lineas_identicas = SolicitudesDevolucion.validar_lineas_documento(doc_data)
 
@@ -354,7 +352,7 @@ class SerializerDocument:
                 "PriceAfterVAT": linea['precio_unitario'] * 1.19,
                 "GrossPrice": int(linea['precio_lista']),
                 "DiscountPercent": linea['descuento'],
-                "WarehouseCode": doc['U_LED_SUCURS'],
+                "WarehouseCode": linea['WarehouseCode'],
                 "FreeText": linea.get('comentario', ''),
                 "ShippingMethod": "",
                 "ShipDate": linea.get('fecha_entrega', ""),

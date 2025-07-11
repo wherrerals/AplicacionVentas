@@ -169,10 +169,15 @@ class ReturnsView(View):
             docnum = data.get('DocNum', '')
             id_docu = data.get('id_documento', '')
             aprobacion = data.get('Approve')
+            
+            if docEntry != '':
+                aprobacion = 1
+  
+            user = request.user
+            data['creado_por'] = user.username
 
             doc = Documento()
             document_db = DocumentoRepository()
-
             if aprobacion != 1:
                 if id_docu:
                     result = doc.update_document_db(id_docu, data)
@@ -184,8 +189,6 @@ class ReturnsView(View):
             if docEntry:
                     repo = SolicitudesDevolucion()
                     result = repo.actualizarDocumento(docnum, docEntry, data)
-                    if result.get('success'):
-                        document_db.update_document_status(id_docu, result.get('docNum'), result.get('docEntry'), 'Aprobado')
                     return JsonResponse(result, status=200)
             else:
                 repo = SolicitudesDevolucion()
@@ -271,7 +274,10 @@ class ReturnsView(View):
     def details_rr_pending(self, request):
 
         id = request.GET.get('id')
+        
         documents_data = DocumentoRepository.get_document_data_lines(filtro_id=id)
         serilized_data = SerializerDocument.serialize_documento_completo(documents_data)
-        
+
+        print("Serialized Data:", serilized_data)
+
         return JsonResponse(serilized_data, safe=False)

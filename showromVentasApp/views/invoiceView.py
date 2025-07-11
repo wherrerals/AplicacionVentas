@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 # Importing modules
 from adapters.sl_client import APIClient
 from datosLsApp.models.documentodb import DocumentoDB
+from datosLsApp.models.usuariodb import UsuarioDB
 from datosLsApp.serializer.invoiceSerializer import InvoiceSerializer
 from logicaVentasApp.context.user_context import UserContext
 from logicaVentasApp.services.documento import Documento

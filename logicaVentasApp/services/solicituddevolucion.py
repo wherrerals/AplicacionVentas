@@ -172,15 +172,25 @@ class SolicitudesDevolucion(Documento):
         }
         
         return resultado
+    
+    def limpiar_antes_de_guardar_sap(self, data):
+
+        """
+        Elimina campos innecesarios y ajusta la estructura de datos antes de enviar a SAP.
+        """
+        # Limpiar líneas de documento
+        for line in data.get('DocumentLines', []):
+            line.pop('LineNum', None)  # Eliminar 'LineNum' si existe
+            line.pop('EstadoCheck', None)  # También podría no ser necesario para SAP
+
+        return data
 
     def actualizarDocumento(self, docnum, docentry, data):
-        docentry = docentry
 
         try:
             docentry = int(docentry)
             jsonData = RertunrRequestSerializer.document_serializer2(data)
             json_lineas_ok = self.elimnar_lineas_no_check(jsonData)
-
             response = self.client.actualizarDevolucionesSL(docentry, json_lineas_ok)
 
             if 'success' in response:
@@ -226,7 +236,8 @@ class SolicitudesDevolucion(Documento):
 
             jsonData = RertunrRequestSerializer.document_serializer2(data)
             json_lineas_ok = self.elimnar_lineas_no_check(jsonData)
-            response = self.client.crearCotizacionSL(self.get_endpoint(), json_lineas_ok)
+            json_limpio = self.limpiar_antes_de_guardar_sap(json_lineas_ok)
+            response = self.client.crearCotizacionSL(self.get_endpoint(), json_limpio)
             
             if isinstance(response, dict):
                 if 'DocEntry' in response:

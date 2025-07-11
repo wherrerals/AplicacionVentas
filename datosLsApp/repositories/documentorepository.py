@@ -50,7 +50,7 @@ class DocumentoRepository:
 
  
     @staticmethod
-    def create_document_db(data):
+    def create_document_db(data, creado_por=None):
         print(f"Creando documento con datos: {data}")
         business_partner = SocioNegocioDB.objects.get(codigoSN=data['CardCode'])
         document_type = TipoDocTributarioDB.objects.get(codigo=data['U_LED_TIPDOC'])
@@ -86,6 +86,7 @@ class DocumentoRepository:
             tipoobjetoSap=tipo_objeto,
             tipoVenta=tipo_venta,
             socio_negocio=business_partner,
+            creado_por=creado_por,
         )
 
         # Crear líneas relacionadas al documento
@@ -114,6 +115,7 @@ class DocumentoRepository:
                 tipoentrega=tipo_entrega,
                 tipoobjetoSap=tipo_objeto,
                 estado_devolucion=linea['EstadoCheck'],
+                bodega = linea['WarehouseCode'],
             )
 
         return document
@@ -317,7 +319,6 @@ class DocumentoRepository:
             try:
                 usuario = UsuarioDB.objects.select_related('sucursal', 'vendedor').get(vendedor__codigo=doc.vendedor.codigo)
                 sucursal_codigo = usuario.sucursal.codigo
-                print(f"Usuario encontrado: {usuario}, Sucursal: {usuario.sucursal.codigo}")
             except UsuarioDB.DoesNotExist:
                 pass
 
@@ -338,7 +339,7 @@ class DocumentoRepository:
                     "num_linea": linea.numLinea,
                     "linea_base": linea.numLineaBase,
                     "imagen_url": linea.producto.imagen,
-                    "warehouse": linea.direccionEntrega,
+                    "WarehouseCode": linea.bodega,
                     "estate_rr_line": linea.estado_devolucion,
                 })
 
