@@ -260,11 +260,14 @@ class DocumentoRepository:
                 Q(socio_negocio__codigoSN__icontains=filtro_nombre)
             )
             
+        """
         if filtro_sucursal:
             vendedores_en_sucursal = UsuarioDB.objects.filter(
                 sucursal=filtro_sucursal
             ).values('vendedor')
             queryset = queryset.filter(vendedor__in=Subquery(vendedores_en_sucursal))
+        """
+
         if filtro_estado:
             queryset = queryset.filter(estado_documento=filtro_estado)
 
@@ -314,7 +317,7 @@ class DocumentoRepository:
             try:
                 usuario = UsuarioDB.objects.select_related('sucursal', 'vendedor').get(vendedor__codigo=doc.vendedor.codigo)
                 sucursal_codigo = usuario.sucursal.codigo
-
+                print(f"Usuario encontrado: {usuario}, Sucursal: {usuario.sucursal.codigo}")
             except UsuarioDB.DoesNotExist:
                 pass
 
