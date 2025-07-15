@@ -19,16 +19,7 @@ services:
       dockerfile: ./docker/dockerfile.app2
     image: studio-go:dev
     container_name: studio-go-dev
-    command: >
-        sh -c "
-        python manage.py makemigrations --settings=config.settings.develop &&
-        python manage.py migrate --fake-initial --settings=config.settings.develop &&
-        python manage.py makemigrations datosLsApp --settings=config.settings.develop &&
-        python manage.py migrate datosLsApp --settings=config.settings.develop &&
-        python manage.py makemigrations taskApp --settings=config.settings.develop &&
-        python manage.py migrate taskApp --settings=config.settings.develop &&
-        python manage.py runserver --settings=config.settings.develop 0.0.0.0:8000
-        "
+    command: /entrypointdev.sh
     volumes:
       - .:/app
     ports:

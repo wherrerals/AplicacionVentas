@@ -1,17 +1,42 @@
-//const { act } = require("react");
+// ---- CSRF helper ----
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     // Function to apply the coupon
-    const couponInput = document.getElementById('coupon_code');
+    const couponInput = document.getElementById('cupon_data');
     console.log('Coupon input element:', couponInput);
+
     if (couponInput) {
-        couponInput.addEventListener('input', function() {
+        couponInput.addEventListener('input', function () {
             aplicarCupon(this.value.trim());
             console.log('Coupon input changed:', this.value);
         });
+
+        // escuchar el enter 
+
+        couponInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent form submission
+                const codigoCupon = this.value.trim();
+                console.log('Enter pressed, applying coupon:', codigoCupon);
+            }
+        });
+
     }
 });
-
 
 function aplicarCupon(codigoCupon) {
     if (!codigoCupon) {
@@ -20,7 +45,7 @@ function aplicarCupon(codigoCupon) {
     }
 
     const filasProductos = document.querySelectorAll('tbody.product-row');
-    const productos  = Array.from(filasProductos).map(row => {
+    const productos = Array.from(filasProductos).map(row => {
         return {
             itemCode: row.getAttribute('data-itemcode'),
             id: row.getAttribute('data-id'),
@@ -29,31 +54,33 @@ function aplicarCupon(codigoCupon) {
         // validar los datos del cupon
     });
 
-    fetch('/consult_coupon/', {
+    fetch('/ventas/validar_cupon/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken') // Assuming you have a function to get CSRF token
+            //'X-CSRFToken': csrftoken
+
         },
+
         body: JSON.stringify({
-            code: codigo,
+            code: codigoCupon,
             product_codes: productos
-    })
+        })
 
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            actualizarDescuentosDesdeCupon(data.reglas);
-        } else {
-            console.log('Invalid coupon code.');
-            alert('Invalid coupon code.');
-        }
-    })
-    .catch(error => {
-        console.error('Error applying coupon:', error);
-        alert('An error occurred while applying the coupon.');
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                actualizarDescuentosDesdeCupon(data.reglas);
+            } else {
+                console.log('Invalid coupon code.');
+                alert('Invalid coupon code.');
+            }
+        })
+        .catch(error => {
+            console.error('Error applying coupon:', error);
+            alert('An error occurred while applying the coupon.');
+        });
 }
 
 

@@ -4,7 +4,7 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Instalar dependencias necesarias, incluyendo herramientas para fonts y WeasyPrint
+# Instalar dependencias necesarias
 RUN apk update && apk add --no-cache \
     mysql-dev \
     python3-dev \
@@ -22,28 +22,25 @@ RUN apk update && apk add --no-cache \
     libuuid \
     && pip install --upgrade pip
 
-# Copiar el archivo de requerimientos antes de la instalación
-COPY ./requirements.txt ./ 
-
-# Instalar dependencias de Python desde requirements.txt
+# Copiar requirements y luego instalar
+COPY ./requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Generar la caché de fuentes
+# Generar caché de fuentes
 RUN fc-cache -f
 
-# Eliminar las herramientas de compilación para reducir el tamaño de la imagen
+# Eliminar build-base para aligerar
 RUN apk del build-base
 
-# Copiar el código de la aplicación
-COPY ./ ./
+# Copiar código fuente
+COPY . .
 
-RUN ls -la /app
+# Copiar entrypoint y dar permisos
+COPY entrypointdev.sh /entrypointdev.sh
+RUN chmod +x /entrypointdev.sh
 
-# Dar permisos de ejecución al entrypoint
-RUN chmod +x entrypoint.sh
+# Exponer puerto 8000
+EXPOSE 8000
 
-# Exponer el puerto 7000 para la aplicación
-EXPOSE 7000
-
-# Comando por defecto para ejecutar el servidor
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Usar script como entrypoint
+ENTRYPOINT ["/entrypointdev.sh"]

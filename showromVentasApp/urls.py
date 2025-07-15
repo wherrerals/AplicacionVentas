@@ -13,6 +13,7 @@ cotizacionView = CotizacionView()
 
 urlpatterns = [
     path('', view.home, name="home"),
+    path('validar_cupon/', view.validar_cupon, name='validar_cupon'),
     path('agregar_editar_clientes/', SocioNegocioView.as_view(), name='agregar_editar_clientes'),
     path('listado_socios_negocio/', SocioNegocioView.as_view(), name='listado_socios_negocio'),
     path('informacion_cliente/', SocioNegocioView.as_view(), name='informacion_cliente'),
@@ -81,5 +82,4 @@ urlpatterns = [
     path('<slug:codigo>/editar/', CuponUpdateView.as_view(), name='editar'),
     path('<slug:codigo>/', CuponDetailView.as_view(), name='detalle'),
     path('get_doctotal/', view.get_doctotal, name='get_doctotal'),
-
 ]
