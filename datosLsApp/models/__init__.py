@@ -25,3 +25,5 @@ from datosLsApp.models.vendedordb import VendedorDB
 from datosLsApp.models.stockbodegasdb import StockBodegasDB
 from datosLsApp.models.collectionsdb import CollectionsDB
 from datosLsApp.models.rules_coupondb import RulesCouponDB
+from datosLsApp.models.confiDescuentosDB import ConfiDescuentosDB
+from datosLsApp.models.couponsdb import CouponsDB
