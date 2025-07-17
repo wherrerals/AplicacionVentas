@@ -28,6 +28,7 @@ from datosLsApp.repositories.stockbodegasrepository import StockBodegasRepositor
 from logicaVentasApp.services.calculador import CalculadoraTotales
 from logicaVentasApp.services.contacto import Contacto
 from logicaVentasApp.services.cotizacion import Cotizacion
+from logicaVentasApp.services.coupons import Coupons
 from logicaVentasApp.services.direccion import Direccion
 from logicaVentasApp.services.producto import Producto
 from logicaVentasApp.services.socionegocio import SocioNegocio
@@ -1558,53 +1559,10 @@ def get_doctotal(request):
 def validar_cupon(request):
     data = json.loads(request.body)
     code = data.get('code')
-    productos = data.get('product_codes')  # [{'itemcode': 'A01'}, {'itemcode': 'B02'}]
+    productos = data.get('product_codes', [])
+    coupon = Coupons(code, productos)
+    data_coupon = coupon.get_coupon()
 
-    print(f"Datos recibidos para validar cupón: {code}")
-    print(f"Productos recibidos: {productos}")
-    
-    try:
-        cupon = CouponsDB.objects.get(cupon_code=code, active=True)
+    print(f"Datos del cupón: {data_coupon}")
 
-        # Opcional: validar vigencia
-        now = timezone.now()
-        if cupon.valid_from and cupon.valid_to and not (cupon.valid_from <= now <= cupon.valid_to):
-            return JsonResponse({'success': False, 'error': 'Cupón fuera de vigencia'})
-
-        reglas = []
-        for regla in cupon.RulesCoupons.all():   
-            operador = regla.operator
-            print(f"Procesando regla con operador: {operador}")
-            
-            for prod in productos:
-                itemcode = prod['itemCode']
-                print(f"Procesando producto: {itemcode} con operador: {operador}")
-                if operador == 'todo':
-                    reglas.append({'itemcode': itemcode, 'descuento_cupon': float(cupon.discount_percentage)})
-                
-                elif operador == '!=':
-                    # Si el producto no está relacionado explícitamente con esta regla
-                    if not regla.productos.filter(codigo=itemcode).exists():
-                        reglas.append({'itemcode': itemcode, 'descuento_cupon': float(cupon.discount_percentage)})
-
-                elif operador == '==':
-                    if regla.productos.filter(codigo=itemcode).exists():
-                        reglas.append({'itemcode': itemcode, 'descuento_cupon': float(cupon.discount_percentage)})
-
-                elif operador == '<':
-                    producto = regla.productos.filter(codigo=itemcode).first()
-                    if producto and float(prod.get('precio', 0)) < producto.precio:
-                        reglas.append({'itemcode': itemcode, 'descuento_cupon': float(cupon.discount_percentage)})
-
-                elif operador == '>':
-                    producto = regla.productos.filter(codigo=itemcode).first()
-                    if producto and float(prod.get('precio', 0)) > producto.precio:
-                        reglas.append({'itemcode': itemcode, 'descuento_cupon': float(cupon.discount_percentage)})
-
-                print(f"Procesando producto: {itemcode} con operador: {operador}")
-
-        print(f"Reglas aplicadas: {reglas}")
-        return JsonResponse({'success': True, 'reglas': reglas})
-
-    except CouponsDB.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'Cupón inválido'})  
+    return JsonResponse(data_coupon, status=200)
