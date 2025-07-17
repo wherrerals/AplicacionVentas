@@ -339,6 +339,7 @@ class SolicitudesDevolucion(Documento):
             return {"errores": errores}
 
         lineas_doc = LineaDB.objects.filter(documento=documento)
+        print(f"Líneas del documento base: {lineas_doc}")
 
         # Validar cada línea enviada vs base
         lineas_enviadas = data.get('DocumentLines', [])
@@ -351,7 +352,7 @@ class SolicitudesDevolucion(Documento):
             cantidad_enviada = linea.get('Quantity', 0)
 
             try:
-                linea_db = lineas_doc.get(producto=linea.get('ItemCode'))
+                linea_db = lineas_doc.get(producto=linea.get('ItemCode'), numLineaBase=linea.get('LineNum'))
                 if cantidad_enviada > linea_db.cantidad:
                     errores.append(
                         f"Cantidad enviada ({cantidad_enviada}) es mayor que la cantidad original "
