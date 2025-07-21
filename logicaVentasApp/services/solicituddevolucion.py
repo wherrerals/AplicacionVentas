@@ -307,21 +307,6 @@ class SolicitudesDevolucion(Documento):
 
     @staticmethod
     def validar_lineas_documento(data):
-        """
-        data = {
-            "docEntry_relacionado": int,
-            "DocumentLines": [
-                {
-                    "producto_id": int,
-                    "numLinea": int,
-                    "cantidad": int,
-                    "EstadoCheck": int,
-                    ...
-                },
-                ...
-            ]
-        }
-        """
 
         print("Validando líneas del documento...")
 
@@ -367,7 +352,7 @@ class SolicitudesDevolucion(Documento):
             (
                 l.producto.codigo,
                 str(l.numLineaBase),
-                l.cantidad,
+                l.cantidad_solicitada,
                 )
             for l in lineas_doc
         )
