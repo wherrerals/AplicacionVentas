@@ -70,8 +70,9 @@ function aplicarCupon(codigoCupon) {
     })
         .then(response => response.json())
         .then(data => {
+            console.log('Coupon response:', data);
             if (data.success) {
-                actualizarDescuentosDesdeCupon(data.reglas);
+                actualizarDescuentosDesdeCupon(data);
             } else {
                 console.log('Invalid coupon code.');
                 alert('Invalid coupon code.');
@@ -90,24 +91,23 @@ function actualizarDescuentosDesdeCupon(reglas) {
     filasProductos.forEach(row => {
         const itemcode = row.getAttribute('data-itemcode');
 
-        const regla = reglas.find(r => r.itemcode === itemcode || r.operador === 'todo');
+        //const regla = reglas.find(r => r.itemcode === itemcode || r.operador === 'todo');
+        const rules = reglas.discount * 100
 
-        if (regla) {
+        if (rules) {
+
+            console.log('Applying discount for item:', itemcode, 'Discount:', rules);
             // Obtener los valores de descuento
-            const maxBase = parseFloat(row.querySelector('#descuento')?.textContent.replace('Max: ', '') || '0');
-            const descuentoCupon = parseFloat(regla.descuento_cupon) || 0;
+            const maxBase = parseFloat(row.querySelector('#agg_descuento')?.value);
+            const descuentoCupon = parseFloat(rules) || 0;
             const nuevoMax = maxBase + descuentoCupon;
-
-            // Actualizar visualmente
-            const elemDescuento = row.querySelector('#descuento');
-            if (elemDescuento) {
-                elemDescuento.textContent = `Max: ${nuevoMax}%`;
-                elemDescuento.hidden = false;
-            }
 
             const inputDescuento = row.querySelector('#agg_descuento');
             if (inputDescuento) {
                 inputDescuento.max = nuevoMax;
+                inputDescuento.value = nuevoMax;
+                inputDescuento.dispatchEvent(new Event('input', { bubbles: true }));
+                
                 if (parseFloat(inputDescuento.value) > nuevoMax) {
                     inputDescuento.value = nuevoMax;
                 }

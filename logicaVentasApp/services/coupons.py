@@ -17,7 +17,7 @@ class Coupons():
     def coupon_vality_date(self):
 
         now = timezone.now()
-        if self.coupon.valid_from and self.coupon.valid_to and not (self.coupon.valid_from <= now <= self.coupon.valid_to):
+        if self.coupon.valid_from and self.coupon.valid_to and not (self.coupon.valid_to <= now <= self.coupon.valid_from):
             return True
         return False
 
