@@ -95,6 +95,9 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
                         window.location.href = `/ventas/generar_cotizacion/`;
                     } else if (tipoDocumento === "Solicitud") {
                         const clienteElement = document.getElementById("inputCliente");
+                        const tipo_documento = document.getElementById("tipo_documento");
+                        const td = tipo_documento?.innerText || "";
+                        const tipo_documento_formateado  = td.split(" ")[0].toLowerCase();
                         const fullText = clienteElement?.innerText || "";
                         const cardCode = fullText.split("C")[0].trim();
                         const folio_element = document.getElementById("folio_cotizacion");
@@ -114,6 +117,7 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
                             sessionStorage.setItem("nombreVendedor", nombreVendedor);
                         }
                         
+                        sessionStorage.setItem("tipo_documento", tipo_documento_formateado);
                         sessionStorage.setItem("docTotal", docTotal);
                         sessionStorage.setItem("docentry_in_folio", docentry_in_folio);
                         sessionStorage.setItem("cardCode", cardCode);
