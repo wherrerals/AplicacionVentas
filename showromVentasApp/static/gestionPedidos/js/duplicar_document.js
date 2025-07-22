@@ -9,9 +9,30 @@ document.addEventListener("DOMContentLoaded", function () {
   const code_vendedor = sessionStorage.getItem("codigoVendedor");
   const sucursal = sessionStorage.getItem("sucursal");
   const docTotal = sessionStorage.getItem("docTotal");
+  const tipo_documento = sessionStorage.getItem("tipo_documento");
+
+  console.log("Tipo de documento desde sessionStorage:", tipo_documento);
+
+  let tp = ""
+
+  if (tipo_documento == "factura"){
+    tp = "FACT";
+  }else{
+    tp = "BOLE"
+  }
+
+  console.log("Tipo Documento:", tipo_documento);
 
   if (tipoDocumento == 'Solicitud') {
 
+    const radios = document.getElementsByName("tipoDocTributario");
+    for(let i = 0; i < radios.length; i++) {
+      if(radios[i].value === tp) {
+        radios[i].checked = true;
+        break;
+      }
+    }
+  
     console.log("Tipo de documento desde sessionStorage:", tipoDocumento);
     console.log("Card Code desde sessionStorage:", cardCode);
     traerInformacionCliente(cardCode);
