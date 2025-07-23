@@ -90,27 +90,30 @@ function actualizarDescuentosDesdeCupon(reglas) {
 
     filasProductos.forEach(row => {
         const itemcode = row.getAttribute('data-itemcode');
-
-        //const regla = reglas.find(r => r.itemcode === itemcode || r.operador === 'todo');
-        const rules = reglas.discount * 100
+        const rules = reglas.discount * 100;
 
         if (rules) {
-
             console.log('Applying discount for item:', itemcode, 'Discount:', rules);
-            // Obtener los valores de descuento
-            const maxBase = parseFloat(row.querySelector('#agg_descuento')?.value);
-            const descuentoCupon = parseFloat(rules) || 0;
-            const nuevoMax = maxBase + descuentoCupon;
 
             const inputDescuento = row.querySelector('#agg_descuento');
+            const descuentoCupon = parseFloat(rules) || 0;
+
             if (inputDescuento) {
-                inputDescuento.max = nuevoMax;
-                inputDescuento.value = nuevoMax;
-                inputDescuento.dispatchEvent(new Event('input', { bubbles: true }));
-                
-                if (parseFloat(inputDescuento.value) > nuevoMax) {
-                    inputDescuento.value = nuevoMax;
+                // Establecer el nuevo valor máximo y reiniciar valor visible
+                inputDescuento.max = descuentoCupon;
+                inputDescuento.value = 0; // o podrías poner descuentoCupon si quieres mostrar el % directo
+                inputDescuento.setAttribute('disabled', 'disabled');
+
+                // Mostrar info de cupón
+                const descuento = row.querySelector('#desc_cupon');
+                if (descuento) {
+                    descuento.textContent = `Cupon: ${descuentoCupon}%`;
+                    descuento.hidden = false;
+                    descuento.dataset.value = descuentoCupon;
                 }
+
+                // 🔁 Lanzar evento manual para recalcular
+                inputDescuento.dispatchEvent(new Event('input', { bubbles: true }));
             }
         }
     });

@@ -61,7 +61,18 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
         var cantidad = parseFloat(inputCantidad.value) || 0;
         var precioUnitario = parseFloat(spanPrecioVenta) || 0;
         var precioTotal = cantidad * precioUnitario;
-        var descuento = parseFloat(inputDescuento.value) || 0;
+        //var descuento = parseFloat(inputDescuento.value) || 0;
+
+        // Verificar si hay un cupon visible con descuento aplicado
+        var cuponInfo = newRow.querySelector('#desc_cupon');
+        var descuento = 0;
+
+        if (cuponInfo && !cuponInfo.hidden && cuponInfo.dataset.value) {
+            descuento = parseFloat(cuponInfo.dataset.value) || 0;
+        } else {
+            descuento = parseFloat(inputDescuento.value) || 0;
+        }
+
 
         // Si el descuento es 0, el precio con descuento también será 0
         var precioFinal = descuento === 0 ? precioTotal : precioTotal - (precioTotal * (descuento / 100));

@@ -139,6 +139,7 @@ class Producto {
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <div>
                         <input class="form-control format-number" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="${this.descuentoAplcado ?? 0}" onclick="this.select()">
+                        <strong style="font-size: 9;width: 100px; color: red" id="desc_cupon" hidden>Cupon:</strong>
                     </div>
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${formatCurrency(this.precioSinDescuento)}</td>
