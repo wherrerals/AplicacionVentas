@@ -15,36 +15,45 @@ function getCookie(name) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Function to apply the coupon
     const couponInput = document.getElementById('cupon_data');
     console.log('Coupon input element:', couponInput);
 
     if (couponInput) {
-        couponInput.addEventListener('input', function () {
-            aplicarCupon(this.value.trim());
-            console.log('Coupon input changed:', this.value);
-        });
-
-        // escuchar el enter 
-
         couponInput.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
-                e.preventDefault(); // Prevent form submission
+                e.preventDefault(); // Evita el envío del formulario
                 const codigoCupon = this.value.trim();
-                console.log('Enter pressed, applying coupon:', codigoCupon);
+                if (codigoCupon !== '') {
+                    console.log('Enter pressed, applying coupon:', codigoCupon);
+                    aplicarCupon(codigoCupon);
+                } else {
+                    console.log('Input is empty, no coupon applied');
+                }
             }
         });
-
     }
 });
+
 
 function aplicarCupon(codigoCupon) {
     if (!codigoCupon) {
         console.log('No coupon code provided.');
         return;
     }
-
+    const inputCliente = document.querySelector('#inputCliente');
+    const cardCode = inputCliente.getAttribute('data-codigosn');
+    if(!cardCode) {
+        //console.log('No card code found for the customer.');
+        alert('Porfavor agrega un cliente primero.');
+        return;
+    }
     const filasProductos = document.querySelectorAll('tbody.product-row');
+    if (filasProductos.length === 0) {
+        console.log('No products found in the order.');
+        alert('No hay productos en el pedido.');
+        return;
+    }
+    
     const productos = Array.from(filasProductos).map(row => {
         return {
             itemCode: row.getAttribute('data-itemcode'),
@@ -63,6 +72,7 @@ function aplicarCupon(codigoCupon) {
         },
 
         body: JSON.stringify({
+            card_code: cardCode,
             code: codigoCupon,
             product_codes: productos
         })
