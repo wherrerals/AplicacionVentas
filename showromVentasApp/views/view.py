@@ -1558,6 +1558,7 @@ def get_doctotal(request):
 @csrf_exempt
 def validar_cupon(request):
     data = json.loads(request.body)
+    print(f"Datos recibidos para validar cupón: {data}")
     code = data.get('code')
     productos = data.get('product_codes', [])
     coupon = Coupons(code, productos)

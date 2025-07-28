@@ -97,24 +97,24 @@ function aplicarCupon(codigoCupon) {
 
 function actualizarDescuentosDesdeCupon(reglas) {
     const filasProductos = document.querySelectorAll('tbody.product-row');
+    const productosAplicables = reglas.products.map(p => p.codigo); // Extrae los códigos permitidos
+    const porcentajeDescuento = parseFloat(reglas.discount) * 100;
 
     filasProductos.forEach(row => {
         const itemcode = row.getAttribute('data-itemcode');
-        const rules = reglas.discount * 100;
 
-        if (rules) {
-            console.log('Applying discount for item:', itemcode, 'Discount:', rules);
+        // Solo aplica si el item está en la lista de productos del cupón
+        if (productosAplicables.includes(itemcode)) {
+            console.log('Applying discount for item:', itemcode, 'Discount:', porcentajeDescuento);
 
             const inputDescuento = row.querySelector('#agg_descuento');
-            const descuentoCupon = parseFloat(rules) || 0;
+            const descuentoCupon = porcentajeDescuento || 0;
 
             if (inputDescuento) {
-                // Establecer el nuevo valor máximo y reiniciar valor visible
                 inputDescuento.max = descuentoCupon;
-                inputDescuento.value = 0; // o podrías poner descuentoCupon si quieres mostrar el % directo
+                inputDescuento.value = 0;
                 inputDescuento.setAttribute('disabled', 'disabled');
 
-                // Mostrar info de cupón
                 const descuento = row.querySelector('#desc_cupon');
                 if (descuento) {
                     descuento.textContent = `Cupon: ${descuentoCupon}%`;
@@ -122,12 +122,25 @@ function actualizarDescuentosDesdeCupon(reglas) {
                     descuento.dataset.value = descuentoCupon;
                 }
 
-                // 🔁 Lanzar evento manual para recalcular
                 inputDescuento.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        } else {
+            // Opción: limpiar descuento si el producto no aplica
+            const inputDescuento = row.querySelector('#agg_descuento');
+            if (inputDescuento) {
+                inputDescuento.removeAttribute('disabled');
+            }
+
+            const descuento = row.querySelector('#desc_cupon');
+            if (descuento) {
+                descuento.hidden = true;
+                descuento.textContent = '';
+                descuento.dataset.value = '';
             }
         }
     });
 }
+
 
 
 

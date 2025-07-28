@@ -29,6 +29,18 @@ class Coupons():
     def get_coupon_discount(self):
         return self.coupon.discount_percentage
     
+    def rules_coupon(self):
+        rules = self.coupon.rules.all()
+        if not rules:
+            return None
+        return list(rules.values('operator'))
+    
+    def products_apply_coupon(self):
+        products = self.coupon.products.all()
+        if not products:
+            return None
+        return list(products.values('codigo'))
+    
     def coupon_error(self):
         
         error = []
@@ -44,7 +56,7 @@ class Coupons():
             error.append("El Cupon {coupon} no esta activo")
 
         return ''.join(error)
-        
+    
 
     def get_coupon(self):
         
@@ -53,5 +65,9 @@ class Coupons():
             return {"error": errors}
         
         discount = self.get_coupon_discount()
-        return {"success": True, "discount": discount, "products": self.products}
+        rules = self.rules_coupon()
+        print("rules", rules)
+        products = self.products_apply_coupon()
+
+        return {"success": True, "discount": discount, "products": products, "rules": rules[0]}
 
