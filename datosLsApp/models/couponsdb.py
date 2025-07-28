@@ -1,4 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+from datosLsApp.models.rules_coupondb import RulesCouponDB
 
 class CouponsDB(models.Model):
     
@@ -19,6 +22,8 @@ class CouponsDB(models.Model):
     coupon_type = models.CharField(max_length=50)
     same_price_and_discount = models.BooleanField(default=False)
     last_modification = models.DateTimeField(auto_now=True)
+    users = models.ManyToManyField(User, through='CouponUsage', related_name='available_coupons', blank=True)
+    rules = models.ManyToManyField(RulesCouponDB, related_name='rules_coupons', blank=True)
 
     def __str__(self):
         return f"{self.cupon_code} - {self.name} - {self.active} - {self.valid_from} - {self.valid_to} - {self.discount_percentage} - {self.max_uses} - {self.one_use_only} - {self.coupon_type}"
