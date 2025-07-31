@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "id_documento": id_documento,
             "DocEntry": docEntry,
             "Folio": folio_number,
-            "DocDate": docDate,
+            "DocDate": fechaentrega,
             'DocTotal': docTotal,
             "docTotal_base": docTotal_base,
             "NumAtCard": referencia,
