@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const sucursal = sessionStorage.getItem("sucursal");
   const docTotal = sessionStorage.getItem("docTotal");
   const tipo_documento = sessionStorage.getItem("tipo_documento");
+  const date_reference = sessionStorage.getItem("doc_data_reference");
+  console.log("fecha: ", date_reference);
 
   console.log("Tipo de documento desde sessionStorage:", tipo_documento);
 
@@ -42,6 +44,10 @@ document.addEventListener("DOMContentLoaded", function () {
       folioInput.value = folio_cotizacion;
       folioInput.setAttribute("data-refdocentr", docentry_in_folio); // Agregar el atributo data-docentry
     }
+
+    const doc_data_reference_element = document.getElementById("fecha_entrega");
+    doc_data_reference_element.value = date_reference;
+    console.log("Doc Data Reference Element:", doc_data_reference_element);
 
     const totalBrutoElement = document.getElementById("total_bruto");
     if (totalBrutoElement && docTotal) {

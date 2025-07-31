@@ -106,6 +106,7 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
                         const vendedorElement = document.getElementById("vendedor_data");
                         const sucursalElement = document.getElementById("sucursal");
                         const docTotal = document.getElementById("total_bruto").getAttribute("data-total-bruto");
+                        const doc_data_reference = document.getElementById("docDueDate").getAttribute("data-original-date");
 
                         if (vendedorElement) {
                             const codigoVendedor = vendedorElement.getAttribute("data-codeven");
@@ -122,6 +123,7 @@ document.querySelectorAll("#duplicar-ODV, #duplicar-Cotizacion, #duplicar-Solici
                         sessionStorage.setItem("docentry_in_folio", docentry_in_folio);
                         sessionStorage.setItem("cardCode", cardCode);
                         sessionStorage.setItem("folio", folio);
+                        sessionStorage.setItem("doc_data_reference", doc_data_reference);
 
 
                         window.location.href = `/ventas/solicitudes_devolucion/`;
