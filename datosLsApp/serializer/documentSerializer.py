@@ -63,7 +63,10 @@ class SerializerDocument:
                 treeType = 'iSalesTree'
             else:
                 treeType = 'iNotATree'
-            
+
+            cupon = linea.get('Text', None)
+            cupon_formateado = cupon.split(': ')[1] if cupon else None
+
             warehouseCode = linea.get('WarehouseCode')
 
             nueva_linea = {
@@ -71,7 +74,8 @@ class SerializerDocument:
                 'Quantity': linea.get('Quantity'),
                 'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
                 'ShipDate': linea.get('ShipDate'),
-                'FreeText': linea.get('FreeText'),
+                #'FreeText': linea.get('FreeText'),
+                'FreeText': cupon_formateado,
                 'DiscountPercent': linea.get('DiscountPercent'),
                 'WarehouseCode': warehouseCode,
                 'CostingCode': linea.get('CostingCode'),

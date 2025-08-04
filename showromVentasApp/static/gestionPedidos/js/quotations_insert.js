@@ -80,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const costingCode2 = "AV";
             const cogsCostingCode2 = "AV";
             const docentryLinea = row.getAttribute('data-docentryLinea'); // "null" o el valor asignado
+            const cupon = row.querySelector("#desc_cupon").innerText; // Capturar el valor del cupón
 
             console.log('warehouseCode:', warehouseCode);
 
@@ -103,6 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "COGSCostingCode": cogsCostingCode, //pendiente 
                 "CostingCode2": costingCode2, // Pendiente código de sucursal, lc, Ph, gr, rs
                 "COGSCostingCode2": cogsCostingCode2,
+                "Text": cupon, // Comentarios de la línea
             };
             lines.push(line);
         });

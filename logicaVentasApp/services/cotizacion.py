@@ -307,6 +307,8 @@ class Cotizacion(Documento):
 
             # Preparar el JSON para la cotización
             jsonData = SerializerDocument.document_serializer(data)
+
+            print("JSON Data para crear cotización:", jsonData)
             
             # Realizar la solicitud a la API
             response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
