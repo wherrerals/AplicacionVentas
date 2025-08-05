@@ -1,5 +1,7 @@
 from django.utils import timezone
 from datosLsApp.models.couponsdb import CouponsDB
+from datosLsApp.models.rulescouponsrelation import CouponRuleRelation
+from logicaVentasApp.services.couponvalidator import CouponValidator
 
 
 class Coupons():
@@ -30,10 +32,21 @@ class Coupons():
         return self.coupon.discount_percentage
     
     def rules_coupon(self):
-        rules = self.coupon.rules.all()
-        if not rules:
+
+        if not self.coupon:
             return None
-        return list(rules.values('operator'))
+        rules_with_values = CouponRuleRelation.objects.filter(coupon=self.coupon).select_related('rule')
+
+        result = []
+
+        for rule in rules_with_values:
+            result.append({
+                'operator': rule.rule.operator,
+                'max_value': rule.max_value,
+                'min_value': rule.min_value
+            })
+        
+        return result if result else None
     
     def products_apply_coupon(self):
         products = self.coupon.products.all()
@@ -66,8 +79,20 @@ class Coupons():
         
         discount = self.get_coupon_discount()
         rules = self.rules_coupon()
-        print("rules", rules)
-        products = self.products_apply_coupon()
+        product_codes = [p['itemCode'] for p in self.products]
 
-        return {"success": True, "discount": discount, "products": products, "rules": rules[0]}
 
+        if rules and rules[0]['operator'] == 'todo':
+            applicable_codes = product_codes
+        else:
+            valid_codes = set(p['codigo'] for p in self.coupon.products.all().values('codigo'))
+            applicable_codes = list(valid_codes.intersection(product_codes))
+
+        validator = CouponValidator(applicable_codes, rules)
+        filtered_products = validator.get_applicable_products()
+
+        return {"success": True, 
+                "discount": discount, 
+                "products": [{"codigo": p.codigo} for p in filtered_products],
+                "rules": rules[0] if rules else None,
+                }

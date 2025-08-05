@@ -28,3 +28,4 @@ from datosLsApp.models.rules_coupondb import RulesCouponDB
 from datosLsApp.models.confiDescuentosDB import ConfiDescuentosDB
 from datosLsApp.models.couponsdb import CouponsDB
 from datosLsApp.models.cuponUser import CouponUsage
+from datosLsApp.models.rulescouponsrelation import CouponRuleRelation
