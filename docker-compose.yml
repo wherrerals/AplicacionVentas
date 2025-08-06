@@ -35,6 +35,8 @@ services:
       "
     volumes:
       - .:/app
+      - media_data:/app/media 
+
     ports:
       - "7000:7000"
     depends_on:
@@ -159,3 +161,4 @@ services:
 
 volumes:
   mysql_data:
+  media_data: 

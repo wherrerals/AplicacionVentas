@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Subir Imagen</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .custom-file-upload {
+            border: 2px dashed #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .custom-file-upload:hover {
+            border-color: #0d6efd;
+            background-color: #f8f9fa;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="form-container bg-white">
+            <h1 class="text-center mb-4">
+                <i class="bi bi-cloud-arrow-up"></i> Subir Imagen
+            </h1>
+            
+            <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                {% for field in form %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    
+                    {% if field.name == 'imagen' %}
+                    <div class="custom-file-upload mb-2" onclick="document.getElementById('{{ field.id_for_label }}').click()">
+                        <i class="bi bi-image fs-1 text-muted"></i>
+                        <p class="mt-2 mb-1">Haz clic para seleccionar una imagen</p>
+                        <small class="text-muted">Formatos soportados: JPG, PNG, GIF</small>
+                        {{ field }}
+                    </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                    
+                    {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                    {% endif %}
+                    
+                    {% for error in field.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-upload"></i> Subir Imagen
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Mostrar el nombre del archivo seleccionado
+        document.querySelector('input[type="file"]').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name || 'Ningún archivo seleccionado';
+            const uploadArea = this.closest('.custom-file-upload');
+            
+            if (uploadArea) {
+                const infoElement = uploadArea.querySelector('p');
+                if (infoElement) {
+                    infoElement.textContent = fileName;
+                    infoElement.classList.add('fw-bold');
+                    uploadArea.querySelector('i').className = 'bi bi-check-circle-fill fs-1 text-success';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -26,6 +26,7 @@ LOCAL_APPS = [
     "showromVentasApp",
     "taskApp",
     "logs",
+    "uploadApp",
 ]
 
 THIRD_APPS = []
@@ -144,6 +145,9 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = "es-co"
 
 TIME_ZONE = "America/Santiago"
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 USE_I18N = True
 
