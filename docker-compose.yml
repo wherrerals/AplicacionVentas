@@ -43,6 +43,18 @@ services:
       - db
       - rabbitmq
 
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - media_data:/app/media
+      - static_data:/app/staticfiles
+    depends_on:
+      - web
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
