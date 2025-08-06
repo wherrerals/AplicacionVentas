@@ -4,7 +4,7 @@
 
 # archivos media
 /media/
-
+/migrations/
 
 #archivos ds json
 *.json
