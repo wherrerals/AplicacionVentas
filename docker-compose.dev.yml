@@ -31,7 +31,8 @@ services:
         "
     volumes:
       - .:/app
-      - media_volume:/app/media  # 🔥 Esto persiste tu carpeta media/
+      - media_data:/app/media  # 🔥 Esto persiste tu carpeta media/
+      
     ports:
       - "8000:8000"
     depends_on:
