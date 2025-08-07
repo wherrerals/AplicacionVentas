@@ -56,6 +56,7 @@ class SerializerDocument:
         repo_producto = ProductoRepository()
         lineas_json = []
 
+        print("Lineas del documento:")
         for linea in doc_data.get('DocumentLines', []):
             item_code = linea.get('ItemCode')
             
@@ -65,7 +66,20 @@ class SerializerDocument:
                 treeType = 'iNotATree'
 
             cupon = linea.get('Text', None)
-            cupon_formateado = cupon.split(': ')[1] if cupon else None
+            cupon_formateado = None
+            discount_percent = None
+            cupon_percent = None
+
+
+            if cupon:
+                cupon_formateado = cupon.split(': ')[1] if cupon else None
+                cupon_percent = float(cupon_formateado.split('%')[0]) if cupon_formateado else None
+
+
+            if cupon_percent !=0:
+                discount_percent = cupon_percent + linea.get('DiscountPercent', 0)
+            else:
+                discount_percent = linea.get('DiscountPercent', 0)
 
             warehouseCode = linea.get('WarehouseCode')
 
@@ -76,7 +90,7 @@ class SerializerDocument:
                 'ShipDate': linea.get('ShipDate'),
                 #'FreeText': linea.get('FreeText'),
                 'FreeText': cupon_formateado,
-                'DiscountPercent': linea.get('DiscountPercent'),
+                'DiscountPercent': discount_percent, #linea.get('DiscountPercent'),
                 'WarehouseCode': warehouseCode,
                 'CostingCode': linea.get('CostingCode'),
                 'ShippingMethod': linea.get('ShippingMethod'),

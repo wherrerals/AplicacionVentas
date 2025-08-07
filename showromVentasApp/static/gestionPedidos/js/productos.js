@@ -1,5 +1,5 @@
 class Producto {
-    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado) {
+    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, cuponDescuento, descuentoAplcado) {
         
         this.docEntry_linea = docEntry_linea;
         this.linea_documento = linea_documento;
@@ -16,9 +16,10 @@ class Producto {
         this.sucursal = sucursal;
         this.comentario = comentario;
         this.descuentoAplcado = descuentoAplcado ?? 0;
+        this.cuponDescuento = cuponDescuento
 
         console.log("Producto descuentoAplcado:", this.descuentoAplcado);
-        console.log("Producto descuentoAplcado:", this.descuentoAplcado);
+        console.log("Producto descuentoAplcado:", this.cuponDescuento);
     }
     
 
@@ -139,7 +140,7 @@ class Producto {
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <div>
                         <input class="form-control format-number" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="${this.descuentoAplcado ?? 0}" onclick="this.select()">
-                        <strong style="font-size: 9;width: 100px; color: red" id="desc_cupon" hidden>Cupon:</strong>
+                        <strong style="font-size: 9;width: 100px; color: red" id="desc_cupon" ${this.cuponDescuento ? '' : 'hidden'}>Cupon: ${this.cuponDescuento ?? 0}%</strong>
                     </div>
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${formatCurrency(this.precioSinDescuento)}</td>

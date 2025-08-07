@@ -31,6 +31,8 @@ document.addEventListener("DOMContentLoaded", function () {
           console.log("Datos de la cotización:", data);
 
           // Extracción de datos principales
+
+          const cuponDescuento = "PRUEBA"
           const salesEmployeeName = data.Cliente.SalesPersons.SalesEmployeeName;
           const salesPersonCode = data.Cliente.SalesPersons.SalesEmployeeCode;
           const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
@@ -66,6 +68,10 @@ document.addEventListener("DOMContentLoaded", function () {
           }
 
           
+          const cuponInput = document.getElementById("cupon_data");
+          if (cuponInput) {
+            cuponInput.value = cuponDescuento;
+          }
 
           const showroomElement = document.getElementById("sucursal");
           if (showroomElement) {
@@ -174,6 +180,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const descuentoAplcado = line.DiscountPercent;
             const sucursal = line.WarehouseCode;
             const comentario = line.FreeText;
+            const cuponDescuento = line.DiscountPercent;
 
             let linea_documento_real = parseInt(linea_documento);
 
@@ -191,10 +198,11 @@ document.addEventListener("DOMContentLoaded", function () {
               precioDescuento,
               descuentoAplcado,
               sucursal,
-              comentario
+              comentario,
+              cuponDescuento
             });
 
-            agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado);
+            agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, cuponDescuento);
           });
         }
 

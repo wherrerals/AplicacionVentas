@@ -42,6 +42,8 @@ function aplicarCupon(codigoCupon) {
     }
     const inputCliente = document.querySelector('#inputCliente');
     const cardCode = inputCliente.getAttribute('data-codigosn');
+    const docTotal = document.getElementById("total_bruto").getAttribute("data-total-bruto");
+
     if(!cardCode) {
         //console.log('No card code found for the customer.');
         alert('Porfavor agrega un cliente primero.');
@@ -74,7 +76,8 @@ function aplicarCupon(codigoCupon) {
         body: JSON.stringify({
             card_code: cardCode,
             code: codigoCupon,
-            product_codes: productos
+            product_codes: productos,
+            doc_total: docTotal
         })
 
     })

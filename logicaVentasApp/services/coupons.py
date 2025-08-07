@@ -6,15 +6,17 @@ from logicaVentasApp.services.couponvalidator import CouponValidator
 
 class Coupons():
 
-    def __init__(self, coupon, products):
+    def __init__(self, coupon, products, doc_total):
         try:
             self.coupon = CouponsDB.objects.get(cupon_code=coupon)
             self.exist = True
             self.products = products
+            self.doc_total = doc_total
         except CouponsDB.DoesNotExist:
             self.coupon = None
             self.exist = False
             self.products = None
+            self.doc_total = None
 
     def coupon_vality_date(self):
 
@@ -88,7 +90,7 @@ class Coupons():
             valid_codes = set(p['codigo'] for p in self.coupon.products.all().values('codigo'))
             applicable_codes = list(valid_codes.intersection(product_codes))
 
-        validator = CouponValidator(applicable_codes, rules)
+        validator = CouponValidator(applicable_codes, rules, self.doc_total)
         filtered_products = validator.get_applicable_products()
 
         return {"success": True, 

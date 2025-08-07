@@ -1561,7 +1561,8 @@ def validar_cupon(request):
     print(f"Datos recibidos para validar cupón: {data}")
     code = data.get('code')
     productos = data.get('product_codes', [])
-    coupon = Coupons(code, productos)
+    doc_total = data.get('doc_total', 0)
+    coupon = Coupons(code, productos, doc_total)
     data_coupon = coupon.get_coupon()
 
     print(f"Datos del cupón: {data_coupon}")
