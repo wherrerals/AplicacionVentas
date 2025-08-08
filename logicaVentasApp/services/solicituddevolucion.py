@@ -328,6 +328,7 @@ class SolicitudesDevolucion(Documento):
 
         # Validar cada línea enviada vs base
         lineas_enviadas = data.get('DocumentLines', [])
+        print(f"Líneas enviadas: {lineas_enviadas}")
 
         # Validar que todas las líneas estén marcadas como check y cantidades coherentes
         for linea in lineas_enviadas:
@@ -337,7 +338,15 @@ class SolicitudesDevolucion(Documento):
             cantidad_enviada = linea.get('Quantity', 0)
 
             try:
-                linea_db = lineas_doc.get(producto=linea.get('ItemCode'), numLineaBase=linea.get('LineNum'))
+                #linea_db = lineas_doc.get(producto=linea.get('ItemCode'), numLineaBase=linea.get('LineNum'))
+
+                linea_db = LineaDB.objects.get(
+                    documento=documento,
+                    producto__codigo=linea.get('ItemCode'),
+                    numLineaBase=linea.get('LineNum'),
+                    docEntryBase=doc_entry_relacionado
+                )
+
                 if cantidad_enviada > linea_db.cantidad:
                     errores.append(
                         f"Cantidad enviada ({cantidad_enviada}) es mayor que la cantidad original "
