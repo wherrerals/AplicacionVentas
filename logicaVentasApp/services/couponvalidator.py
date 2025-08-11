@@ -28,8 +28,11 @@ class CouponValidator:
         return False
 
     def get_applicable_products(self):
-        if not self.rules:
-            return []
+        print("Reglas aplicables:", self.rules)
+        rules = self.rules[0]
+        if rules['operator'] == 'todo':
+            print("aplica para todos los productos")
+            return self.products
 
         rule = self.rules[0]
 

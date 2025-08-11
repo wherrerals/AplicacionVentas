@@ -260,6 +260,27 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
 
     document.getElementById('productos').appendChild(newRow);
 
+
+    // ---- APLICAR UI DEL CUPÓN ANTES de inicializar interactividad ----
+    if (producto.cuponDescuento && Number(producto.cuponDescuento) > 0) {
+        const descuentoCupon = Number(producto.cuponDescuento);
+
+        const inputDescuentoRow = newRow.querySelector('#agg_descuento');
+        if (inputDescuentoRow) {
+            inputDescuentoRow.max = descuentoCupon;
+            inputDescuentoRow.value = 0;
+            inputDescuentoRow.setAttribute('disabled', 'disabled');
+        }
+
+        const descElem = newRow.querySelector('#desc_cupon');
+        if (descElem) {
+            descElem.textContent = `Cupon: ${descuentoCupon}%`;
+            descElem.hidden = false;
+            descElem.dataset.value = descuentoCupon; // <- importante para calcular correctamente
+        }
+    }
+
+
     const indiceProducto = newRow.querySelector('#indixe_producto').getAttribute('data-indice'); 
 
 

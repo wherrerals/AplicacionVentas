@@ -17,4 +17,4 @@ class CouponUsage(models.Model):
         verbose_name_plural = 'coupon_usage'
 
     def __str__(self):
-        return f"{self.user.username} - {self.coupon.code}"
+        return f"{self.user.username} - {self.coupon.cupon_code}"
