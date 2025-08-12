@@ -69,13 +69,7 @@
                                 </td>
                                 <td>{{ img.nombre }}</td>
                                 <td>{{ img.fecha_carga|date:"d/m/Y H:i" }}</td>
-                                <td>
-                                    {% if img.archivo and img.archivo.name and img.archivo.storage.exists(img.archivo.name) %}
-                                        {{ img.archivo.size|filesizeformat }}
-                                    {% else %}
-                                        Archivo no disponible
-                                    {% endif %}
-                                </td>
+                                <td>{{ img.archivo.size|filesizeformat }}</td>
                                 <td>
                                     <a href="{{ img.archivo.url }}" class="btn btn-sm btn-outline-primary" 
                                        target="_blank" download="{{ img.nombre }}">
