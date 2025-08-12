@@ -25,6 +25,8 @@ services:
       python manage.py migrate datosLsApp --settings=config.settings.qa &&
       python manage.py makemigrations taskApp --settings=config.settings.qa &&
       python manage.py migrate taskApp --settings=config.settings.qa &&
+      python manage.py makemigrations uploadApp --settings=config.settings.qa &&
+      python manage.py migrate uploadApp --settings=config.settings.qa &&
       python manage.py makemigrations --settings=config.settings.qa &&
       python manage.py migrate --settings=config.settings.qa &&
       python manage.py collectstatic --no-input --settings=config.settings.qa &&
