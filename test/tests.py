@@ -1,8 +1,8 @@
 from unittest.mock import patch, MagicMock
 from django.test import TestCase
 from adapters.sl_client import APIClient
-from datosLsApp.repositories.productorepository import ProductoRepository
-from logicaVentasApp.services.producto import Producto
+from infrastructure.repositories.productorepository import ProductoRepository
+from domain.services.producto import Producto
 from taskApp.models import SyncState
 
 

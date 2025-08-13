@@ -199,11 +199,12 @@ AplicacionVentas/__pycache__
 
 #Ignorar Migrations de django
 * migrations
-datosLsApp/migrations/
-logicaVentasApp/migrations/
-showromVentasApp/migrations/
+infrastructure/migrations/
+domain/migrations/
+presentation/migrations/
 taskApp/migrations/
 uploadApp/migrations/
+logs/migrations/
 
 
 AplicacionVentas/__pycache__/settings.cpython-311.pyc

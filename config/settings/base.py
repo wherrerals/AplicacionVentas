@@ -19,11 +19,11 @@ BASE_APPS = [
 ]
 
 LOCAL_APPS = [
-    "datosLsApp",
+    "infrastructure",
     "apps.core",
     "config",
-    "logicaVentasApp",
-    "showromVentasApp",
+    "domain",
+    "presentation",
     "taskApp",
     "logs",
     "uploadApp",
@@ -34,7 +34,7 @@ THIRD_APPS = []
 INSTALLED_APPS = BASE_APPS + LOCAL_APPS + THIRD_APPS
 
 BASE_MIDDLEWARE = [
-    "showromVentasApp.middleware.my_middleware.NoCacheMiddleware",
+    "presentation.middleware.my_middleware.NoCacheMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -58,7 +58,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, "showromVentasApp/templates/showromVentasApp")],
+        "DIRS": [os.path.join(BASE_DIR, "presentation/templates/showromVentasApp")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -66,8 +66,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "showromVentasApp.context_processors.grupos_usuario",
-                "showromVentasApp.context_processors.vendedor_codigo",
+                "presentation.context_processors.grupos_usuario",
+                "presentation.context_processors.vendedor_codigo",
             ],
         },
     },
@@ -117,8 +117,8 @@ VTEX_APP_TOKEN = "WTEPUGSXUOIOMSAVTEIIJOCBMXTUZWTESEFDQHZSLHJZMJXAVHPGOPDKMUVMAP
 VTEX_BASE_URL = "https://ledstudiocl.myvtex.com/api/"
 
 
-# python ./manage.py makemigrations showromVentasApp
-# python ./manage.py sqlmigrate showromVentasApp 0001
+# python ./manage.py makemigrations presentation
+# python ./manage.py sqlmigrate presentation 0001
 # python ./manage.py migrate
 
 # Password validation
@@ -154,7 +154,7 @@ USE_I18N = True
 USE_TZ = True
 
 LOGIN_REDIRECT_URL = "/ventas"
-# LOGIN_REDIRECT_URL = '/Users/Cuervo/Documents/AplicacionVentas/showromVentasApp/templates/login'
+# LOGIN_REDIRECT_URL = '/Users/Cuervo/Documents/AplicacionVentas/presentation/templates/login'
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",

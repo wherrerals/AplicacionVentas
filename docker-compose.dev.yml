@@ -22,11 +22,15 @@ services:
     command: >
         sh -c "
         python manage.py makemigrations --settings=config.settings.develop &&
-        python manage.py migrate --fake-initial --settings=config.settings.develop &&
-        python manage.py makemigrations datosLsApp --settings=config.settings.develop &&
-        python manage.py migrate datosLsApp --settings=config.settings.develop &&
+        python manage.py migrate --fake --settings=config.settings.develop &&
+        python manage.py makemigrations infrastructure --settings=config.settings.develop &&
+        python manage.py migrate --fake infrastructure --settings=config.settings.develop &&
         python manage.py makemigrations taskApp --settings=config.settings.develop &&
         python manage.py migrate taskApp --settings=config.settings.develop &&
+        python manage.py makemigrations logs --settings=config.settings.develop &&
+        python manage.py migrate logs --settings=config.settings.develop &&
+        python manage.py makemigrations uploadApp --settings=config.settings.develop &&
+        python manage.py migrate uploadApp --settings=config.settings.develop &&
         python manage.py runserver --settings=config.settings.develop 0.0.0.0:8000
         "
     volumes:
