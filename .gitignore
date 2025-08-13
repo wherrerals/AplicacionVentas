@@ -203,6 +203,7 @@ datosLsApp/migrations/
 logicaVentasApp/migrations/
 showromVentasApp/migrations/
 taskApp/migrations/
+uploadApp/migrations/
 
 
 AplicacionVentas/__pycache__/settings.cpython-311.pyc

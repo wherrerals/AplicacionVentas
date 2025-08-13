@@ -1311,19 +1311,11 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
                 },
                 'productos': data.get('DocumentLines', []),
                 'descuento_por_producto': [int(item.get('porcentaje_descuento', 0)) for item in data.get('DocumentLines', [])],                
-                'totales': {
-                    'total_sin_descuento': 10,#sum(item['subtotal_neto'] + item['descuento'] for item in data['DocumentLines']),
-                    'total_descuento': 10,#sum(item['descuento'] for item in data['DocumentLines']),
-                    'total_neto':10, #sum(item['subtotal_neto'] for item in data['DocumentLines']),
-                    'iva': 10,#sum(item['subtotal_neto'] for item in data['DocumentLines']) * 0.19,
-                    'subtotal_neto': 10,#sum(item['subtotal_neto'] for item in data['DocumentLines']) * 1.19,
-                },
             }
 
 
             # Crear instancia de calculadora y obtener valores por línea
             calculadora = CalculadoraTotales(data)
-            totales = calculadora.calcular_totales()
             lineas_neto = calculadora.calcular_linea_neto()
 
             # Asociar cada línea neta al producto correspondiente
@@ -1333,7 +1325,8 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
 
             # Asignar productos actualizados al cotizacion
             cotizacion["productos"] = productos
-            cotizacion["totales"] = totales
+            cotizacion["totales"] = calculadora.calcular_totales()
+            print(f"Totales calculados: {cotizacion['totales']}")
             cotizacion["tiene_descuento"] = any(cotizacion["descuento_por_producto"])
 
             # Renderizar plantilla HTML
