@@ -18,16 +18,24 @@ services:
       dockerfile: ./docker/dockerfile.qa
     image: studio-go:qa
     container_name: studio-go
+    image: studio-go:qa
+    container_name: studio-go
     command: >
       sh -c "
       rm -rf staticfiles/ &&
+      python manage.py makemigrations infrastructure --settings=config.settings.qa &&
+      python manage.py migrate infrastructure --fake --settings=config.settings.qa &&
       python manage.py makemigrations infrastructure --settings=config.settings.qa &&
       python manage.py migrate infrastructure --fake --settings=config.settings.qa &&
       python manage.py makemigrations taskApp --settings=config.settings.qa &&
       python manage.py migrate taskApp --fake --settings=config.settings.qa &&
       python manage.py makemigrations uploadApp --settings=config.settings.qa &&
       python manage.py migrate uploadApp --fake --settings=config.settings.qa &&
+      python manage.py migrate taskApp --fake --settings=config.settings.qa &&
+      python manage.py makemigrations uploadApp --settings=config.settings.qa &&
+      python manage.py migrate uploadApp --fake --settings=config.settings.qa &&
       python manage.py makemigrations --settings=config.settings.qa &&
+      python manage.py migrate --fake --settings=config.settings.qa &&
       python manage.py migrate --fake --settings=config.settings.qa &&
       python manage.py collectstatic --no-input --settings=config.settings.qa &&
       gunicorn --env DJANGO_SETTINGS_MODULE=config.settings.qa config.wsgi:application --bind 0.0.0.0:7000
@@ -35,11 +43,23 @@ services:
     volumes:
       - .:/app
       - media_data:/app/media 
+      - media_data:/app/media 
     ports:
       - "7000:7000"
     depends_on:
       - db
       - rabbitmq
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - media_data:/app/media
+    depends_on:
+      - web
 
   nginx:
     image: nginx:latest
@@ -68,6 +88,8 @@ services:
       dockerfile: ./docker/dockerfile.qa
     image: c-beat:qa
     container_name: c-beat
+    image: c-beat:qa
+    container_name: c-beat
     command: celery -A config beat --loglevel=info
     depends_on:
       - rabbitmq
@@ -81,6 +103,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/dockerfile.qa
+    image: cw-products:qa
+    container_name: cw-products
     image: cw-products:qa
     container_name: cw-products
     command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in
@@ -98,6 +122,8 @@ services:
       dockerfile: ./docker/dockerfile.app
     image: cw-recetas:qa
     container_name: cw-recetas
+    image: cw-recetas:qa
+    container_name: cw-recetas
     command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in_receta
     depends_on:
       - rabbitmq
@@ -111,6 +137,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/dockerfile.app
+    image: cw-importados:qa
+    container_name: cw-products-importados
     image: cw-importados:qa
     container_name: cw-products-importados
     command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in_importado
@@ -129,6 +157,8 @@ services:
       dockerfile: ./docker/dockerfile.qa
     image: cw-users:qa
     container_name: cw-users
+    image: cw-users:qa
+    container_name: cw-users
     command: celery -A config worker --loglevel=info --concurrency=2 -Q q_clients_in
     depends_on:
       - rabbitmq
@@ -143,6 +173,8 @@ services:
       context: .
       dockerfile: ./docker/dockerfile.qa  # Asegúrate de que este Dockerfile esté configurado correctamente
     command: celery -A config worker -Q q_pdf_generation -l info -E
+    image: cw-pdf:qa
+    container_name: cw-pdf
     image: cw-pdf:qa
     container_name: cw-pdf
     depends_on:
@@ -160,6 +192,8 @@ services:
     command: sh -c "celery -A config worker -Q update_recipe_comp -l info -E"
     image: cw-update-components:qa
     container_name: cw-update-components
+    image: cw-update-components:qa
+    container_name: cw-update-components
     depends_on:
       - rabbitmq
       - db
@@ -170,5 +204,6 @@ services:
 
 volumes:
   mysql_data:
+  media_data: 
   media_data: 
 
