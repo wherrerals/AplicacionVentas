@@ -1,0 +1,19 @@
+from django.db import models
+from infrastructure.models.regiondb import RegionDB
+
+class ComunaDB(models.Model):
+    class Meta:
+        db_table = "Comuna"
+
+        verbose_name = 'Comuna'
+        verbose_name_plural = 'Comuna'
+
+    codigo = models.CharField(primary_key= True,max_length=50,null = False)
+    nombre = models.CharField(max_length=50,null = False)
+    region = models.ForeignKey(RegionDB, on_delete=models.CASCADE, default=1)
+    codgio_postal = models.CharField(max_length=50, default='0', null=True)
+
+    #El parametro to_field='atributo_En_otro_modelo' es solo necesario si la relacion es con algo que no sea la llave primaria
+
+    def __str__(self):
+        return f'{self.codigo, self.nombre}'

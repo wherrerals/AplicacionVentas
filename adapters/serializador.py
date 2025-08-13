@@ -1,9 +1,9 @@
 import json
 
-from datosLsApp.repositories.comunarepository import ComunaRepository
-from datosLsApp.repositories.direccionrepository import DireccionRepository
-from datosLsApp.repositories.regionrepository import RegionRepository
-from datosLsApp.repositories.socionegociorepository import SocioNegocioRepository
+from infrastructure.repositories.comunarepository import ComunaRepository
+from infrastructure.repositories.direccionrepository import DireccionRepository
+from infrastructure.repositories.regionrepository import RegionRepository
+from infrastructure.repositories.socionegociorepository import SocioNegocioRepository
 
 class Serializador:
     def __init__(self, formato):

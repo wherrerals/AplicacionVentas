@@ -1,0 +1,386 @@
+
+
+from adapters.sl_client import APIClient
+from infrastructure.repositories.contactorepository import ContactoRepository
+from infrastructure.repositories.direccionrepository import DireccionRepository
+from infrastructure.repositories.productorepository import ProductoRepository
+from infrastructure.repositories.vendedorRepository import VendedorRepository
+from domain.services.calculador import CalculadoraTotales
+from domain.services.direccion import Direccion
+from domain.services.typeofsale import TypeOfSale
+from domain.services.vendedor import Seller
+
+
+class SerializerDocument:
+
+
+    @staticmethod
+    def document_serializer(doc_data):
+
+        prueba_line = doc_data.get('DocumentLines', [])
+
+        for line in prueba_line:
+            print(f"SKU de la linea: {line.get('ItemCode', 'No hay SKU')}")
+            print(f"Cantidad de la Linea: {line.get('Quantity', 'No hay lineas')}")
+
+        doc_total = CalculadoraTotales.calculate_docTotal(doc_data)
+        
+        type_sales = Seller.tipoVentaTipoVendedor(doc_data.get('SalesPersonCode'))
+        
+        if type_sales == 'NA':
+            type_sales = TypeOfSale.Sale_type_line_type(doc_data.get('DocumentLines', []))
+        
+        type_sales = TypeOfSale.sale_type(type_sales, doc_data.get('TransportationCode'))
+
+        branch_code = VendedorRepository.get_sucursal(doc_data.get('SalesPersonCode'))
+                    
+        addres_bill, address_ship = Direccion.assign_bill_ship_addres(doc_data.get('Address'), doc_data.get('Address2'), branch_code)
+
+        cabecera = {
+            'DocDate': doc_data.get('DocDate'),
+            'DocDueDate': doc_data.get('DocDueDate'),
+            'TaxDate': doc_data.get('TaxDate'),
+            #'DocTotal': doc_data.get('DocTotal'),
+            'DocTotal': f'{doc_total}',
+            'CardCode': doc_data.get('CardCode'),
+            'NumAtCard': doc_data.get('NumAtCard'),
+            'Comments': doc_data.get('Comments'),
+            'PaymentGroupCode': doc_data.get('PaymentGroupCode'),
+            'SalesPersonCode': doc_data.get('SalesPersonCode'),
+            'TransportationCode': doc_data.get('TransportationCode'),
+            'U_LED_TIPVTA': type_sales,
+            'U_LED_TIPDOC': doc_data.get('U_LED_TIPDOC'),
+            'U_LED_FORENV': doc_data.get('TransportationCode'),
+        }
+
+        repo_producto = ProductoRepository()
+        lineas_json = []
+
+        print("Lineas del documento:")
+        for linea in doc_data.get('DocumentLines', []):
+            item_code = linea.get('ItemCode')
+            
+            if repo_producto.es_receta(item_code):
+                treeType = 'iSalesTree'
+            else:
+                treeType = 'iNotATree'
+
+            cupon = linea.get('Text', None)
+            cupon_formateado = None
+            discount_percent = None
+            cupon_percent = None
+
+
+            if cupon:
+                cupon_formateado = cupon.split(': ')[1] if cupon else None
+                cupon_percent = float(cupon_formateado.split('%')[0]) if cupon_formateado else None
+
+
+            if cupon_percent !=0:
+                discount_percent = cupon_percent + linea.get('DiscountPercent', 0)
+            else:
+                discount_percent = linea.get('DiscountPercent', 0)
+
+            warehouseCode = linea.get('WarehouseCode')
+
+            nueva_linea = {
+                'ItemCode': item_code,
+                'Quantity': linea.get('Quantity'),
+                'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
+                'ShipDate': linea.get('ShipDate'),
+                #'FreeText': linea.get('FreeText'),
+                'FreeText': cupon_formateado,
+                'DiscountPercent': discount_percent, #linea.get('DiscountPercent'),
+                'WarehouseCode': warehouseCode,
+                'CostingCode': linea.get('CostingCode'),
+                'ShippingMethod': linea.get('ShippingMethod'),
+                'COGSCostingCode': linea.get('COGSCostingCode'),
+                'CostingCode2': linea.get('CostingCode2'),
+                'TreeType': treeType
+            }
+
+            lineas_json.append(nueva_linea)
+
+        # validar si es una lista o un class el tipo de addres_bill y address_ship
+        if not isinstance(addres_bill, list) and not isinstance(address_ship, list):
+            taxExtension = {
+                "StreetS": addres_bill.calleNumero,
+                "CityS": addres_bill.ciudad,
+                "CountyS": f"{addres_bill.comuna.codigo} - {addres_bill.comuna.nombre}",
+                "StateS": addres_bill.region.numero,
+                "CountryS": "CL",
+                "StreetB": address_ship.calleNumero,
+                "CityB": address_ship.ciudad,
+                "CountyB": f"{address_ship.comuna.codigo} - {address_ship.comuna.nombre}",
+                "StateB": address_ship.region.numero,
+                "CountryB": "CL",
+            } 
+        else:
+            taxExtension = SerializerDocument.build_tax_extension(addres_bill, address_ship)
+    
+        return {
+            **cabecera,
+            'DocumentLines': lineas_json,
+            'TaxExtension': taxExtension
+        }
+
+    @staticmethod
+    def document_serializer2(doc_data):
+        from domain.services.solicituddevolucion import SolicitudesDevolucion
+        lineas_identicas = SolicitudesDevolucion.validar_lineas_documento(doc_data)
+
+        if lineas_identicas:
+            print(f"Lineas Identicas: {lineas_identicas}")
+            doc_total = lineas_identicas.get('DoctotalBase', 0)
+        else:
+            print("Lineas no son identicas, calculando docTotal")
+            doc_total = CalculadoraTotales.calculate_docTotal_rr(doc_data)
+
+        print(f"DocTotal calculado: {doc_total}")
+            
+        type_sales = Seller.tipoVentaTipoVendedor(doc_data.get('SalesPersonCode'))
+        
+        if type_sales == 'NA':
+            type_sales = TypeOfSale.Sale_type_line_type(doc_data.get('DocumentLines', []))
+        
+        type_sales = TypeOfSale.sale_type(type_sales, doc_data.get('TransportationCode'))
+        branch_code = VendedorRepository.get_sucursal(doc_data.get('SalesPersonCode'))      
+        addres_bill, address_ship = Direccion.assign_bill_ship_addres(doc_data.get('Address'), doc_data.get('Address2'), branch_code)
+
+        raw_cabecera  = {
+            'DocDate': doc_data.get('DocDate'),
+            'DocDueDate': doc_data.get('DocDueDate'),
+            'TaxDate': doc_data.get('TaxDate'),
+            'U_VK_Folio': doc_data.get('Folio'),
+            'DocTotalBase': doc_data.get('docTotal_base'),
+            'DocTotal': f'{doc_total}',
+            'CardCode': doc_data.get('CardCode'),
+            'NumAtCard': doc_data.get('NumAtCard'),
+            'Comments': doc_data.get('Comments'),
+            'PaymentGroupCode': doc_data.get('PaymentGroupCode'),
+            'SalesPersonCode': doc_data.get('SalesPersonCode'),
+            'TransportationCode': doc_data.get('TransportationCode', 1),
+            'U_LED_TIPDEV': doc_data.get('U_LED_TIPDEV', ''),
+            'U_LED_TIPVTA': type_sales,
+            'U_LED_TIPDOC': doc_data.get('U_LED_TIPDOC'),
+            'U_LED_FORENV': doc_data.get('TransportationCode'),
+            'RefDocEntr': doc_data.get('RefDocEntr'),
+        }
+
+        cabecera = {k: v for k, v in raw_cabecera.items() if v not in (None, '')}
+
+
+        repo_producto = ProductoRepository()
+        lineas_json = []
+
+        for linea in doc_data.get('DocumentLines', []):
+            item_code = linea.get('ItemCode')
+            
+            if repo_producto.es_receta(item_code):
+                treeType = 'iSalesTree'
+            else:
+                treeType = 'iNotATree'
+
+            unit_price = linea.get('UnitePrice')
+            print(f"Precio unitario: {unit_price}")
+            unit_price_neto = unit_price / 1.19 
+            print(f"Precio unitario neto: {unit_price_neto}")
+            
+            warehouseCode = linea.get('WarehouseCode')
+
+            nueva_linea = {
+                'ItemCode': item_code,
+                'DocEntryBase': linea.get('DocEntry_line', 0),
+                'LineNum': linea.get('LineNum'),
+                'Quantity': linea.get('Quantity'),
+                'Quantity2': linea.get('Quantity2', 0),
+                #'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
+                'UnitPrice': float(unit_price_neto),
+                'ShipDate': linea.get('ShipDate'),
+                'FreeText': linea.get('FreeText'),
+                'DiscountPercent': linea.get('DiscountPercent'),
+                'WarehouseCode': warehouseCode,
+                'CostingCode': linea.get('CostingCode'),
+                'ShippingMethod': linea.get('ShippingMethod'),
+                'COGSCostingCode': linea.get('COGSCostingCode'),
+                'CostingCode2': linea.get('CostingCode2'),
+                'TreeType': treeType,
+                'EstadoCheck': linea.get('EstadoCheck', '0'),
+            }
+            print(f"price: {nueva_linea.get('UnitPrice')}")
+            lineas_json.append(nueva_linea)
+
+        if not isinstance(addres_bill, list) and not isinstance(address_ship, list):
+            taxExtension = {
+                "StreetS": addres_bill.calleNumero,
+                "CityS": addres_bill.ciudad,
+                "CountyS": f"{addres_bill.comuna.codigo} - {addres_bill.comuna.nombre}",
+                "StateS": addres_bill.region.numero,
+                "CountryS": "CL",
+                "StreetB": address_ship.calleNumero,
+                "CityB": address_ship.ciudad,
+                "CountyB": f"{address_ship.comuna.codigo} - {address_ship.comuna.nombre}",
+                "StateB": address_ship.region.numero,
+                "CountryB": "CL",
+            } 
+        else:
+            taxExtension = SerializerDocument.build_tax_extension(addres_bill, address_ship)
+    
+        return {
+            **cabecera,
+            'DocumentLines': lineas_json,
+            'TaxExtension': taxExtension
+        }
+
+    def build_tax_extension(address_list):
+        if not address_list or len(address_list) < 2:
+            raise ValueError("Se requieren al menos dos direcciones para bill y ship")
+
+        bill = address_list[0]
+        ship = address_list[1]
+
+        taxExtension = {
+            "StreetS": bill['direccion'],
+            "CityS": bill['ciudad'],
+            "CountyS": bill['comuna'],
+            "StateS": bill['region'],
+            "CountryS": "CL",
+            "StreetB": ship['direccion'],
+            "CityB": ship['ciudad'],
+            "CountyB": ship['comuna'],
+            "StateB": ship['region'],
+            "CountryB": "CL",
+        }
+
+        return taxExtension
+
+    @staticmethod
+    def build_tax_extension(addres_bill, address_ship):
+
+            bill = addres_bill[0]
+            ship = address_ship[0]
+
+            return {
+                "StreetS": bill.get('direccion', ''),
+                "CityS": bill.get('ciudad', ''),
+                "CountyS": bill.get('comuna', ''),
+                "StateS": bill.get('region', ''),
+                "CountryS": bill.get('pais', 'CL'),
+                "StreetB": ship.get('direccion', ''),
+                "CityB": ship.get('ciudad', ''),
+                "CountyB": ship.get('comuna', ''),
+                "StateB": ship.get('region', ''),
+                "CountryB": ship.get('pais', 'CL'),
+            }
+
+
+
+    @staticmethod
+    def serialize_recipe_ingredients(document_lines, type_document):
+        lines = document_lines.get("value", [])
+
+        result = {"DocumentLines": []}
+
+        # Ordenar por LineNum
+        parsed_lines = [line.get(f"{type_document}/DocumentLines", {}) for line in lines]
+
+        current_warehouse = None
+        current_line_num = None
+
+        for line in parsed_lines:
+            tree_type = line.get("TreeType")
+            warehouse = line.get("WarehouseCode")
+            item_code = line.get("ItemCode")
+            line_num = line.get("LineNum")
+
+            if tree_type == "S":
+                # Guardar la bodega actual para futuras líneas I
+                current_warehouse = warehouse
+                current_line_num = line_num
+
+                result["DocumentLines"].append({
+                    "LineNum": line_num,
+                    "ItemCode": item_code,
+                    "WarehouseCode": current_warehouse,
+                    "TreeType": "iSalesTree"
+                })
+
+            elif tree_type == "I" and current_warehouse is not None:
+                # Usar la bodega asociada a la última línea S
+                result["DocumentLines"].append({
+                    "LineNum": line_num,
+                    "ItemCode": item_code,
+                    "WarehouseCode": current_warehouse,
+                    "TreeType": "iIngredient"
+                })
+
+            # Si es "N" o sin TreeType válido, ignorar
+
+        return result
+    
+
+    @staticmethod
+    def serialize_documento_completo(documentos: list[dict]):
+        if not documentos:
+            return {}
+
+        doc = documentos[0]
+
+        cliente = {
+            "SalesPersons": {
+                "SalesEmployeeName": f"{doc['U_LED_SUCURS']} - {doc['SalesEmployeeName']}",
+                "SalesEmployeeCode": doc['SalesEmployeeCode'],
+                "U_LED_SUCURS": doc['U_LED_SUCURS'],
+            },
+            
+            "ReturnRequest": {
+                "DocNum": doc.get("docNum", "") if doc.get("docNum") != 0 else "",
+                "DocEntry": doc.get("docEntry", "") if doc.get("docEntry") != 0 else "",
+                "DocDate": doc.get("fechaEntrega", ""),
+                "Folio": doc.get("folio", ""),
+                "Cancelled": "N" if doc.get("estado_documento") != "Cancelado" else "Y",
+                "CardCode": doc.get("CardCode", ""),
+                "DocumentStatus": "O" if doc.get("estado_documento") == "Borrador" else "C",
+                "RefDocEntr": doc.get("RefDocEntr", ""),
+                "id": doc.get("id", ""),
+                "CardName": doc.get("nombre_cliente", ""),
+                "TransportationCode": doc.get("TransportationCode", ""),
+                "U_LED_TIPDEV": doc.get("U_LED_TIPDEV", ""),
+                "U_LED_TIPDOC": "",
+                "NumAtCard": doc.get("referencia", ""),
+                "Comments": doc.get("comentario", "")
+            },
+
+            "ContactEmployee": {
+                "Contactos": []
+            }
+        }
+
+        lines = []
+        for linea in doc.get('lineas', []):
+            lines.append({
+                "LineNum": 0,
+                "linea_base": linea.get('linea_base'),
+                "DocEntry": doc.get("id", ""),
+                "ItemCode": linea['producto_codigo'],
+                "ItemDescription": linea['producto_nombre'],
+                "Quantity": linea['cantidad'],
+                "Quantity2": linea.get('cantidad_original'),
+                "imagen": linea['imagen_url'],
+                "PriceAfterVAT": linea['precio_unitario'] * 1.19,
+                "GrossPrice": int(linea['precio_lista']),
+                "DiscountPercent": linea['descuento'],
+                "WarehouseCode": linea['WarehouseCode'],
+                "FreeText": linea.get('comentario', ''),
+                "ShippingMethod": "",
+                "ShipDate": linea.get('fecha_entrega', ""),
+                "estate_rr_line": linea.get('estate_rr_line'),
+            })
+
+        resultado = {
+            "Cliente": cliente,
+            "DocumentLines": lines
+        }
+        
+        return resultado
+

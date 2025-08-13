@@ -7,10 +7,9 @@ from django.shortcuts import redirect
 urlpatterns = [
     path('', lambda request: redirect('ventas/')),
     path('admin/', admin.site.urls),
-    path('ventas/', include('showromVentasApp.urls')),
+    path('ventas/', include('presentation.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('upload/', include('uploadApp.urls')),
-    #path('', include('logicaVentasApp.urls')),
 ]  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

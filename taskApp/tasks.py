@@ -2,9 +2,9 @@
 from venv import logger
 from celery import shared_task, states
 from celery.result import AsyncResult
-from logicaVentasApp.services.socionegocio import SocioNegocio
+from domain.services.socionegocio import SocioNegocio
 from taskApp.models import CeleryTask
-from logicaVentasApp.services.producto import Producto
+from domain.services.producto import Producto
 
 # tasks.py
 from django.template.loader import render_to_string

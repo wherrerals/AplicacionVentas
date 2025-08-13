@@ -8,7 +8,7 @@ python manage.py waitForDb --settings=config.settings.production
 python manage.py migrate --settings=config.settings.production
 
 
-gunicorn --env DJANGO_SETTINGS_MODULE=config.settings.production config.wsgi:application --bind 0.0.0.0:7000 --timeout 180
+gunicorn --env DJANGO_SETTINGS_MODULE=config.settings.production config.wsgi:application --bind 0.0.0.0:7000
 #gunicorn --env DJANGO_SETTINGS_MODULE=config.settings.production config.wsgi:application --bind 0.0.0.0:7000 --workers=17 --threads=4 --timeout 300 --log-level debug
 #gunicorn --env DJANGO_SETTINGS_MODULE=config.settings.production config.wsgi:application \
 #--bind 0.0.0.0:7000 --workers=16 --threads=4 --timeout=300 \
