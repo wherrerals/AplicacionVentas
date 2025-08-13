@@ -24,6 +24,8 @@ services:
       rm -rf staticfiles/ &&
       python manage.py makemigrations infrastructure --settings=config.settings.production &&
       python manage.py migrate infrastructure --fake --settings=config.settings.production &&
+      python manage.py makemigrations infrastructure --settings=config.settings.production &&
+      python manage.py migrate infrastructure --fake-initial --settings=config.settings.production &&
       python manage.py makemigrations taskApp --settings=config.settings.production &&
       python manage.py migrate taskApp --settings=config.settings.production &&
       python manage.py makemigrations --settings=config.settings.production &&
