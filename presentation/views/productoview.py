@@ -75,3 +75,6 @@ class Productos(View):
     
     def prueba(self, request):
         pass
+
+
+

@@ -227,3 +227,5 @@ celerybeat-schedule.bak
 staticfiles/
 
 * staticfiles/
+
+core.*

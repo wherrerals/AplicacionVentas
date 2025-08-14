@@ -1561,3 +1561,6 @@ def validar_cupon(request):
     print(f"Datos del cupón: {data_coupon}")
 
     return JsonResponse(data_coupon, status=200)
+def validar_imagenes(request):
+    productos = ProductoDB.objects.all()
+    return render(request, 'validar_imagenes.html', {'productos': productos})

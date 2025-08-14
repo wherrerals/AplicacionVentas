@@ -82,4 +82,5 @@ urlpatterns = [
     path('<slug:codigo>/editar/', CuponUpdateView.as_view(), name='editar'),
     path('<slug:codigo>/', CuponDetailView.as_view(), name='detalle'),
     path('get_doctotal/', view.get_doctotal, name='get_doctotal'),
+    path('validar_imagenes/', view.validar_imagenes, name='validar_imagenes'),
 ]

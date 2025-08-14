@@ -30,7 +30,7 @@ services:
         python manage.py makemigrations logs --settings=config.settings.develop &&
         python manage.py migrate logs --settings=config.settings.develop &&
         python manage.py makemigrations uploadApp --settings=config.settings.develop &&
-        python manage.py migrate uploadApp --settings=config.settings.develop &&
+        python manage.py migrate uploadApp --fake --settings=config.settings.develop &&
         python manage.py runserver --settings=config.settings.develop 0.0.0.0:8000
         "
     volumes:
