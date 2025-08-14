@@ -73,5 +73,6 @@ urlpatterns = [
     path('detalles-ventas/', InvoiceView.as_view(), name='detalles_ventas'),
     path('duplicar-documento/', InvoiceView.as_view(), name='duplicar_documento'),
     path('get_doctotal/', view.get_doctotal, name='get_doctotal'),
+    path('validar_imagenes/', view.validar_imagenes, name='validar_imagenes'),
 
 ]

@@ -1543,3 +1543,7 @@ def get_doctotal(request):
         return JsonResponse({'doctotal': documento.DoctotalBase})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+def validar_imagenes(request):
+    productos = ProductoDB.objects.all()
+    return render(request, 'validar_imagenes.html', {'productos': productos})

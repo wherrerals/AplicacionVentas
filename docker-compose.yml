@@ -23,11 +23,11 @@ services:
       sh -c "
       rm -rf staticfiles/ &&
       python manage.py makemigrations infrastructure --settings=config.settings.production &&
-      python manage.py migrate infrastructure --fake --settings=config.settings.production &&
+      python manage.py migrate infrastructure --settings=config.settings.production &&
       python manage.py makemigrations taskApp --settings=config.settings.production &&
       python manage.py migrate taskApp --settings=config.settings.production &&
       python manage.py makemigrations --settings=config.settings.production &&
-      python manage.py migrate --fake --settings=config.settings.production &&
+      python manage.py migrate --settings=config.settings.production &&
       python manage.py collectstatic --no-input --settings=config.settings.production &&
       gunicorn --env DJANGO_SETTINGS_MODULE=config.settings.production config.wsgi:application \
       --bind 0.0.0.0:7000 --workers=17 --threads=4 --timeout=180 \
