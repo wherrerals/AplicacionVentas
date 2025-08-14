@@ -27,5 +27,5 @@ from infrastructure.models.collectionsdb import CollectionsDB
 from infrastructure.models.rules_coupondb import RulesCouponDB
 from infrastructure.models.confiDescuentosDB import ConfiDescuentosDB
 from infrastructure.models.couponsdb import CouponsDB
-from infrastructure.models.cuponUser import CouponUsage
+from infrastructure.models.cuponUser import CouponUsageDB
 from infrastructure.models.rulescouponsrelation import CouponRuleRelation
