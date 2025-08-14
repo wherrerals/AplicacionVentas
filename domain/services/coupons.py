@@ -31,6 +31,7 @@ class Coupons():
         return False        
 
     def get_coupon_discount(self):
+        
         return self.coupon.discount_percentage
     
     def rules_coupon(self):

@@ -23,4 +23,4 @@ class ProductoDB(models.Model):
     
 
     def __str__(self):
-        return f"{self.codigo}, {self.precioLista}, {self.precioVenta}"
+        return self.codigo
