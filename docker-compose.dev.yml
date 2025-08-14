@@ -22,7 +22,7 @@ services:
     command: >
         sh -c "
         python manage.py makemigrations --settings=config.settings.develop &&
-        python manage.py migrate  --settings=config.settings.develop &&
+        python manage.py migrate --settings=config.settings.develop &&
         python manage.py makemigrations infrastructure --settings=config.settings.develop &&
         python manage.py migrate  infrastructure --settings=config.settings.develop &&
         python manage.py makemigrations taskApp --settings=config.settings.develop &&

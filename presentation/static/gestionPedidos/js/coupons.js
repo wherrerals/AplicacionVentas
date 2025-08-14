@@ -65,36 +65,37 @@ function aplicarCupon(codigoCupon) {
         // validar los datos del cupon
     });
 
-    fetch('/ventas/validar_cupon/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            //'X-CSRFToken': csrftoken
-
-        },
-
-        body: JSON.stringify({
-            card_code: cardCode,
-            code: codigoCupon,
-            product_codes: productos,
-            doc_total: docTotal
-        })
-
+fetch('/ventas/validar_cupon/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+    },
+    body: JSON.stringify({
+        card_code: cardCode,
+        code: codigoCupon,
+        product_codes: productos,
+        doc_total: docTotal
     })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Coupon response:', data);
-            if (data.success) {
-                actualizarDescuentosDesdeCupon(data);
-            } else {
-                console.log('Invalid coupon code.');
-                alert('Invalid coupon code.');
-            }
-        })
-        .catch(error => {
-            console.error('Error applying coupon:', error);
-            alert('An error occurred while applying the coupon.');
-        });
+})
+.then(response => response.json())
+.then(data => {
+    console.log('Coupon response:', data);
+
+    if (data.error) {
+        // Muestra todos los errores devueltos por el backend
+        alert(data.error);
+    } else if (data.success) {
+        actualizarDescuentosDesdeCupon(data);
+    } else {
+        alert('Ocurrió un error desconocido al aplicar el cupón.');
+    }
+})
+.catch(error => {
+    console.error('Error applying coupon:', error);
+    alert('Ocurrió un error al aplicar el cupón.');
+});
+
 }
 
 

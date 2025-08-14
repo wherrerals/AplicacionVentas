@@ -70,6 +70,12 @@ class Coupons():
         if not self.coupon_is_active():
             error.append("El Cupon {coupon} no esta activo")
 
+        rules = self.rules_coupon()
+        if rules and rules[0]['min_value']:
+            if float(self.doc_total) < float(rules[0]['min_value']):
+                min_value = int(rules[0]['min_value'])
+                error.append(f"El valor de la factura debe ser mayor a $ {min_value:,}".replace(',', '.'))
+
         return ''.join(error)
     
 
@@ -83,14 +89,13 @@ class Coupons():
         rules = self.rules_coupon()
         product_codes = [p['itemCode'] for p in self.products]
 
-
         if rules and rules[0]['operator'] == 'todo':
             applicable_codes = product_codes
         else:
             valid_codes = set(p['codigo'] for p in self.coupon.products.all().values('codigo'))
             applicable_codes = list(valid_codes.intersection(product_codes))
 
-        validator = CouponValidator(applicable_codes, rules, self.doc_total)
+        validator = CouponValidator(applicable_codes, rules, self.doc_total, self.coupon)
         filtered_products = validator.get_applicable_products()
 
         return {"success": True, 

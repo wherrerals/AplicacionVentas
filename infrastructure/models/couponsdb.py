@@ -18,6 +18,7 @@ class CouponsDB(models.Model):
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     max_uses = models.IntegerField(default=1)
     one_use_only = models.BooleanField(default=False)
+    allows_maximum_discount = models.BooleanField(default=False)
     coupon_type = models.CharField(max_length=50)
     same_price_and_discount = models.BooleanField(default=False)
     last_modification = models.DateTimeField(auto_now=True)
