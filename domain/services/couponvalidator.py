@@ -40,9 +40,16 @@ class CouponValidator:
             return []
 
         if self.cupon.same_price_and_discount:
+            print("Aplicando filtro de productos con mismo precio y descuento")
+            print(f"{self.cupon.same_price_and_discount}")
             # Solo productos sin diferencia de precios
             return [p for p in self.products if p.precioVenta == p.precioLista]
         
         # Si es falso, aplica a todos
         return self.products
 
+    def get_discounted_products(self):
+        """
+        Retorna productos que tienen un descuento aplicado.
+        """
+        return [p for p in self.products if p.descuento > 0]

@@ -16,6 +16,8 @@ function getCookie(name) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const couponInput = document.getElementById('cupon_data');
+    const applyButton = document.getElementById('btn-aplicar-cupon');
+
     console.log('Coupon input element:', couponInput);
 
     if (couponInput) {
@@ -29,6 +31,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     console.log('Input is empty, no coupon applied');
                 }
+            }
+        });
+    }
+
+        if (applyButton) {
+        applyButton.addEventListener('click', function () {
+            const codigoCupon = couponInput.value.trim();
+            if (codigoCupon !== '') {
+                console.log('Button clicked, applying coupon:', codigoCupon);
+                aplicarCupon(codigoCupon);
+            } else {
+                console.log('Input is empty, no coupon applied');
             }
         });
     }

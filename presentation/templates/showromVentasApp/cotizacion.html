@@ -145,7 +145,19 @@ document.addEventListener("DOMContentLoaded", function() {
       </div>
       <div class="col" style="text-align: left; padding-top: 12px; padding-bottom: 0px">
         <!-- Estados -->
-          <input class="form-control" type="text" id="cupon_data" name="Cupon_id" placeholder="Ingrese Un Cupón..." style="font-size: 12px; border-color: rgb(159, 168, 175)" />
+          <div class="input-group" style="max-width: 300px;">
+            <input 
+              class="form-control" 
+              type="text" 
+              id="cupon_data" 
+              name="Cupon_id" 
+              placeholder="Ingrese Un Cupón..." 
+              style="font-size: 12px; border-color: rgb(159, 168, 175)" 
+            />
+            <button class="btn btn-primary" type="button" id="btn-aplicar-cupon" style="font-size: 12px;">
+              Aplicar
+            </button>
+          </div>
         <p style="
               padding-bottom: 0px;
               padding-top: 0px;
