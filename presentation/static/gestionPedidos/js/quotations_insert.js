@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const ulfen = 1; //document.getElementById("uledforenv").value;
         const referencia = document.getElementById("referencia").value; //listo
         const observaciones = document.getElementById("Observaciones-1").value; //selecionando observaciones por fila de producto por medio de id
-
+        const cupon_code = document.getElementById("cupon_data").value; //listo
         // Obtener el elemento <select>
         const selectElement = document.getElementById("direcciones_despacho");
         const direccion2 = selectElement.value;
@@ -128,7 +128,8 @@ document.addEventListener("DOMContentLoaded", function () {
             "TransportationCode": trnasp,
             "U_LED_TIPDOC": ultd,
             "U_LED_FORENV": ulfen,
-            "DocumentLines": lines
+            "DocumentLines": lines,
+            "Cupon_code": cupon_code
         };
 
         // Convertir a JSON

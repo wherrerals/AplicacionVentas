@@ -2,7 +2,7 @@ from infrastructure.models.productodb import ProductoDB
 
 
 class CouponValidator:
-    def __init__(self, product_codes, rules, doc_total, cupon):
+    def __init__(self, product_codes, rules, doc_total, cupon, users_data=None):
         """
         products: lista de diccionarios o instancias con precios
         rules: lista de reglas [{'operator': '>', 'min_value': ..., 'max_value': ...}]
@@ -11,6 +11,7 @@ class CouponValidator:
         self.rules = rules
         self.doc_total = doc_total
         self.cupon = cupon
+        self.users_data = users_data
 
     def _apply_rule(self, rule):
         op = rule['operator']
@@ -48,8 +49,24 @@ class CouponValidator:
         # Si es falso, aplica a todos
         return self.products
 
-    def get_discounted_products(self):
-        """
-        Retorna productos que tienen un descuento aplicado.
-        """
-        return [p for p in self.products if p.descuento > 0]
+    def get_discounted_products(self, filtered_products, discount):
+
+        products_with_discounts = []
+        for product in filtered_products:
+            if self.cupon.allows_maximum_discount:
+                final_discount = discount
+            else:
+                from presentation.views.view import limitar_descuento
+                print(f"discount: {discount}")
+                limite_producto = limitar_descuento(product, self.users_data) / 100
+                print(f"Limite producto: {limite_producto}")
+                final_discount = min(discount, limite_producto)
+                print(f"Final discount: {final_discount}")
+
+            products_with_discounts.append({
+                "codigo": product.codigo,
+                "descuento": final_discount
+            })
+
+        return products_with_discounts
+    

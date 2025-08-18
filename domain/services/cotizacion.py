@@ -299,6 +299,7 @@ class Cotizacion(Documento):
             return {'error': str(e)}
 
     def crearDocumento(self, data):
+        print("Creando cotización con los siguientes datos:", data)
         try:
             # Verificar los datos antes de preparar el JSON
             errores = self.validarDatosCotizacion(data)
@@ -306,6 +307,7 @@ class Cotizacion(Documento):
                 return {'error': errores}
 
             # Preparar el JSON para la cotización
+            print("Preparando datos para crear cotización...")
             jsonData = SerializerDocument.document_serializer(data)
 
             print("JSON Data para crear cotización:", jsonData)
@@ -325,7 +327,12 @@ class Cotizacion(Documento):
                     self.update_components(response, doc_entry, type_document='Quotations')
     
                     DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Create')
+                    from infrastructure.repositories.couponrepository import CouponRepository
                     
+                    if data.get('Cupon_code') != '':
+                        usage = CouponRepository.mark_coupon_as_used(data.get('Cupon_code'), jsonData.get('CardCode'))
+                        print(f"Usado: {usage.used}, Restantes: {usage.remaining_uses}")
+
                     return {
                         'success': 'Cotización creada exitosamente',
                         'docNum': doc_num,

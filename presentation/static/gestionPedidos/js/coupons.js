@@ -115,19 +115,23 @@ fetch('/ventas/validar_cupon/', {
 
 function actualizarDescuentosDesdeCupon(reglas) {
     const filasProductos = document.querySelectorAll('tbody.product-row');
-    const productosAplicables = reglas.products.map(p => p.codigo); // Extrae los códigos permitidos
-    const porcentajeDescuento = parseFloat(reglas.discount) * 100;
+
+    // Creamos un mapa {codigo: descuento} para acceso rápido
+    const descuentosPorProducto = {};
+    if (reglas.products && Array.isArray(reglas.products)) {
+        reglas.products.forEach(p => {
+            descuentosPorProducto[p.codigo] = parseFloat(p.descuento) * 100; // Convertimos a %
+        });
+    }
 
     filasProductos.forEach(row => {
         const itemcode = row.getAttribute('data-itemcode');
+        const descuentoCupon = descuentosPorProducto[itemcode] || null;
 
-        // Solo aplica si el item está en la lista de productos del cupón
-        if (productosAplicables.includes(itemcode)) {
-            console.log('Applying discount for item:', itemcode, 'Discount:', porcentajeDescuento);
+        if (descuentoCupon !== null) {
+            console.log('Aplicando descuento para item:', itemcode, 'Descuento:', descuentoCupon);
 
             const inputDescuento = row.querySelector('#agg_descuento');
-            const descuentoCupon = porcentajeDescuento || 0;
-
             if (inputDescuento) {
                 inputDescuento.max = descuentoCupon;
                 inputDescuento.value = 0;
@@ -135,7 +139,7 @@ function actualizarDescuentosDesdeCupon(reglas) {
 
                 const descuento = row.querySelector('#desc_cupon');
                 if (descuento) {
-                    descuento.textContent = `Cupon: ${descuentoCupon}%`;
+                    descuento.textContent = `Cupón: ${descuentoCupon}%`;
                     descuento.hidden = false;
                     descuento.dataset.value = descuentoCupon;
                 }
@@ -143,7 +147,7 @@ function actualizarDescuentosDesdeCupon(reglas) {
                 inputDescuento.dispatchEvent(new Event('input', { bubbles: true }));
             }
         } else {
-            // Opción: limpiar descuento si el producto no aplica
+            // Si el producto no tiene descuento de cupón, limpiamos
             const inputDescuento = row.querySelector('#agg_descuento');
             if (inputDescuento) {
                 inputDescuento.removeAttribute('disabled');
@@ -158,6 +162,7 @@ function actualizarDescuentosDesdeCupon(reglas) {
         }
     });
 }
+
 
 
 

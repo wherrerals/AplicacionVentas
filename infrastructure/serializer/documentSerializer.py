@@ -65,15 +65,15 @@ class SerializerDocument:
             else:
                 treeType = 'iNotATree'
 
-            cupon = linea.get('Text', None)
-            cupon_formateado = None
-            discount_percent = None
-            cupon_percent = None
+            cupon = linea.get('Text', 0)
+            cupon_formateado = 0
+            discount_percent = 0
+            cupon_percent = 0
 
 
             if cupon:
-                cupon_formateado = cupon.split(': ')[1] if cupon else None
-                cupon_percent = float(cupon_formateado.split('%')[0]) if cupon_formateado else None
+                cupon_formateado = cupon.split(': ')[1] if cupon else 0
+                cupon_percent = float(cupon_formateado.split('%')[0]) if cupon_formateado else 0
 
 
             if cupon_percent !=0:
@@ -123,6 +123,7 @@ class SerializerDocument:
             'DocumentLines': lineas_json,
             'TaxExtension': taxExtension
         }
+        
 
     @staticmethod
     def document_serializer2(doc_data):

@@ -1086,3 +1086,20 @@ class APIClient:
         except requests.exceptions.HTTPError as e:
             if "response" in locals() and response is not None:
                 print(f"Cuerpo de la respuesta del servidor: {response.text}")
+
+
+    def get_sales_or_orders(self, card_code):
+        self.__login()
+        #quitar C o c a el cardcode
+        card_code = card_code.replace("C", "").replace("c", "")
+        crossjoin = "(Invoices,SalesPersons)?$expand"
+        expand = "Invoices($select=DocEntry)&$filter=Invoices/SalesPersonCode eq SalesPersons/SalesEmployeeCode "
+        query = f"and (Invoices/CardCode eq '{card_code}C' or Invoices/CardCode eq '{card_code}c' or contains(Invoices/CardCode, '{card_code}'))&$top=1"
+        url = f"{self.base_url}${crossjoin}?$expand={expand}{query}"
+
+        response = self.session.get(url, verify=False)
+        response.raise_for_status()
+        data = response.json()
+        
+        # Retorna el conteo de resultados
+        return len(data.get("value", []))
