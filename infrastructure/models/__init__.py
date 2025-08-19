@@ -23,9 +23,14 @@ from infrastructure.models.tipoventadb import TipoVentaDB
 from infrastructure.models.usuariodb import UsuarioDB
 from infrastructure.models.vendedordb import VendedorDB
 from infrastructure.models.stockbodegasdb import StockBodegasDB
-from infrastructure.models.collectionsdb import CollectionsDB
 from infrastructure.models.rules_coupondb import RulesCouponDB
 from infrastructure.models.confiDescuentosDB import ConfiDescuentosDB
 from infrastructure.models.couponsdb import CouponsDB
 from infrastructure.models.cuponUser import CouponUsageDB
 from infrastructure.models.rulescouponsrelation import CouponRuleRelation
+from infrastructure.models.collectionproductsdb import CollectionsProducts
+from infrastructure.models.collectiondb import CollectionDB
+
+
+
+
