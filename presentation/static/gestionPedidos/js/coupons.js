@@ -50,8 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 function aplicarCupon(codigoCupon) {
+    showLoadingOverlay()
     if (!codigoCupon) {
         console.log('No coupon code provided.');
+        hideLoadingOverlay();
         return;
     }
     const inputCliente = document.querySelector('#inputCliente');
@@ -61,12 +63,15 @@ function aplicarCupon(codigoCupon) {
     if(!cardCode) {
         //console.log('No card code found for the customer.');
         alert('Porfavor agrega un cliente primero.');
+        hideLoadingOverlay();
         return;
+        
     }
     const filasProductos = document.querySelectorAll('tbody.product-row');
     if (filasProductos.length === 0) {
         console.log('No products found in the order.');
         alert('No hay productos en el pedido.');
+        hideLoadingOverlay();
         return;
     }
     
@@ -98,15 +103,22 @@ fetch('/ventas/validar_cupon/', {
 
     if (data.error) {
         // Muestra todos los errores devueltos por el backend
+        hideLoadingOverlay();
         alert(data.error);
     } else if (data.success) {
+        
         actualizarDescuentosDesdeCupon(data);
+        hideLoadingOverlay();
+
     } else {
+        hideLoadingOverlay();
         alert('Ocurrió un error desconocido al aplicar el cupón.');
+        
     }
 })
 .catch(error => {
     console.error('Error applying coupon:', error);
+    hideLoadingOverlay();
     alert('Ocurrió un error al aplicar el cupón.');
 });
 

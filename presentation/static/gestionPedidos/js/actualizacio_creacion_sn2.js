@@ -136,8 +136,10 @@ formularios.forEach(formulario => {
                         throw new Error(data.message || 'Error en los datos enviados');
                     });
                 } else if (response.status === 500) {
+                    hideLoadingOverlay();
                     throw new Error('Error interno del servidor');
                 } else {
+                    hideLoadingOverlay();
                     throw new Error('Error desconocido');
                 }
             }
@@ -181,6 +183,7 @@ formularios.forEach(formulario => {
         .catch(error => {
             submitButton.disabled = false;
             console.error('Error en la solicitud:', error);
+            hideLoadingOverlay();
             mostrarMensaje(error.message || 'Ocurrió un error desconocido', 'error');
         });
     });

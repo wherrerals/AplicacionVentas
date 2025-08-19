@@ -1092,10 +1092,10 @@ class APIClient:
         self.__login()
         #quitar C o c a el cardcode
         card_code = card_code.replace("C", "").replace("c", "")
-        crossjoin = "(Invoices,SalesPersons)?$expand"
+        crossjoin = "(Invoices,SalesPersons)"
         expand = "Invoices($select=DocEntry)&$filter=Invoices/SalesPersonCode eq SalesPersons/SalesEmployeeCode "
         query = f"and (Invoices/CardCode eq '{card_code}C' or Invoices/CardCode eq '{card_code}c' or contains(Invoices/CardCode, '{card_code}'))&$top=1"
-        url = f"{self.base_url}${crossjoin}?$expand={expand}{query}"
+        url = f"{self.base_url}$crossjoin{crossjoin}?$expand={expand}{query}"
 
         response = self.session.get(url, verify=False)
         response.raise_for_status()

@@ -83,9 +83,6 @@ class Coupons():
         if not self.exist:
             error.append("El Cupon no existe")
             return ''.join(error)
-        
-        if self.validate_sales_after_coupon():
-            error.append(f"El Cliente {self.sncode} ya tiene ventas posteriores a la aplicacion del Cupon \n")
 
         if self.coupon.one_use_only:
             if self.count_use_cupon() >= self.coupon.max_uses:
@@ -106,6 +103,9 @@ class Coupons():
             if float(self.doc_total) < float(rules[0]['min_value']):
                 min_value = int(rules[0]['min_value'])
                 error.append(f"El valor de la factura debe ser mayor a $ {min_value:,}".replace(',', '.'))
+        
+        if self.validate_sales_after_coupon():
+            error.append(f"El Cliente {self.sncode} ya tiene ventas posteriores a la aplicacion del Cupon \n")
 
         return ''.join(error)
     

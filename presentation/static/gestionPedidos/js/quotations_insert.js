@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const tipoDocElement = document.querySelector("[name='tipoDocTributario']:checked");
         if (!tipoDocElement) {
             console.error("No se seleccionó un tipo de documento tributario.");
+            hideLoadingOverlay();
             return;
         }
         const ultd = tipoDocElement.value; //listo
@@ -205,6 +206,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => {
                 console.error('Hubo un error durante la operación:', error);
+                hideLoadingOverlay();
             })
 
             .finally(() => {
