@@ -2,7 +2,7 @@ from django.db import models
 
 class CollectionDB(models.Model):
 
-    collection_id = models.AutoField(primary_key=True)
+    collection_id = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=150, null=False)
     
     products = models.ManyToManyField(
