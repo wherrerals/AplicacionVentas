@@ -2,43 +2,530 @@
 {% block title %}{{ form_title }}{% endblock %}
 
 {% block content %}
-<h3>{{ form_title }}</h3>
-<form method="post" novalidate>
-  {% csrf_token %}
+<div class="container-fluid">
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">{{ form_title }}</h2>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">
+              <a href="{% url 'listar' %}">Cupones</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+              {% if form.instance.pk %}Editar{% else %}Crear{% endif %}
+            </li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Section -->
   <div class="row">
-    <div class="col-md-6">
-    {% include "components/form_field.html" with field=form.cupon_code %}
-    {% include "components/form_field.html" with field=form.name %}
-    {% include "components/form_field.html" with field=form.description %}
-    {% include "components/form_field.html" with field=form.coupon_type %}
-    {% include "components/form_field.html" with field=form.active %}
-    </div>
-    <div class="col-md-6">
-      <label>Rango de validez</label>
-      <div class="row">
-        <div class="col">
-          {% include "components/form_field.html" with field=form.valid_from %}
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            
+            <div class="row">
+              <!-- Left Column - Basic Information -->
+              <div class="col-lg-6">
+                <div class="form-section mb-4">
+                  <h5 class="form-section-title mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Información Básica
+                  </h5>
+                  
+                  <div class="form-fields-group">
+                    <div class="row mb-3">
+                      <div class="col-md-6">
+                        {% include "components/form_field.html" with field=form.cupon_code %}
+                      </div>
+                      <div class="col-md-6">
+                        {% include "components/form_field.html" with field=form.name %}
+                      </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                      <label for="{{ form.description.id_for_label }}" class="form-label">
+                        {{ form.description.label }}
+                        {% if form.description.field.required %}
+                          <span class="text-danger">*</span>
+                        {% endif %}
+                      </label>
+                      <textarea 
+                        name="{{ form.description.name }}" 
+                        id="{{ form.description.id_for_label }}" 
+                        class="form-control auto-resize-textarea{% if form.description.errors %} is-invalid{% endif %}"
+                        rows="1"
+                        placeholder="{{ form.description.field.help_text|default:'Ingresa una descripción del cupón...' }}"
+                        style="resize: none; overflow: hidden; min-height: 38px;">{{ form.description.value|default:'' }}</textarea>
+                      {% if form.description.errors %}
+                        <div class="invalid-feedback">
+                          {{ form.description.errors.0 }}
+                        </div>
+                      {% endif %}
+                      {% if form.description.help_text %}
+                        <small class="form-text text-muted">{{ form.description.help_text }}</small>
+                      {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                      {% include "components/form_field.html" with field=form.coupon_type %}
+                    </div>
+                    
+                    <div class="form-group">
+                      <div class="form-check form-switch p-3 bg-light rounded border-start border-3 border-secondary">
+                        {{ form.active }}
+                        <label class="form-check-label fw-medium" for="{{ form.active.id_for_label }}">
+                          Cupón activo
+                        </label>
+                        <small class="form-text text-muted d-block mt-1">
+                          Determina si el cupón está disponible para uso
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column - Configuration -->
+              <div class="col-lg-6">
+                <!-- Validity Period -->
+                <div class="form-section mb-4">
+                  <h5 class="form-section-title mb-3">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Período de Validez
+                  </h5>
+                  
+                  <div class="row g-3">
+                    <div class="col-sm-6">
+                      <label for="{{ form.valid_from.id_for_label }}" class="form-label">
+                        Válido desde
+                        {% if form.valid_from.field.required %}
+                          <span class="text-danger">*</span>
+                        {% endif %}
+                      </label>
+                      {{ form.valid_from }}
+                      {% if form.valid_from.errors %}
+                        <div class="invalid-feedback d-block">
+                          {{ form.valid_from.errors.0 }}
+                        </div>
+                      {% endif %}
+                      {% if form.valid_from.help_text %}
+                        <small class="form-text text-muted">{{ form.valid_from.help_text }}</small>
+                      {% endif %}
+                    </div>
+                    <div class="col-sm-6">
+                      <label for="{{ form.valid_to.id_for_label }}" class="form-label">
+                        Válido hasta
+                        {% if form.valid_to.field.required %}
+                          <span class="text-danger">*</span>
+                        {% endif %}
+                      </label>
+                      {{ form.valid_to }}
+                      {% if form.valid_to.errors %}
+                        <div class="invalid-feedback d-block">
+                          {{ form.valid_to.errors.0 }}
+                        </div>
+                      {% endif %}
+                      {% if form.valid_to.help_text %}
+                        <small class="form-text text-muted">{{ form.valid_to.help_text }}</small>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Discount Configuration -->
+                <div class="form-section mb-4">
+                  <h5 class="form-section-title mb-3">
+                    <i class="fas fa-percentage me-2"></i>
+                    Configuración de Descuento
+                  </h5>
+                  
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="{{ form.discount_percentage.id_for_label }}" class="form-label">
+                        Porcentaje de descuento
+                        {% if form.discount_percentage.field.required %}
+                          <span class="text-danger">*</span>
+                        {% endif %}
+                      </label>
+                      {{ form.discount_percentage }}
+                      {% if form.discount_percentage.errors %}
+                        <div class="invalid-feedback d-block">
+                          {{ form.discount_percentage.errors.0 }}
+                        </div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                      <label for="{{ form.max_uses.id_for_label }}" class="form-label">
+                        Máximo de usos
+                        {% if form.max_uses.field.required %}
+                          <span class="text-danger">*</span>
+                        {% endif %}
+                      </label>
+                      {{ form.max_uses }}
+                      {% if form.max_uses.errors %}
+                        <div class="invalid-feedback d-block">
+                          {{ form.max_uses.errors.0 }}
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Usage Options -->
+                <div class="form-section mb-4">
+                  <h5 class="form-section-title mb-3">
+                    <i class="fas fa-cogs me-2"></i>
+                    Opciones de Uso
+                  </h5>
+                  
+                  <div class="form-switches-group">
+                    <div class="form-group mb-3">
+                      <div class="form-check form-switch">
+                        {{ form.one_use_only }}
+                        <label class="form-check-label fw-medium" for="{{ form.one_use_only.id_for_label }}">
+                          Uso único por usuario
+                        </label>
+                        <small class="form-text text-muted d-block">
+                          Cada usuario solo puede usar este cupón una vez
+                        </small>
+                      </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                      <div class="form-check form-switch">
+                        {{ form.same_price_and_discount }}
+                        <label class="form-check-label fw-medium" for="{{ form.same_price_and_discount.id_for_label }}">
+                          Mismo precio y descuento
+                        </label>
+                        <small class="form-text text-muted d-block">
+                          Aplicar el mismo descuento independientemente del precio
+                        </small>
+                      </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                      <div class="form-check form-switch">
+                        {{ form.allows_maximum_discount }}
+                        <label class="form-check-label fw-medium" for="{{ form.allows_maximum_discount.id_for_label }}">
+                          Permite descuento máximo
+                        </label>
+                        <small class="form-text text-muted d-block">
+                          Habilita la aplicación del descuento máximo disponible
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CRÍTICO: Management Forms ANTES de los formsets -->
+            {{ rules_formset.management_form }}
+            {{ collections_formset.management_form }}
+
+            <!-- Coupon Rules Section -->
+            <div class="form-section mb-4">
+              <h5 class="form-section-title mb-3">
+                <i class="fas fa-list-alt me-2"></i>
+                Reglas del Cupón
+              </h5>
+
+              <!-- Mostrar errores generales del formset -->
+              {% if rules_formset.non_form_errors %}
+                <div class="alert alert-danger mb-3">
+                  <strong>Errores en Reglas:</strong>
+                  {{ rules_formset.non_form_errors }}
+                </div>
+              {% endif %}
+
+              <div class="table-responsive">
+                <table class="table table-bordered table-sm align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Regla</th>
+                      <th>Mínimo</th>
+                      <th>Máximo</th>
+                      <th class="text-center">Eliminar</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for rform in rules_formset %}
+                      <tr {% if rform.DELETE.value %}style="display:none;"{% endif %}>
+                        <!-- CRÍTICO: Incluir TODOS los campos ocultos (especialmente ID) -->
+                        {{ rform.id }}
+
+                        {% for hidden_field in rform.hidden_fields %}
+                          {{ hidden_field }}
+                        {% endfor %}
+                        
+                        <td>
+                          {{ rform.rule }}
+                          {% if rform.rule.errors %}
+                            <div class="text-danger small mt-1">
+                              {{ rform.rule.errors.0 }}
+                            </div>
+                          {% endif %}
+                        </td>
+                        <td>
+                          {{ rform.min_value }}
+                          {% if rform.min_value.errors %}
+                            <div class="text-danger small mt-1">
+                              {{ rform.min_value.errors.0 }}
+                            </div>
+                          {% endif %}
+                        </td>
+                        <td>
+                          {{ rform.max_value }}
+                          {% if rform.max_value.errors %}
+                            <div class="text-danger small mt-1">
+                              {{ rform.max_value.errors.0 }}
+                            </div>
+                          {% endif %}
+                        </td>
+                        <td class="text-center">
+                          {{ rform.DELETE }}
+                          {% if rform.DELETE.errors %}
+                            <div class="text-danger small mt-1">
+                              {{ rform.DELETE.errors.0 }}
+                            </div>
+                          {% endif %}
+                        </td>
+                      </tr>
+                      
+                      <!-- Mostrar errores generales del form individual -->
+                      {% if rform.non_field_errors %}
+                        <tr>
+                          <td colspan="4">
+                            <div class="alert alert-danger alert-sm mb-0">
+                              {{ rform.non_field_errors }}
+                            </div>
+                          </td>
+                        </tr>
+                      {% endif %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Coupon Collections Section -->
+            <div class="form-section mb-4">
+              <h5 class="form-section-title mb-3">
+                <i class="fas fa-folder-open me-2"></i>
+                Colecciones del Cupón
+              </h5>
+
+              <!-- Mostrar errores generales del formset -->
+              {% if collections_formset.non_form_errors %}
+                <div class="alert alert-danger mb-3">
+                  <strong>Errores en Colecciones:</strong>
+                  {{ collections_formset.non_form_errors }}
+                </div>
+              {% endif %}
+
+              <div class="table-responsive">
+                <table class="table table-bordered table-sm align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Colección</th>
+                      <th class="text-center">Eliminar</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for cform in collections_formset %}
+                      <tr {% if cform.DELETE.value %}style="display:none;"{% endif %}>
+
+                        {{ cform.id }}
+                        
+                        <!-- CRÍTICO: Incluir TODOS los campos ocultos (especialmente ID) -->
+                        {% for hidden_field in cform.hidden_fields %}
+                          {{ hidden_field }}
+                        {% endfor %}
+                        
+                        <td>
+                          {{ cform.collection }}
+                          {% if cform.collection.errors %}
+                            <div class="text-danger small mt-1">
+                              {{ cform.collection.errors.0 }}
+                            </div>
+                          {% endif %}
+                        </td>
+                        <td class="text-center">
+                          {{ cform.DELETE }}
+                          {% if cform.DELETE.errors %}
+                            <div class="text-danger small mt-1">
+                              {{ cform.DELETE.errors.0 }}
+                            </div>
+                          {% endif %}
+                        </td>
+                      </tr>
+                      
+                      <!-- Mostrar errores generales del form individual -->
+                      {% if cform.non_field_errors %}
+                        <tr>
+                          <td colspan="2">
+                            <div class="alert alert-danger alert-sm mb-0">
+                              {{ cform.non_field_errors }}
+                            </div>
+                          </td>
+                        </tr>
+                      {% endif %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="row mt-4">
+              <div class="col-12">
+                <hr class="mb-4">
+                <div class="d-flex justify-content-end gap-2">
+                  <a href="{% url 'listar' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-2"></i>
+                    Cancelar
+                  </a>
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>
+                    {% if form.instance.pk %}Actualizar{% else %}Guardar{% endif %} Cupón
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
         </div>
-        <div class="col">
-          {% include "components/form_field.html" with field=form.valid_to %}
-        </div>
-      </div>
-      {% include "components/form_field.html" with field=form.discount_percentage %}
-      {% include "components/form_field.html" with field=form.max_uses %}
-      
-      <div class="form-check form-switch mt-3">
-        {{ form.one_use_only }}
-        <label class="form-check-label" for="uso_unico">Uso Único</label>
-      </div>
-      <div class="form-check form-switch">
-        {{ form.same_price_and_discount }}
-        <label class="form-check-label" for="mismo_precio">Mismo precio y descuento</label>
       </div>
     </div>
   </div>
-  <div class="mt-3">
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a href="{% url 'listar' %}" class="btn btn-secondary">Cancelar</a>
-  </div>
-</form>
+</div>
+
+<!-- Custom Styles -->
+<style>
+.form-section-title {
+  color: #495057;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.form-fields-group .mb-3:not(:last-child) {
+  margin-bottom: 1.5rem !important;
+}
+
+.form-switches-group .form-check {
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+  border-radius: 0.375rem;
+  border-left: 3px solid #dee2e6;
+  transition: all 0.2s ease;
+}
+
+.form-switches-group .form-check:hover {
+  background-color: #e9ecef;
+  border-left-color: #0d6efd;
+}
+
+.form-switches-group .form-check input:checked + label {
+  color: #0d6efd;
+}
+
+/* Auto-resize textarea */
+.auto-resize-textarea {
+  transition: height 0.2s ease;
+  line-height: 1.5;
+}
+
+.auto-resize-textarea:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.card {
+  border: none;
+  border-radius: 0.5rem;
+}
+
+.breadcrumb {
+  background-color: transparent;
+  padding: 0;
+}
+
+.btn {
+  border-radius: 0.375rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+  border: none;
+}
+
+.btn-outline-secondary {
+  border-color: #6c757d;
+  color: #6c757d;
+}
+
+/* Estilos para alertas pequeñas en formsets */
+.alert-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Mejor visualización de errores en tablas */
+.table td .text-danger.small {
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
+
+@media (max-width: 768px) {
+  .d-flex.justify-content-between {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .form-section {
+    margin-bottom: 2rem !important;
+  }
+  
+  .table-responsive {
+    font-size: 0.9rem;
+  }
+}
+</style>
+
+<!-- Auto-resize textarea script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const textareas = document.querySelectorAll('.auto-resize-textarea');
+  
+  textareas.forEach(function(textarea) {
+    // Function to resize textarea
+    function resizeTextarea(element) {
+      element.style.height = 'auto';
+      element.style.height = Math.max(38, element.scrollHeight) + 'px';
+    }
+    
+    // Initial resize
+    resizeTextarea(textarea);
+    
+    // Resize on input
+    textarea.addEventListener('input', function() {
+      resizeTextarea(this);
+    });
+    
+    // Resize on focus (in case content was changed programmatically)
+    textarea.addEventListener('focus', function() {
+      resizeTextarea(this);
+    });
+  });
+});
+</script>
 {% endblock %}

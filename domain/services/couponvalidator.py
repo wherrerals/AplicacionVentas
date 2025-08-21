@@ -7,7 +7,7 @@ class CouponValidator:
         products: lista de diccionarios o instancias con precios
         rules: lista de reglas [{'operator': '>', 'min_value': ..., 'max_value': ...}]
         """
-        self.products = ProductoDB.objects.filter(codigo__in=product_codes)
+        self.products = list(ProductoDB.objects.filter(codigo__in=product_codes))
         self.rules = rules
         self.doc_total = doc_total
         self.cupon = cupon
@@ -48,8 +48,37 @@ class CouponValidator:
         
         # Si es falso, aplica a todos
         return self.products
+    
+
+    def get_list_collection_productos(self):
+        """
+        Retorna una lista de códigos de productos en las colecciones asociadas al cupón.
+        """
+        productos = []
+        for collection in self.cupon.collections.all():
+            print(f"Validando colección: {collection}")
+            if collection.coupon_does_not_apply:
+                print(f"Omitiendo colección {collection} porque no aplica el cupón")
+                productos.extend(collection.products.values_list("codigo", flat=True))
+        return list(productos)
+
+    def omit_products_in_collections(self, filtered_products):
+        """
+        Omite los productos que estén en colecciones donde no aplica el cupón.
+        """
+        sku_omitidos = self.get_list_collection_productos()
+
+        print(f"Productos a omitir por colecciones: {sku_omitidos}")
+
+        if not sku_omitidos:
+            return filtered_products
+
+        return [p for p in filtered_products if p.codigo not in sku_omitidos]
 
     def get_discounted_products(self, filtered_products, discount):
+        print(f"Productos filtrados: {filtered_products}")
+        filtered_products = self.omit_products_in_collections(filtered_products)
+        print(f"Productos filtrados después de omitir colecciones: {filtered_products}")
 
         products_with_discounts = []
         for product in filtered_products:
@@ -57,11 +86,8 @@ class CouponValidator:
                 final_discount = discount
             else:
                 from presentation.views.view import limitar_descuento
-                print(f"discount: {discount}")
                 limite_producto = limitar_descuento(product, self.users_data) / 100
-                print(f"Limite producto: {limite_producto}")
                 final_discount = min(discount, limite_producto)
-                print(f"Final discount: {final_discount}")
 
             products_with_discounts.append({
                 "codigo": product.codigo,
@@ -69,4 +95,6 @@ class CouponValidator:
             })
 
         return products_with_discounts
+    
+    
     

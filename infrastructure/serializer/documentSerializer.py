@@ -51,12 +51,14 @@ class SerializerDocument:
             'U_LED_TIPVTA': type_sales,
             'U_LED_TIPDOC': doc_data.get('U_LED_TIPDOC'),
             'U_LED_FORENV': doc_data.get('TransportationCode'),
+            'U_LED_COD_CUPON': doc_data.get('Cupon_code', '')
         }
 
         repo_producto = ProductoRepository()
         lineas_json = []
 
         print("Lineas del documento:")
+        
         for linea in doc_data.get('DocumentLines', []):
             item_code = linea.get('ItemCode')
             
@@ -88,8 +90,8 @@ class SerializerDocument:
                 'Quantity': linea.get('Quantity'),
                 'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
                 'ShipDate': linea.get('ShipDate'),
-                #'FreeText': linea.get('FreeText'),
-                'FreeText': cupon_formateado,
+                'FreeText': linea.get('FreeText'),
+                'U_LED_DCTO_CUPON': cupon_formateado,
                 'DiscountPercent': discount_percent, #linea.get('DiscountPercent'),
                 'WarehouseCode': warehouseCode,
                 'CostingCode': linea.get('CostingCode'),

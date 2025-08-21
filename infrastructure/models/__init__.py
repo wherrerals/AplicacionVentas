@@ -30,7 +30,7 @@ from infrastructure.models.cuponUser import CouponUsageDB
 from infrastructure.models.rulescouponsrelation import CouponRuleRelation
 from infrastructure.models.collectionproductsdb import CollectionsProducts
 from infrastructure.models.collectiondb import CollectionDB
-
+from infrastructure.models.couponcollectiondb import CouponCollectionsDB
 
 
 

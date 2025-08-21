@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Eliminar Cupón {{ cupon.cupon_code }}{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <h4>¿Estás seguro de que deseas eliminar este cupón?</h4>
+    <p>
+      <strong>Código:</strong> {{ cupon.cupon_code }}<br>
+      <strong>Nombre:</strong> {{ cupon.name }}<br>
+      <strong>Tipo:</strong> {{ cupon.coupon_type }}
+    </p>
+
+    <div class="mt-4 d-flex justify-content-end gap-2">
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+      </form>
+      <a href="{% url 'listar' %}" class="btn btn-secondary">Cancelar</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

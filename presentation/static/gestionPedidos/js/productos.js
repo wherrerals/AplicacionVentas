@@ -18,8 +18,6 @@ class Producto {
         this.descuentoAplcado = descuentoAplcado ?? 0;
         this.cuponDescuento = cuponDescuento
 
-        console.log("Producto descuentoAplcado:", this.descuentoAplcado);
-        console.log("Producto descuentoAplcado:", this.cuponDescuento);
     }
     
 
@@ -246,7 +244,7 @@ class Producto {
 }
 
 // Función global para manejar la adición de productos
-function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, descuentoAplcado) {
+function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, cuponDescuento, descuentoAplcado) {
     // Contador de productos
     console.log("cantidad: ", cantidad);
     console.log("sucursal: ", sucursal);
@@ -254,11 +252,15 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
     let contprod = document.querySelectorAll('#productos tbody').length + 1;
 
     // Crear una instancia de Producto
-    let producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado);
-
+    let producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, cuponDescuento, descuentoAplcado);
+    
     let newRow = producto.crearFila(contprod);
 
     document.getElementById('productos').appendChild(newRow);
+
+
+    console.log("Producto creado xxx:", producto);
+    console.log("Producto creado:", producto.cuponDescuento, producto.precioDescuento);
 
 
     // ---- APLICAR UI DEL CUPÓN ANTES de inicializar interactividad ----

@@ -128,6 +128,7 @@ class Coupons():
 
         validator = CouponValidator(applicable_codes, rules, self.doc_total, self.coupon, users_data=self.users_data)
         filtered_products = validator.get_applicable_products()
+        print(f"filtered_products: {filtered_products}")
         products_with_discounts = validator.get_discounted_products(filtered_products, discount)
 
         print("Productos con descuentos aplicados:", products_with_discounts)

@@ -18,35 +18,67 @@ document.addEventListener('DOMContentLoaded', () => {
     const couponInput = document.getElementById('cupon_data');
     const applyButton = document.getElementById('btn-aplicar-cupon');
 
-    console.log('Coupon input element:', couponInput);
-
     if (couponInput) {
+        // Detectar ENTER
         couponInput.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
-                e.preventDefault(); // Evita el envío del formulario
+                e.preventDefault();
                 const codigoCupon = this.value.trim();
                 if (codigoCupon !== '') {
-                    console.log('Enter pressed, applying coupon:', codigoCupon);
                     aplicarCupon(codigoCupon);
-                } else {
-                    console.log('Input is empty, no coupon applied');
-                }
+                } 
+            }
+        });
+
+        // Detectar cuando se borra el input
+        couponInput.addEventListener('input', function () {
+            if (this.value.trim() === '') {
+                console.log('Cupón borrado, restaurando estado original...');
+                restaurarEstadoCupon();
             }
         });
     }
 
-        if (applyButton) {
+    if (applyButton) {
         applyButton.addEventListener('click', function () {
             const codigoCupon = couponInput.value.trim();
             if (codigoCupon !== '') {
-                console.log('Button clicked, applying coupon:', codigoCupon);
                 aplicarCupon(codigoCupon);
-            } else {
-                console.log('Input is empty, no coupon applied');
-            }
+            } 
         });
     }
 });
+
+
+
+// ---- FUNCIÓN INVERSA: restaurar estado SOLO en productos con cupón válido ----
+function restaurarEstadoCupon() {
+    const filasProductos = document.querySelectorAll('tbody.product-row');
+
+    filasProductos.forEach(row => {
+        const descuento = row.querySelector('#desc_cupon');
+
+        // Solo actuar si el cupón está visible y no es "0%"
+        if (descuento && !descuento.hidden && !descuento.textContent.includes("0%")) {
+            const inputDescuento = row.querySelector('#agg_descuento');
+
+            if (inputDescuento) {
+                inputDescuento.removeAttribute('disabled');
+                inputDescuento.value = 0;
+                inputDescuento.max = 100; // valor estándar
+                inputDescuento.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+
+            // Restaurar la etiqueta de cupón a su estado inactivo
+            descuento.hidden = true;
+            descuento.textContent = "Cupon: 0%";
+            descuento.dataset.value = '';
+        }
+    });
+
+    console.log("Se restauraron solo los productos afectados por cupón.");
+}
+
 
 
 function aplicarCupon(codigoCupon) {
@@ -83,6 +115,8 @@ function aplicarCupon(codigoCupon) {
 
         // validar los datos del cupon
     });
+
+
 
 fetch('/ventas/validar_cupon/', {
     method: 'POST',

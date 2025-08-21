@@ -12,4 +12,4 @@ class RulesCouponDB(models.Model):
 
 
     def __str__(self):
-        return f"{self.operator}, {self.name}, {self.rule_id}"
+        return f"{self.name}"

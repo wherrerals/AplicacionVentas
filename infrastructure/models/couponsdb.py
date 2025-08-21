@@ -22,6 +22,7 @@ class CouponsDB(models.Model):
     coupon_type = models.CharField(max_length=50)
     same_price_and_discount = models.BooleanField(default=False)
     last_modification = models.DateTimeField(auto_now=True)
+    collections = models.ManyToManyField('CollectionDB', through='CouponCollectionsDB', related_name='coupons_collections', blank=True)
     bp_use = models.ManyToManyField('SocioNegocioDB', through='CouponUsageDB', related_name='available_coupons', blank=True)
     rules = models.ManyToManyField(RulesCouponDB, through='CouponRuleRelation', related_name='rules_coupons', blank=True)
     products = models.ManyToManyField(ProductoDB, related_name='products_coupons', blank=True)

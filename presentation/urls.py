@@ -1,6 +1,6 @@
 from django.urls import path
 from presentation.views.cotizacionview import CotizacionView
-from presentation.views.cuponesView import CuponCreateView, CuponDetailView, CuponListView, CuponUpdateView
+from presentation.views.cuponesView import CuponCreateView, CuponDetailView, CuponListView, CuponUpdateView, CuponDeleteView
 from presentation.views.devolucionesview import ReturnsView
 from presentation.views.odvView import OdvView
 from presentation.views.invoiceView import InvoiceView
@@ -80,6 +80,7 @@ urlpatterns = [
     path('listar/', CuponListView.as_view(), name='listar'),
     path('nuevo/', CuponCreateView.as_view(), name='crear'),
     path('<slug:codigo>/editar/', CuponUpdateView.as_view(), name='editar'),
+    path('<str:codigo>/eliminar/', CuponDeleteView.as_view(), name='eliminar'),
     path('<slug:codigo>/', CuponDetailView.as_view(), name='detalle'),
     path('get_doctotal/', view.get_doctotal, name='get_doctotal'),
     path('validar_imagenes/', view.validar_imagenes, name='validar_imagenes'),
