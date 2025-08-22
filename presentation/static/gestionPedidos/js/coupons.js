@@ -73,6 +73,7 @@ function restaurarEstadoCupon() {
             descuento.hidden = true;
             descuento.textContent = "Cupon: 0%";
             descuento.dataset.value = '';
+            inputDescuento.dispatchEvent(new Event('input', { bubbles: true }));
         }
     });
 

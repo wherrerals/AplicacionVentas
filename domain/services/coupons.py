@@ -4,6 +4,7 @@ from infrastructure.models.rulescouponsrelation import CouponRuleRelation
 from domain.services.couponvalidator import CouponValidator
 
 
+
 class Coupons():
 
     def __init__(self, coupon, products, doc_total, users_data, sncode):
@@ -22,12 +23,27 @@ class Coupons():
             self.users_data = None
             self.sncode = None
 
-    def coupon_vality_date(self):
 
+    def is_valid_by_date(self):
+        """
+        Retorna True si el cupón es válido según las fechas configuradas.
+        """
         now = timezone.now()
-        if self.coupon.valid_from and self.coupon.valid_to and not (self.coupon.valid_to <= now <= self.coupon.valid_from):
-            return True
-        return False
+
+        if self.coupon.valid_from and self.coupon.valid_to:
+            return self.coupon.valid_from <= now <= self.coupon.valid_to
+
+        # Si solo tiene fecha de inicio (sin fecha fin)
+        if self.coupon.valid_from and not self.coupon.valid_to:
+            return now >= self.coupon.valid_from
+
+        # Si solo tiene fecha fin (sin fecha inicio)
+        if not self.coupon.valid_from and self.coupon.valid_to:
+            return now <= self.coupon.valid_to
+
+        # Si no tiene fechas, puedes decidir si es válido o no (ej: True siempre)
+        return True
+
 
     def coupon_is_active(self):
         if self.coupon.active:
@@ -89,14 +105,14 @@ class Coupons():
                 error.append(f"El Cliente {self.sncode} ha alcanzado el limite de usos de este Cupon \n")
 
             elif self.validate_sales_after_coupon():
-                error.append(f"El Cliente {self.sncode} ya tiene ventas posteriores a la aplicacion del Cupon \n")
+                error.append(f"El Cliente {self.sncode} tiene ventas anteriores registradas \n")
 
         else:
             if self.count_use_cupon() >= self.coupon.max_uses:
                 error.append(f"El Cupon {self.coupon.cupon_code} ha alcanzado su limite de usos \n")
 
-        if not self.coupon_vality_date():
-            error.append(f"El Cupon {self.coupon.cupon_code} ha caducado \n")
+        if not self.is_valid_by_date():
+            error.append(f"El Cupon {self.coupon.cupon_code} HA CADUCADO. \n")
 
         if not self.coupon_is_active():
             error.append(f"El Cupon {self.coupon.cupon_code} no esta activo \n")

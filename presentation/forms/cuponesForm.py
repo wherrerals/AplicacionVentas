@@ -14,7 +14,7 @@ class CuponForm(forms.ModelForm):
             'valid_to': forms.DateInput(attrs={'type': 'datetime-local'}),
             'one_use_only': forms.CheckboxInput(attrs={'class': 'form-check-input', 'role': 'switch'}),
             'same_price_and_discount': forms.CheckboxInput(attrs={'class': 'form-check-input', 'role': 'switch'}),
-            'allows_maximum_discount': forms.CheckboxInput(attrs={'class': 'form-check-input', 'role': 'switch'}),
+            'exceed_maximum_discount': forms.CheckboxInput(attrs={'class': 'form-check-input', 'role': 'switch'}),
             'active': forms.CheckboxInput(attrs={'class': 'form-check-input', 'role': 'switch'}),
         }
 

@@ -82,7 +82,7 @@ class CouponValidator:
 
         products_with_discounts = []
         for product in filtered_products:
-            if self.cupon.allows_maximum_discount:
+            if self.cupon.exceed_maximum_discount:
                 final_discount = discount
             else:
                 from presentation.views.view import limitar_descuento
