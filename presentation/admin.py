@@ -24,6 +24,7 @@ from infrastructure.models import (
     TipoClienteDB,
     TipoEntregaDB,
     TipoObjetoSapDB,
+    CollectionDB
 
 )
 
@@ -284,6 +285,8 @@ class ConfiEmpresaDBper(admin.ModelAdmin):
         "rentabilidadBrutaConAut",
     )
 
+class CollectionDBper(admin.ModelAdmin):
+    list_display = ("collection_id", "coupon_does_not_apply", "coupon_does_not_apply")
 
 # Register your models here.
 admin.site.register(TipoDocTributarioDB, TipoDocTributarioDBper)
@@ -312,3 +315,4 @@ admin.site.register(ConfiEmpresaDB, ConfiEmpresaDBper)
 admin.site.register(TipoEntregaDB, TipoEntregaDBper)
 admin.site.register(TipoObjetoSapDB, TipoObjetoSapDBper)
 admin.site.register(CouponsDB, CuponesDBper)
+admin.site.register(CollectionDB, CollectionDBper)
