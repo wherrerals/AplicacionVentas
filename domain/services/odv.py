@@ -117,6 +117,7 @@ class OrdenVenta(Documento):
                 "Comments": quotations.get("Comments") if quotations.get("Comments") else "",
                 "DocumentStatus": quotations.get("DocumentStatus"),
                 "Cancelled": quotations.get("Cancelled"),
+                "U_LED_COD_CUPON": quotations.get("U_LED_COD_CUPON"),
                 "U_LED_TIPVTA": quotations.get("U_LED_TIPVTA"),
                 "U_LED_TIPDOC": quotations.get("U_LED_TIPDOC"),
                 "U_LED_NROPSH": quotations.get("U_LED_NROPSH"),
@@ -165,6 +166,14 @@ class OrdenVenta(Documento):
                 else:
                     descuentoMax = math.floor(min(descuentoMax * 100, 10))
 
+            data_cupon = line.get("U_LED_DCTO_CUPON")
+            if data_cupon:
+                if data_cupon == None:
+                    data_cupon = 0
+                elif data_cupon != "":
+                    data_cupon = data_cupon.replace("%", "")
+                    data_cupon = int(data_cupon)
+
             document_line = {
                 "DocEntry": line.get("DocEntry"),
                 "LineNum": line.get("LineNum"),
@@ -184,6 +193,7 @@ class OrdenVenta(Documento):
                 "Address": line.get("Address"),
                 "ShippingMethod": line.get("ShippingMethod"),
                 "FreeText": line.get("FreeText"),
+                "U_LED_DCTO_CUPON": data_cupon,
                 "BaseType": line.get("BaseType"),
                 "GrossBuyPrice": line.get("GrossBuyPrice"),
                 "BaseEntry": line.get("BaseEntry"),

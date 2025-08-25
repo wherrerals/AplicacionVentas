@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
           if (data.Cliente && data.Cliente.SalesPersons) {
   
             // Extracción de datos principales
+            const cuponDescuento = data.Cliente.Orders.U_LED_COD_CUPON || "";
             const salesEmployeeName = data.Cliente.SalesPersons.SalesEmployeeName;
             const salesPersonCode = data.Cliente.SalesPersons.SalesEmployeeCode;
             const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
@@ -90,7 +91,12 @@ document.addEventListener("DOMContentLoaded", function () {
               vendedorDataElement.innerText = vendedorLimpio;
               vendedorDataElement.setAttribute("data-codeven", salesPersonCode);
             }
-  
+
+          const cuponInput = document.getElementById("cupon_data");
+          if (cuponInput) {
+            cuponInput.value = cuponDescuento;
+          }
+
             const showroomElement = document.getElementById("sucursal");
             if (showroomElement) {
               showroomElement.innerText = sucursal;
@@ -146,6 +152,8 @@ document.addEventListener("DOMContentLoaded", function () {
               const sucursal = line.WarehouseCode;
               const descuentoAplcado = line.DiscountPercent;
               const comentario = line.FreeText;
+              const cuponDescuento = line.U_LED_DCTO_CUPON;
+
               const fechaEntrega = line.ShipDate;
               const tipoentrega2 = line.ShippingMethod;
 
@@ -168,7 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
               });
 
   
-              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado,  tipoentrega2, fechaEntrega);
+              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, cuponDescuento, descuentoAplcado,  tipoentrega2, fechaEntrega);
             });
           }
 

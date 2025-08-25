@@ -1,5 +1,5 @@
 class Producto {
-    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado, tipoentrega2, cantidadCoti, precioCoti, fechaEntrega = new Date().toISOString().split('T')[0]) {
+    constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, cuponDescuento, descuentoAplcado, tipoentrega2, cantidadCoti, precioCoti, fechaEntrega = new Date().toISOString().split('T')[0]) {
         
         this.docEntry_linea = docEntry_linea;
         this.linea_documento = linea_documento;
@@ -20,6 +20,8 @@ class Producto {
         this.tipoEntrega2 = tipoentrega2;
         this.fechaEntrega = fechaEntrega;
         this.descuentoAplcado = descuentoAplcado ?? 0;
+        this.cuponDescuento = cuponDescuento
+
 
         console.log("atributos del constructor mapeados",
             {
@@ -189,13 +191,12 @@ class Producto {
                         </div>
                     </div>
                 </td>
-
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <div>
-                        <input class="form-control" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="${this.descuentoAplcado ?? 0}" onclick="this.select()">
+                        <input class="form-control format-number" type="number" style="font-size: 12px;width: 60px;" id="agg_descuento" min="0" value="${this.descuentoAplcado ?? 0}" onclick="this.select()">
+                        <strong style="font-size: 9;width: 100px; color: red" id="desc_cupon" ${this.cuponDescuento ? '' : 'hidden'}>Cupon: ${this.cuponDescuento ?? 0}%</strong>
                     </div>
-                </td>
-                   
+                </td>     
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${this.precioSinDescuento}</td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <div>
@@ -653,7 +654,7 @@ class Producto {
 let lineasDocumento = {}; // Objeto para almacenar las líneas por producto
 
 
-function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, precioCoti, tipoEntrega2, fechaEntrega, descuentoAplcado = 1 - 1) {
+function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, precioCoti, tipoEntrega2, fechaEntrega, cuponDescuento, descuentoAplcado = 1 - 1) {
     
     
     lineasDocumento[productoCodigo] = {
@@ -669,11 +670,30 @@ function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre
     // Crear instancia del producto
 
     const cantidadFinal = cantidad !== undefined ? cantidad : 1;
-    const producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, precioCoti, tipoEntrega2, fechaEntrega, descuentoAplcado);
+    const producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, precioCoti, tipoEntrega2, fechaEntrega, cuponDescuento, descuentoAplcado);
     const newRow = producto.crearFila(contprod); // Crear la fila del producto
 
     document.getElementById('productos').appendChild(newRow); // Agregar la fila al tbody
 
+
+    // ---- APLICAR UI DEL CUPÓN ANTES de inicializar interactividad ----
+    if (producto.cuponDescuento && Number(producto.cuponDescuento) > 0) {
+        const descuentoCupon = Number(producto.cuponDescuento);
+
+        const inputDescuentoRow = newRow.querySelector('#agg_descuento');
+        if (inputDescuentoRow) {
+            inputDescuentoRow.max = descuentoCupon;
+            inputDescuentoRow.value = 0;
+            inputDescuentoRow.setAttribute('disabled', 'disabled');
+        }
+
+        const descElem = newRow.querySelector('#desc_cupon');
+        if (descElem) {
+            descElem.textContent = `Cupon: ${descuentoCupon}%`;
+            descElem.hidden = false;
+            descElem.dataset.value = descuentoCupon; // <- importante para calcular correctamente
+        }
+    }
 
     newRow.querySelector('#mostrar-descuento').addEventListener('click', function () {
         producto.alternarMaxDescuento(newRow);

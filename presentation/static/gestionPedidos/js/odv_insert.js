@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const pgc = -1;
       const referencia = document.getElementById("referencia").value;
       const observaciones = document.getElementById("Observaciones-1").value;
+      const cupon_code = document.getElementById("cupon_data").value; //listo
       const spcInt = document.getElementById("vendedor_data").getAttribute("data-codeVen");
       const spc = parseInt(spcInt, 10);
       const selectElement = document.getElementById("direcciones_despacho");
@@ -73,7 +74,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const cogsCostingCode = warehouseCode;
         const costingCode2 = "AV";
         const cogsCostingCode2 = "AV";
-  
+        const cupon = row.querySelector("#desc_cupon").innerText; // Capturar el valor del cupón
+
+
         const line = {
           LineNum: linenum,
           DocEntry_line: docentryLinea,
@@ -91,7 +94,7 @@ document.addEventListener("DOMContentLoaded", function () {
           CostingCode2: costingCode2,
           COGSCostingCode2: cogsCostingCode2,
           CantidadInicialSAP: cantidadInicialSAP,
-          
+          Text: cupon, // Comentarios de la línea
         };
         
         lines.push(line);
@@ -117,6 +120,8 @@ document.addEventListener("DOMContentLoaded", function () {
         U_LED_TIPDOC: ultd,
         U_LED_FORENV: ulfen,
         DocumentLines: lines,
+        Cupon_code: cupon_code
+
       };
   
       // Convertir a JSON
