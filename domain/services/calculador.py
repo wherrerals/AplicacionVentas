@@ -35,39 +35,31 @@ class CalculadoraTotales:
         for item in self.data.get("DocumentLines", []):
             cantidad = Decimal(item["cantidad"])
             precio_unitario_bruto = self.to_decimal(self.limpiar_valor(item["precio_unitario"]))
-            precio_unitario_neto = (precio_unitario_bruto / (Decimal("1") + self.iva_porcentaje)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-            print(f"precio_unitario_neto: {precio_unitario_neto}")
+            
+            # Calcular subtotal bruto primero
+            subtotal_bruto = (cantidad * precio_unitario_bruto).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            
+            # Calcular descuento bruto
             porcentaje_descuento = (Decimal(item["porcentaje_descuento"]) / Decimal("100")).quantize(Decimal("0.0001"))
-
-            subtotal_bruto = (cantidad * precio_unitario_bruto).quantize(Decimal("0.01"))
-            subtotal_neto = (cantidad * precio_unitario_neto).quantize(Decimal("0.01"))
-            descuento_bruto = (subtotal_bruto * porcentaje_descuento).quantize(Decimal("0.01"))
-            descuento_neto = (subtotal_neto * porcentaje_descuento).quantize(Decimal("0.01"))
-
+            descuento_bruto = (subtotal_bruto * porcentaje_descuento).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            
+            # Calcular valores netos a partir de los brutos ya redondeados
+            subtotal_neto = ((subtotal_bruto) / (Decimal("1") + self.iva_porcentaje)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            descuento_neto = ((descuento_bruto) / (Decimal("1") + self.iva_porcentaje)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+            
+            print(f"Item - Subtotal neto: {subtotal_neto}, Descuento neto: {descuento_neto}")
+            
             total_sin_descuento_bruto += subtotal_bruto
             total_sin_descuento_neto += subtotal_neto
             total_descuento_bruto += descuento_bruto
             total_descuento_neto += descuento_neto
 
-
         total_valor_bruto = total_sin_descuento_bruto - total_descuento_bruto
         total_valor_neto = total_sin_descuento_neto - total_descuento_neto
-        print(f"total_valor_neto: {total_valor_neto}")  # Esto ya debería ser 189.803 exacto
-
-        total_a_pagar_bruto = int(total_valor_bruto * (1 + self.iva_porcentaje))
-        total_a_pagar_neto = int(total_valor_neto * (1 + self.iva_porcentaje))
-
-        dic = {
-            "total_sin_descuento_bruto": self.formatear_valor(total_sin_descuento_bruto),
-            "total_sin_descuento_neto": self.formatear_valor(total_sin_descuento_neto),
-            "total_descuento_bruto": self.formatear_valor(total_descuento_bruto),
-            "total_descuento_neto": self.formatear_valor(total_descuento_neto),
-            "total_valor_bruto": self.formatear_valor(total_valor_bruto),
-            "total_valor_neto": self.formatear_valor(total_valor_neto),
-            "ciclos": ciclos,
-        }
-
         
+        print(f"total_valor_neto calculado: {total_valor_neto}")
+
+        # El resto del código permanece igual...
         return {
             "total_sin_descuento_bruto": self.formatear_valor(total_sin_descuento_bruto),
             "total_sin_descuento_neto": self.formatear_valor(total_sin_descuento_neto),
