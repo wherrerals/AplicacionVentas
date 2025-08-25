@@ -1285,6 +1285,14 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
                 today = date.today()
                 nueva_fecha = today + timedelta(days=9)
                 fecha = f"{nueva_fecha.day}-{nueva_fecha.month}-{nueva_fecha.year}"
+            
+            productos = data.get('DocumentLines', [])
+            for p in productos:
+                descripcion = p.get("descripcion", "")
+                # Detecta "(Descontinuado)" sin importar mayúsculas/minúsculas
+                if "(descontinuado)" in descripcion.lower():
+                    p["descripcion"] = descripcion.replace("(Descontinuado)", "(Últimas unidades)") \
+                                                .replace("(descontinuado)", "(Últimas unidades)")
 
             cotizacion = {
                 "tipo_documento": obtener_nombre_documento(data.get('tipo_documento')),  
@@ -1313,7 +1321,7 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
                     'sucursal': detalle_sucursal.ubicacion,
                     
                 },
-                'productos': data.get('DocumentLines', []),
+                'productos': productos,
                 'descuento_por_producto': [int(item.get('porcentaje_descuento', 0)) for item in data.get('DocumentLines', [])],                
             }
 
@@ -1419,6 +1427,14 @@ def generar_cotizacion_pdf(request, cotizacion_id):
             nueva_fecha = today + timedelta(days=9)
             fecha = f"{nueva_fecha.day}-{nueva_fecha.month}-{nueva_fecha.year}"
 
+        productos = data.get('DocumentLines', [])
+        for p in productos:
+            descripcion = p.get("descripcion", "")
+            # Detecta "(Descontinuado)" sin importar mayúsculas/minúsculas
+            if "(descontinuado)" in descripcion.lower():
+                p["descripcion"] = descripcion.replace("(Descontinuado)", "(Últimas unidades)") \
+                                            .replace("(descontinuado)", "(Últimas unidades)")
+
         cotizacion = {
             "tipo_documento": data.get('tipo_documento'),  
             'numero': data.get('numero'),
@@ -1445,9 +1461,11 @@ def generar_cotizacion_pdf(request, cotizacion_id):
                 'contacto': contactos,
                 'sucursal': detalle_sucursal.ubicacion if detalle_sucursal else '',
             },
-            'productos': data.get('DocumentLines', []),
+            'productos': productos,
         }
 
+        print(f"productos {cotizacion['productos']}")
+        
         calculadora = CalculadoraTotales(data)
         cotizacion["totales"] = calculadora.calcular_totales()
         cotizacion["tiene_descuento"] = any(float(item.get('porcentaje_descuento', 0)) for item in data.get('DocumentLines', []))
