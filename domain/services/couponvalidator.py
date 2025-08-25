@@ -1,4 +1,5 @@
 from infrastructure.models.productodb import ProductoDB
+from infrastructure.repositories.collectionrepository import CollectionRepository
 
 
 class CouponValidator:
@@ -50,34 +51,33 @@ class CouponValidator:
         return self.products
     
 
-    def get_list_collection_productos(self):
+    def validate_products(self, product_list):
         """
-        Retorna una lista de códigos de productos en las colecciones asociadas al cupón.
+        Retorna lista final de productos aplicando las reglas de collections.
         """
-        productos = []
-        for collection in self.cupon.collections.all():
-            print(f"Validando colección: {collection}")
-            if collection.coupon_does_not_apply:
-                print(f"Omitiendo colección {collection} porque no aplica el cupón")
-                productos.extend(collection.products.values_list("codigo", flat=True))
-        return list(productos)
+        collections = self.cupon.collections.all()
+        productos_validos = []
 
-    def omit_products_in_collections(self, filtered_products):
-        """
-        Omite los productos que estén en colecciones donde no aplica el cupón.
-        """
-        sku_omitidos = self.get_list_collection_productos()
+        for product in product_list:
+            reglas = CollectionRepository.product_in_collections(product.codigo, collections)
 
-        print(f"Productos a omitir por colecciones: {sku_omitidos}")
+            if not reglas:
+                # No está en ninguna colección → se acepta
+                productos_validos.append(product)
+                continue
 
-        if not sku_omitidos:
-            return filtered_products
+            # Si aparece en colecciones donde al menos una tiene `coupon_does_not_apply=True`
+            if any(reglas):
+                # Omitir
+                continue
+            else:
+                # Todas las colecciones permiten cupón
+                productos_validos.append(product)
 
-        return [p for p in filtered_products if p.codigo not in sku_omitidos]
+        return productos_validos
 
     def get_discounted_products(self, filtered_products, discount):
-        print(f"Productos filtrados: {filtered_products}")
-        filtered_products = self.omit_products_in_collections(filtered_products)
+        filtered_products = self.validate_products(filtered_products)
         print(f"Productos filtrados después de omitir colecciones: {filtered_products}")
 
         products_with_discounts = []
