@@ -30,6 +30,8 @@ document.addEventListener("DOMContentLoaded", function () {
           console.log("Datos de la cotización:", data);
 
           // Extracción de datos principales
+          const cuponDescuento = data.Cliente.Orders.U_LED_COD_CUPON || "";
+
           const salesEmployeeName = data.Cliente.SalesPersons.SalesEmployeeName;
           const sucursal = data.Cliente.SalesPersons.U_LED_SUCURS;
           const docDate = data.Cliente.Orders.DocDate;
@@ -93,6 +95,11 @@ document.addEventListener("DOMContentLoaded", function () {
             vendedorDataElement.innerText = vendedorLimpio;
           }
 
+          const cuponInput = document.getElementById("cupon_data");
+          if (cuponInput) {
+            cuponInput.value = cuponDescuento;
+          }
+          
           const showroomElement = document.getElementById("sucursal");
           if (showroomElement) {
             showroomElement.innerText = sucursal;
@@ -143,22 +150,14 @@ document.addEventListener("DOMContentLoaded", function () {
               const descuentoAplcado = line.DiscountPercent;
               const stockBodega = line.StockBodega;
               const comentario = line.FreeText;
+              const cuponDescuento = line.U_LED_DCTO_CUPON;
+              const fechaEntrega = line.ShipDate;
               const precioCoti = precioVenta * line.Quantity;
               const cantidadCoti = line.Quantity;
               const tipoentrega2 = line.ShippingMethod;
-
-          
               let cantidad = cantidadCoti;  // Dejar la cantidad igual a cantidadCoti para todos los casos.
-
               let linea_documento_real = parseInt(linea_documento);
-
-          
-              console.log("Agregando producto con datos:", {
-                precioVenta,
-                precioCoti,
-              });
-              
-          
+                        
               // Verificar si el código del producto comienza con "SV"
               const isSVProduct = productoCodigo.startsWith("SV");
 
@@ -186,26 +185,8 @@ document.addEventListener("DOMContentLoaded", function () {
                           }
                       });
               }, 100);
-          
-              agregarProducto(
-                  docEntry_linea, 
-                  linea_documento_real,
-                  productoCodigo,
-                  nombre,
-                  imagen,
-                  precioVenta,
-                  stockTotal,
-                  precioLista,
-                  precioDescuento,
-                  cantidad,
-                  sucursal,
-                  comentario,
-                  descuentoAplcado,
-                  line.Quantity,
-                  cantidadCoti,
-                  precioCoti,
-                  
-              );
+
+              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, cuponDescuento, descuentoAplcado, tipoentrega2, cantidadCoti, precioCoti);
           });
           
              

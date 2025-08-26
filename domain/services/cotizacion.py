@@ -547,6 +547,7 @@ class Cotizacion(Documento):
                 "ShippingMethod": line.get("ShippingMethod"),
                 "FreeText": line.get("FreeText"),
                 "U_LED_DCTO_CUPON": data_cupon,
+                "TreeType": line.get("TreeType"),
                 "BaseType": line.get("BaseType"),
                 "GrossBuyPrice": line.get("GrossBuyPrice"),
                 "BaseEntry": line.get("BaseEntry"),
@@ -562,11 +563,15 @@ class Cotizacion(Documento):
                     "SalesStock": warehouse_info.get("SalesStock"),
                 }
             }
-            
+
+            if document_line["TreeType"] != "I":
+                document_lines.append(document_line)
+
+            """                 
             # Agrega la línea solo si el Price es mayor a 0
             if document_line["Price"] and document_line["Price"] > 0:
                 document_lines.append(document_line)
-
+            """
 
         # Formar el diccionario final
         resultado = {
@@ -597,6 +602,7 @@ class Cotizacion(Documento):
                 "PriceAfterVAT": line.get("PriceAfterVAT"),
                 "LineTotal": line.get("LineTotal"),
                 "GrossTotal": line.get("GrossTotal"),
+                "TreeType": line.get("TreeType"),
                 "ShipDate": line.get("ShipDate"),
                 "Address": line.get("Address"),
                 "ShippingMethod": line.get("ShippingMethod"),
@@ -615,8 +621,14 @@ class Cotizacion(Documento):
             }
             
             # Agrega la línea solo si el Price es mayor a 0
+            if document_line["TreeType"] != "I":
+                document_lines.append(document_line)
+
+            """"
             if document_line["Price"] and document_line["Price"] > 0:
                 document_lines.append(document_line)
+            """
+
 
         return document_lines
     

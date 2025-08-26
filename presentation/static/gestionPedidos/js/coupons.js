@@ -58,27 +58,37 @@ function restaurarEstadoCupon() {
     filasProductos.forEach(row => {
         const descuento = row.querySelector('#desc_cupon');
 
-        // Solo actuar si el cupón está visible y no es "0%"
-        if (descuento && !descuento.hidden && !descuento.textContent.includes("0%")) {
-            const inputDescuento = row.querySelector('#agg_descuento');
+        if (descuento && !descuento.hidden) {
+            // Extraer solo el número del texto, por ejemplo "Cupon: 100%" -> 100
+            const porcentaje = parseInt(descuento.textContent.replace(/\D/g, ''), 10);
 
-            if (inputDescuento) {
-                inputDescuento.removeAttribute('disabled');
-                inputDescuento.value = 0;
-                inputDescuento.max = 100; // valor estándar
+            // Solo actuar si el porcentaje es mayor a 0
+            if (porcentaje > 0) {
+                const inputDescuento = row.querySelector('#agg_descuento');
+
+                if (inputDescuento) {
+                    inputDescuento.removeAttribute('disabled');
+                    inputDescuento.value = 0;
+                    inputDescuento.max = 100; // valor estándar
+                    inputDescuento.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+
+                // Restaurar la etiqueta de cupón a su estado inactivo
+                descuento.hidden = true;
+                descuento.textContent = "Cupon: 0%";
+                descuento.dataset.value = '';
                 inputDescuento.dispatchEvent(new Event('input', { bubbles: true }));
-            }
 
-            // Restaurar la etiqueta de cupón a su estado inactivo
-            descuento.hidden = true;
-            descuento.textContent = "Cupon: 0%";
-            descuento.dataset.value = '';
-            inputDescuento.dispatchEvent(new Event('input', { bubbles: true }));
+                if (inputDescuento) {
+                    inputDescuento.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }
         }
     });
 
     console.log("Se restauraron solo los productos afectados por cupón.");
 }
+
 
 
 
