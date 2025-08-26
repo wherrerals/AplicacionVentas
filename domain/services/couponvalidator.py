@@ -3,7 +3,9 @@ from infrastructure.repositories.collectionrepository import CollectionRepositor
 
 
 class CouponValidator:
-    def __init__(self, product_codes, rules, doc_total, cupon, users_data=None):
+    def __init__(self, product_codes, rules, doc_total, coupon, users_data=None):
+
+        print(f"Inicializando CouponValidator con cupon: {coupon}")
         """
         products: lista de diccionarios o instancias con precios
         rules: lista de reglas [{'operator': '>', 'min_value': ..., 'max_value': ...}]
@@ -11,8 +13,10 @@ class CouponValidator:
         self.products = list(ProductoDB.objects.filter(codigo__in=product_codes))
         self.rules = rules
         self.doc_total = doc_total
-        self.cupon = cupon
+        self.coupon = coupon
         self.users_data = users_data
+
+        print(f"cupon: {self.coupon}")
 
     def _apply_rule(self, rule):
         op = rule['operator']
@@ -41,9 +45,9 @@ class CouponValidator:
         if not self.products:
             return []
 
-        if self.cupon.same_price_and_discount:
+        if self.coupon.same_price_and_discount:
             print("Aplicando filtro de productos con mismo precio y descuento")
-            print(f"{self.cupon.same_price_and_discount}")
+            print(f"{self.coupon.same_price_and_discount}")
             # Solo productos sin diferencia de precios
             return [p for p in self.products if p.precioVenta == p.precioLista]
         
@@ -54,27 +58,41 @@ class CouponValidator:
     def validate_products(self, product_list):
         """
         Retorna lista final de productos aplicando las reglas de collections.
+        
+        Reglas:
+        - Si no hay colecciones: todos los productos son válidos
+        - Si coupon_does_not_apply = False: solo productos EN la colección
+        - Si coupon_does_not_apply = True: solo productos FUERA de la colección
         """
-        collections = self.cupon.collections.all()
+        collections = self.coupon.collections.all()
+        
+        # Si no hay colecciones asociadas, todos los productos son válidos
+        if not collections.exists():
+            return product_list
+        
+        # Obtener la configuración global de la colección
+        is_exclusive_collection = CollectionRepository.validate_coupon_does_not_apply(collections)
+        print(f"Colección es exclusiva (coupon_does_not_apply): {is_exclusive_collection}")
+        
         productos_validos = []
-
+        
         for product in product_list:
-            reglas = CollectionRepository.product_in_collections(product.codigo, collections)
-
-            if not reglas:
-                # No está en ninguna colección → se acepta
-                productos_validos.append(product)
-                continue
-
-            # Si aparece en colecciones donde al menos una tiene `coupon_does_not_apply=True`
-            if any(reglas):
-                # Omitir
-                continue
+            # Verificar si el producto está en alguna colección
+            product_is_in_collection = CollectionRepository.product_in_collections(product.codigo, collections)
+            print(f"Producto {product.codigo} está en colección: {product_is_in_collection}")
+            
+            # Aplicar lógica según el tipo de colección
+            if is_exclusive_collection:
+                # Colección exclusiva: solo productos FUERA de la colección
+                if not product_is_in_collection:
+                    productos_validos.append(product)
             else:
-                # Todas las colecciones permiten cupón
-                productos_validos.append(product)
-
+                # Colección inclusiva: solo productos DENTRO de la colección
+                if product_is_in_collection:
+                    productos_validos.append(product)
+        
         return productos_validos
+
 
     def get_discounted_products(self, filtered_products, discount):
         filtered_products = self.validate_products(filtered_products)
@@ -82,7 +100,7 @@ class CouponValidator:
 
         products_with_discounts = []
         for product in filtered_products:
-            if self.cupon.exceed_maximum_discount:
+            if self.coupon.exceed_maximum_discount:
                 final_discount = discount
             else:
                 from presentation.views.view import limitar_descuento
