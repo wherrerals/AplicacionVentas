@@ -22,7 +22,6 @@ class BusinessPartnerSerializer:
             "SalesPersonCode": -1,
             "Cellular": client_data.get("telefonoSN", ""),
             "EmailAddress": client_data.get("emailSN", ""),
-            "CardForeignName": f"{client_data.get('nombreSN', '')} {client_data.get('apellidoSN', '')}".strip(),
             "DunningTerm": "ESTANDAR",
             "CompanyPrivate": "cPrivate",
             "AliasName": client_data.get("nombreSN", ""),

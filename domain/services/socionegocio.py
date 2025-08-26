@@ -60,6 +60,7 @@ class SocioNegocio:
         """
         this method is used to validate the mandatory data of the business partner.
         """
+        self.validar_largo_nombre()
         self.validarGrupoSN()
         self.validarRut()
         self.validarEmail()
@@ -292,7 +293,11 @@ class SocioNegocio:
     def validarNombre(self):
         if not self.nombre:
             raise ValidationError("Nombre no encontrado")
-        
+    
+    def validar_largo_nombre(self):
+        if len(self.nombre) > 200:
+            raise ValidationError("Nombre con mas de 200 caracteres, debe ser menor o igual a 200")
+
     def validarApellido(self):
 
         if self.gruposn == '105':
@@ -350,7 +355,8 @@ class SocioNegocio:
     def create_sap_bp(self, json_data_bp):
         
         api_conection = APIClient()
-        
+
+        print(f"DATOS DEL CLIENTE: {json_data_bp}")
         response = api_conection.create_bp_sl(json_data_bp)
         
         if isinstance(response, dict):
