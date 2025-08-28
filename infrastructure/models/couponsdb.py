@@ -25,6 +25,8 @@ class CouponsDB(models.Model):
     collections = models.ManyToManyField('CollectionDB', through='CouponCollectionsDB', related_name='coupons_collections', blank=True)
     bp_use = models.ManyToManyField('SocioNegocioDB', through='CouponUsageDB', related_name='available_coupons', blank=True)
     rules = models.ManyToManyField(RulesCouponDB, through='CouponRuleRelation', related_name='rules_coupons', blank=True)
+    products = models.ManyToManyField(ProductoDB, related_name='products_coupons', blank=True)
+
 
     def __str__(self):
         return f"{self.cupon_code} - {self.name} - {self.active} - {self.valid_from} - {self.valid_to} - {self.discount_percentage} - {self.max_uses} - {self.one_use_only} - {self.coupon_type}"
