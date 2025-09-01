@@ -14,13 +14,13 @@ class valorTributario {
     // Metodo para calcular IVA, bruto y neto
     calcularValores() {
         var precioFinal = parseFloat(this.precioFinal) || 0;
-        var bruto = precioFinal;
-        var neto = precioFinal / 1.19;
+        var bruto = Math.round(precioFinal / 1.19);
+        var neto = precioFinal;
         var iva = bruto - neto;
         return {
             bruto: bruto,
-            neto: neto,
-            iva: iva
+            neto: Math.round(neto),
+            iva: Math.round(iva)
         };
     }
 }
@@ -73,18 +73,23 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
             descuento = parseFloat(inputDescuento.value) || 0;
         }
 
-
-        // Si el descuento es 0, el precio con descuento también será 0
         var precioFinal = descuento === 0 ? precioTotal : precioTotal - (precioTotal * (descuento / 100));
-        var precioConDescuento = descuento === 0 ? 0 : precioUnitario * (1 - (descuento / 100));
+        var precioConDescuento = precioUnitario * (1 - (descuento / 100));
 
         console.log('Precio final:', precioFinal, 'Precio con descuento:', precioConDescuento);
 
-        let precioFinaldefinido = Math.round(precioFinal);
-        let precioConDescuentodefinido = Math.round(precioConDescuento);
+        let precioFinaldefinido = Math.round(precioFinal * 1000) / 1000;
+        let precioConDescuentodefinido = Math.round(precioConDescuento * 1000) / 1000;
+
+        const precioNeto_n = precioUnitario / 1.19;
+        let precioConDescuento2 = precioNeto_n * (1 - (descuento / 100));
+        precioConDescuento2 = Math.round(precioConDescuento2 * 10000) / 10000;
+        let precioFinal_n = precioConDescuento2 * cantidad;
+        precioFinal_n = Math.round(precioFinal_n);
+        console.log('Precio Unitario:', precioUnitario, 'Precio neto:', precioNeto_n, 'Precio con descuento redondeado:', precioConDescuento2, 'Precio final antes de IVA:', precioFinal_n, 'Precio final después de IVA:', precioFinal_n,);
 
         // Actualizar el producto en la lista
-        producto.modificarPrecioFinal(precioFinal);
+        producto.modificarPrecioFinal(precioFinal_n);
 
         tdPrecioVenta.textContent = formatCurrency(precioFinaldefinido);
         tdPrecioDescuento.textContent = formatCurrency(precioConDescuentodefinido);
@@ -125,23 +130,19 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
     
         productos.forEach(producto => {
             const valores = producto.calcularValores();
-            totalIva += valores.iva;
-            totalBruto += valores.bruto;
+            //totalIva += valores.iva;
             totalNeto += valores.neto;
+            totalBruto = Math.round(totalNeto * 1.19);
+            totalIva = totalBruto - totalNeto;
+
+
             console.log('totalIva:', totalIva, 'totalBruto:', totalBruto, 'totalNeto:', totalNeto);
         });
 
 
         //asignar valor a data-total-neto para enviarlo al backend
         document.querySelector('#total_neto').setAttribute('data-total-neto', totalNeto);
-        document.querySelector('#total_bruto').setAttribute('data-total-bruto', totalBruto);
-
-        // Redondear los totales al final
-        totalIva = Math.round(totalIva);
-        totalBruto = Math.round(totalBruto);
-        totalNeto = Math.round(totalNeto);
-
-    
+        document.querySelector('#total_bruto').setAttribute('data-total-bruto', totalBruto);    
         document.querySelector('#iva').textContent = formatCurrency(totalIva);
         document.querySelector('#total_bruto').textContent = formatCurrency(totalBruto);
         document.querySelector('#total_neto').textContent = formatCurrency(totalNeto);
