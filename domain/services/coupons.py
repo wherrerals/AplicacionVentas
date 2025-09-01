@@ -71,11 +71,6 @@ class Coupons():
         
         return result if result else None
     
-    def products_apply_coupon(self):
-        products = self.coupon.products.all()
-        if not products:
-            return None
-        return list(products.values('codigo'))
     
     def count_use_cupon(self):
         from infrastructure.repositories.couponrepository import CouponRepository
