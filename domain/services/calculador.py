@@ -105,19 +105,30 @@ class CalculadoraTotales:
 
         return lineas_calculadas
     
-    @staticmethod
-    def calculate_docTotal(doc_data):
-        """
-        Calcula el total del documento a partir de los datos del documento.
-        """
-        total = 0
+    def calculate_docTotal(self):
 
-        for linea in doc_data.get('DocumentLines', []):
-            line_price = linea.get('line_price', 0)
-            line_price_clean = line_price.replace("$", "").replace(" ", "").replace(".", "")
-            total += float(line_price_clean)
-        
-        return total
+        total_precio_final_neto = Decimal("0")
+
+        print("Calculando total del documento...")
+        print(f"Datos del documento: {self.data}")
+
+        for item  in self.data.get('DocumentLines', []):
+            cantidad = Decimal(item["Quantity"])
+            precio_unitario_bruto = Decimal(item["UnitePrice"])
+            porcentaje_descuento = (Decimal(item["DiscountPercent"]) / Decimal("100")).quantize(Decimal("0.0001"))
+
+            precio_neto = (precio_unitario_bruto / (Decimal("1") + self.iva_porcentaje))
+            precio_descuento = (precio_neto * (Decimal("1") - porcentaje_descuento))
+            precio_descuento = precio_descuento.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
+            precio_final_neto = precio_descuento * cantidad
+            precio_final_neto = precio_final_neto.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+            total_precio_final_neto += precio_final_neto
+
+        total_valor_neto = total_precio_final_neto
+        total_valor_bruto = total_valor_neto * (Decimal("1") + self.iva_porcentaje)
+        total_valor_bruto = total_valor_bruto.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+
+        return total_valor_bruto
     
     @staticmethod
     def calculate_docTotal_rr(doc_data):

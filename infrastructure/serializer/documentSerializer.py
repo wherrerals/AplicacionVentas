@@ -22,9 +22,10 @@ class SerializerDocument:
         for line in prueba_line:
             print(f"SKU de la linea: {line.get('ItemCode', 'No hay SKU')}")
             print(f"Cantidad de la Linea: {line.get('Quantity', 'No hay lineas')}")
+            
+        calculator = CalculadoraTotales(doc_data)
+        doc_total = calculator.calculate_docTotal()
 
-        doc_total = CalculadoraTotales.calculate_docTotal(doc_data)
-        
         type_sales = Seller.tipoVentaTipoVendedor(doc_data.get('SalesPersonCode'))
         
         if type_sales == 'NA':
@@ -41,7 +42,7 @@ class SerializerDocument:
             'DocDueDate': doc_data.get('DocDueDate'),
             'TaxDate': doc_data.get('TaxDate'),
             #'DocTotal': doc_data.get('DocTotal'),
-            'DocTotal': f'{doc_total}',
+            #'DocTotal': f'{doc_total}',
             'CardCode': doc_data.get('CardCode'),
             'NumAtCard': doc_data.get('NumAtCard'),
             'Comments': doc_data.get('Comments'),
@@ -85,10 +86,14 @@ class SerializerDocument:
 
             warehouseCode = linea.get('WarehouseCode')
 
+            unit_price = linea.get('UnitePrice')
+            unit_price_neto = round(unit_price / 1.19, 4)
+
             nueva_linea = {
                 'ItemCode': item_code,
                 'Quantity': linea.get('Quantity'),
-                'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
+                #'UnitPrice': repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode')),
+                'UnitPrice': unit_price_neto,
                 'ShipDate': linea.get('ShipDate'),
                 'FreeText': linea.get('FreeText'),
                 'U_LED_DCTO_CUPON': cupon_formateado,
