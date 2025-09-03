@@ -1,28 +1,28 @@
-// Dependencias: valorTributario.js
 class valorTributario {
     constructor(codigoProducto, precioFinal, indiceProducto) {
         this.codigoProducto = codigoProducto;
-        this.precioFinal = precioFinal;
+        this.precioFinal = precioFinal; // total neto línea (sin IVA)
         this.indiceProducto = indiceProducto;
     }
 
-    // Metodo para modificar el precio final
+    // Metodo para modificar el precio final (total neto línea)
     modificarPrecioFinal(precioFinal) {
         this.precioFinal = precioFinal;
     }
 
-    // Metodo para calcular IVA, bruto y neto
+    // Metodo para devolver neto, bruto y IVA (pero bruto e IVA se recalculan a nivel documento)
     calcularValores() {
-        var precioFinal = parseFloat(this.precioFinal) || 0;
-        var bruto = Math.round(precioFinal / 1.19);
-        var neto = precioFinal;
-        var iva = bruto - neto;
+        var neto = this.precioFinal || 0;
         return {
-            bruto: bruto,
-            neto: Math.round(neto),
-            iva: Math.round(iva)
+            neto: neto
         };
     }
+}
+
+// Función de redondeo genérica
+function roundTo(num, decimals) {
+    const factor = Math.pow(10, decimals);
+    return Math.round(num * factor) / factor;
 }
 
 // Array global para almacenar las instancias de valorTributario
@@ -44,8 +44,6 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
     // Crear instancia de valorTributario y agregarla al array
     var producto = new valorTributario(codigoProducto, 0, indiceProducto);
     productos.push(producto);
-
-    console.log('Producto agregado:', producto);
 
     // Agregar evento de cambio al input de cantidad para calcular el precio total
     inputCantidad.addEventListener('input', calcularPrecioTotal);
@@ -81,12 +79,16 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
         let precioFinaldefinido = Math.round(precioFinal * 1000) / 1000;
         let precioConDescuentodefinido = Math.round(precioConDescuento * 1000) / 1000;
 
-        const precioNeto_n = precioUnitario / 1.19;
-        let precioConDescuento2 = precioNeto_n * (1 - (descuento / 100));
-        precioConDescuento2 = Math.round(precioConDescuento2 * 10000) / 10000;
-        let precioFinal_n = precioConDescuento2 * cantidad;
-        precioFinal_n = Math.round(precioFinal_n);
-        console.log('Precio Unitario:', precioUnitario, 'Precio neto:', precioNeto_n, 'Precio con descuento redondeado:', precioConDescuento2, 'Precio final antes de IVA:', precioFinal_n, 'Precio final después de IVA:', precioFinal_n,);
+        // 1 obtner el precio neto 
+        const precioNeto  = precioUnitario / 1.19;
+
+        // 2. Precio neto unitario con descuento (redondeado a 4 decimales)
+        let precioConDescuento2 = roundTo(precioNeto * (1 - descuento / 100), 4);
+
+        // 3. Total neto de la línea (sin redondear a pesos todavía)
+        const precioFinal_n = roundTo(precioConDescuento2 * cantidad, 0);
+
+        console.log('Precio Unitario:', precioUnitario, 'Precio neto:', precioNeto      , 'Precio con descuento redondeado:', precioConDescuento2, 'Precio final antes de IVA:', precioFinal_n, 'Precio final después de IVA:', precioFinal_n,);
 
         // Actualizar el producto en la lista
         producto.modificarPrecioFinal(precioFinal_n);
@@ -120,25 +122,45 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
         // Actualizar los valores totales
         actualizarValores();
     });
-    
+
+
+    function redondeoCondicional(numero) {
+        const parteDecimal = +(numero - Math.floor(numero)).toFixed(2);
+
+        // Si la parte decimal es mayor o igual a 0.45 -> redondeamos hacia arriba
+        if (parteDecimal >= 0.15) {
+            return Math.ceil(numero);
+        }
+
+        // En caso contrario, redondeo normal al entero más cercano
+        return Math.round(numero);
+    }
+
 
     // Función para actualizar los valores de IVA, bruto y neto sumando todos los productos
     function actualizarValores() {
-        let totalIva = 0;
-        let totalBruto = 0;
         let totalNeto = 0;
     
         productos.forEach(producto => {
             const valores = producto.calcularValores();
             //totalIva += valores.iva;
             totalNeto += valores.neto;
-            totalBruto = Math.round(totalNeto * 1.19);
-            totalIva = totalBruto - totalNeto;
 
-
-            console.log('totalIva:', totalIva, 'totalBruto:', totalBruto, 'totalNeto:', totalNeto);
         });
 
+        // Aquí recién redondeamos a pesos (entero)
+        let totalBruto = roundTo(totalNeto * 1.19, 2);
+
+        console.log('Total bruto antes de redondeo condicional:', totalBruto);
+        
+        // Regla de negocio: si los decimales >= 0.15, subimos al siguiente entero.
+        // Ejemplo: 6899.15 -> 6900, 6899.14 -> 6899
+        totalBruto = redondeoCondicional(totalBruto);
+
+        let totalIva = totalBruto - totalNeto;
+
+
+        console.log('totalIva:', totalIva, 'totalBruto:', totalBruto, 'totalNeto:', totalNeto);
 
         //asignar valor a data-total-neto para enviarlo al backend
         document.querySelector('#total_neto').setAttribute('data-total-neto', totalNeto);

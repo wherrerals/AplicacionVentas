@@ -53,6 +53,27 @@ document.addEventListener("DOMContentLoaded", function () {
             const totalspan = row.querySelector("#precio_Venta").textContent;
             const comentarios = row.querySelector("#comentarios-1").value; 
             const img = row.querySelector("#img_productox").src;
+            let cupon = row.querySelector("#desc_cupon").innerText; // Capturar el valor del cupón
+
+            // quitar los espacios y el % de cupon 
+            console.log('CUPON1:', cupon);
+
+
+            cupon = cupon.replace(/[^0-9.]/g, "");
+            
+            // CONNVERTIR CUPON EN NUMERO 
+
+            cupon = parseFloat(cupon) || 0;
+
+            console.log('CUPON2:', cupon);
+
+            let discount_real = 0
+
+            if (cupon != 0) {
+                discount_real = parseFloat(cupon) || 0;
+            } else {
+                discount_real = parseFloat(porcentaje_descuento) || 0;
+            }
 
             const total = totalspan;
             const discount = discountspan;
@@ -64,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "comentarios": comentarios,
                 "descripcion": name,
                 "cantidad": quantity,
-                "porcentaje_descuento": porcentaje_descuento,
+                "porcentaje_descuento": discount_real,
                 "descuento": discount,
                 "precio_unitario": price,
                 "subtotal_neto": total,
