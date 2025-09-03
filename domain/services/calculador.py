@@ -1,6 +1,5 @@
 import re
-from decimal import Decimal, ROUND_HALF_UP, ROUND_CEILING, ROUND_DOWN
-
+from decimal import Decimal, ROUND_HALF_UP
 
 class CalculadoraTotales:
     def __init__(self, data):
@@ -63,7 +62,7 @@ class CalculadoraTotales:
 
         total_valor_neto = total_precio_final_neto
         total_valor_bruto = total_valor_neto * (Decimal("1") + self.iva_porcentaje)
-        total_valor_bruto = self.redondeo_condicional(total_valor_bruto)
+        total_valor_bruto = total_valor_bruto.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
         
         print(f"total_valor_neto calculado: {total_valor_neto}")
 
@@ -75,14 +74,8 @@ class CalculadoraTotales:
             "total_descuento_neto": self.formatear_valor(total_descuento_neto),
             "total_valor_bruto": self.formatear_valor(total_valor_bruto),
             "total_valor_neto": self.formatear_valor(total_valor_neto),
-            "iva": self.formatear_valor(total_valor_bruto - total_valor_neto),
+            "iva": self.formatear_valor(total_valor_neto * self.iva_porcentaje),
         }
-
-    def redondeo_condicional(self, numero):
-        parte_decimal = numero - numero.to_integral_value(rounding=ROUND_DOWN)
-        if parte_decimal >= Decimal("0.25"):
-            return numero.to_integral_value(rounding=ROUND_CEILING)
-        return numero.to_integral_value(rounding=ROUND_HALF_UP)
     
     def calcular_linea_neto(self):
         lineas_calculadas = []
