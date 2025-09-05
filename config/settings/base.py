@@ -112,10 +112,9 @@ CELERY_TASK_CREATE_MISSING_QUEUES = True
 
 
 # Base Vtex API
-VTEX_APP_KEY = "vtexappkey-ledstudiocl-AJHPCL"
-VTEX_APP_TOKEN = "WTEPUGSXUOIOMSAVTEIIJOCBMXTUZWTESEFDQHZSLHJZMJXAVHPGOPDKMUVMAPDBZXXDGDFJFNXCMFDNICGGSOCGFNKEHGSEWMEYRLHNCISFSILPJUYXMGKLZUXDKJLB"
-VTEX_BASE_URL = "https://ledstudiocl.myvtex.com/api/"
-
+VTEX_APP_KEY = os.environ.get("VTEX_APP_KEY")
+VTEX_APP_TOKEN = os.environ.get("VTEX_APP_TOKEN")
+VTEX_BASE_URL = os.environ.get("VTEX_BASE_URL")
 
 # python ./manage.py makemigrations presentation
 # python ./manage.py sqlmigrate presentation 0001
