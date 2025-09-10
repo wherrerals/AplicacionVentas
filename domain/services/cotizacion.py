@@ -325,9 +325,11 @@ class Cotizacion(Documento):
                     name_vendedor = VendedorRepository.obtenerNombreVendedor(salesPersonCode)
                     # Guardar el log de la cotización
                     self.update_components(response, doc_entry, type_document='Quotations')
-    
+
                     DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Create')
                     from infrastructure.repositories.couponrepository import CouponRepository
+                    
+                    print("Datos de la cotización:", data)
                     
                     if data.get('Cupon_code') != '':
                         usage = CouponRepository.mark_coupon_as_used(data.get('Cupon_code'), jsonData.get('CardCode'))
@@ -358,14 +360,16 @@ class Cotizacion(Documento):
             return {'error': str(e)}
     
     def update_components(self, data, doc_entry, type_document):
-        document_line = data.get('DocumentLines')
+        try:
+            document_lines = data.get('DocumentLines', [])
+            if document_lines and document_lines[0].get('TreeType') == 'iSalesTree':
+                logger.info(f"Encolando actualización de componentes para docEntry={doc_entry}")
+                update_components_task.delay(doc_entry, type_document)
+            else:
+                logger.debug(f"Documento {doc_entry} sin TreeType iSalesTree, no requiere actualización")
+        except Exception as e:
+            logger.error(f"Error en update_components: {str(e)}")
 
-        if 'TreeType' in document_line[0]:
-            print("Enviando tarea para actualizar componentes...")
-            try:
-                return update_components_task.delay(doc_entry, type_document)
-            except Exception as e:
-                logger.error(f"Error al encolar la tarea de actualización de componentes: {str(e)}")
         
     def validarDatosCotizacion(self, data):
         """

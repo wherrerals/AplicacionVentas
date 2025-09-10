@@ -276,7 +276,7 @@ class DocumentoRepository:
         queryset = queryset.select_related(
             'socio_negocio', 
             'socio_negocio__grupoSN'
-        )[offset:offset + limite]
+        ).order_by('-id')[offset:offset + limite]
 
         documentos = []
         for doc in queryset:
