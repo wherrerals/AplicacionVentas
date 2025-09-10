@@ -362,13 +362,14 @@ class Cotizacion(Documento):
     def update_components(self, data, doc_entry, type_document):
         try:
             document_lines = data.get('DocumentLines', [])
-            if document_lines and document_lines[0].get('TreeType') == 'iSalesTree':
+            if any(line.get('TreeType') == 'iSalesTree' for line in document_lines):
                 logger.info(f"Encolando actualización de componentes para docEntry={doc_entry}")
                 update_components_task.delay(doc_entry, type_document)
             else:
                 logger.debug(f"Documento {doc_entry} sin TreeType iSalesTree, no requiere actualización")
         except Exception as e:
             logger.error(f"Error en update_components: {str(e)}")
+
 
         
     def validarDatosCotizacion(self, data):
