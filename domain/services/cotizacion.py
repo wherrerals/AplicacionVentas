@@ -332,7 +332,9 @@ class Cotizacion(Documento):
                     print("Datos de la cotización:", data)
                     
                     if data.get('Cupon_code') != '':
-                        usage = CouponRepository.mark_coupon_as_used(data.get('Cupon_code'), jsonData.get('CardCode'))
+                        #quitar los espacio en blanco
+                        cupon = data.get('Cupon_code').strip()
+                        usage = CouponRepository.mark_coupon_as_used(cupon, jsonData.get('CardCode'))
                         print(f"Usado: {usage.used}, Restantes: {usage.remaining_uses}")
 
                     return {
