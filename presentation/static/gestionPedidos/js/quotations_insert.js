@@ -173,7 +173,23 @@ document.addEventListener("DOMContentLoaded", function () {
                         title: titulo,
                         text: mensaje,
                         confirmButtonText: 'Aceptar'
-                    });
+                    })
+
+                        .then(() => {
+                        const baseUrl = `/ventas/generar_cotizacion/`;
+
+                        if (data.docEntry){
+                            const url = `${baseUrl}?docentry=${data.docEntry}`;
+                            window.location.href = url;
+                        }
+                        else {
+                            const url = `${baseUrl}?id=${data.id_solicitud}`;
+                            window.location.href = url;
+                        }
+                    })
+                    ;
+
+
 
                     if (numeroCotizacion) {
                         numeroCotizacion.textContent = `${data.docNum}`;
