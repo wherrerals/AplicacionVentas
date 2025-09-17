@@ -9,7 +9,7 @@ from django.db.models import Sum, F
 
 class ProductoRepository:
     def calculate_margen_descuentos(self, precio_venta, costo, rentabilidad_minima):
-
+        print(f"Calculando margen y descuento para precio_venta: {precio_venta}, costo: {costo}, rentabilidad_minima: {rentabilidad_minima}")
         if precio_venta <= 0 or costo <= 0:
             return 0, 0
         else:

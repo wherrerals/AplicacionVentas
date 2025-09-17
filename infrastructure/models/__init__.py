@@ -31,6 +31,8 @@ from infrastructure.models.rulescouponsrelation import CouponRuleRelation
 from infrastructure.models.collectionproductsdb import CollectionsProducts
 from infrastructure.models.collectiondb import CollectionDB
 from infrastructure.models.couponcollectiondb import CouponCollectionsDB
+from infrastructure.models.pricelistsdb import PriceListsDB
+from infrastructure.models.pricelistproductdb import PriceListProductDB
 
 
 

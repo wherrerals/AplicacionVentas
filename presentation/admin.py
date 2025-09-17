@@ -29,6 +29,7 @@ from infrastructure.models import (
 )
 
 from infrastructure.models.couponsdb import CouponsDB
+from infrastructure.models.pricelistsdb import PriceListsDB
 from infrastructure.models.regiondb import RegionDB
 from infrastructure.models.stockbodegasdb import StockBodegasDB
 from infrastructure.models.confiDescuentosDB import ConfiDescuentosDB
@@ -288,6 +289,12 @@ class ConfiEmpresaDBper(admin.ModelAdmin):
 class CollectionDBper(admin.ModelAdmin):
     list_display = ("collection_id", "coupon_does_not_apply", "coupon_does_not_apply")
 
+class PriceListsDBper(admin.ModelAdmin):
+    list_display = ("code_list", "name", "description", "valid_from", "valid_to", "active", "last_modification")
+    search_fields = ["code_list", "name"]
+    list_filter = ("active",)
+    ordering = ("-last_modification",)
+
 # Register your models here.
 admin.site.register(TipoDocTributarioDB, TipoDocTributarioDBper)
 admin.site.register(SucursalDB, SucursalDBper)
@@ -316,3 +323,4 @@ admin.site.register(TipoEntregaDB, TipoEntregaDBper)
 admin.site.register(TipoObjetoSapDB, TipoObjetoSapDBper)
 admin.site.register(CouponsDB, CuponesDBper)
 admin.site.register(CollectionDB, CollectionDBper)
+admin.site.register(PriceListsDB, PriceListsDBper)

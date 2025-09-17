@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_http_methods
 from django.db import transaction
 from django.http import JsonResponse, HttpResponse
+from domain.services.listprice import ListPriceService
 from infrastructure.models.couponsdb import CouponsDB
 from weasyprint import HTML
 #Modulos Diseñados
@@ -877,7 +878,7 @@ def busquedaProductos(request):
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'}) """
 
-def busquedaProductos(request):
+""" def busquedaProductos(request):
     if request.method == 'GET' and 'numero' in request.GET:
         numero = request.GET.get('numero', '').strip()
 
@@ -887,8 +888,12 @@ def busquedaProductos(request):
             Q(codigo__icontains=numero) | Q(nombre__icontains=numero)
         ).only(
             'codigo', 'nombre', 'imagen', 'precioVenta', 'stockTotal',
-            'precioLista', 'descontinuado', 'inactivo'
+            'precioLista', 'descontinuado', 'inactivo', 'costo'
         )[:20]
+
+        list_prices = ListPriceService(codigo, costo, users_data)
+        list_prices.get_list_price_info(users_data['vendedor'])
+
 
         resultados_formateados = [
             {
@@ -906,27 +911,54 @@ def busquedaProductos(request):
 
         return JsonResponse({'resultados': resultados_formateados})
     else:
+        return JsonResponse({'error': 'No se proporcionó un número válido'}) """
+
+def busquedaProductos(request):
+    if request.method == 'GET' and 'numero' in request.GET:
+        numero = request.GET.get('numero', '').strip()
+
+        users_data = user_data(request)
+
+        resultados = ProductoDB.objects.filter(
+            Q(codigo__icontains=numero) | Q(nombre__icontains=numero)
+        ).only(
+            'codigo', 'nombre', 'imagen', 'precioVenta', 'stockTotal',
+            'precioLista', 'descontinuado', 'inactivo', 'costo'
+        )[:20]
+
+        resultados_formateados = []
+        for p in resultados:
+            if p.precioVenta > 0 and p.inactivo != "tYES":
+                # inicializar el servicio de listas de precio
+                list_prices = ListPriceService(p.codigo, p.costo, users_data)
+                new_price, new_discounted_price = list_prices.get_list_price_info()
+
+                print(f"new_price: {new_price}, new_discounted_price: {new_discounted_price}")
+
+                # valores por defecto
+                precio = p.precioVenta
+                max_descuento = limitar_descuento(p, users_data, new_discounted_price)
+
+                # integrar tu lógica:
+                if new_price != 0.0:
+                    precio = new_price
+                    max_descuento = limitar_descuento(p, users_data, new_discounted_price)
+
+                resultados_formateados.append({
+                    'codigo': p.codigo,
+                    'nombre': p.nombre + " (Descontinuado)" if p.descontinuado == "1" else p.nombre,
+                    'imagen': p.imagen,
+                    'precio': precio,
+                    'stockTotal': p.stockTotal,
+                    'precioAnterior': p.precioLista,
+                    'maxDescuento': max_descuento,
+                })
+
+        return JsonResponse({'resultados': resultados_formateados})
+    else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
 
-
-""" def limitar_descuento(producto, users_data):
-
-    if users_data['tipoVendedor'] == 'P':
-        if producto.marca == 'LST':
-            #codigo = 2 
-            return math.floor(min(producto.dsctoMaxTienda * 100, 91)) #25
-        else:
-            # codigo = 4
-            return math.floor(min(producto.dsctoMaxTienda * 100, 91)) #15
-    else:
-        if producto.marca == 'LST':
-            #codigo = 1 
-            return math.floor(min(producto.dsctoMaxTienda * 100, 91)) #15
-        else:
-            #codigo = 3
-            return math.floor(min(producto.dsctoMaxTienda * 100, 91)) #10 """
-
-def limitar_descuento(producto, users_data):
+def limitar_descuento(producto, users_data, new_discounted_price):
     """
     Limita el descuento máximo según el tipo de producto y tipo de vendedor.
     El valor límite se obtiene desde la base de datos ConfiDescuentosDB según un código:
@@ -954,6 +986,10 @@ def limitar_descuento(producto, users_data):
     except ConfiDescuentosDB.DoesNotExist:
         # Si no se encuentra la configuración, usar un valor por defecto
         limite = 0
+
+        if new_discounted_price is not None and new_discounted_price > 0:
+            producto.dsctoMaxTienda = new_discounted_price
+
     return math.floor(min(producto.dsctoMaxTienda * 100, limite))
 
 
