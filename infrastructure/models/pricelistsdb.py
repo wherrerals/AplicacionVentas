@@ -17,3 +17,5 @@ class PriceListsDB(models.Model):
 
     def __str__(self):
         return f"{self.code_list} - {self.name} - {self.valid_from} - {self.valid_to} - {self.active}"
+    
+    
