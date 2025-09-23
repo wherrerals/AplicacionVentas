@@ -937,12 +937,12 @@ def busquedaProductos(request):
 
                 # valores por defecto
                 precio = p.precioVenta
-                max_descuento = limitar_descuento(p, users_data, new_discounted_price)
+                max_descuento = limitar_descuento(p, users_data, 0.0, 0.0)  # Llamada inicial con 0.0 para evitar errores
 
                 # integrar tu lógica:
                 if new_price != 0.0:
                     precio = new_price
-                    max_descuento = limitar_descuento(p, users_data, new_discounted_price)
+                    max_descuento = limitar_descuento(p, users_data, new_price, new_discounted_price)
 
                 resultados_formateados.append({
                     'codigo': p.codigo,
@@ -958,7 +958,7 @@ def busquedaProductos(request):
     else:
         return JsonResponse({'error': 'No se proporcionó un número válido'})
 
-def limitar_descuento(producto, users_data, new_discounted_price):
+def limitar_descuento(producto, users_data, new_price, new_discounted_price):
     """
     Limita el descuento máximo según el tipo de producto y tipo de vendedor.
     El valor límite se obtiene desde la base de datos ConfiDescuentosDB según un código:
@@ -984,13 +984,18 @@ def limitar_descuento(producto, users_data, new_discounted_price):
         confi = ConfiDescuentosDB.objects.get(codigo=codigo)
         limite = confi.limiteDescuentoMaximo
     except ConfiDescuentosDB.DoesNotExist:
-        # Si no se encuentra la configuración, usar un valor por defecto
         limite = 0
 
-        if new_discounted_price is not None and new_discounted_price > 0:
-            producto.dsctoMaxTienda = new_discounted_price
-
-    return math.floor(min(producto.dsctoMaxTienda * 100, limite))
+    descuentoMax = producto.dsctoMaxTienda if producto.dsctoMaxTienda else 0.0
+    # Aquí va tu validación común
+    if new_price > 0:
+        descuentoMax = new_discounted_price
+        print("caso1:", descuentoMax)
+        return math.floor(min(descuentoMax * 100, limite))
+    
+    else:
+        print("caso2:", descuentoMax)
+        return math.floor(min(descuentoMax * 100, limite))
 
 
 

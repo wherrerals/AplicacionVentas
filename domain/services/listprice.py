@@ -56,13 +56,26 @@ class ListPriceService:
         """Calcula un nuevo precio con el descuento de rentabilidad"""
         repo = ProductoRepository()
         self.load_data()
-        margen_bruto, descuento = repo.calculate_margen_descuentos(float(self.list_price_product.price_list), self.costo, self.rentability)
+
+        if not self.list_price_product:
+            # No hay lista de precios asociada
+            return 0.0
+
+        margen_bruto, descuento = repo.calculate_margen_descuentos(
+            float(self.list_price_product.price_list),
+            self.costo,
+            self.rentability
+        )
 
         return descuento
+
     
 
     def get_list_price_info(self) -> dict:
         """Retorna un diccionario con la información de la lista de precios"""
+
+        if self.list_price_is_active():
+            return 0.0, 0.0
 
         new_price = self.get_price()
         print(f"validando precio: {new_price}")
