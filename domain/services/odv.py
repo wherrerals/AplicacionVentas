@@ -5,6 +5,7 @@ from requests import request
 from adapters.sl_client import APIClient
 from infrastructure.models.stockbodegasdb import StockBodegasDB
 from infrastructure.repositories.contactorepository import ContactoRepository
+from infrastructure.repositories.couponrepository import CouponRepository
 from infrastructure.repositories.direccionrepository import DireccionRepository
 from infrastructure.repositories.productorepository import ProductoRepository
 from infrastructure.repositories.stockbodegasrepository import StockBodegasRepository
@@ -431,6 +432,12 @@ class OrdenVenta(Documento):
 
                     self.update_components(response, doc_entry, type_document='Orders')
                     DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='ODV', url="", json=jsonData, response=response, estate='Creado')
+
+                    if data.get('Cupon_code') != '':
+                        #quitar los espacio en blanco
+                        cupon = data.get('Cupon_code').strip()
+                        usage = CouponRepository.mark_coupon_as_used(cupon, jsonData.get('CardCode'))
+                        print(f"Usado: {usage.used}, Restantes: {usage.remaining_uses}")
 
                     return {
                         'success': 'Orden Venta creada exitosamente',
