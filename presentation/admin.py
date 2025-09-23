@@ -3,6 +3,7 @@ from pyexpat.errors import messages
 from django import forms
 from django.contrib import admin
 from django.shortcuts import render
+from django.db import transaction
 from infrastructure.models import (
     CondicionPagoDB,
     DocumentoDB,
@@ -25,11 +26,11 @@ from infrastructure.models import (
     TipoEntregaDB,
     TipoObjetoSapDB,
     CollectionDB
-
 )
 
 from infrastructure.models.couponsdb import CouponsDB
 from infrastructure.models.pricelistsdb import PriceListsDB
+from infrastructure.models.pricelistproductdb import PriceListProductDB
 from infrastructure.models.regiondb import RegionDB
 from infrastructure.models.stockbodegasdb import StockBodegasDB
 from infrastructure.models.confiDescuentosDB import ConfiDescuentosDB
@@ -295,6 +296,115 @@ class PriceListsDBper(admin.ModelAdmin):
     list_filter = ("active",)
     ordering = ("-last_modification",)
 
+
+class PriceListProductDBper(admin.ModelAdmin):
+    list_display = ("code_list", "code_product", "price_list")
+    search_fields = ["code_list__code_list", "code_product__codigo"]
+    list_filter = ("code_list",)
+    ordering = ("code_list", "code_product")
+
+    change_list_template = "admin/pricelistproduct_changelist.html"
+
+    def get_urls(self):
+
+        from django.urls import path
+
+        urls = super().get_urls()
+        my_urls = [
+            path("import-csv/", self.import_csv),
+        ]
+        return my_urls + urls
+
+
+    def import_csv(self, request):
+        if request.method == "POST":
+            form = CsvImportForm(request.POST, request.FILES)
+            if form.is_valid():
+                csv_file = request.FILES["csv_file"]
+                if not csv_file.name.endswith(".csv"):
+                    self.message_user(request, "El archivo debe ser CSV", level=40)  # ERROR
+                    return render(request, "admin/csv_form2.html", {"form": form})
+
+                try:
+                    decoded_file = csv_file.read().decode("utf-8-sig").splitlines()
+                    reader = csv.DictReader(decoded_file, delimiter=";")
+
+                    created_count = 0
+                    updated_count = 0
+                    errors = []
+
+                    with transaction.atomic():
+                        for row in reader:
+                            if "code_list" in row and "code_product" in row and "price_list" in row:
+                                try:
+                                    # Buscar FKs usando los códigos
+                                    code_list = PriceListsDB.objects.get(code_list=row["code_list"])
+                                    code_product = ProductoDB.objects.get(codigo=row["code_product"])
+
+                                    # Crear o actualizar
+                                    obj, created = self.model.objects.update_or_create(
+                                        code_list=code_list,
+                                        code_product=code_product,
+                                        defaults={"price_list": row["price_list"]},
+                                    )
+
+                                    if created:
+                                        created_count += 1
+                                    else:
+                                        updated_count += 1
+
+                                except PriceListsDB.DoesNotExist:
+                                    errors.append(f'Lista de precios con código {row["code_list"]} no existe')
+                                except ProductoDB.DoesNotExist:
+                                    errors.append(f'Producto con código {row["code_product"]} no existe')
+                                except Exception as e:
+                                    errors.append(
+                                        f"Error con fila {row}: {str(e)}"
+                                    )
+                            else:
+                                errors.append(
+                                    'El CSV debe contener las columnas "code_list", "code_product" y "price_list"'
+                                )
+                                break
+
+                    # Mensajes al usuario
+                    if created_count:
+                        self.message_user(
+                            request,
+                            f"✅ Se crearon {created_count} precios nuevos",
+                            level=25,
+                        )
+                    if updated_count:
+                        self.message_user(
+                            request,
+                            f"🔄 Se actualizaron {updated_count} precios",
+                            level=25,
+                        )
+                    if errors:
+                        for error in errors:
+                            self.message_user(request, f"⚠️ {error}", level=30)
+
+                    return self.changelist_view(request)
+
+                except Exception as e:
+                    self.message_user(
+                        request,
+                        f"Error procesando el archivo: {str(e)}",
+                        level=40,  # ERROR
+                    )
+                    return render(request, "admin/csv_form2.html", {"form": form})
+            else:
+                for field, field_errors in form.errors.items():
+                    for error in field_errors:
+                        self.message_user(request, f"Error en {field}: {error}", level=40)
+                return render(request, "admin/csv_form2.html", {"form": form})
+
+        # GET → mostrar formulario vacío
+        form = CsvImportForm()
+        return render(request, "admin/csv_form2.html", {"form": form})
+
+
+
 # Register your models here.
 admin.site.register(TipoDocTributarioDB, TipoDocTributarioDBper)
 admin.site.register(SucursalDB, SucursalDBper)
@@ -324,3 +434,4 @@ admin.site.register(TipoObjetoSapDB, TipoObjetoSapDBper)
 admin.site.register(CouponsDB, CuponesDBper)
 admin.site.register(CollectionDB, CollectionDBper)
 admin.site.register(PriceListsDB, PriceListsDBper)
+admin.site.register(PriceListProductDB, PriceListProductDBper)

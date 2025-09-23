@@ -16,6 +16,6 @@ class PriceListsDB(models.Model):
     last_modification = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.code_list} - {self.name} - {self.valid_from} - {self.valid_to} - {self.active}"
+        return f"{self.code_list}"
     
     

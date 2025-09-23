@@ -1,0 +1,38 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+    <div>
+        {% if messages %}
+            <ul class="messagelist">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        
+        <form action="." method="POST" enctype="multipart/form-data">
+            {{ form.non_field_errors }}
+            {% for field in form %}
+                <div class="fieldWrapper">
+                    {{ field.errors }}
+                    {{ field.label_tag }} {{ field }}
+                    {% if field.help_text %}
+                        <p class="help">{{ field.help_text }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            {% csrf_token %}
+            <button type="submit">Cargar CSV</button>
+        </form>
+    </div>
+    <br />
+    <div>
+        <h2>Formato del CSV:</h2>
+        <p>El archivo CSV debe contener las siguientes columnas:</p>
+        <ul>
+            <li>code_list: El código de la lista de precios</li>
+            <li>code_product: El código del producto existente</li>
+            <li>price_list: El nuevo precio</li>
+        </ul>
+    </div>
+{% endblock %}
