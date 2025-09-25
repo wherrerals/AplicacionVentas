@@ -9,7 +9,7 @@ from django.db.models import Sum, F
 
 class ProductoRepository:
     def calculate_margen_descuentos(self, precio_venta, costo, rentabilidad_minima):
-        print(f"Calculando margen y descuento para precio_venta: {precio_venta}, costo: {costo}, rentabilidad_minima: {rentabilidad_minima}")
+
         if precio_venta <= 0 or costo <= 0:
             return 0, 0
         else:
@@ -98,7 +98,8 @@ class ProductoRepository:
         componentes = ApiClientSL.productTreesComponents(item_code).get("ProductTreeLines", [])
 
         # Definimos las bodegas específicas
-        bodegas = ["ME", "PH", "LC"]
+        bodegas = list(self.get_bodegas_permitidas())
+        print(f"Bodegas permitidas: {bodegas} CALCULANDO STOCK RECETA PARA {item_code}")
 
         # Inicializamos el stock total por bodega con infinito
         stock_por_bodega = {bodega: float('inf') for bodega in bodegas}
@@ -147,6 +148,10 @@ class ProductoRepository:
         self.update_stock_total(producto)
 
         return stock_total_receta, costo_total
+    
+
+    def get_bodegas_permitidas(self):
+        return {p.nombre for p in BodegaDB.objects.filter(estado=True)}
 
 
 
@@ -159,7 +164,7 @@ class ProductoRepository:
         warehouses = stock_data.get("ItemWarehouseInfoCollection", [])
 
         # Lista de bodegas permitidas
-        bodegas_permitidas = {"ME", "PH", "LC"}
+        bodegas_permitidas = self.get_bodegas_permitidas()
 
         # Filtrar y devolver un diccionario con el stock disponible (InStock - Committed)
         return {
@@ -168,9 +173,10 @@ class ProductoRepository:
             if bodega["WarehouseCode"] in bodegas_permitidas
         }
     
+    
     def obtener_stock_componentes_db_receta(self, item_code):
         # Lista de bodegas permitidas (usando los nombres como están en la BD)
-        bodegas_permitidas = {"ME", "PH", "LC"}
+        bodegas_permitidas = self.get_bodegas_permitidas()
         
         # Obtener los registros de stock para el producto
         stocks = StockBodegasDB.objects.filter(
