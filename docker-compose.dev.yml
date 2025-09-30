@@ -1,5 +1,4 @@
-#version: '3.8'  #agregar esto solo se necesita especificar la versión
-# cw = celery worker
+version: '3.8'
 
 services:
   db:
@@ -35,21 +34,21 @@ services:
         "
     volumes:
       - .:/app
-      - media_data:/app/media  # 🔥 Esto persiste tu carpeta media/
-      
+      - media_data:/app/media
     ports:
       - "8000:8000"
     depends_on:
       - db
       - rabbitmq
-
+    networks:
+      - shared_network
 
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -58,6 +57,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - shared_network
 
   celery-beat:
     build:
@@ -71,6 +72,8 @@ services:
       - db
     volumes:
       - .:/app
+    networks:
+      - shared_network
 
   celery-worker-products:
     build:
@@ -85,7 +88,9 @@ services:
     volumes:
       - .:/app
     environment:
-      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+      CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
+    networks:
+      - shared_network
 
   celery-worker-products-recetas:
     build:
@@ -100,8 +105,10 @@ services:
     volumes:
       - .:/app
     environment:
-      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
-  
+      CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
+    networks:
+      - shared_network
+
   celery-worker-products-importados:
     build:
       context: .
@@ -115,8 +122,9 @@ services:
     volumes:
       - .:/app
     environment:
-      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
-
+      CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
+    networks:
+      - shared_network
 
   celery-worker-users:
     build:
@@ -131,7 +139,9 @@ services:
     volumes:
       - .:/app
     environment:
-      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+      CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
+    networks:
+      - shared_network
 
   celery-worker-pdf:
     build:
@@ -146,7 +156,9 @@ services:
     volumes:
       - .:/app
     environment:
-      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+      CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
+    networks:
+      - shared_network
 
   celery-update-recipes-components:
     build:
@@ -161,8 +173,15 @@ services:
     volumes:
       - .:/app
     environment:
-      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
-
+      CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
+    networks:
+      - shared_network
+  
 volumes:
   mysql_data:
   media_data:
+
+networks:
+  shared_network:
+    name: shared_network
+    driver: bridge

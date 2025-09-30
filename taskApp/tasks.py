@@ -12,6 +12,11 @@ from weasyprint import HTML
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 
+@shared_task
+def prueba12(datos):
+    print("Tarea de prueba ejecutada con datos:", datos)
+    return f"Tarea de prueba completada con datos: {datos}"
+
 @shared_task(bind=True)
 def sync_products(self):
     # Registrar la tarea en la base de datos al iniciar

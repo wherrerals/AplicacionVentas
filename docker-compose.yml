@@ -47,8 +47,8 @@ services:
     image: rabbitmq:3-management
     container_name: rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -66,7 +66,7 @@ services:
     volumes:
       - .:/app
     environment:
-      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+      CELERY_BROKER_URL: "amqp://admin:admin@rabbitmq:5672//"
 
   celery-worker-products:
     build:
@@ -81,7 +81,7 @@ services:
     volumes:
       - .:/app
     environment:
-      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+      CELERY_BROKER_URL: "amqp://admin:admin@rabbitmq:5672//"
 
 
   celery-worker-products-recetas:
@@ -97,7 +97,7 @@ services:
     volumes:
       - .:/app
     environment:
-      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+      CELERY_BROKER_URL: "amqp://admin:admin@rabbitmq:5672//"
   
   celery-worker-products-importados:
     build:
@@ -112,7 +112,7 @@ services:
     volumes:
       - .:/app
     environment:
-      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+      CELERY_BROKER_URL: "amqp://admin:admin@rabbitmq:5672//"
 
   celery-worker-users:
     build:
@@ -127,7 +127,7 @@ services:
     volumes:
       - .:/app
     environment:
-      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+      CELERY_BROKER_URL: "amqp://admin:admin@rabbitmq:5672//"
 
   celery-worker-pdf:
     build:
@@ -142,7 +142,7 @@ services:
     volumes:
       - .:/app
     environment:
-      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+      CELERY_BROKER_URL: "amqp://admin:admin@rabbitmq:5672//"
 
   celery-update-recipes-components:
     build:
@@ -157,7 +157,7 @@ services:
     volumes:
       - .:/app
     environment:
-      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672//"
+      CELERY_BROKER_URL: "amqp://admin:admin@rabbitmq:5672//"
 
 volumes:
   mysql_data:

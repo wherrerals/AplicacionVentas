@@ -86,7 +86,7 @@ class Producto:
         # Sincronizar los productos y su stock
         repo = ProductoRepository()
         creacion, listadoProductos = repo.sync_products_and_stock(jsonserializado)
-
+        self.iniciar_sincronizacion(data=jsonserializado)
 
         # Incrementar el valor de `skip` si la sincronización fue exitosa
         if creacion and listadoProductos:
@@ -287,3 +287,17 @@ class Producto:
         # verificar si la actualizacion fue exitosa
         print("Update recipe response:", update_recipe)
 
+
+
+    def iniciar_sincronizacion(self, data):
+        from taskApp.tasks import prueba12
+
+        datos = {"producto": data, "mensaje": "Iniciando sincronización de productos"}
+        
+        # Enviar a la cola RabbitMQ
+        prueba12.apply_async(
+            args=[datos],
+            queue='cola_productos'
+        )
+        
+        return "Tarea enviada a Celery"

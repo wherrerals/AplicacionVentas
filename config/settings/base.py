@@ -1,4 +1,5 @@
 from pathlib import Path
+from kombu import Exchange, Queue
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -78,10 +79,15 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATA_UPLOAD_MAX_NUMBER_FIELDS = None  # Permite un número ilimitado (no recomendado)
 
 # Docker Config BROKER REDIS
-CELERY_BROKER_URL = "amqp://guest:guest@rabbitmq:5672//"
+CELERY_BROKER_URL = "amqp://admin:admin123@rabbitmq:5672//"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_BACKEND = "rpc://"
+
+CELERY_TASK_QUEUES = (
+    Queue("q.item.mw.studiogo", Exchange("ex.fanout.item.mw", type="fanout"), routing_key=""),
+    Queue("q.item.mw.vtex", Exchange("ex.fanout.item.mw", type="fanout"), routing_key=""),
+)
 
 # Configuración de rutas de tareas a colas específicas
 CELERY_TASK_ROUTES = {
@@ -99,6 +105,10 @@ CELERY_TASK_ROUTES = {
 
     "taskApp.tasks.syncUser": {
         "queue": "q_clients_in"
+    },  # Asigna la tarea a una cola específica
+
+    "taskApp.tasks.prueba12": {
+        "queue": "cola_productos"
     },  # Asigna la tarea a una cola específica
     
 }
