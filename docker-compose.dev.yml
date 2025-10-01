@@ -3,6 +3,7 @@ version: '3.8'
 services:
   db:
     image: mysql:9.0.1
+    container_name: db
     environment:
       MYSQL_ROOT_PASSWORD: Ea7hava5*
       MYSQL_DATABASE: led_studio
@@ -11,6 +12,8 @@ services:
       - mysql_data:/var/lib/mysql
     ports:
       - "4350:3306"
+    networks:
+      - a_network
 
   web:
     build:
@@ -23,7 +26,7 @@ services:
         python manage.py makemigrations --settings=config.settings.develop &&
         python manage.py migrate --settings=config.settings.develop &&
         python manage.py makemigrations infrastructure --settings=config.settings.develop &&
-        python manage.py migrate  infrastructure --settings=config.settings.develop &&
+        python manage.py migrate infrastructure --settings=config.settings.develop &&
         python manage.py makemigrations taskApp --settings=config.settings.develop &&
         python manage.py migrate taskApp --settings=config.settings.develop &&
         python manage.py makemigrations logs --settings=config.settings.develop &&
@@ -40,8 +43,11 @@ services:
     depends_on:
       - db
       - rabbitmq
+    environment:
+      DJANGO_SETTINGS_MODULE: "config.settings.develop"
     networks:
-      - shared_network
+      - a_network
+      - shared_network   # solo si necesita RabbitMQ
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -72,8 +78,11 @@ services:
       - db
     volumes:
       - .:/app
+    environment:
+      DJANGO_SETTINGS_MODULE: "config.settings.develop"
     networks:
-      - shared_network
+      - a_network
+      - shared_network   # solo si necesita RabbitMQ
 
   celery-worker-products:
     build:
@@ -89,7 +98,9 @@ services:
       - .:/app
     environment:
       CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
+      DJANGO_SETTINGS_MODULE: "config.settings.develop"
     networks:
+      - a_network
       - shared_network
 
   celery-worker-products-recetas:
@@ -106,7 +117,9 @@ services:
       - .:/app
     environment:
       CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
+      DJANGO_SETTINGS_MODULE: "config.settings.develop"
     networks:
+      - a_network
       - shared_network
 
   celery-worker-products-importados:
@@ -123,7 +136,9 @@ services:
       - .:/app
     environment:
       CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
+      DJANGO_SETTINGS_MODULE: "config.settings.develop"
     networks:
+      - a_network
       - shared_network
 
   celery-worker-users:
@@ -140,7 +155,9 @@ services:
       - .:/app
     environment:
       CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
+      DJANGO_SETTINGS_MODULE: "config.settings.develop"
     networks:
+      - a_network
       - shared_network
 
   celery-worker-pdf:
@@ -157,7 +174,9 @@ services:
       - .:/app
     environment:
       CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
+      DJANGO_SETTINGS_MODULE: "config.settings.develop"
     networks:
+      - a_network
       - shared_network
 
   celery-update-recipes-components:
@@ -174,7 +193,9 @@ services:
       - .:/app
     environment:
       CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
+      DJANGO_SETTINGS_MODULE: "config.settings.develop"
     networks:
+      - a_network
       - shared_network
   
 volumes:
@@ -182,6 +203,8 @@ volumes:
   media_data:
 
 networks:
-  shared_network:
-    name: shared_network
+  a_network:       # red interna exclusiva para Sistema A
     driver: bridge
+  shared_network:   # red compartida con RabbitMQ
+    external: true
+    name: shared_network
