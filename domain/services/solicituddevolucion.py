@@ -1,3 +1,4 @@
+from datetime import datetime
 from venv import logger
 from adapters.sl_client import APIClient
 from infrastructure.models.documentodb import DocumentoDB
@@ -217,6 +218,11 @@ class SolicitudesDevolucion(Documento):
 
 
     def elimnar_lineas_no_check(self, data):
+        
+        print("Eliminando líneas no marcadas...")
+        print("Datos antes de filtrar:", data)
+
+        data['DocDate'] = datetime.today().strftime('%Y-%m-%d')
 
         lineas_filtradas = [
             linea for linea in data.get('DocumentLines', [])
