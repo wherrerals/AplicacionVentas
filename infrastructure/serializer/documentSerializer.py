@@ -156,7 +156,7 @@ class SerializerDocument:
         addres_bill, address_ship = Direccion.assign_bill_ship_addres(doc_data.get('Address'), doc_data.get('Address2'), branch_code)
 
         raw_cabecera  = {
-            'DocDate': doc_data.get('DocDate'),
+            #'DocDate': doc_data.get('DocDate'),
             'DocDueDate': doc_data.get('DocDueDate'),
             'TaxDate': doc_data.get('TaxDate'),
             'U_VK_Folio': doc_data.get('Folio'),
