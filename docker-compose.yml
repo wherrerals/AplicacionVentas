@@ -205,8 +205,8 @@ volumes:
   media_data:
 
 networks:
-  a_network:       # red interna exclusiva para Sistema A
+  a_network:
     driver: bridge
-  shared_network:   # red compartida con RabbitMQ
+  shared_network:
     external: true
     name: shared_network
