@@ -99,7 +99,6 @@ class ProductoRepository:
 
         # Definimos las bodegas específicas
         bodegas = list(self.get_bodegas_permitidas())
-        print(f"Bodegas permitidas: {bodegas} CALCULANDO STOCK RECETA PARA {item_code}")
 
         # Inicializamos el stock total por bodega con infinito
         stock_por_bodega = {bodega: float('inf') for bodega in bodegas}

@@ -168,6 +168,10 @@ class Serializador:
     def formatearDatos(self, json_data):
         # Lista para almacenar todos los productos procesados
         productos = []
+        from infrastructure.repositories.productorepository import ProductoRepository
+
+        pr = ProductoRepository()
+        bodegas_permitidas = list(pr.get_bodegas_permitidas())
 
         # Recorrer todos los productos en "value"
         for product_data in json_data.get("value", []):
@@ -228,7 +232,7 @@ class Serializador:
             bodegas = []
             for warehouse_info in product_data.get("ItemWarehouseInfoCollection", []):
                 warehouse_code = warehouse_info.get("WarehouseCode")
-                if warehouse_code in ["PH", "LC", "ME"]:  # Filtrar por WarehouseCode
+                if warehouse_code in bodegas_permitidas:  # Filtrar por WarehouseCode
                     bodegas.append({
                         "nombre": warehouse_code,
                         "stock_disponible": warehouse_info.get("InStock"),
