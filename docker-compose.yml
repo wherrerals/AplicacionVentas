@@ -202,6 +202,7 @@ services:
 
 volumes:
   mysql_data:
+  media_data:
 
 networks:
   a_network:       # red interna exclusiva para Sistema A
