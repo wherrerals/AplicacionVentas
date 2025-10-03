@@ -206,4 +206,3 @@ volumes:
   mysql_data:
   media_data: 
   media_data: 
-
