@@ -443,11 +443,33 @@ class Cotizacion(Documento):
         except Exception as e:
             logger.error(f"Error al actualizar el estado de la cotización: {str(e)}")
             return {'error': str(e)}
-        
-    def formatearDatos(self, json_data):
+
+    def user_data(self, request):
+        user = request.user
+        from infrastructure.models.usuariodb import UsuarioDB
+
+        codigoVendedor = UsuarioDB.objects.get(usuarios=user).vendedor.codigo
+
+        tipoVendedor = UsuarioDB.objects.get(usuarios=user).vendedor.tipoVendedor
+
+        return {
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'is_staff': user.is_staff,
+            'is_superuser': user.is_superuser,
+            'is_active': user.is_active,
+            'vendedor': codigoVendedor,
+            'tipoVendedor': tipoVendedor
+        }
+
+    def formatearDatos(self, json_data, request):
         # Extraer y limpiar la información del cliente
 
         bodegas = ["ME", "LC", "PH"]
+        user_data = self.user_data(request)
+
 
         client_info = json_data["Client"]["value"][0]
         quotations = client_info.get("Quotations", {})
@@ -498,7 +520,15 @@ class Cotizacion(Documento):
             warehouse_info = line_info.get("Items/ItemWarehouseInfoCollection", {})
             
             # obtener imagen por medio del codigo en la tabla de productos
+            productos = ProductoDB.objects.filter(codigo=line.get("ItemCode")).first()
             
+            from domain.services.listprice import ListPriceService
+            list_prices = ListPriceService(productos.codigo, productos.costo, user_data)
+            new_price, new_discounted_price = list_prices.get_list_price_info()
+            
+            from presentation.views.view import limitar_descuento
+            max_descuento = limitar_descuento(productos, user_data, new_price, new_discounted_price)
+
             sku = line.get("ItemCode")
             bodega = line.get("WarehouseCode")
             if bodega not in bodegas:
@@ -560,7 +590,7 @@ class Cotizacion(Documento):
                 "BaseEntry": line.get("BaseEntry"),
                 "BaseLine": line.get("BaseLine"),
                 "LineStatus": line.get("LineStatus"),
-                "DescuentoMax": descuentoMax,
+                "DescuentoMax": max_descuento,
                 "PriceList": priceList,
                 "StockBodega": stock_bodega,
                 "WarehouseInfo": {

@@ -238,14 +238,14 @@ class CotizacionView(View):
         # Verificar si el socio de negocio ya existe en la base de datos
         if sn.verificarSocioDB(cardCode):
             cotiza = Cotizacion()
-            lines_data = cotiza.formatearDatos(data)
+            lines_data = cotiza.formatearDatos(data, request)
 
             return JsonResponse(lines_data, safe=False)
         else:
             # Crear el cliente en caso de que no exista y responder
             sn.crearYresponderCliente(cardCode, rut)
             cotiza = Cotizacion()
-            lines_data = cotiza.formatearDatos(data)
+            lines_data = cotiza.formatearDatos(data, request)
             return JsonResponse(lines_data, safe=False)
         
     def copiarAODV(self, request):
@@ -264,7 +264,7 @@ class CotizacionView(View):
         }
 
         cotiza = Cotizacion()
-        datosQuotations = cotiza.formatearDatos(data)
+        datosQuotations = cotiza.formatearDatos(data, request)
 
         lines_data = cotiza.reemplazarQuotationsPorOrders(datosQuotations)
 

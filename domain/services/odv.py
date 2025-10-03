@@ -3,6 +3,7 @@ import math
 from django.http import JsonResponse
 from requests import request
 from adapters.sl_client import APIClient
+from infrastructure.models.productodb import ProductoDB
 from infrastructure.models.stockbodegasdb import StockBodegasDB
 from infrastructure.repositories.contactorepository import ContactoRepository
 from infrastructure.repositories.couponrepository import CouponRepository
@@ -92,8 +93,28 @@ class OrdenVenta(Documento):
         filters = {k: v for k, v in filters.items() if v and v != "''"}
 
         return filters
+    
+    def user_data(self, request):
+        user = request.user
+        from infrastructure.models.usuariodb import UsuarioDB
 
-    def formatearDatos(self, json_data):
+        codigoVendedor = UsuarioDB.objects.get(usuarios=user).vendedor.codigo
+
+        tipoVendedor = UsuarioDB.objects.get(usuarios=user).vendedor.tipoVendedor
+
+        return {
+            'username': user.username,
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'is_staff': user.is_staff,
+            'is_superuser': user.is_superuser,
+            'is_active': user.is_active,
+            'vendedor': codigoVendedor,
+            'tipoVendedor': tipoVendedor
+        }
+
+    def formatearDatos(self, json_data, request):
         # Extraer y limpiar la información del cliente  
 
         client_info = json_data["Client"]["value"][0]
@@ -102,6 +123,8 @@ class OrdenVenta(Documento):
         contact_employee = client_info.get("BusinessPartners/ContactEmployees", {})
         vendedor_repo = VendedorRepository()
         tipo_vendedor = vendedor_repo.obtenerTipoVendedor(salesperson.get("SalesEmployeeCode"))
+        user_data = self.user_data(request)
+
 
         # Formatear los datos de cliente
         cliente = {
@@ -143,6 +166,15 @@ class OrdenVenta(Documento):
         for line_info in json_data["DocumentLine"]["value"]:
             line = line_info.get("Orders/DocumentLines", {})
             warehouse_info = line_info.get("Items/ItemWarehouseInfoCollection", {})
+
+            productos = ProductoDB.objects.filter(codigo=line.get("ItemCode")).first()
+
+            from domain.services.listprice import ListPriceService
+            list_prices = ListPriceService(productos.codigo, productos.costo, user_data)
+            new_price, new_discounted_price = list_prices.get_list_price_info()
+
+            from presentation.views.view import limitar_descuento
+            max_descuento = limitar_descuento(productos, user_data, new_price, new_discounted_price)
             
             sku = line.get("ItemCode")
             
@@ -201,7 +233,7 @@ class OrdenVenta(Documento):
                 "BaseEntry": line.get("BaseEntry"),
                 "BaseLine": line.get("BaseLine"),
                 "LineStatus": line.get("LineStatus"),
-                "DescuentoMax": descuentoMax,
+                "DescuentoMax": max_descuento,
                 "PriceList": priceList,
                 "StockBodega": stock_bodega,
                 "WarehouseInfo": {

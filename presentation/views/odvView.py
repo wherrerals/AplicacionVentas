@@ -127,7 +127,7 @@ class OdvView(View):
 
         if sn.verificarSocioDB(cardCode):
             odv = OrdenVenta()
-            lines_data = odv.formatearDatos(data)
+            lines_data = odv.formatearDatos(data, request)
 
             return JsonResponse(lines_data, safe=False)
         
@@ -135,7 +135,7 @@ class OdvView(View):
             # Crear el cliente en caso de que no exista y responder
             sn.crearYresponderCliente(cardCode, rut)
             odv = OrdenVenta()
-            lines_data = odv.formatearDatos(data)
+            lines_data = odv.formatearDatos(data, request)
             return JsonResponse(lines_data, safe=False)
 
     @csrf_exempt
