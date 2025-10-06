@@ -43,7 +43,8 @@ class Producto {
             const bodegaMap = {
                 "LC": "LC",
                 "PH": "PH",
-                "ME": "ME"
+                "ME": "ME",
+                "VI": "VI"
             };
 
             const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
@@ -97,6 +98,7 @@ class Producto {
                             <option value="LC" ${this.sucursal === 'LC' ? 'selected' : ''}>LC</option>
                             <option value="PH" ${this.sucursal === 'PH' ? 'selected' : ''}>PH</option>
                             <option value="ME" ${this.sucursal === 'ME' ? 'selected' : ''}>ME</option>
+                            <option value="VI" ${this.sucursal === 'VI' ? 'selected' : ''}>VI</option>
                             </optgroup>
                           </select>
                         </div>
