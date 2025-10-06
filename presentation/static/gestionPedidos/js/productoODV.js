@@ -163,7 +163,7 @@ class Producto {
                             <option id="LC" data-stock="" value="LC" ${this.sucursal === 'LC' ? 'selected' : '' } data-cantidadInicialSAP="${this.sucursal === 'LC' && this.cantidad !== undefined ? this.cantidad : 0}">LC</option>
                             <option id="ME" data-stock="" value="ME" ${this.sucursal === 'ME' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'ME' && this.cantidad !== undefined ? this.cantidad : 0}">ME</option>
                             <option id="PH" data-stock="" value="PH" ${this.sucursal === 'PH' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'PH' && this.cantidad !== undefined ? this.cantidad : 0}">PH</option>
-                            <option value="VI" ${this.sucursal === 'VI' ? 'selected' : ''}>VI</option>
+                            <option id="VI" data-stock="" value="VI" ${this.sucursal === 'VI' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'VI' && this.cantidad !== undefined ? this.cantidad : 0}">VI</option>
                             </optgroup>
                         </select>
                     </div>
