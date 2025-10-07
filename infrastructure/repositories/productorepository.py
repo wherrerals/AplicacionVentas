@@ -7,6 +7,7 @@ from django.db.models import Sum, F
 
 
 
+
 class ProductoRepository:
     def calculate_margen_descuentos(self, precio_venta, costo, rentabilidad_minima):
 
@@ -303,9 +304,60 @@ class ProductoRepository:
                 id_Bodega=F('idBodega'),
                 stock_V=F('stock')
             )
+
+            #limitar descuentos
+            producto_obj = ProductoDB.objects.get(codigo=producto['codigo'])
+            dsctoMaxTienda, dctoMaxProyectos = ProductoRepository().limitar_descuento(producto_obj)
+            producto['dsctoMaxTienda'] = dsctoMaxTienda
+            producto['dctoMaxProyectos'] = dctoMaxProyectos
+
             producto['bodegas'] = list(bodegas)
 
         return producto_lista
+    
+
+    def limitar_descuento(self, producto):
+        """
+        Calcula los límites de descuento para un producto en tienda y en proyectos.
+
+        :param producto: objeto con atributos marca, dsctoMaxTienda y dctoMaxProyectos
+        :return: (dsctoMaxTienda, dsctoMaxProyectos)
+        """
+
+        from infrastructure.models.confiDescuentosDB import ConfiDescuentosDB
+
+        # Mapear códigos según vendedor y marca
+        mapping = {
+            ("T", "LST"): "1",
+            ("T", "OTHER"): "3",
+            ("P", "LST"): "2",
+            ("P", "OTHER"): "4",
+        }
+
+        marca_key = "LST" if producto.marca == "LST" else "OTHER"
+
+        # Obtener límites desde DB (si no existe, usar 0)
+        try:
+            confi_t = ConfiDescuentosDB.objects.get(codigo=mapping[("T", marca_key)])
+            limite_t = (confi_t.limiteDescuentoMaximo or 0) / 100
+        except ConfiDescuentosDB.DoesNotExist:
+            limite_t = 0
+
+        try:
+            confi_p = ConfiDescuentosDB.objects.get(codigo=mapping[("P", marca_key)])
+            limite_p = (confi_p.limiteDescuentoMaximo or 0) / 100
+        except ConfiDescuentosDB.DoesNotExist:
+            limite_p = 0
+
+        # Descuentos del producto (si no existen, 0.0)
+        descuento_max_tienda = producto.dsctoMaxTienda or 0.0
+        descuento_max_proy = producto.dctoMaxProyectos or 0.0
+
+        # Aplicar límites en escala 0–1
+        dscto_max_tienda = min(descuento_max_tienda, limite_t)
+        dscto_max_proyectos = min(descuento_max_proy, limite_p)
+
+        return dscto_max_tienda, dscto_max_proyectos
 
     @staticmethod
     def obtener_total_productos(filtro_nombre=None, filtro_codigo=None):
