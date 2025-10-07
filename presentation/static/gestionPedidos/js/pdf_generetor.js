@@ -13,8 +13,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const rut = document.getElementById("inputCliente").getAttribute("data-codigosn");
         console.log("RUT del cliente:", rut);
 
-        const docNum = document.getElementById("numero_cotizacion").textContent.trim();
+        let docNum = document.getElementById("numero_cotizacion").textContent.trim();
         console.log("Número de cotización:", docNum);
+
+        let folio = document.getElementById("folio_cotizacion");
+        if (folio) {
+            docNum = folio.textContent.trim();
+        }
 
         const docDate = fechaSolo;
         console.log("Fecha del documento:", docDate);
@@ -53,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         const boleta_factura = document.getElementById("tipo_documento");
-        let documento = "COTI"; // Asignar "01" si no se encuentra el elemento
+        let documento = "Cotización"; // Asignar "01" si no se encuentra el elemento
         
         if (boleta_factura) {
             documento = boleta_factura.textContent.split(' ')[0];
