@@ -32,12 +32,34 @@ document.addEventListener("DOMContentLoaded", function () {
         const totalbruto = document.querySelector("#total_bruto").textContent;
 
         const selectElement = document.getElementById("direcciones_despacho");
-        const direccion2 = selectElement.value;
+        let direccion2 = selectElement.value;
+        
+        console.log("Dirección seleccionada:", direccion2);
+        // si la direccion dos es indefinida
+
+        if (!direccion2 || direccion2 === "undefined") {
+            direccion2 = selectElement.textContent.trim();
+        }
 
         const contactoCliente = document.getElementById("contactos_cliete") || document.getElementById("idContact");
-        const contacto = contactoCliente.value;
+        let contacto = contactoCliente.value;
+
+        if (!contacto || contacto === "undefined") {
+            contacto = contactoCliente.textContent.trim();
+        }
+
         const sucursal = document.getElementById("sucursal").textContent.trim();
         const observaciones = document.getElementById("Observaciones-1").value; //selecionando observaciones por fila de producto por medio de id
+
+
+        const boleta_factura = document.getElementById("tipo_documento");
+        let documento = "COTI"; // Asignar "01" si no se encuentra el elemento
+        
+        if (boleta_factura) {
+            documento = boleta_factura.textContent.split(' ')[0];
+        }
+
+        console.log("Tipo de documento:", documento);
 
 
         // Construir líneas del documento
@@ -54,12 +76,14 @@ document.addEventListener("DOMContentLoaded", function () {
             const discountspan = row.querySelector("#Precio_Descuento").textContent;
             const totalspan = row.querySelector("#precio_Venta").textContent;
             const comentarios = row.querySelector("#comentarios-1").value; //selecionando comentarios por fila de producto por medio de id
-            let cupon = row.querySelector("#desc_cupon").innerText; // Capturar el valor del cupón
+            let cupon_element = row.querySelector("#desc_cupon"); //selecionando cupon por fila de producto por medio de id, si no hay cupon asignar 0
+            let cupon = "0"
 
-            // quitar los espacios y el % de cupon 
-            console.log('CUPON1:', cupon);
-
-
+            if (cupon_element) {
+                cupon = cupon_element.innerText;
+            }
+            
+            console.log('CUPON0:', cupon);
             cupon = cupon.replace(/[^0-9.]/g, "");
             
             // CONNVERTIR CUPON EN NUMERO 
@@ -101,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         const documentData = {
-            "tipo_documento": "Cotización",
+            "tipo_documento": documento,
             "numero": docNum,
             "fecha": docDate,
             "valido_hasta": docDueDate,
@@ -126,10 +150,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const id = docNum;
 
         // Iniciar el proceso con los datos capturados
-        generarCotizacionPDF(id, documentData, docNum);
+        generarCotizacionPDF(id, documentData, docNum, documento);
     }
 
-    function generarCotizacionPDF(id, documentData, docNum) {
+    function generarCotizacionPDF(id, documentData, docNum, tipo_documento) {
         const maxTimeout = 20000; // 45 segundos en milisegundos
         let timeoutId;
         
@@ -184,11 +208,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         })
                         .then(data => {
                             if (data instanceof Blob) {
+                                console.log('data:', data);
                                 // Es un PDF, proceder a la descarga
                                 const url = window.URL.createObjectURL(data);
                                 const a = document.createElement("a");
                                 a.href = url;
-                                a.download = `cotizacion_${docNum}.pdf`;
+                                a.download = `${tipo_documento}_${docNum}.pdf`;
                                 document.body.appendChild(a);
                                 a.click();
                                 a.remove();

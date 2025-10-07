@@ -158,6 +158,9 @@ def generar_pdf_async(cotizacion_id, cotizacion_data, absolute_uri):
 # In tasks.py - Optimize the task to be more efficient
 @shared_task(queue='q_pdf_generation')
 def generar_pdf_async(cotizacion_id, cotizacion_data, absolute_uri):
+
+    tipo_documento = cotizacion_data.get('tipo_documento', 'Documento')
+
     try:
         # Log start of PDF generation
         logger.info(f"Iniciando generación de PDF para cotización {cotizacion_id}")
@@ -191,7 +194,7 @@ def generar_pdf_async(cotizacion_id, cotizacion_data, absolute_uri):
         # Retornar el contenido codificado y el nombre del archivo
         return {
             'pdf_content': pdf_base64,
-            'file_name': f"Cotizacion_{cotizacion_id}.pdf"
+            'file_name': f"{tipo_documento}_{cotizacion_id}.pdf"
         }
     except Exception as e:
         logger.error(f"Error generando PDF para cotización {cotizacion_id}: {str(e)}")

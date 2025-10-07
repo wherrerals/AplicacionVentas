@@ -1335,8 +1335,9 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
                     p["descripcion"] = descripcion.replace("(Descontinuado)", "(Últimas unidades)") \
                                                 .replace("(descontinuado)", "(Últimas unidades)")
 
+            tipo_documento = obtener_nombre_documento(data.get('tipo_documento'))
             cotizacion = {
-                "tipo_documento": obtener_nombre_documento(data.get('tipo_documento')),  
+                "tipo_documento": tipo_documento,
                 'numero': data.get('numero'),
                 'fecha': fecha,
                 'validez': validez,
@@ -1390,7 +1391,7 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
 
             # Devolver PDF como respuesta
             response = HttpResponse(pdf_file, content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment; filename="cotizacion_{cotizacion["numero"]}.pdf"'
+            response['Content-Disposition'] = f'attachment; filename="{tipo_documento}_{cotizacion["numero"]}.pdf"'
             return response
 
         except (KeyError, ValueError, json.JSONDecodeError) as e:
@@ -1408,11 +1409,33 @@ def prueba(request):
     
     return JsonResponse(coteodata, safe=False)
 
+def direccion_pdf(id_direccion):
+        address = ''
+        if id_direccion and id_direccion != 'No hay direcciones disponibles':
+            try:
+                direcciones = DireccionRepository.obtenerDireccionesID(id_direccion)
+                address = f"{direcciones.calleNumero}, {direcciones.comuna.nombre}"
+            except Exception as e:
+                address = id_direccion
+        return address
+
+def contacto_pdf(contacto_id):
+        contactos = ''
+        if contacto_id and contacto_id != 'No hay contactos disponibles':
+            try:
+                contacto = ContactoRepository.obtenerContacto(contacto_id)
+                contactos = contacto.nombreCompleto if contacto.nombre != "1" else ""
+            except Exception as e:
+                contactos = contacto_id
+        return contactos
+
 @csrf_exempt
 @require_POST
 def generar_cotizacion_pdf(request, cotizacion_id):
     try:
         data = json.loads(request.body)
+
+        print("Datos recibidos para generar PDF:", data)
 
         codigoSn = data.get('rut')
         snrepo = SocioNegocioRepository()
@@ -1432,16 +1455,10 @@ def generar_cotizacion_pdf(request, cotizacion_id):
         
 
         id_direccion = data.get('direccion')
-        address = ''
-        if id_direccion and id_direccion != 'No hay direcciones disponibles':
-            direcciones = DireccionRepository.obtenerDireccionesID(id_direccion)
-            address = f"{direcciones.calleNumero}, {direcciones.comuna.nombre}"
+        address = direccion_pdf(id_direccion)
 
         contacto_id = data.get('contacto')
-        contactos = ''
-        if contacto_id and contacto_id != 'No hay contactos disponibles':
-            contacto = ContactoRepository.obtenerContacto(contacto_id)
-            contactos = contacto.nombreCompleto if contacto.nombre != "1" else datossocio.nombre
+        contactos = contacto_pdf(contacto_id)
 
         sucursal = data.get('sucursal')
         detalle_sucursal = SucursalDB.objects.filter(codigo=sucursal).first()

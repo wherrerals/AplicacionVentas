@@ -104,10 +104,10 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("JSON generado:", jsonData);
 
         const id = docNum;
-        generarCotizacionPDF(id, documentData, docNum);
+        generarCotizacionPDF(id, documentData, docNum, "ODV");
     }
 
-    function generarCotizacionPDF(id, documentData, docNum) {
+    function generarCotizacionPDF(id, documentData, docNum, tipo_documento) {
         const maxTimeout = 20000; // 45 segundos en milisegundos
         let timeoutId;
 
@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             const url = window.URL.createObjectURL(data);
                             const a = document.createElement("a");
                             a.href = url;
-                            a.download = `cotizacion_${docNum}.pdf`;
+                            a.download = `${tipo_documento}_${docNum}.pdf`;
                             document.body.appendChild(a);
                             a.click();
                             a.remove();

@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `cotizacion_${docNum}.pdf`;
+                a.download = `${docType}_${docNum}.pdf`;
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
