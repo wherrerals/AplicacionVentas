@@ -139,6 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const stockME = getStockBodega("ME");
       const stockPH = getStockBodega("PH");
       const stockLC = getStockBodega("LC");
+      const stockVI = getStockBodega("VI");
       // quitar los decimales de los desucentos
       const descuentoTienda_float = parseFloat(product.dsctoMaxTienda * 100);
       const descuentoProyecto_float = parseFloat(product.dctoMaxProyectos * 100);
@@ -151,9 +152,10 @@ document.addEventListener("DOMContentLoaded", function () {
       tr.innerHTML = `
                 <td>${product.codigo}</td>
                 <td>${product.nombre}</td>
-                <td>${stockME}</td>
-                <td>${stockPH}</td>
-                <td>${stockLC}</td>
+                <td style="text-align: center;">${stockME}</td>
+                <td style="text-align: center;">${stockPH}</td>
+                <td style="text-align: center;">${stockLC}</td>
+                <td style="text-align: center;">${stockVI}</td>
                 <td style="text-align: center;">${product.stockTotal}</td>
                 <td style="text-align: right;">${product.precioVenta}</td>
                 <td style="text-align: center;">${descuentoTienda}</td>
