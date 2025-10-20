@@ -1,8 +1,9 @@
 // Dependencias: valorTributario.js
 class valorTributario {
-    constructor(codigoProducto, precioFinal, indiceProducto) {
+    constructor(codigoProducto, precioFinal, precioDescuento, indiceProducto) {
         this.codigoProducto = codigoProducto;
         this.precioFinal = precioFinal;
+        this.precioDescuento = precioDescuento;
         this.indiceProducto = indiceProducto;
     }
 
@@ -11,15 +12,22 @@ class valorTributario {
         this.precioFinal = precioFinal;
     }
 
+    modificarPrecioDescuento(precioDescuento) {
+        this.precioDescuento = precioDescuento;
+    }
+
     // Metodo para calcular IVA, bruto y neto
     calcularValores() {
         var precioFinal = parseFloat(this.precioFinal) || 0;
         var bruto = Math.round(precioFinal / 1.19);
         var neto = precioFinal;
+        var precio_o = parseFloat(this.precioDescuento) || 0;
+        var descuento = Math.round(precio_o);
         var iva = bruto - neto;
         return {
             bruto: bruto,
             neto: Math.round(neto),
+            descuento: descuento,
             iva: Math.round(iva)
         };
     }
@@ -42,7 +50,7 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
     var valorNeto = document.querySelector('#total_neto small');
 
     // Crear instancia de valorTributario y agregarla al array
-    var producto = new valorTributario(codigoProducto, 0, indiceProducto);
+    var producto = new valorTributario(codigoProducto, 0, 0, indiceProducto);
     productos.push(producto);
 
     console.log('Producto agregado:', producto);
@@ -88,8 +96,17 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
         precioFinal_n = Math.round(precioFinal_n);
         console.log('Precio Unitario:', precioUnitario, 'Precio neto:', precioNeto_n, 'Precio con descuento redondeado:', precioConDescuento2, 'Precio final antes de IVA:', precioFinal_n, 'Precio final después de IVA:', precioFinal_n,);
 
+        let precioConDescuento3 = precioNeto_n * (1 - (0 / 100));
+        precioConDescuento3 = Math.round(precioConDescuento3 * 10000) / 10000;
+
+        let precioFinal_0 = precioConDescuento3 * cantidad;
+        precioFinal_0 = Math.round(precioFinal_0);
+        console.log('Precio con descuento 0%:', precioConDescuento3, 'Precio final 0% antes de IVA:', precioFinal_0, 'Precio final 0% después de IVA:', precioFinal_0,);
         // Actualizar el producto en la lista
+        
         producto.modificarPrecioFinal(precioFinal_n);
+        
+        producto.modificarPrecioDescuento(precioFinal_0);
 
         tdPrecioVenta.textContent = formatCurrency( Math.round(precioFinal_n * 1.19));
         tdPrecioDescuento.textContent = formatCurrency(precioConDescuentodefinido);
@@ -127,6 +144,8 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
         let totalIva = 0;
         let totalBruto = 0;
         let totalNeto = 0;
+        let totalDesc = 0;
+        let x = 0
     
         productos.forEach(producto => {
             const valores = producto.calcularValores();
@@ -134,6 +153,8 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
             totalNeto += valores.neto;
             totalBruto = Math.round(totalNeto * 1.19);
             totalIva = totalBruto - totalNeto;
+            x += valores.descuento;
+            totalDesc = Math.round(x * 1.19);
 
 
             console.log('totalIva:', totalIva, 'totalBruto:', totalBruto, 'totalNeto:', totalNeto);
@@ -142,10 +163,34 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
 
         //asignar valor a data-total-neto para enviarlo al backend
         document.querySelector('#total_neto').setAttribute('data-total-neto', totalNeto);
-        document.querySelector('#total_bruto').setAttribute('data-total-bruto', totalBruto);    
-        document.querySelector('#iva').textContent = formatCurrency(totalIva);
-        document.querySelector('#total_bruto').textContent = formatCurrency(totalBruto);
-        document.querySelector('#total_neto').textContent = formatCurrency(totalNeto);
+        document.querySelector('#total_bruto').setAttribute('data-total-bruto', totalDesc);
+        document.querySelector('#total_descuento').setAttribute('data-total-descuento', totalBruto);
+        //document.querySelector('#iva').textContent = formatCurrency(totalIva);
+        document.querySelector('#iva').innerHTML = `<small>${formatCurrency(totalIva)}</small>`;
+        
+        //document.querySelector('#total_bruto').textContent = formatCurrency(totalDesc);
+        document.querySelector('#total_bruto').innerHTML = `<small>${formatCurrency(totalDesc)}</small>`;
+
+        // hacerlo en negrita el total descuento
+        //document.querySelector('#total_neto').textContent = formatCurrency(totalNeto);
+        document.querySelector('#total_neto').innerHTML = `<small>${formatCurrency(totalNeto)}</small>`;
+
+        //document.querySelector('#total_descuento').textContent = formatCurrency(totalBruto);
+        document.querySelector('#total_descuento').innerHTML = `<b>${formatCurrency(totalBruto)}</b>`;
+
+        if (totalDesc != totalBruto) {
+            // aplicar tachado
+            //document.querySelector('#total_bruto').style.textDecoration = 'line-through';
+            // aplicar color rojo
+            document.querySelector('#total_bruto').style.color = 'red';
+        } else {
+            // quitar tachado
+            //document.querySelector('#total_bruto').style.textDecoration = 'none';
+            // quitar color rojo
+            document.querySelector('#total_bruto').style.color = 'black';
+        }
+
+
 
 
     }

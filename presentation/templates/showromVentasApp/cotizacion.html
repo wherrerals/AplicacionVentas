@@ -18,6 +18,13 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+  <style>
+    .subrayado-superior {
+        text-decoration: overline;
+    }
+
+  </style>
+
   <script>
     document.querySelectorAll(".calcular_cantidad").forEach(input => {
         input.addEventListener("click", function() {
@@ -725,7 +732,7 @@ document.addEventListener("DOMContentLoaded", function() {
       </div>
       <div class="row">
         <div class="col" style="width: 70%">
-          <textarea id="Observaciones-1" class="form-control" placeholder="Observaciones"></textarea>
+          <textarea id="Observaciones-1" class="form-control" placeholder="Observaciones" style="height: 96px;"></textarea>
         </div>
         <div class="col">
           <div class="row">
@@ -746,12 +753,23 @@ document.addEventListener("DOMContentLoaded", function() {
           </div>
           <div class="row">
             <div class="col-sm-7 text-end" >
-              <small><b>Total Bruto:</b></small>
+              <small><b>Total Bruto Sin Dcto:</b></small>
             </div>
             <div class="col" style="text-align: right" data-total-bruto="" id="total_bruto">
               <small>0</small>
             </div>
           </div>
+
+          <div class="row">
+            <div class="col-sm-7 text-end" >
+              <small><b>Total Bruto Con Dcto:</b></small>
+            </div>
+            <div class="col" style="text-align: right" data-total-descuento="" id="total_descuento">
+              <small><b>0</b></small>
+            </div>
+          </div>
+
+
         </div>
       </div>
       <div class="row">
