@@ -467,6 +467,9 @@ class Cotizacion(Documento):
     def formatearDatos(self, json_data, request):
         # Extraer y limpiar la información del cliente
 
+        print("Formateando datos de cotización...")
+        print("JSON Data recibido para formatear:", json_data)
+
         bodegas = ["ME", "LC", "PH"]
         user_data = self.user_data(request)
 

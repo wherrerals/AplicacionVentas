@@ -249,12 +249,18 @@ class CotizacionView(View):
             return JsonResponse(lines_data, safe=False)
         
     def copiarAODV(self, request):
-        # Obtener el parámetro 'docentry' de la solicitud
         docentry = request.GET.get('documento_copiado')
         client = APIClient()
 
-        # Llamar al método para obtener los detalles del cliente
         documentClient = client.detalleCotizacionCliente(docentry)
+        print("Document Client:", documentClient)
+
+        value = documentClient.get('value', [])
+        if not value or value[0].get('Quotations') is None:
+            documentClient = client.detalleCotizacionCliente2(docentry)
+
+        print("Document Client:", documentClient)
+
         documentLine = client.detalleCotizacionLineas(docentry)
         
         # Preparar la estructura de datos para enviar como respuesta
