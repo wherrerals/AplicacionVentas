@@ -12,13 +12,13 @@ class valorTributario {
 
     calcularValores() {
         var precioFinal = parseFloat(this.precioFinal) || 0;
-        var bruto = precioFinal;
-        var neto = precioFinal / 1.19;
+        var bruto = Math.round(precioFinal / 1.19);
+        var neto = precioFinal;
         var iva = bruto - neto;
         return {
             bruto: bruto,
-            neto: neto,
-            iva: iva
+            neto: Math.round(neto),
+            iva: Math.round(iva)
         };
     }
 }
@@ -73,16 +73,22 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
 
         var precioTotal = cantidad * precioUnitario;
         var precioFinal = descuento === 0 ? precioTotal : precioTotal - (precioTotal * (descuento / 100));
-        var precioConDescuento = descuento === 0 ? 0 : precioUnitario * (1 - (descuento / 100));
+        var precioConDescuento = precioUnitario * (1 - (descuento / 100));
 
         console.log('Precio final:', precioFinal, 'Precio con descuento:', precioConDescuento);
 
-        let precioFinaldefinido = Math.round(precioFinal);
-        let precioConDescuentodefinido = Math.round(precioConDescuento);
+        let precioFinaldefinido = Math.round(precioFinal * 1000) / 1000;
+        let precioConDescuentodefinido = Math.round(precioConDescuento * 1000) / 1000;
 
-        producto.modificarPrecioFinal(precioFinal);
+        const precioNeto_n = precioUnitario / 1.19;
+        let precioConDescuento2 = precioNeto_n * (1 - (descuento / 100));
+        precioConDescuento2 = Math.round(precioConDescuento2 * 10000) / 10000;
+        let precioFinal_n = precioConDescuento2 * cantidad;
+        precioFinal_n = Math.round(precioFinal_n);
 
-        tdPrecioVenta.textContent = formatCurrency(precioFinaldefinido);
+        producto.modificarPrecioFinal(precioFinal_n);
+
+        tdPrecioVenta.textContent = formatCurrency( Math.round(precioFinal_n * 1.19));
         tdPrecioDescuento.textContent = formatCurrency(precioConDescuentodefinido);
 
         actualizarValores();
@@ -122,9 +128,10 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
                 const checkbox = filaProducto.querySelector('.switch-producto');
                 if (checkbox && checkbox.checked) {
                     const valores = producto.calcularValores();
-                    totalIva += valores.iva;
-                    totalBruto += valores.bruto;
+                    //totalIva += valores.iva;
                     totalNeto += valores.neto;
+                    totalBruto = Math.round(totalNeto * 1.19);
+                    totalIva = totalBruto - totalNeto;
                 }
             }
         });
@@ -144,15 +151,20 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
 }
 
 function formatCurrency(value) {
+    // Convertimos el valor a número entero
     const integerValue = Math.floor(value);
+    
+    // Usamos toLocaleString con minimumFractionDigits: 0 para no mostrar decimales
     let formattedValue = integerValue.toLocaleString('es-ES', {
         minimumFractionDigits: 0,
-        maximumFractionDigits: 0
+        maximumFractionDigits: 0  // Esto asegura que no se muestren decimales
     });
 
+    // Si el valor tiene 4 dígitos y no incluye un punto, lo añadimos manualmente
     if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
         formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
     }
 
+    // Agregamos el símbolo de peso al principio
     return `$ ${formattedValue}`;
 }
