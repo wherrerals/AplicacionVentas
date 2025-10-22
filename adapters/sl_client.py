@@ -83,7 +83,7 @@ class APIClient:
 
         self.__login()
         crossjoin = f"{endpoint},SalesPersons"
-        expand = f"{endpoint}($select=DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
+        expand = f"{endpoint}($select=U_LED_TIPDEV,DocEntry,DocNum,CardCode,CardName,SalesPersonCode,DocDate,DocumentStatus,Cancelled,VatSum,DocTotal,DocTotal sub VatSum as DocTotalNeto),SalesPersons($select=SalesEmployeeName)"
         order_by = f"DocNum desc"
         filter_condition = (
             f"{endpoint}/SalesPersonCode eq SalesPersons/SalesEmployeeCode"

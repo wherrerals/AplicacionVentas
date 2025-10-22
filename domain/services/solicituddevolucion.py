@@ -28,7 +28,6 @@ class SolicitudesDevolucion(Documento):
 
     def construirSolicitudesDevolucion(data):
         filters = {}
-
         name = data.get('carData')
         name_mayus = name.upper() if name else None
         name_minus = name.lower() if name else None
@@ -61,6 +60,10 @@ class SolicitudesDevolucion(Documento):
                 filters['contains(SalesPersons/SalesEmployeeCode,'] = f"{value})" 
             else:
                 filters['contains(SalesPersons/SalesEmployeeName,'] = f"'{value}')"
+        
+        if data.get('U_LED_TIPDEV'):
+            tipo_devolucion = data.get('U_LED_TIPDEV')
+            filters['ReturnRequest/U_LED_TIPDEV eq'] = f"'{tipo_devolucion}'"
         
         if data.get('DocumentStatus'):
             document_status = data.get('DocumentStatus')

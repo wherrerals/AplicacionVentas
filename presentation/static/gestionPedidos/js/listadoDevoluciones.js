@@ -141,14 +141,31 @@ showLoadingOverlay();
             const vatSumFormatted = formatCurrency(quotation.DocTotalNeto);
             const docTotalFormatted = formatCurrency(quotation.DocTotal);
             
-            
+            const typerr = (quotation) => {
+                if (quotation.U_LED_TIPDEV === 'CAMB') return 'Cambio';
+                else if (quotation.U_LED_TIPDEV === 'GARA') return 'Garantia';
+                else if (quotation.U_LED_TIPDEV === 'INTE') return 'Interna';
+                else if (quotation.U_LED_TIPDEV === 'NCRE') return 'Nota Credito';
+                else return 'N/A';
+            };
+
             const getStatus = (quotation) => {
                 if (quotation.Cancelled === 'Y') return 'Cancelado';
                 else if (quotation.DocumentStatus === 'O') return 'Abierto';
                 else if (quotation.DocumentStatus === 'C') return 'Cerrado';
                 else return 'Activo';
             };
+
+            // quitar el xx - de los nombres pueden ser lc - u rs - y solo dejar el nombre del vendedor 
+            const name_employe = (quotation) => {
+                let name = salesPerson.SalesEmployeeName || 'N/A';
+                let partes = name.split(" - ");
+                return partes[partes.length - 1]; // Devuelve la última parte como el nombre
+            };
+
+            const typerrValue = typerr(quotation);
             const status = getStatus(quotation);
+            const nameEmployee = name_employe(quotation);
             let urlModel = `/ventas/detalles_devolucion/?docentry=${quotation.DocEntry}`;
 
             date = quotation.DocDate
@@ -161,9 +178,10 @@ showLoadingOverlay();
             tr.innerHTML = `
                 <td><a href="#" class="docentry-link" data-docentry="${quotation.DocEntry}">${quotation.DocNum}</a></td>
                 <td><a href="#" class="cliente-link" data-cadcode="${quotation.CardCode}">${quotation.CardCode} - ${quotation.CardName || 'Cliente Desconocido'}</a></td>
-                <td>${salesPerson.SalesEmployeeName || 'N/A'}</td>
-                <td>${fechaFormateada}</td>
-                <td>${status}</td>
+                <td style="text-align: center;" data-trr="${quotation.U_LED_TIPDEV || 'N/A'}">${typerrValue}</td>
+                <td>${nameEmployee}</td>
+                <td style="text-align: center;">${fechaFormateada}</td>
+                <td style="text-align: center;">${status}</td>
                 <td style="text-align: right;"> ${vatSumFormatted}</td>
                 <td style="text-align: right;"> ${docTotalFormatted}</td>
             `;
@@ -236,7 +254,8 @@ showLoadingOverlay();
             carData: document.querySelector('[name="cardName"]').value,
             salesEmployeeName: document.querySelector('#filtro_vendedor').value,
             DocumentStatus: document.querySelector('[name="DocumentStatus"]').value,
-            docTotal: document.querySelector('[name="docTotal"]').value
+            //docTotal: document.querySelector('[name="docTotal"]').value,
+            U_LED_TIPDEV: document.querySelector('[name="U_LED_TIPDEV"]').value
         };
     };
 
