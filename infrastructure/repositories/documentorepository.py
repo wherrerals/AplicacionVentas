@@ -57,7 +57,7 @@ class DocumentoRepository:
         seller = VendedorDB.objects.get(codigo=data['SalesPersonCode'])
         print(data['U_LED_TIPVTA'])
         tipo_venta = TipoVentaDB.objects.get(codigo=data['U_LED_TIPVTA'])  # puedes cambiar esto si luego usas el dato dinámico
-        tipo_entrega = TipoEntregaDB.objects.get(codigo='1')
+        tipo_entrega = TipoEntregaDB.objects.get(nombre=data['U_LED_TIPDEV'])
         condicion_pago = CondicionPagoDB.objects.get(codigo=data['PaymentGroupCode'])
         tipo_objeto = TipoObjetoSapDB.objects.get(codigo="1")
 

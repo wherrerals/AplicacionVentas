@@ -736,6 +736,15 @@ function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre
     
     producto.actualizarStock(newRow);
 
+
+    const input_descuento = newRow.querySelector('#agg_descuento');
+    const value_defecto = "0";
+    input_descuento.addEventListener('input', () => {
+        if (input_descuento.value === '') {
+            input_descuento.value = value_defecto;
+        }
+    });
+
     newRow.querySelector('.form-select').addEventListener('change', function () {
         let stockBodegaElem = newRow.querySelector('[name="stock_bodega"]');
         let cantidadInput = newRow.querySelector('#calcular_cantidad');

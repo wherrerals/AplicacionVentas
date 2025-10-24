@@ -305,6 +305,21 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
 
     const indiceProducto = newRow.querySelector('#indixe_producto').getAttribute('data-indice'); 
 
+    const input_descuento = newRow.querySelector('#agg_descuento');
+    const value_defecto = "0";
+    input_descuento.addEventListener('input', () => {
+        if (input_descuento.value === '') {
+            input_descuento.value = value_defecto;
+        }
+    });
+
+    const input_cantidad = newRow.querySelector('#calcular_cantidad');
+    const value_defecto_cant = "1";
+    input_cantidad.addEventListener('input', () => {
+        if (input_cantidad.value === '') {
+            input_cantidad.value = value_defecto_cant;
+        }
+    });
 
     // Agregar eventos
     newRow.querySelector('#mostrar-descuento').addEventListener('click', function () {
