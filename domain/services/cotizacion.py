@@ -523,9 +523,11 @@ class Cotizacion(Documento):
             warehouse_info = line_info.get("Items/ItemWarehouseInfoCollection", {})
             
             # obtener imagen por medio del codigo en la tabla de productos
+            print("item code de la linea:", line.get("ItemCode"))
             productos = ProductoDB.objects.filter(codigo=line.get("ItemCode")).first()
             
             from domain.services.listprice import ListPriceService
+            print("Calculando precios para el producto:", productos.codigo)
             list_prices = ListPriceService(productos.codigo, productos.costo, user_data)
             new_price, new_discounted_price = list_prices.get_list_price_info()
             
