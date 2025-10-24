@@ -212,8 +212,8 @@ class DocumentoRepository:
         return document
 
     @staticmethod
-    def get_total_documents(filtro_id=None, filtro_nombre=None, filtro_sucursal=None, filtro_estado=None):
-
+    def get_total_documents(filtro_id=None, filtro_nombre=None, filtro_sucursal=None, filtro_estado=None, filtro_tipo_devolucion=None):
+        
         # Obtener los vendedores que tengan usuarios con esa sucursal
         if filtro_sucursal:
             vendedores_en_sucursal = UsuarioDB.objects.filter(
@@ -239,6 +239,11 @@ class DocumentoRepository:
         if filtro_estado:
             queryset = queryset.filter(estado_documento=filtro_estado)
 
+        if filtro_tipo_devolucion:
+            queryset = queryset.filter(tipoentrega__nombre=filtro_tipo_devolucion)
+
+        print(f"Total documentos encontrados: {queryset.count()}")
+
         return queryset.count()
 
 
@@ -248,10 +253,11 @@ class DocumentoRepository:
 
 
     @staticmethod
-    def get_document(filtro_id=None, filtro_nombre=None, filtro_sucursal=None, filtro_estado=None, offset=0, limite=20):
+    def get_document(filtro_id=None, filtro_nombre=None, filtro_sucursal=None, filtro_estado=None, filtro_tipo_devolucion=None, offset=0, limite=20):
         queryset = DocumentoDB.objects.filter(
             tipoobjetoSap_id=1,
             estado_documento='Borrador'
+
         )
 
         if filtro_id:
@@ -273,10 +279,16 @@ class DocumentoRepository:
         if filtro_estado:
             queryset = queryset.filter(estado_documento=filtro_estado)
 
+        
+        if filtro_tipo_devolucion:
+            queryset = queryset.filter(tipoentrega__nombre=filtro_tipo_devolucion)
+
         queryset = queryset.select_related(
             'socio_negocio', 
             'socio_negocio__grupoSN'
         ).order_by('-id')[offset:offset + limite]
+
+
 
         documentos = []
         for doc in queryset:
@@ -295,6 +307,7 @@ class DocumentoRepository:
                 'fechaEntrega': doc.fechaEntrega,
                 'estado_documento': doc.estado_documento,
                 'totalDocumento': doc.totalDocumento,
+                'tipoentrega_codigo': doc.tipoentrega.nombre,
             })
 
         print(f"documentos: {documentos}")

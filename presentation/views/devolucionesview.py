@@ -243,7 +243,8 @@ class ReturnsView(View):
                 filtro_id=filters.get('id', None),
                 filtro_nombre=filters.get('nombre', None),
                 filtro_sucursal=filters.get('sucursal', None),
-                filtro_estado=filters.get('estado', None)
+                filtro_estado=filters.get('estado', None),
+                filtro_tipo_devolucion=filters.get('U_LED_TIPDEV', None)
             )
 
             print("Total Records:", total_records)
@@ -253,6 +254,7 @@ class ReturnsView(View):
                 filtro_nombre=filters.get('nombre', None),
                 filtro_sucursal=filters.get('sucursal', None),
                 filtro_estado=filters.get('estado', None),
+                filtro_tipo_devolucion=filters.get('U_LED_TIPDEV', None),
                 offset=offset,
                 limite=limit
             )

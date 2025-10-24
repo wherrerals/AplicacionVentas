@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
             id: filters.id || null,
             nombre: filters.nombre || null,
             sucursal: filters.sucursal || null,
-
+            U_LED_TIPDEV: filters.U_LED_TIPDEV || null,
         }
     };
 
@@ -122,19 +122,38 @@ document.addEventListener("DOMContentLoaded", function () {
   showLoadingOverlay();
 
 const displayDocuments = (docs) => {
+
+
   const tbody = document.querySelector("#listadoCotizaciones");
   tbody.innerHTML = "";
   showLoadingOverlay();
 
+    // Función auxiliar para traducir el tipo de entrega
+    const typerr = (doc) => {
+      if (!doc || !doc.tipoentrega_codigo) return 'N/A';
+
+      switch (doc.tipoentrega_codigo) {
+        case 'DEVO': return 'Devolución';
+        case 'CAMB': return 'Cambio';
+        case 'GARA': return 'Garantía';
+        case 'INTE': return 'Interna';
+        case 'NCRE': return 'NC';
+        default: return 'N/A';
+      }
+    };
+
   docs.forEach((doc) => {
+
+    const valtyperrValue = typerr(doc);
+    
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><a href="#" class="id-link" data-id="${doc.id}">${doc.id}</a></td>
-      <td><a href="#" class="cliente-link" data-cadcode="${doc.CardCode}">${doc.CardCode} - ${doc.nombre_cliente || 'Cliente Desconocido'}
-      </a></td>
+      <td><a href="#" class="cliente-link" data-cadcode="${doc.CardCode}">${doc.CardCode} - ${doc.nombre_cliente || 'Cliente Desconocido'}</a></td>
+      <td style="text-align: center;">${valtyperrValue}</td>
       <td>${doc.SalesEmployeeName || 'N/A'}</td>
-      <td>${doc.fechaEntrega || '-'}</td>
-      <td>${doc.estado_documento || '-'}</td>
+      <td style="text-align: center;">${doc.fechaEntrega || '-'}</td>
+      <td style="text-align: center;">${doc.estado_documento || '-'}</td>
       <td style="text-align: right;">${doc.totalDocumento?.toLocaleString() || 0}</td>
       <td style="text-align: right;">0</td>
     `;
@@ -192,14 +211,19 @@ const displayDocuments = (docs) => {
 };
 
 
+
   const getFilterData = () => {
     // Buscar el campo de sucursal (puede ser input o select)
     const sucursalField = document.querySelector('#sucursal_filter') || document.querySelector('[name="sucursal"]');
+    const U_LED_TIPDEVField = document.querySelector('#filtro_tipdev');
+
     
     return {
         id: document.querySelector('[name="docNum"]').value,
         nombre: document.querySelector('[name="cardName"]').value,
-        sucursal: sucursalField ? sucursalField.value : null
+        sucursal: sucursalField ? sucursalField.value : null,
+        U_LED_TIPDEV: U_LED_TIPDEVField ? U_LED_TIPDEVField.value : null,
+
     };
 };
 
@@ -351,13 +375,17 @@ const fetchAndDisplayData = (page = 1) => {
 
 
   // Si hay parámetros en la URL, aplicarlos automáticamente
-  if (nombre || id || sucursal) {
+  if (nombre || id || sucursal || tipoentrega_codigo) {
     // Colocar los valores en los campos correspondientes
     if (id) document.querySelector('[name="docNum"]').value = id;
     if (nombre) document.querySelector('[name="cardName"]').value = nombre;
     if (sucursal) {
       const sucursalField = document.querySelector('#sucursal_filter') || document.querySelector('[name="sucursal"]');
       if (sucursalField) sucursalField.value = sucursal;
+    }
+    if (tipoentrega_codigo) {
+      const tipoentregaField = document.querySelector('#filtro_tipdev');
+      if (tipoentregaField) tipoentregaField.value = tipoentrega_codigo;
     }
 
     // Aplicar los filtros automáticamente
