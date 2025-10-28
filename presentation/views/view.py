@@ -1107,6 +1107,117 @@ def probandoSL(request):
 
     return JsonResponse(lines_data, safe=False)
 
+""" 
+def calcular_stock_total(data):
+
+    from infrastructure.repositories.productorepository import ProductoRepository
+    pr = ProductoRepository()
+
+    bodegas_permitidas = list(pr.get_bodegas_permitidas())
+    print(f"Bodegas permitidas: {bodegas_permitidas}")
+
+    data_real = [b for b in data if b['bodega'] in bodegas_permitidas]
+
+    stock_total = sum(b['stock'] for b in data_real)
+
+    if stock_total < 0:
+        for b in data_real:
+            b['stock'] = 0
+
+    return data_real """
+
+def calcular_stock_total(data):
+    from infrastructure.repositories.productorepository import ProductoRepository
+    pr = ProductoRepository()
+
+    bodegas_permitidas = list(pr.get_bodegas_permitidas())
+    print(f"Bodegas permitidas: {bodegas_permitidas}")
+
+    # Filtrar solo bodegas activas
+    data_real = [b for b in data if b['bodega'] in bodegas_permitidas]
+
+    # Calcular total general
+    stock_total = sum(b['stock'] for b in data_real)
+
+    # === Regla 1: total general negativo → todo en 0 ===
+    if stock_total < 0:
+        for b in data_real:
+            b['stock'] = 0
+        return data_real
+
+    # === Regla 2: total positivo y hay bodegas con stock negativo ===
+    negativos = [b for b in data_real if b['stock'] < 0]
+    if negativos:
+        cd = next((b for b in data_real if b['bodega'] == 'ME'), None)
+        suma_negativos = abs(sum(b['stock'] for b in negativos))
+
+        # === 2.1 CD (ME) positivo ===
+        if cd and cd['stock'] > 0:
+            if cd['stock'] >= suma_negativos:
+                # CD cubre todo el negativo
+                cd['stock'] -= suma_negativos
+                for b in negativos:
+                    b['stock'] = 0
+            else:
+                # CD no alcanza → se descuenta proporcionalmente del resto
+                restante = suma_negativos - cd['stock']
+                cd['stock'] = 0
+
+                positivas = [b for b in data_real if b['stock'] > 0 and b['bodega'] != 'ME']
+                total_positivo = sum(b['stock'] for b in positivas)
+
+                if total_positivo > 0:
+                    # Usar proporción exacta (sin redondear aún)
+                    descuentos = []
+                    acumulado = 0
+                    for i, b in enumerate(positivas):
+                        proporcion = b['stock'] / total_positivo
+                        descuento = restante * proporcion
+                        # Redondeo solo en el último para evitar error acumulado
+                        if i < len(positivas) - 1:
+                            descuento = int(descuento)
+                            acumulado += descuento
+                        else:
+                            descuento = int(round(restante - acumulado))
+                        descuentos.append((b, descuento))
+
+                    for b, descuento in descuentos:
+                        b['stock'] = max(b['stock'] - descuento, 0)
+
+                # Poner negativos en 0 después del ajuste
+                for b in negativos:
+                    b['stock'] = 0
+
+        # === 2.2 CD (ME) negativo ===
+        elif cd and cd['stock'] < 0:
+            deficit = abs(cd['stock'])
+            cd['stock'] = 0
+
+            positivas = [b for b in data_real if b['stock'] > 0 and b['bodega'] != 'ME']
+            total_positivo = sum(b['stock'] for b in positivas)
+
+            if total_positivo > 0:
+                descuentos = []
+                acumulado = 0
+                for i, b in enumerate(positivas):
+                    proporcion = b['stock'] / total_positivo
+                    descuento = deficit * proporcion
+                    if i < len(positivas) - 1:
+                        descuento = int(descuento)
+                        acumulado += descuento
+                    else:
+                        descuento = int(round(deficit - acumulado))
+                    descuentos.append((b, descuento))
+
+                for b, descuento in descuentos:
+                    b['stock'] = max(b['stock'] - descuento, 0)
+
+            for b in negativos:
+                b['stock'] = 0
+
+    return data_real
+
+
 
 def obtenerStockBodegas(request):
     producto_id = request.GET.get('idProducto')  # Obtener el ID del producto
@@ -1126,6 +1237,7 @@ def obtenerStockBodegas(request):
             }
             for item in stock_por_bodegas
         ]
+        data = calcular_stock_total(data)
 
         return JsonResponse(data, safe=False, status=200)
 
