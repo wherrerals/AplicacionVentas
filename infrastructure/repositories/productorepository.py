@@ -222,8 +222,12 @@ class ProductoRepository:
             # Corregir el cálculo de stockVenta (asegurarnos de obtener un entero)
             stockVenta = bodega_data.get("stock_disponible", -1) - bodega_data.get("stock_comprometido", -1)
 
+            """
+            
             if stockVenta < 0:
                 stockVenta = 0  # Asegurarse de que el stock no sea negativo
+            """
+
 
             # Buscar el registro de stock correctamente
             try:
