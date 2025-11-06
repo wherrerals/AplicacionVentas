@@ -13,7 +13,7 @@ class SocioNegocioDB(models.Model):
     codigoSN = models.CharField(primary_key=True, max_length=255) #Es un identiicador unico que lo diferencia de todas las otras entradas
     nombre = models.CharField(max_length=150,)
     apellido = models.CharField(max_length=150, null=True)
-    razonSocial = models.CharField(max_length=255)
+    razonSocial = models.CharField(max_length=255, null=True)
     rut = models.CharField(max_length=255,null=False)
     email = models.EmailField(null=True, default="sinemali@gmail.com")
     telefono = models.CharField(max_length=18, null=True, default="+56000000000")
@@ -25,6 +25,8 @@ class SocioNegocioDB(models.Model):
     grupoSN = models.ForeignKey(GrupoSNDB, on_delete=models.CASCADE, default=1)
     tipoSN = models.ForeignKey(TipoSNDB,on_delete=models.CASCADE, default=1)
     tipoCliente = models.ForeignKey(TipoClienteDB,on_delete=models.CASCADE, default=1)
+    price_list_asigned = models.ForeignKey('PriceListsDB', on_delete=models.CASCADE, null=True, default=None)
+    
     
     def __str__(self):
         return f"{self.rut}"

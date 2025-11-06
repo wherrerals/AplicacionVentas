@@ -917,6 +917,9 @@ def busquedaProductos(request):
     if request.method == 'GET' and 'numero' in request.GET:
         numero = request.GET.get('numero', '').strip()
 
+        card_code = request.GET.get('cardCode', '').strip()
+        print(f"card_code en busqueda Productos: {card_code}")
+
         users_data = user_data(request)
 
         resultados = ProductoDB.objects.filter(
@@ -930,7 +933,7 @@ def busquedaProductos(request):
         for p in resultados:
             if p.precioVenta > 0 and p.inactivo != "tYES":
                 # inicializar el servicio de listas de precio
-                list_prices = ListPriceService(p.codigo, p.costo, users_data)
+                list_prices = ListPriceService(p.codigo, p.costo, users_data, card_code)
                 new_price, new_discounted_price = list_prices.get_list_price_info()
 
                 print(f"new_price: {new_price}, new_discounted_price: {new_discounted_price}")

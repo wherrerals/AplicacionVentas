@@ -10,10 +10,11 @@ $(document).ready(function () {
     $('#inputNumero').on('input', debounce(function () {
         let numero = $(this).val();
         let tipoDoucmento = $('.tipoDocumento').text().trim();
+        let cardCode = document.getElementById('inputCliente').getAttribute('data-codigosn');
         if (numero.length >= 3) {
             $.ajax({
                 url: '/ventas/buscarproductos/',
-                data: { 'numero': numero },
+                data: { 'numero': numero, 'cardCode': cardCode },
                 dataType: 'json',
                 success: function (data) {
                     $('#resultados').empty();
