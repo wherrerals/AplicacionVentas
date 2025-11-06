@@ -528,7 +528,7 @@ class Cotizacion(Documento):
             
             from domain.services.listprice import ListPriceService
             print("Calculando precios para el producto:", productos.codigo)
-            list_prices = ListPriceService(productos.codigo, productos.costo, user_data)
+            list_prices = ListPriceService(productos.codigo, productos.costo, user_data, quotations.get("CardCode"))
             new_price, new_discounted_price = list_prices.get_list_price_info()
             
             from presentation.views.view import limitar_descuento

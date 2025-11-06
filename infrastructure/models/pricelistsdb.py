@@ -13,6 +13,7 @@ class PriceListsDB(models.Model):
     valid_from = models.DateTimeField(null=True, blank=True)
     valid_to = models.DateTimeField(null=True, blank=True)
     active = models.BooleanField(default=False)
+    list_only_for_members = models.BooleanField(default=False)
     last_modification = models.DateTimeField(auto_now=True)
 
     def __str__(self):
