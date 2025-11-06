@@ -20,7 +20,7 @@ class BatchProduct:
             for item in listItems:
                 item_code = item
 
-                if "SV" in item_code:
+                if "SV" in item_code or 'PN' in item_code:
                         continue
 
 
