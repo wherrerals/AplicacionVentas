@@ -8,7 +8,7 @@ class BatchProduct:
 
     @staticmethod
     def generate_batch(listItems):
-        boundary = BatchProduct.generate_boundary()
+        boundary = "batch_36522ad7-fc75-4b56-8c71-56071383e77b"
         changeset_boundary = "changeset_77162fcd-b8da-41ac-a9f8-9357efbbd"
 
         body_parts = []
@@ -19,6 +19,11 @@ class BatchProduct:
         if listItems:
             for item in listItems:
                 item_code = item
+
+                if "SV" in item_code:
+                        continue
+
+
                 body_parts.append(f"--{changeset_boundary}")
                 body_parts.append("Content-Type: application/http")
                 body_parts.append("Content-Transfer-Encoding: binary")
@@ -34,6 +39,8 @@ class BatchProduct:
         body_parts.append(f"--{boundary}--")
 
         body = "\n".join(body_parts)
+
+        print(body)
 
         return body, boundary, changeset_boundary
 
