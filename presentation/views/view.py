@@ -1758,3 +1758,49 @@ def validar_cupon(request):
 def validar_imagenes(request):
     productos = ProductoDB.objects.all()
     return render(request, 'validar_imagenes.html', {'productos': productos})
+
+
+@csrf_exempt
+def restaurar_precios(request):
+    try:
+        json_data = json.loads(request.body)
+        productos = json_data.get("productos", [])
+        users_data = user_data(request)
+
+        
+        if not productos:
+            return JsonResponse({'error': 'No se proporcionaron productos'}, status=400)
+
+        precios_venta = []
+
+        for producto in productos:
+            sku = producto.get("sku")
+
+            if not sku:
+                continue
+
+            # Buscar el producto exacto
+            resultado = ProductoDB.objects.filter(codigo__iexact=sku).only('codigo', 'precioVenta', 'costo').first()
+            list_prices = ListPriceService(resultado.codigo, resultado.costo, users_data)
+            
+            new_price, new_discounted_price = list_prices.get_list_price_info()
+
+            precio = resultado.precioVenta
+            max_descuento = limitar_descuento(resultado, users_data, 0.0, 0.0)  # Llamada inicial con 0.0 para evitar errores
+
+            # integrar tu lógica:
+            if new_price != 0.0:
+                precio = new_price
+                max_descuento = limitar_descuento(resultado, users_data, new_price, new_discounted_price)
+
+            precios_venta.append({
+                "codigo": sku,
+                "precio": precio,
+                "maxDescuento": max_descuento,
+            })
+
+        return JsonResponse(precios_venta, safe=False, status=200)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+

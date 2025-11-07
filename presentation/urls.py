@@ -75,6 +75,8 @@ urlpatterns = [
     path('detalles-ventas/', InvoiceView.as_view(), name='detalles_ventas'),
     path('duplicar-documento/', InvoiceView.as_view(), name='duplicar_documento'),
 
+    path('restaurar-precios/', view.restaurar_precios, name='restaurar_precios'),
+
     #cupones
 
     path('listar/', CuponListView.as_view(), name='listar'),
