@@ -3,6 +3,7 @@ import requests
 import json
 from django.conf import settings
 import logging
+import re
 
 from adapters.batch.batch_product import BatchProduct
 
@@ -958,17 +959,70 @@ class APIClient:
     
     
 
+
     def bacth_processes_products(self, listItems):
-
         body, boundary, changeset_boundary = BatchProduct.generate_batch(listItems)
-
         headers = {"Content-Type": f"multipart/mixed;boundary={boundary}"}
 
-        batch_response = self.session.post(f"{self.base_url}/$batch", data=body, headers=headers, verify=False)     
+        batch_response = self.session.post(
+            f"{self.base_url}/$batch",
+            data=body,
+            headers=headers,
+            verify=False
+        )
 
-        if batch_response.status_code == 202:
-            print("Batch process completed successfully.")
+        print(f"Batch response status: {batch_response.status_code}")
+
+        if batch_response.status_code != 202:
+            print("❌ El batch request falló antes de procesarse.")
+            print(batch_response.text)
+            return False
+
+        # --- Extrae las respuestas individuales ---
+        responses = self._parse_batch_response(batch_response.text)
+
+        print("\n📦 Resultados individuales:")
+        for i, resp in enumerate(responses, start=1):
+            print(f"\n➡️  Respuesta #{i}")
+            print(f"Status: {resp['status']}")
+            print(f"Body: {resp['body']}\n")
+
         return True
+
+
+    def _parse_batch_response(self, raw_response: str):
+        """
+        Analiza el multipart/mixed devuelto por un batch OData.
+        Retorna una lista de dicts con 'status' y 'body'.
+        """
+        # Detecta los boundaries del changeset
+        boundaries = re.findall(r'--changeset_[^\n\r]+', raw_response)
+        if not boundaries:
+            # fallback si no hay changeset
+            boundaries = re.findall(r'--batch_[^\n\r]+', raw_response)
+
+        parts = re.split(r'--changeset_[^\n\r]+', raw_response)
+        results = []
+
+        for part in parts:
+            # Busca el status line
+            match_status = re.search(r'HTTP/1\.1\s+(\d+)\s+([^\n\r]+)', part)
+            if match_status:
+                status_code = int(match_status.group(1))
+                status_text = match_status.group(2).strip()
+
+                # Extrae cuerpo JSON o texto
+                match_body = re.search(r'\{[\s\S]+\}', part)
+                body = match_body.group(0).strip() if match_body else "(sin cuerpo)"
+
+                results.append({
+                    "status": f"{status_code} {status_text}",
+                    "body": body
+                })
+
+        return results
+
+    
     
     def get_docEntry_sl(self, type_document, doc_num):
 

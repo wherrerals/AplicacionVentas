@@ -70,6 +70,8 @@ class Producto:
         # Obtener los productos
         productos = sync_method[tipo]["sync"](cliente, skip, tipo)
 
+        print(f"estos son los datos del producto {productos}")
+
         # Verificar si no hay productos para sincronizar
         if not productos:
             empty_count += 1
