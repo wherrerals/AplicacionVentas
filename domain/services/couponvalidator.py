@@ -104,7 +104,7 @@ class CouponValidator:
                 final_discount = discount
             else:
                 from presentation.views.view import limitar_descuento
-                limite_producto = limitar_descuento(product, self.users_data) / 100
+                limite_producto = limitar_descuento(product, self.users_data, 0.0, 0.0) / 100
                 final_discount = min(discount, limite_producto)
 
             products_with_discounts.append({
