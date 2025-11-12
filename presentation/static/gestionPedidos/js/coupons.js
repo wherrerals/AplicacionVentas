@@ -177,7 +177,8 @@ function actualizarDescuentosDesdeCupon(reglas) {
     const descuentosPorProducto = {};
     if (reglas.products && Array.isArray(reglas.products)) {
         reglas.products.forEach(p => {
-            descuentosPorProducto[p.codigo] = parseFloat(p.descuento) * 100; // Convertimos a %
+            const porcentaje = parseFloat(p.descuento) * 100;
+            descuentosPorProducto[p.codigo] = parseFloat(porcentaje.toFixed(2));
         });
     }
 
