@@ -39,12 +39,19 @@ $(document).ready(function () {
 
     const rutDisplayParagraph = document.querySelector("#rut-display p");
 
+    actualizarPreciosPorCliente(codigoSN);
+
+
     rutDisplayParagraph.textContent = codigoSN;
     
 
     // Llamar a las funciones cargarContactos y cargarDirecciones
     cargarDirecciones();
     cargarContactos();
+
+    // cargar precios servidor 
+
+
   });
 
   $(document).ready(function () {

@@ -1766,7 +1766,10 @@ def restaurar_precios(request):
         json_data = json.loads(request.body)
         productos = json_data.get("productos", [])
         users_data = user_data(request)
+        cardcode = json_data.get("cardcode", "")
 
+        print(f"Productos recibidos para restaurar precios: {productos}")
+        print(f"Cardcode recibido: {cardcode}")
         
         if not productos:
             return JsonResponse({'error': 'No se proporcionaron productos'}, status=400)
@@ -1781,7 +1784,7 @@ def restaurar_precios(request):
 
             # Buscar el producto exacto
             resultado = ProductoDB.objects.filter(codigo__iexact=sku).only('codigo', 'precioVenta', 'costo').first()
-            list_prices = ListPriceService(resultado.codigo, resultado.costo, users_data)
+            list_prices = ListPriceService(resultado.codigo, resultado.costo, users_data, cardcode)
             
             new_price, new_discounted_price = list_prices.get_list_price_info()
 

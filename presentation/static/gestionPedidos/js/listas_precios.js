@@ -55,12 +55,10 @@ function capturarProductosActuales() {
 
 // Actualiza los precios en base a los datos que vienen del servidor
 function actualizarPreciosDesdeServidor(data) {
-
-
-if (typeof productos !== "undefined" && Array.isArray(productos)) {
-  productos.length = 0; // Vaciar array global de productos tributarios
-  console.log("🧹 Limpieza: array 'productos' reiniciado.");
-}
+  if (typeof productos !== "undefined" && Array.isArray(productos)) {
+    productos.length = 0; // Vaciar array global de productos tributarios
+    console.log("🧹 Limpieza: array 'productos' reiniciado.");
+  }
 
   const filasProductos = document.querySelectorAll("tbody.product-row");
 
@@ -68,9 +66,11 @@ if (typeof productos !== "undefined" && Array.isArray(productos)) {
     const skuElem = row.querySelector('small[name="sku_producto"]');
     const precioVentaElem = row.querySelector('small[name="precio_venta"]');
     const inputCantidad = row.querySelector("#calcular_cantidad");
+    const descuento = row.querySelector('small[name="descuento_max"]');
 
-    const inputDescuento = row.querySelector('#agg_descuento');
+    console.log("descuento elem:", descuento);
 
+    let  inputDescuento = row.querySelector("#agg_descuento");
     if (inputCantidad) {
       const clone = inputCantidad.cloneNode(true);
       inputCantidad.parentNode.replaceChild(clone, inputCantidad);
@@ -79,6 +79,7 @@ if (typeof productos !== "undefined" && Array.isArray(productos)) {
     if (inputDescuento) {
       const clone = inputDescuento.cloneNode(true);
       inputDescuento.parentNode.replaceChild(clone, inputDescuento);
+      inputDescuento = clone; // 🔄 referenciar el nuevo nodo
     }
 
     if (!skuElem || !precioVentaElem) return;
@@ -88,16 +89,25 @@ if (typeof productos !== "undefined" && Array.isArray(productos)) {
 
     if (productoServidor && productoServidor.precio) {
       const nuevoPrecio = parseFloat(productoServidor.precio);
+      const maxDescuento = productoServidor.maxDescuento || 0;
+
+      inputDescuento.setAttribute("max", maxDescuento);
+      inputDescuento.value = Math.min(inputDescuento.value, maxDescuento); // opcional
+
+      const nuevoDescuento = maxDescuento;
+      descuento.textContent = `Max: ${nuevoDescuento}%`;
 
       // Actualizar el atributo y texto del precio
       precioVentaElem.setAttribute("data-preciounitario", nuevoPrecio);
       precioVentaElem.textContent = formatCurrency(nuevoPrecio);
 
-      console.log(`Actualizado precio de ${sku} → ${nuevoPrecio}`);
-
       // Paso 4: forzar recálculo de totales
       if (inputCantidad) {
         inputCantidad.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+
+      if (inputDescuento) {
+        inputDescuento.dispatchEvent(new Event("input", { bubbles: true }));
       }
     }
   });
@@ -113,9 +123,6 @@ if (typeof productos !== "undefined" && Array.isArray(productos)) {
       agregarInteractividad(row, sku, indiceProducto);
     }
   });
-
-
-  
 }
 
 // Formatea el precio al formato local CLP o el que uses
@@ -139,4 +146,32 @@ function formatCurrency(value) {
 
   // Agregamos el símbolo de peso al principio
   return `$ ${formattedValue}`;
+}
+
+async function actualizarPreciosPorCliente(cardcode) {
+  console.log("🔄 Actualizando precios para cliente:", cardcode);
+
+  const productos = capturarProductosActuales();
+  if (productos.length === 0) {
+    console.log("No hay productos cargados, no se actualizarán precios.");
+    return;
+  }
+
+  try {
+    const response = await fetch("/ventas/restaurar-precios/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ productos, cardcode }),
+    });
+
+    if (!response.ok)
+      throw new Error("Error al obtener precios desde el servidor");
+
+    const data = await response.json();
+    console.log("✅ Precios cliente obtenidos:", data);
+
+    actualizarPreciosDesdeServidor(data);
+  } catch (error) {
+    console.error("Error actualizando precios del cliente:", error);
+  }
 }
