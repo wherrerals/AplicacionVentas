@@ -43,6 +43,28 @@ class Coupons():
 
         # Si no tiene fechas, puedes decidir si es válido o no (ej: True siempre)
         return True
+    
+    def validate_list_price(self):
+
+        if not self.coupon.same_price_and_discount:
+            print("El cupón aplica solo a productos con mismo precio y descuento, no se valida lista de precios.")
+            return []
+        
+        print("Validando lista de precios para los productos del cupón...")
+
+        from infrastructure.repositories.pricelistrepository import PriceListRepository
+        cc = self.sncode
+        product_codes = [p['itemCode'] for p in self.products]
+        
+        products_no_price_list = []
+
+        for sku in product_codes:
+            price_list = PriceListRepository.get_product_price(sku, cc)
+
+            if not price_list:
+                products_no_price_list.append(sku)
+
+        return products_no_price_list
 
 
     def coupon_is_active(self):
@@ -132,7 +154,14 @@ class Coupons():
         product_codes = [p['itemCode'] for p in self.products]
 
         if rules and rules[0]['operator'] == 'todo':
-            applicable_codes = product_codes
+            validate_list_price = self.validate_list_price()
+
+            print(f"Productos sin lista de precios para el cupón: {validate_list_price}")
+            # si validate_list_price no es una lista vacia
+            if validate_list_price:
+                applicable_codes = [code for code in product_codes if code in validate_list_price]
+            else:
+                applicable_codes = product_codes
         else:
             valid_codes = set(p['codigo'] for p in self.coupon.products.all().values('codigo'))
             applicable_codes = list(valid_codes.intersection(product_codes))
