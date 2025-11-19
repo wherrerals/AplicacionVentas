@@ -7,6 +7,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (this.value.trim() === "") {
         console.log("Cliente borrado. Obteniendo precios originales...");
 
+
+        const couponInput = document.getElementById("cupon_data");
+        if (couponInput && couponInput.value.trim() !== "") {
+            console.log("Cliente borrado → cupón activo encontrado, eliminando...");
+            couponInput.value = "";      
+            restaurarEstadoCupon();      // llama al script 2
+        }
+
         // Paso 1: capturar los productos actuales
         const productos = capturarProductosActuales();
         if (productos.length === 0) {
