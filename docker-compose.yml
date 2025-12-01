@@ -13,6 +13,8 @@ services:
       - "4350:3306"
     networks:
       - a_network
+      - shared_network
+
 
   web:
     build:
