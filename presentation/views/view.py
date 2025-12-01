@@ -1499,7 +1499,12 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
             cotizacion["tiene_descuento"] = any(cotizacion["descuento_por_producto"])
 
             # Renderizar plantilla HTML
-            html_string = render_to_string('cotizacion_template.html', {'cotizacion': cotizacion})
+            type_pdf = data.get('pdf_button')
+            
+            if type_pdf == 2:
+                html_string = render_to_string('cotizacion_template.html', {'cotizacion': cotizacion})
+            else:
+                html_string = render_to_string('cotizacion_template2.html', {'cotizacion': cotizacion})
 
             # Generar PDF
             pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
@@ -1806,4 +1811,3 @@ def restaurar_precios(request):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
-

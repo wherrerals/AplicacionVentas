@@ -1,8 +1,23 @@
 document.addEventListener("DOMContentLoaded", function () {
+
+    // indicar un boton u otro para generar el pdf
+    document.getElementById("generarPDF").addEventListener("click", crearPDF);
     document.getElementById("generar_pdf_empresa").addEventListener("click", crearPDF);
 
     function crearPDF() {
         showLoadingOverlay();
+
+        let pdfButton = null;
+
+        switch (document.activeElement.id) {
+            case "generarPDF":
+                pdfButton = 1;
+                break;
+            case "generar_pdf_empresa":
+                pdfButton = 2;
+                break;
+        }
+
 
         // Obtener valores iniciales
         const fechaSolo = new Date().toISOString().split('T')[0];
@@ -12,21 +27,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const rut = document.getElementById("inputCliente").getAttribute("data-codigosn");
         let docNumElement = document.getElementById("numero_cotizacion");
         let docNum = docNumElement?.textContent.trim();
-        
+
         // Si no hay número de cotización, usar número de orden
         if (!docNum) {
             docNumElement = document.getElementById("numero_orden");
             docNum = docNumElement?.textContent.trim();
         }
-        
+
         // Obtener el tipo de documento desde el atributo data-type del elemento encontrado
         const docType = docNumElement?.getAttribute("data-type") || "tipo_desconocido";
-        
-        console.log("Número de documento:", docNum);
-        console.log("Tipo de documento:", docType);
-        
-
-
         const docDate = fechaSolo;
         const codigoVendedor = document.getElementById("vendedor_data").getAttribute("data-codeVen");
         const totalNeto = document.querySelector("#total_neto").textContent;
@@ -41,7 +50,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const lines = [];
         const productRows = document.querySelectorAll('.product-row');
-        console.log("Número de filas de productos:", productRows.length);
 
         productRows.forEach((row, index) => {
             const itemCode = row.querySelector("[name='sku_producto']").innerText.trim();
@@ -51,21 +59,15 @@ document.addEventListener("DOMContentLoaded", function () {
             const porcentaje_descuento = row.querySelector("#agg_descuento").value.trim();
             const discountspan = row.querySelector("#Precio_Descuento").textContent;
             const totalspan = row.querySelector("#precio_Venta").textContent;
-            const comentarios = row.querySelector("#comentarios-1").value; 
+            const comentarios = row.querySelector("#comentarios-1").value;
             const img = row.querySelector("#img_productox").src;
             let cupon = row.querySelector("#desc_cupon").innerText; // Capturar el valor del cupón
 
             // quitar los espacios y el % de cupon 
-            console.log('CUPON1:', cupon);
-
-
             cupon = cupon.replace(/[^0-9.]/g, "");
-            
+
             // CONNVERTIR CUPON EN NUMERO 
-
             cupon = parseFloat(cupon) || 0;
-
-            console.log('CUPON2:', cupon);
 
             let discount_real = 0
 
@@ -109,7 +111,10 @@ document.addEventListener("DOMContentLoaded", function () {
             "contacto": contacto,
             "sucursal": sucursal,
             "observaciones": observaciones,
+            "pdf_button": pdfButton
         };
+
+        console.log("Datos del documento para PDF:", documentData);
 
         // Convertir a JSON
         const jsonData = JSON.stringify(documentData);
