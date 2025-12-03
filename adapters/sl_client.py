@@ -422,11 +422,13 @@ class APIClient:
             "Quotations,Quotations/DocumentLines,Items/ItemWarehouseInfoCollection"
         )
         
-        expand = "Quotations/DocumentLines($select=U_LED_DCTO_CUPON,TreeType,DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
+        expand = "Quotations/DocumentLines($select=ItemCode,U_LED_DCTO_CUPON,TreeType,DocEntry,LineNum,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
         filter = f"Quotations/DocEntry eq {docEntry} and Quotations/DocumentLines/DocEntry eq Quotations/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq Quotations/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq Quotations/DocumentLines/WarehouseCode"
 
         base_url = self.base_url # Asegura que no haya doble "/"
         url = f"{base_url}/$crossjoin({crossJoin})?$expand={expand}&$filter={filter}"
+
+        print(f"url detalleCotizacionLineas: {url}")
 
         all_data = []  # Lista para almacenar todos los valores
 
@@ -434,13 +436,14 @@ class APIClient:
             response = self.session.get(url, verify=False)
             response.raise_for_status()
             data = response.json()
-
             # Agregar los resultados actuales a la lista acumulada
             all_data.extend(data.get("value", []))
-
             # Obtener el próximo enlace si existe
             next_link = data.get("odata.nextLink")
             url = f"{base_url}/{next_link}" if next_link else None  # Agregar base_url si es necesario
+
+        
+        print(f"all_data final: {all_data}")
 
         return {"value": all_data}
 
@@ -506,7 +509,7 @@ class APIClient:
             "Orders,Orders/DocumentLines,Items/ItemWarehouseInfoCollection"
             )
 
-        expand = "Orders/DocumentLines($select=U_LED_DCTO_CUPON,TreeType,DocEntry,LineNum,ItemCode,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
+        expand = "Orders/DocumentLines($select=ItemCode,U_LED_DCTO_CUPON,TreeType,DocEntry,LineNum,ItemDescription,WarehouseCode,Quantity,UnitPrice,GrossPrice,DiscountPercent,Price,PriceAfterVAT,LineTotal,GrossTotal,ShipDate,Address,ShippingMethod,FreeText,BaseType,GrossBuyPrice,BaseEntry,BaseLine,LineStatus),Items/ItemWarehouseInfoCollection($select=WarehouseCode,InStock,Committed,InStock sub Committed as SalesStock)"
         filter = f"Orders/DocEntry eq {docEntry} and Orders/DocumentLines/DocEntry eq Orders/DocEntry and Items/ItemWarehouseInfoCollection/ItemCode eq Orders/DocumentLines/ItemCode and Items/ItemWarehouseInfoCollection/WarehouseCode eq Orders/DocumentLines/WarehouseCode"
 
         base_url = self.base_url # Asegura que no haya doble "/"
