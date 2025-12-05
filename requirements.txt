@@ -4,7 +4,7 @@ charset-normalizer==3.3.2
 Django==5.1.13
 djangorestframework
 idna==3.7
-mysqlclient==2.2.4
+mysqlclient==2.2.7
 requests==2.32.4
 sqlparse==0.5.1
 tzdata==2024.1
