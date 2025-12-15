@@ -1022,18 +1022,10 @@ class APIClient:
         print(f"Batch response status: {batch_response.status_code}")
 
         if batch_response.status_code != 202:
-            print("❌ El batch request falló antes de procesarse.")
-            print(batch_response.text)
             return False
 
         # --- Extrae las respuestas individuales ---
         responses = self._parse_batch_response(batch_response.text)
-
-        print("\n📦 Resultados individuales:")
-        for i, resp in enumerate(responses, start=1):
-            print(f"\n➡️  Respuesta #{i}")
-            print(f"Status: {resp['status']}")
-            print(f"Body: {resp['body']}\n")
 
         return True
 
