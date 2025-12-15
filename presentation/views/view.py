@@ -23,6 +23,7 @@ from adapters.sl_client import APIClient
 from infrastructure.repositories.comunarepository import ComunaRepository
 from infrastructure.repositories.contactorepository import ContactoRepository
 from infrastructure.repositories.direccionrepository import DireccionRepository
+from infrastructure.repositories.productorepository import ProductoRepository
 from infrastructure.repositories.regionrepository import RegionRepository
 from infrastructure.repositories.socionegociorepository import SocioNegocioRepository
 from infrastructure.repositories.stockbodegasrepository import StockBodegasRepository
@@ -993,11 +994,9 @@ def limitar_descuento(producto, users_data, new_price, new_discounted_price):
     # Aquí va tu validación común
     if new_price > 0:
         descuentoMax = new_discounted_price
-        print("caso1:", descuentoMax)
         return math.floor(min(descuentoMax * 100, limite))
     
     else:
-        print("caso2:", descuentoMax)
         return math.floor(min(descuentoMax * 100, limite))
 
 
@@ -1811,3 +1810,9 @@ def restaurar_precios(request):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+def update_stock_view(request):
+
+    data = json.loads(request.body)
+    process = ProductoRepository().sync_products_and_stock2(data)
+    return JsonResponse({'status': 'Stock actualizado', 'details': process}, status=200)

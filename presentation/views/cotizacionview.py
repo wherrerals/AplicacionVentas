@@ -222,6 +222,8 @@ class CotizacionView(View):
 
         documentLine = client.detalleCotizacionLineas(docentry)
 
+        print("Lineas de documento:", documentLine)
+
         # Extraer los datos de la clave 'value', asegurándose de manejar la estructura correctamente
         quotations_data = documentClient.get('value', [{}])[0].get('Quotations', {})
         cardCode = quotations_data.get('CardCode')
