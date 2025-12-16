@@ -1110,7 +1110,7 @@ def probandoSL(request):
     return JsonResponse(lines_data, safe=False)
 
 """ 
-def calcular_stock_total(data):
+def calcular_stock_total_receta(data):
 
     from infrastructure.repositories.productorepository import ProductoRepository
     pr = ProductoRepository()
@@ -1125,8 +1125,7 @@ def calcular_stock_total(data):
     if stock_total < 0:
         for b in data_real:
             b['stock'] = 0
-
-    return data_real """
+ """
 
 def calcular_stock_total(data):
     from infrastructure.repositories.productorepository import ProductoRepository
@@ -1224,6 +1223,8 @@ def calcular_stock_total(data):
 def obtenerStockBodegas(request):
     producto_id = request.GET.get('idProducto')  # Obtener el ID del producto
 
+    producto = ProductoDB.objects.filter(codigo=producto_id).first()
+
     if not producto_id:
         return JsonResponse({'error': 'Falta el parámetro: idProducto es obligatorio'}, status=400)
 
@@ -1239,7 +1240,19 @@ def obtenerStockBodegas(request):
             }
             for item in stock_por_bodegas
         ]
-        data = calcular_stock_total(data)
+
+        if producto.TreeType == 'iSalesTree':
+            stockTotal = producto.stockTotal
+            print(f"data 1: {data}")
+
+            data.append({
+                'product_type': producto.TreeType,
+                'stock_total': stockTotal
+            })
+            print("Producto es de tipo iSalesTree")
+            print(f"Data: {data}")
+        else:
+            data = calcular_stock_total(data)
 
         return JsonResponse(data, safe=False, status=200)
 

@@ -39,6 +39,8 @@ class Producto {
     async actualizarStock(row) {
         const stockData = await this.obtenerStock(this.productoCodigo);
 
+        console.log("Stock data obtenido para el producto", this.productoCodigo, ":", stockData);
+
         if (stockData) {
             // Mapear las bodegas válidas (excluyendo GR)
             const bodegaMap = {
@@ -56,8 +58,16 @@ class Producto {
 
             // Mostrar el stock total
             const stockTotalElem = row.querySelector('[name="stock_total"]');
-            stockTotalElem.textContent = `Total: ${stockTotal}`;
-            stockTotalElem.style.color = stockTotal === 0 ? 'red' : 'black';
+            const treeTypeItem = stockData.find(item => item.product_type === 'iSalesTree');
+
+            
+            if (treeTypeItem) {
+                stockTotalElem.textContent = `Total: ${treeTypeItem.stock_total}`;
+                stockTotalElem.style.color = treeTypeItem.stock_total === 0 ? 'red' : 'black';
+            } else {
+                stockTotalElem.textContent = `Total: ${stockTotal}`;
+                stockTotalElem.style.color = stockTotal === 0 ? 'red' : 'black';
+            }
 
             let warningIcon = row.querySelector('#warning_container');
             console.log("capturado el warning icon:", warningIcon);
@@ -206,8 +216,16 @@ class Producto {
         precioVentaElem.addEventListener('mouseover', async () => {
             const stockData = await this.obtenerStock(this.productoCodigo);
             if (stockData) {
-                // Filtrar las bodegas para excluir "GR"
-                const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
+                // Filtrar las bodegas para incluir solo las del mapa válido
+
+                const bodegaMap = {
+                    "LC": "LC",
+                    "PH": "PH",
+                    "ME": "ME",
+                    "VI": "VI"
+                };
+
+                const stockFiltrado = stockData.filter(bodega => bodega.bodega in bodegaMap);
 
                 // Crear el contenido del tooltip solo con las bodegas válidas
                 const tooltipContent = stockFiltrado

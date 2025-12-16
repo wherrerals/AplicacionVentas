@@ -91,14 +91,12 @@ class ProductoRepository:
         return True, productos_procesados
 
 
-    def calcular_stock_y_costo_receta(self, item_code_receta):
+    def calcular_stock_y_costo_receta(self, item_code):
         """Calcula el stock total de la receta y el costo total."""
         # Obtenemos los componentes de la receta desde la API
         
         ApiClientSL = APIClient()
-        componentes = ApiClientSL.productTreesComponents(item_code_receta).get("ProductTreeLines", [])
-        receta_simple = len(componentes) == 1
-
+        componentes = ApiClientSL.productTreesComponents(item_code).get("ProductTreeLines", [])
 
         # Definimos las bodegas específicas
         bodegas = list(self.get_bodegas_permitidas())
@@ -113,25 +111,18 @@ class ProductoRepository:
         for componente in componentes:
             item_code_componente = componente["ItemCode"]
             cantidad_necesaria = componente["Quantity"]
-            if receta_simple:
-                stock_componente = self.obtener_stock_componentes_db_receta_simple(item_code_componente)
-            else:
-                stock_componente = self.obtener_stock_componentes_db_receta(item_code_componente)        
-                
+            
+            stock_componente = self.obtener_stock_componentes_db_receta(item_code_componente)        
             costo_componente = self.obtener_costo_componente_db(item_code_componente)
 
             # Calcular el total del stock del componente en todas sus bodegas
             stock_total_componente = sum(stock_componente.values())
-
-            print(f"Componente {item_code_componente}: stock total {stock_total_componente}, cantidad necesaria {cantidad_necesaria}")
             
             # Calcular stock disponible por la cantidad requerida
             stock_disponible_componente = math.floor(stock_total_componente / cantidad_necesaria) if cantidad_necesaria > 0 else 0
             
             # Actualizar el stock total de la receta (mínimo entre todos los componentes)
             stock_total_receta = min(stock_total_receta, stock_disponible_componente)
-
-            print(f"Stock disponible componente {item_code_componente}: {stock_disponible_componente}")
 
             # Calcular el stock de la receta por bodega
             for bodega in bodegas:
@@ -141,16 +132,12 @@ class ProductoRepository:
                 # Actualizar el stock por bodega (mínimo entre todos los componentes)
                 stock_por_bodega[bodega] = min(stock_por_bodega[bodega], stock_disponible)
 
-                print(f"Bodega {bodega}: stock componente {item_code_componente} = {stock_bodega}, stock disponible receta = {stock_disponible}")
-
             # Sumar el costo total de la receta
             costo_total += costo_componente * cantidad_necesaria
 
             # **Sincronizar stock del componente en las bodegas**
-            producto = ProductoDB.objects.get(codigo=item_code_receta)  # Obtener la instancia del producto
+            producto = ProductoDB.objects.get(codigo=item_code)  # Obtener la instancia del producto
             bodegas_datos = [{"nombre": bodega, "stock_disponible": stock_por_bodega[bodega], "stock_comprometido": 0} for bodega in bodegas]
-
-            print(f"Sincronizando stock para componente {item_code_componente} en receta {item_code_receta}")
 
             #print(f"datos de producto antes de sincronizar el stocl {producto.codigo} bodegas {bodegas_datos}")
             self.sync_stock(producto, bodegas_datos)
@@ -195,22 +182,6 @@ class ProductoRepository:
         stocks = StockBodegasDB.objects.filter(
             idProducto__codigo=item_code,
             idBodega__nombre__in=bodegas_permitidas
-        ).values("idBodega__nombre", "stock", "stockDisponibleReal")
-        
-        # Crear el diccionario en el mismo formato que el otro método
-        return {
-            stock["idBodega__nombre"]: stock["stockDisponibleReal"] if stock["stock"] < 0 else stock["stock"]
-            for stock in stocks
-        }
-
-    def obtener_stock_componentes_db_receta_simple(self, item_code):
-        # Lista de bodegas permitidas (usando los nombres como están en la BD)
-        bodegas_permitidas = self.get_bodegas_permitidas()
-        
-        # Obtener los registros de stock para el producto
-        stocks = StockBodegasDB.objects.filter(
-            idProducto__codigo=item_code,
-            idBodega__nombre__in=bodegas_permitidas
         ).values("idBodega__nombre", "stock")
         
         # Crear el diccionario en el mismo formato que el otro método
@@ -218,31 +189,6 @@ class ProductoRepository:
             stock["idBodega__nombre"]: stock["stock"]
             for stock in stocks
         }
-
-
-    def obtener_stock_componentes_db_receta_2(self, item_code):
-        bodegas_permitidas = self.get_bodegas_permitidas()
-
-        stocks = StockBodegasDB.objects.filter(
-            idProducto__codigo=item_code,
-            idBodega__nombre__in=bodegas_permitidas
-        ).values(
-            "idBodega__nombre",
-            "stock",
-            "stockDisponibleReal"
-        )
-
-        resultado = {}
-
-        for registro in stocks:
-            stock = registro["stock"]
-            stock_real = registro["stockDisponibleReal"]
-
-            resultado[registro["idBodega__nombre"]] = (
-                stock if stock >= 0 else stock_real
-            )
-
-        return resultado
 
     def obtener_costo_componente(self, item_code):
 
@@ -275,8 +221,6 @@ class ProductoRepository:
 
             # Corregir el cálculo de stockVenta (asegurarnos de obtener un entero)
             stockVenta = bodega_data.get("stock_disponible", -1) - bodega_data.get("stock_comprometido", -1)
-
-            print(f"Sincronizando stock para producto {producto.codigo} en bodega {bodega.nombre}: stockDisponible={bodega_data.get('stock_disponible', -1)}, stockComprometido={bodega_data.get('stock_comprometido', -1)}, stockVenta calculado={stockVenta}")
 
             """
             

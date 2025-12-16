@@ -89,13 +89,21 @@ class Producto {
     
             // Calcular el stock total sumando solo las bodegas válidas
             const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock, 0);
+            const treeTypeItem = stockData.find(item => item.product_type === 'iSalesTree');
+
     
             // Mostrar el stock total solo si se solicita
             if (actualizarStockTotal) {
                 const stockTotalElem = row.querySelector('[name="stock_total"]');
                 console.log("Stock total actualizado en actualizar Stock:", stockTotal);
-                stockTotalElem.textContent = `Total: ${stockTotal}`;
-            }
+                if (treeTypeItem) {
+                    stockTotalElem.textContent = `Total: ${treeTypeItem.stock_total}`;
+                    stockTotalElem.style.color = treeTypeItem.stock_total === 0 ? 'red' : 'black';
+                } else {
+                    stockTotalElem.textContent = `Total: ${stockTotal}`;
+                    stockTotalElem.style.color = stockTotal === 0 ? 'red' : 'black';
+                }            
+        }
     
             // Obtener el value de la bodega seleccionada
             const selectBodega = row.querySelector('.form-select');
@@ -278,8 +286,14 @@ class Producto {
             const stockData = await this.obtenerStock(this.productoCodigo);
             if (stockData) {
                 // Filtrar las bodegas para excluir "GR"
-                const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
+                const bodegaMap = {
+                    "LC": "LC",
+                    "PH": "PH",
+                    "ME": "ME",
+                    "VI": "VI"
+                };
 
+                const stockFiltrado = stockData.filter(bodega => bodega.bodega in bodegaMap);
                 // Crear el contenido del tooltip solo con las bodegas válidas
                 const tooltipContent = stockFiltrado
                     .map(bodega => `${bodega.bodega}: ${bodega.stock}`)
