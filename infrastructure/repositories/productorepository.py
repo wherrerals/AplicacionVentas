@@ -5,6 +5,8 @@ from django.db.models import Sum
 import math
 from django.db.models import Sum, F
 
+from infrastructure.repositories.stockbodegasrepository import StockBodegasRepository
+
 
 
 
@@ -74,6 +76,8 @@ class ProductoRepository:
                     
                     margen_bruto, descuento_maximo = self.calculate_margen_descuentos(precio_venta, costo_receta, rentabilidad_minima)
                     
+                    StockBodegasRepository().calcular_stock_real_bodegas(producto_info["codigo"])
+
                     
                     producto.dsctoMaxTienda = descuento_maximo
                     producto.dctoMaxProyectos = descuento_maximo
@@ -85,6 +89,7 @@ class ProductoRepository:
                 if "Bodegas" in product_data:
                     self.sync_stock(producto, product_data["Bodegas"])
                     self.update_stock_total(producto)
+                    StockBodegasRepository().calcular_stock_real_bodegas(producto_info["codigo"])
 
             productos_procesados.append(producto.codigo)
 
@@ -255,7 +260,7 @@ class ProductoRepository:
     def update_stock_total(self, producto):
 
         stock_total = StockBodegasDB.objects.filter(idProducto=producto).aggregate(
-            total_stock=Sum('stock_disponible_real')
+            total_stock=Sum('stock_disponible')
         )['total_stock'] or 0
 
         # Actualizar el campo stockTotal en el producto
