@@ -89,6 +89,8 @@ class ProductoRepository:
             productos_procesados.append(producto.codigo)
 
         return True, productos_procesados
+    
+    def calcular_stock_real_bodegas(self, item_code):
 
 
     def calcular_stock_y_costo_receta(self, item_code):
@@ -182,11 +184,11 @@ class ProductoRepository:
         stocks = StockBodegasDB.objects.filter(
             idProducto__codigo=item_code,
             idBodega__nombre__in=bodegas_permitidas
-        ).values("idBodega__nombre", "stock")
+        ).values("idBodega__nombre", "stock_disponible_real")
         
         # Crear el diccionario en el mismo formato que el otro método
         return {
-            stock["idBodega__nombre"]: stock["stock"]
+            stock["idBodega__nombre"]: stock["stock_disponible_real"]
             for stock in stocks
         }
 
@@ -233,8 +235,11 @@ class ProductoRepository:
             try:
                 stock_bodega = StockBodegasDB.objects.get(idProducto=producto, idBodega=bodega)
                 # Si existe, actualizamos los valores
-                stock_bodega.stock = stockVenta
-                stock_bodega.stockDisponibleReal = bodega_data.get("stock_disponible", -1)
+                stock_bodega.stock_disponible = stockVenta
+                stock_bodega.stock_fisico = bodega_data.get("stock_disponible", -1)
+                stock_bodega.stock_comprometido = bodega_data.get("stock_comprometido", -1)
+
+                #pendiente stock disponible real
                 
                 # Guardar los cambios
                 stock_bodega.save()
@@ -243,15 +248,16 @@ class ProductoRepository:
                 StockBodegasDB.objects.create(
                     idProducto=producto,
                     idBodega=bodega,
-                    stock=stockVenta,
-                    stockDisponibleReal=bodega_data.get("stock_disponible", -1)
+                    stock_disponible=stockVenta,
+                    stock_fisico=bodega_data.get("stock_disponible", -1),
+                    stock_comprometido=bodega_data.get("stock_comprometido", -1)
                 )
 
 
     def update_stock_total(self, producto):
 
         stock_total = StockBodegasDB.objects.filter(idProducto=producto).aggregate(
-            total_stock=Sum('stock')
+            total_stock=Sum('stock_disponible_real')
         )['total_stock'] or 0
 
         # Actualizar el campo stockTotal en el producto
@@ -306,7 +312,7 @@ class ProductoRepository:
             bodegas = StockBodegasDB.objects.filter(idProducto__codigo=producto['codigo']).values(
                 producto_codigo=F('idProducto__codigo'),
                 id_Bodega=F('idBodega'),
-                stock_V=F('stock')
+                stock_V=F('stock_disponible_real')
             )
 
             #limitar descuentos

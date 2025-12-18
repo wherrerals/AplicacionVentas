@@ -1138,41 +1138,41 @@ def calcular_stock_total(data):
     data_real = [b for b in data if b['bodega'] in bodegas_permitidas]
 
     # Calcular total general
-    stock_total = sum(b['stock'] for b in data_real)
+    stock_total = sum(b['stock_disponible'] for b in data_real)
 
     # === Regla 1: total general negativo → todo en 0 ===
     if stock_total < 0:
         for b in data_real:
-            b['stock'] = 0
+            b['stock_disponible'] = 0
         return data_real
 
     # === Regla 2: total positivo y hay bodegas con stock negativo ===
-    negativos = [b for b in data_real if b['stock'] < 0]
+    negativos = [b for b in data_real if b['stock_disponible'] < 0]
     if negativos:
-        cd = next((b for b in data_real if b['bodega'] == 'ME'), None)
-        suma_negativos = abs(sum(b['stock'] for b in negativos))
+        cd = next((b for b in data_real if b['stock_disponible'] == 'ME'), None)
+        suma_negativos = abs(sum(b['stock_disponible'] for b in negativos))
 
         # === 2.1 CD (ME) positivo ===
-        if cd and cd['stock'] > 0:
-            if cd['stock'] >= suma_negativos:
+        if cd and cd['stock_disponible'] > 0:
+            if cd['stock_disponible'] >= suma_negativos:
                 # CD cubre todo el negativo
-                cd['stock'] -= suma_negativos
+                cd['stock_disponible'] -= suma_negativos
                 for b in negativos:
-                    b['stock'] = 0
+                    b['stockstock_disponible'] = 0
             else:
                 # CD no alcanza → se descuenta proporcionalmente del resto
-                restante = suma_negativos - cd['stock']
-                cd['stock'] = 0
+                restante = suma_negativos - cd['stock_disponible']
+                cd['stock_disponible'] = 0
 
-                positivas = [b for b in data_real if b['stock'] > 0 and b['bodega'] != 'ME']
-                total_positivo = sum(b['stock'] for b in positivas)
+                positivas = [b for b in data_real if b['stock_disponible'] > 0 and b['bodega'] != 'ME']
+                total_positivo = sum(b['stock_disponible'] for b in positivas)
 
                 if total_positivo > 0:
                     # Usar proporción exacta (sin redondear aún)
                     descuentos = []
                     acumulado = 0
                     for i, b in enumerate(positivas):
-                        proporcion = b['stock'] / total_positivo
+                        proporcion = b['stock_disponible'] / total_positivo
                         descuento = restante * proporcion
                         # Redondeo solo en el último para evitar error acumulado
                         if i < len(positivas) - 1:
@@ -1183,25 +1183,24 @@ def calcular_stock_total(data):
                         descuentos.append((b, descuento))
 
                     for b, descuento in descuentos:
-                        b['stock'] = max(b['stock'] - descuento, 0)
+                        b['stock_disponible'] = max(b['stock_disponible'] - descuento, 0)
 
                 # Poner negativos en 0 después del ajuste
                 for b in negativos:
-                    b['stock'] = 0
-
+                    b['stock_disponible'] = 0
         # === 2.2 CD (ME) negativo ===
-        elif cd and cd['stock'] < 0:
-            deficit = abs(cd['stock'])
-            cd['stock'] = 0
+        elif cd and cd['stock_disponible'] < 0:
+            deficit = abs(cd['stock_disponible'])
+            cd['stock_disponible'] = 0
 
-            positivas = [b for b in data_real if b['stock'] > 0 and b['bodega'] != 'ME']
-            total_positivo = sum(b['stock'] for b in positivas)
+            positivas = [b for b in data_real if b['stock_disponible'] > 0 and b['bodega'] != 'ME']
+            total_positivo = sum(b['stock_disponible'] for b in positivas)
 
             if total_positivo > 0:
                 descuentos = []
                 acumulado = 0
                 for i, b in enumerate(positivas):
-                    proporcion = b['stock'] / total_positivo
+                    proporcion = b['stock_disponible'] / total_positivo
                     descuento = deficit * proporcion
                     if i < len(positivas) - 1:
                         descuento = int(descuento)
@@ -1211,10 +1210,10 @@ def calcular_stock_total(data):
                     descuentos.append((b, descuento))
 
                 for b, descuento in descuentos:
-                    b['stock'] = max(b['stock'] - descuento, 0)
+                    b['stock_disponible'] = max(b['stockstock_disponible'] - descuento, 0)
 
             for b in negativos:
-                b['stock'] = 0
+                b['stock_disponible'] = 0
 
     return data_real
 
@@ -1236,14 +1235,13 @@ def obtenerStockBodegas(request):
         data = [
             {
                 'bodega': item.idBodega.codigo,
-                'stock': item.stock
+                'stock': item.stock_disponible_real
             }
             for item in stock_por_bodegas
         ]
 
         if producto.TreeType == 'iSalesTree':
             stockTotal = producto.stockTotal
-            print(f"data 1: {data}")
 
             data.append({
                 'product_type': producto.TreeType,

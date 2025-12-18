@@ -263,7 +263,7 @@ class ComunaDBper(admin.ModelAdmin):
 
 
 class stockBodegasDBper(admin.ModelAdmin):
-    list_display = ("idProducto", "idBodega", "stock", "stockDisponibleReal")
+    list_display = ("idProducto", "idBodega", "stock_disponible", "stock_fisico", "stock_disponible_real", "stock_comprometido")
     search_fields = ["idProducto", "idBodega"]
 
 

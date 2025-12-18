@@ -26,11 +26,10 @@ class StockService:
         """
         Actualiza el stock de una bodega específica y el stock total del producto.
         """
-        print(f"Actualizando stock para SKU {sku} en Bodega {bodega_id} | Nueva Cantidad: {nueva_cantidad} (stock actual: {stock_actual})")
         stock_bodega = StockBodegasDB.objects.select_for_update().filter(idProducto__codigo=sku, idBodega=bodega_id).first()
 
         # Determinar si se está agregando o quitando stock
-        stock_bodega.stock = nueva_cantidad + stock_actual
+        stock_bodega.stock_disponible_real = nueva_cantidad + stock_actual
 
         stock_bodega.save()
 
@@ -44,7 +43,6 @@ class StockService:
         - Si ajuste es positivo: se suma al stock
         - Si ajuste es negativo: se resta del stock
         """
-        print(f"Ajustando stock para SKU {sku} en Bodega {bodega_id} | Ajuste: {ajuste} (stock actual: {stock_actual})")
         
         # Verificar si el registro existe
         stock_bodega = StockBodegasDB.objects.select_for_update().filter(
@@ -54,8 +52,7 @@ class StockService:
         if stock_bodega:
             # Aplicar el ajuste al stock actual (no reemplazar)
             nuevo_stock = stock_actual + ajuste
-            stock_bodega.stock = nuevo_stock
-            print(f"Nuevo stock para SKU {sku} en Bodega {bodega_id}: {nuevo_stock}")
+            stock_bodega.stock_disponible_real = nuevo_stock
             stock_bodega.save()
 
             # Actualizar el stock total del producto
@@ -65,8 +62,7 @@ class StockService:
             # Si no existe el registro, crearlo si es necesario
             try:
                 producto = ProductoDB.objects.get(codigo=sku)
-                print(f"Creando nuevo registro de stock para SKU {sku} en Bodega {bodega_id}")
-                
+
                 # Para una nueva línea, el stock inicial debería ser 0 + el ajuste
                 nuevo_stock = ajuste  # Esto podría ser negativo si estamos restando stock
                 
@@ -90,9 +86,8 @@ class StockService:
 
     def actualizar_stock_total(self, sku):
         """ Actualiza el stock total sumando los stocks de todas las bodegas del producto """
-        print(f"Actualizando stock total para SKU {sku}")
         
-        stock_total = StockBodegasDB.objects.filter(idProducto__codigo=sku).aggregate(total=Sum('stock'))['total'] or 0
+        stock_total = StockBodegasDB.objects.filter(idProducto__codigo=sku).aggregate(total=Sum('stock_disponible_real'))['total'] or 0
 
         producto = ProductoDB.objects.filter(codigo=sku).first()
         if producto:

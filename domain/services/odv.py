@@ -311,7 +311,7 @@ class OrdenVenta(Documento):
             for (sku, bodega_id), cantidad_total in stock_anterior.items():
                 stock_actual = StockBodegasDB.objects.filter(
                     idProducto__codigo=sku, idBodega=bodega_id
-                ).values_list('stock', flat=True).first() or 0
+                ).values_list('stock_disponible_real', flat=True).first() or 0
                 
                 # Capturar el stock actual en memoria para referencia
                 stock_service.capture_initial_stock(sku, bodega_id, stock_actual)
@@ -357,7 +357,7 @@ class OrdenVenta(Documento):
                     if stock_actual == 0:  # Si no teníamos registro previo, buscar en la DB
                         stock_actual = StockBodegasDB.objects.filter(
                             idProducto__codigo=sku, idBodega=bodega_id
-                        ).values_list('stock', flat=True).first() or 0
+                        ).values_list('stock_disponible_real', flat=True).first() or 0
                         stock_service.capture_initial_stock(sku, bodega_id, stock_actual)
                     
                     # Restar del stock disponible (es una nueva venta)
@@ -439,7 +439,7 @@ class OrdenVenta(Documento):
                 bodega_id = item['WarehouseCode']
                 cantidad = item['Quantity']
 
-                stock_actual = StockBodegasDB.objects.filter(idProducto__codigo=sku, idBodega=bodega_id).values_list('stock', flat=True).first() or 0 # Capturar el stock inicial antes de descontarl
+                stock_actual = StockBodegasDB.objects.filter(idProducto__codigo=sku, idBodega=bodega_id).values_list('stock_disponible_real', flat=True).first() or 0 # Capturar el stock inicial antes de descontarl
                 stock_inicial.append((sku, bodega_id, stock_actual))  # Guardar para rollback
                 stock_service.actualizar_stock(sku, bodega_id, -cantidad, stock_actual) # Descontar stock
 
@@ -491,7 +491,7 @@ class OrdenVenta(Documento):
             logger.error(f"Error al crear la cotización: {str(e)}")
             # Rollback del stock si algo falla
             for sku, bodega_id, stock_original in stock_inicial:
-                StockBodegasDB.objects.filter(idProducto__codigo=sku, idBodega=bodega_id).update(stock=stock_original)
+                StockBodegasDB.objects.filter(idProducto__codigo=sku, idBodega=bodega_id).update(stock_disponible_real=stock_original)
 
             return {'error': str(e)}
 
@@ -571,7 +571,7 @@ class OrdenVenta(Documento):
             if (item_code, warehouse_code) not in stock_validado:
                 stock_en_bodega = StockBodegasDB.objects.filter(
                     idProducto__codigo=item_code, idBodega=warehouse_code
-                ).values_list("stock", flat=True).first() or 0
+                ).values_list("stock_disponible_real", flat=True).first() or 0
 
                 # Ajustar stock disponible si DocEntry tiene un valor
                 if doc_entry:  

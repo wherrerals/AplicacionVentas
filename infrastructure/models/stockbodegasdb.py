@@ -5,8 +5,10 @@ from infrastructure.models.productodb import ProductoDB
 class StockBodegasDB(models.Model):
     idProducto = models.ForeignKey(ProductoDB, on_delete=models.CASCADE)
     idBodega = models.ForeignKey(BodegaDB, on_delete=models.CASCADE)
-    stock = models.IntegerField(default=-1)
-    stockDisponibleReal = models.IntegerField(default=-1)
+    stock_disponible = models.IntegerField(default=-1) # stock disponible Real anteriormente stock, instock - commited
+    stock_fisico = models.IntegerField(default=-1) #antes stockDisponibleReal
+    stock_disponible_real = models.IntegerField(default=-1) # stock procesado por studio Go
+    stock_comprometido = models.IntegerField(default=0) # stock comprometido para ventas
 
     class Meta:
         db_table = "StockBodegas"
