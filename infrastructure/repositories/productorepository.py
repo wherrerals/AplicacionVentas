@@ -90,8 +90,6 @@ class ProductoRepository:
 
         return True, productos_procesados
     
-    def calcular_stock_real_bodegas(self, item_code):
-
 
     def calcular_stock_y_costo_receta(self, item_code):
         """Calcula el stock total de la receta y el costo total."""

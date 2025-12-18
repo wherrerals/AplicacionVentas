@@ -1158,7 +1158,7 @@ def calcular_stock_total(data):
                 # CD cubre todo el negativo
                 cd['stock_disponible'] -= suma_negativos
                 for b in negativos:
-                    b['stockstock_disponible'] = 0
+                    b['stock_disponible'] = 0
             else:
                 # CD no alcanza → se descuenta proporcionalmente del resto
                 restante = suma_negativos - cd['stock_disponible']
