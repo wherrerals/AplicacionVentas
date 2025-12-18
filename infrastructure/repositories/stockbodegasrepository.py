@@ -1,5 +1,4 @@
 from infrastructure.models import StockBodegasDB
-from presentation.views.view import calcular_stock_total
 
 class StockBodegasRepository:
     def consultarStockPorProducto(self, producto_id):
