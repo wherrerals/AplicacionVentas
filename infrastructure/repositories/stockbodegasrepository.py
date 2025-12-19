@@ -39,8 +39,7 @@ class StockBodegasRepository:
         # Implementar la lógica para calcular el stock real de bodegas
         print("Calculando stock real para el item_code: ", item_code)
 
-        repo = StockBodegasRepository()
-        stock_por_bodegas = repo.consultarStockPorProducto(item_code)
+        stock_por_bodegas = self.consultarStockPorProducto(item_code)
 
         data = [
             {
@@ -50,13 +49,15 @@ class StockBodegasRepository:
             for item in stock_por_bodegas
         ]
 
-        data = self.calcular_stock_total(data)
-        data_processed = self.actualizar_stcok_disponible_real(item_code, data)
+        data_processed = self.normalizar_stock_bodegas(data)
+        self.actualizar_stock_disponible_real(item_code, data)
 
         print("data_processed: ", data_processed)
+
+        return data_processed
     
 
-    def actualizar_stcok_disponible_real(self, item_code, data):
+    def actualizar_stock_disponible_real(self, item_code, data):
 
         for entrada in data:
             try:
@@ -74,7 +75,7 @@ class StockBodegasRepository:
                 continue
 
 
-    def calcular_stock_total(self, data):
+    def normalizar_stock_bodegas(self, data):
         from infrastructure.repositories.productorepository import ProductoRepository
         pr = ProductoRepository()
 
@@ -95,7 +96,7 @@ class StockBodegasRepository:
         # === Regla 2: total positivo y hay bodegas con stock negativo ===
         negativos = [b for b in data_real if b['stock_procesado'] < 0]
         if negativos:
-            cd = next((b for b in data_real if b['stock_procesado'] == 'ME'), None)
+            cd = next((b for b in data_real if b['bodega'] == 'ME'), None)
             suma_negativos = abs(sum(b['stock_procesado'] for b in negativos))
 
             # === 2.1 CD (ME) positivo ===

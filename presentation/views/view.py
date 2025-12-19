@@ -1149,7 +1149,7 @@ def calcular_stock_total(data):
     # === Regla 2: total positivo y hay bodegas con stock negativo ===
     negativos = [b for b in data_real if b['stock_disponible'] < 0]
     if negativos:
-        cd = next((b for b in data_real if b['stock_disponible'] == 'ME'), None)
+        cd = next((b for b in data_real if b['bodega'] == 'ME'), None)
         suma_negativos = abs(sum(b['stock_disponible'] for b in negativos))
 
         # === 2.1 CD (ME) positivo ===

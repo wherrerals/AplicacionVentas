@@ -137,6 +137,8 @@ class ProductoRepository:
                 # Actualizar el stock por bodega (mínimo entre todos los componentes)
                 stock_por_bodega[bodega] = min(stock_por_bodega[bodega], stock_disponible)
 
+                print(f"Componente {item_code_componente} Bodega {bodega} Stock Componente: {stock_bodega} Cantidad Necesaria: {cantidad_necesaria} Stock Disponible Receta en Bodega: {stock_disponible}")
+
             # Sumar el costo total de la receta
             costo_total += costo_componente * cantidad_necesaria
 
