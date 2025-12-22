@@ -10,6 +10,8 @@ urlpatterns = [
     path('ventas/', include('presentation.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('upload/', include('uploadApp.urls')),
+    path('api/v1/sgo/', include('api_go.urls')),
+
 ]  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

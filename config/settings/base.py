@@ -28,6 +28,7 @@ LOCAL_APPS = [
     "taskApp",
     "logs",
     "uploadApp",
+    "api_go",
 ]
 
 THIRD_APPS = []

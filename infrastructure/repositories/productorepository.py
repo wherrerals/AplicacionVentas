@@ -51,10 +51,12 @@ class ProductoRepository:
                 precio_venta, costo, rentabilidad_minima
             )
 
+            nombre = product.get("ItemName") or ""
+
             producto, _ = ProductoDB.objects.update_or_create(
                 codigo=item_code,
                 defaults={
-                    "nombre": product.get("ItemName", ""),
+                    "nombre": nombre,
                     "marca": product.get("U_LED_MARCA", ""),
                     "costo": costo,
                     "precioLista": precio_lista,
