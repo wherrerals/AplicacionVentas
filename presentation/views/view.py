@@ -34,6 +34,8 @@ from domain.services.coupons import Coupons
 from domain.services.direccion import Direccion
 from domain.services.producto import Producto
 from domain.services.socionegocio import SocioNegocio
+from django.contrib.auth import authenticate
+
 #librerias Python usadas
 import requests
 import json
@@ -1824,8 +1826,50 @@ def restaurar_precios(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-def update_stock_view(request):
 
-    data = json.loads(request.body)
-    process = ProductoRepository().sync_products_and_stock2(data)
-    return JsonResponse({'status': 'Stock actualizado', 'details': process}, status=200)
+@csrf_exempt
+@require_POST
+def update_stock_view(request):
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+
+        auth_data = payload.get("auth")
+        products = payload.get("products")
+
+        if not auth_data:
+            return JsonResponse({"error": "auth is required"}, status=400)
+
+        if not isinstance(products, list):
+            return JsonResponse(
+                {"error": "products must be a list"},
+                status=400
+            )
+
+        user = authenticate(
+            username=auth_data.get("username"),
+            password=auth_data.get("password")
+        )
+
+        if user is None:
+            return JsonResponse(
+                {"error": "Invalid credentials"},
+                status=401
+            )
+
+        result = ProductoRepository().sync_products_and_stock2(products)
+
+        return JsonResponse(
+            {
+                "status": "ok",
+                "executed_by": user.username,
+                "processed": len(products),
+                "result": result
+            },
+            status=200
+        )
+
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

@@ -20,6 +20,119 @@ class ProductoRepository:
             margen_bruto = (precio_sin_iva - costo) / precio_sin_iva
             descuento_maximo = margen_bruto - (rentabilidad_minima / 100)
             return margen_bruto, max(descuento_maximo, 0)  # Asegurar que no sea negativo
+        
+
+    def sync_products_and_stock2(self, products):
+
+        rentabilidad_minima = 50
+        productos_procesados = []
+
+        for product in products:
+
+            item_code = product.get("ItemCode")
+            if not item_code:
+                continue
+
+            # Precio venta (lista 2)
+            precio_venta = next(
+                (p["Price"] for p in product.get("ItemPrices", []) if p["PriceList"] == 2),
+                0.0
+            )
+
+            # Precio lista (lista 3)
+            precio_lista = next(
+                (p["Price"] for p in product.get("ItemPrices", []) if p["PriceList"] == 3),
+                0.0
+            )
+
+            costo = product.get("AvgStdPrice", 0.0)
+
+            margen_bruto, descuento_maximo = self.calculate_margen_descuentos(
+                precio_venta, costo, rentabilidad_minima
+            )
+
+            producto, _ = ProductoDB.objects.update_or_create(
+                codigo=item_code,
+                defaults={
+                    "nombre": product.get("ItemName", ""),
+                    "marca": product.get("U_LED_MARCA", ""),
+                    "costo": costo,
+                    "precioLista": precio_lista,
+                    "precioVenta": precio_venta,
+                    "dsctoMaxTienda": descuento_maximo,
+                    "dctoMaxProyectos": descuento_maximo,
+                    "TreeType": product.get("TreeType", ""),
+                    "inactivo": "Y" if product.get("Frozen") else "N",
+                }
+            )
+
+            # Recetas
+            if product.get("TreeType") == "iSalesTree":
+                stock_receta, costo_receta = self.calcular_stock_y_costo_receta(item_code)
+
+                producto.stockTotal = stock_receta
+                producto.costo = costo_receta
+
+                margen_bruto, descuento_maximo = self.calculate_margen_descuentos(
+                    precio_venta, costo_receta, rentabilidad_minima
+                )
+
+                producto.dsctoMaxTienda = descuento_maximo
+                producto.dctoMaxProyectos = descuento_maximo
+                producto.save()
+
+                StockBodegasRepository().calcular_stock_real_bodegas(item_code)
+
+            # Productos normales
+            else:
+                self.sync_stock2(producto, product.get("ItemWarehouseInfoCollection", []))
+                self.update_stock_total2(producto)
+                StockBodegasRepository().calcular_stock_real_bodegas(item_code)
+
+            productos_procesados.append(producto.codigo)
+
+        return True, productos_procesados
+    
+
+    def sync_stock2(self, producto, bodegas):
+
+        for bodega_data in bodegas:
+
+            warehouse_code = bodega_data.get("WarehouseCode")
+            if not warehouse_code:
+                continue
+
+            try:
+                bodega = BodegaDB.objects.get(codigo=warehouse_code)
+            except BodegaDB.DoesNotExist:
+                continue
+
+            stock_fisico = bodega_data.get("InStock", 0)
+            stock_comprometido = bodega_data.get("Committed", 0)
+            stock_disponible = bodega_data.get("AvailableStock", 0)
+
+            StockBodegasDB.objects.update_or_create(
+                idProducto=producto,
+                idBodega=bodega,
+                defaults={
+                    "stock_fisico": stock_fisico,
+                    "stock_comprometido": stock_comprometido,
+                    "stock_disponible": stock_disponible,
+                }
+            )
+
+    def update_stock_total2(self, producto):
+
+        stock_total = (
+            StockBodegasDB.objects
+            .filter(idProducto=producto)
+            .aggregate(total=Sum("stock_disponible"))
+            .get("total") or 0
+        )
+
+        producto.stockTotal = stock_total
+        producto.save(update_fields=["stockTotal"])
+
 
     def sync_products_and_stock(self, products):
 
