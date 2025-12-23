@@ -88,7 +88,7 @@ class Producto {
             console.log("Stock filtrado en actualizar Stock:", stockFiltrado);
     
             // Calcular el stock total sumando solo las bodegas válidas
-            const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock, 0);
+            const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock_disponible, 0);
             const treeTypeItem = stockData.find(item => item.product_type === 'iSalesTree');
 
     
@@ -113,7 +113,7 @@ class Producto {
             const bodegaSeleccionada = bodegaMap[valueSeleccionado];
     
             // Encontrar el stock de la bodega seleccionada
-            const stockBodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock || 0;
+            const stockBodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock_disponible || 0;
             const name_bodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.bodega || 0;
     
             console.log("Bodega seleccionada zzzzz:", name_bodega);
@@ -129,7 +129,7 @@ class Producto {
             for (const bodega of stockFiltrado) {
                 const optionElement = selectBodega.querySelector(`option[id="${bodega.bodega}"]`);
                 if (optionElement) {
-                    optionElement.setAttribute('data-stock', bodega.stock);
+                    optionElement.setAttribute('data-stock', bodega.stock_disponible);
                     // Opcionalmente, puedes mostrar el stock en el texto del option
                     // optionElement.textContent = `${bodega.bodega} (${bodega.stock})`;
                 }
@@ -296,7 +296,7 @@ class Producto {
                 const stockFiltrado = stockData.filter(bodega => bodega.bodega in bodegaMap);
                 // Crear el contenido del tooltip solo con las bodegas válidas
                 const tooltipContent = stockFiltrado
-                    .map(bodega => `${bodega.bodega}: ${bodega.stock}`)
+                    .map(bodega => `${bodega.bodega}: ${bodega.stock_disponible}`)
                     .join('\n');
 
                 // Asignar el contenido del tooltip

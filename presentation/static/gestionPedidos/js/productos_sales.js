@@ -49,7 +49,7 @@ class Producto {
 
             const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
 
-            const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock, 0);
+            const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock_disponible, 0);
 
             const stockTotalElem = row.querySelector('[name="stock_total"]');
             stockTotalElem.textContent = `Total: ${stockTotal}`;
@@ -59,7 +59,7 @@ class Producto {
 
             const bodegaSeleccionada = bodegaMap[valueSeleccionado];
 
-            const stockBodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock || 0;
+            const stockBodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock_disponible || 0;
 
             const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
             stockBodegaElem.textContent = `Stock: ${stockBodega}`;
@@ -182,7 +182,7 @@ class Producto {
 
                 // Crear el contenido del tooltip solo con las bodegas válidas
                 const tooltipContent = stockFiltrado
-                    .map(bodega => `${bodega.bodega}: ${bodega.stock}`)
+                    .map(bodega => `${bodega.bodega}: ${bodega.stock_disponible}`)
                     .join('\n');
 
                 // Asignar el contenido del tooltip

@@ -1237,7 +1237,7 @@ def obtenerStockBodegas(request):
         data = [
             {
                 'bodega': item.idBodega.codigo,
-                'stock_disponible': item.stock_disponible
+                'stock_disponible': item.stock_disponible_real
             }
             for item in stock_por_bodegas
         ]
@@ -1249,12 +1249,6 @@ def obtenerStockBodegas(request):
                 'product_type': producto.TreeType,
                 'stock_total': stockTotal
             })
-            print("Producto es de tipo iSalesTree")
-            print(f"Data: {data}")
-        else:
-            data = calcular_stock_total(data)
-            print("Producto no es de tipo iSalesTree")
-            print(f"Data ajustada: {data}")
 
         return JsonResponse(data, safe=False, status=200)
 

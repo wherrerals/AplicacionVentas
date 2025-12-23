@@ -1,5 +1,6 @@
 import json
 from django.contrib.auth import authenticate
+from adapters.sl_client import APIClient
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from infrastructure.repositories.productorepository import ProductoRepository
@@ -28,7 +29,9 @@ class ProductsAPIView(APIView):
         if user is None:
             return Response({"error": "Invalid credentials"}, status=401)
 
-        result = ProductoRepository().sync_products_and_stock2(products)
+        result, list_product = ProductoRepository().sync_products_and_stock2(products)
+        cliente = APIClient()
+        cliente.bacth_processes_products(list_product)
 
         return Response(
             {
