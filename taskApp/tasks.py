@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 from weasyprint import HTML
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+from infrastructure.repositories.productorepository import ProductoRepository
 
 @shared_task
 def prueba12(datos):
@@ -232,3 +233,21 @@ pdf_options = {
     'encoding': 'UTF-8',
 }
  """
+
+
+
+@shared_task(
+    queue="q_sync_products",
+    bind=True,
+    autoretry_for=(Exception,),
+)
+def sync_products_task(self, products):
+    print("Tarea Programada")
+    repo = ProductoRepository()
+    result, list_product = repo.sync_products_and_stock2(products)
+
+    print("finalizada")
+    return {
+        "processed": len(products),
+        "result": list_product,
+    }

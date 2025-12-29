@@ -40,5 +40,7 @@ class BatchProduct:
 
         body = "\n".join(body_parts)
 
+        print(f"boy patch{body}")
+
         return body, boundary, changeset_boundary
 

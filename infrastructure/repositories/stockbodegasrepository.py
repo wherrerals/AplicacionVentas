@@ -157,7 +157,7 @@ class StockBodegasRepository:
                         descuentos.append((b, descuento))
 
                     for b, descuento in descuentos:
-                        b['stock_procesado'] = max(b['stockstock_disponible'] - descuento, 0)
+                        b['stock_procesado'] = max(b['stock_procesado'] - descuento, 0)
 
                 for b in negativos:
                     b['stock_procesado'] = 0
