@@ -93,6 +93,9 @@ class ProductoRepository:
 
             productos_procesados.append(producto.codigo)
 
+        cliente = APIClient()
+        cliente.bacth_processes_products(productos_procesados)
+        
         return True, productos_procesados
     
 

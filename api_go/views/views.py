@@ -4,6 +4,7 @@ from adapters.sl_client import APIClient
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from infrastructure.repositories.productorepository import ProductoRepository
+from taskApp.tasks import sync_products_task
 
 
 class ProductsAPIView(APIView):
@@ -12,8 +13,6 @@ class ProductsAPIView(APIView):
     def post(self, request):
         auth_data = request.data.get("auth")
         products = request.data.get("products")
-
-        print(f"productos recibidos: {products}")
 
         if not auth_data:
             return Response({"error": "auth is required"}, status=400)
@@ -29,16 +28,14 @@ class ProductsAPIView(APIView):
         if user is None:
             return Response({"error": "Invalid credentials"}, status=401)
 
-        result, list_product = ProductoRepository().sync_products_and_stock2(products)
-        cliente = APIClient()
-        cliente.bacth_processes_products(list_product)
+        task = sync_products_task.delay(products)
 
         return Response(
             {
                 "status": "ok",
                 "executed_by": user.username,
                 "processed": len(products),
-                "result": result,
+                "result": task.id,
             },
             status=200,
         )
