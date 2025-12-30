@@ -196,6 +196,27 @@ services:
       - a_network
       - shared_network
 
+  celery-worker-product-api-sgo:
+    build:
+      context: .
+      dockerfile: ./docker/dockerfile.app
+    image: cw-celery-worker-sgo:prod
+    container_name: cw-celery-worker-sgo
+    command: celery -A config worker -l info -Q q_sync_products
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_started
+    volumes:
+      - .:/app
+    environment:
+      DJANGO_SETTINGS_MODULE: "config.settings.production"
+      CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
+    networks:
+      - a_network
+      - shared_network
+
 volumes:
   mysql_data:
   media_data:
