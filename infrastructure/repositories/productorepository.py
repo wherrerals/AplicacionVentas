@@ -68,10 +68,16 @@ class ProductoRepository:
                 }
             )
 
+            # Recetas
+            if product.get("TreeType") == "iSalesTree":
+                print(f"prosesando reseta")
+                self.sync_stock2(producto, product.get("ItemWarehouseInfoCollection", []))
+                self.update_stock_total2(producto)
 
-            self.sync_stock2(producto, product.get("ItemWarehouseInfoCollection", []))
-            self.update_stock_total2(producto)
-            #StockBodegasRepository().calcular_stock_real_bodegas(item_code)
+            else:
+                self.sync_stock2(producto, product.get("ItemWarehouseInfoCollection", []))
+                self.update_stock_total2(producto)
+                #StockBodegasRepository().calcular_stock_real_bodegas(item_code)
 
             productos_procesados.append(producto.codigo)
 
