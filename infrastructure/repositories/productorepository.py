@@ -68,28 +68,10 @@ class ProductoRepository:
                 }
             )
 
-            # Recetas
-            if product.get("TreeType") == "iSalesTree":
-                stock_receta, costo_receta = self.calcular_stock_y_costo_receta(item_code)
 
-                producto.stockTotal = stock_receta
-                producto.costo = costo_receta
-
-                margen_bruto, descuento_maximo = self.calculate_margen_descuentos(
-                    precio_venta, costo_receta, rentabilidad_minima
-                )
-
-                producto.dsctoMaxTienda = descuento_maximo
-                producto.dctoMaxProyectos = descuento_maximo
-                producto.save()
-
-                StockBodegasRepository().calcular_stock_real_bodegas(item_code)
-
-            # Productos normales
-            else:
-                self.sync_stock2(producto, product.get("ItemWarehouseInfoCollection", []))
-                self.update_stock_total2(producto)
-                StockBodegasRepository().calcular_stock_real_bodegas(item_code)
+            self.sync_stock2(producto, product.get("ItemWarehouseInfoCollection", []))
+            self.update_stock_total2(producto)
+            #StockBodegasRepository().calcular_stock_real_bodegas(item_code)
 
             productos_procesados.append(producto.codigo)
 
@@ -115,6 +97,7 @@ class ProductoRepository:
             stock_fisico = bodega_data.get("InStock", 0)
             stock_comprometido = bodega_data.get("Committed", 0)
             stock_disponible = bodega_data.get("AvailableStock", 0)
+            stock_disponible_real = bodega_data.get("AvailableStockReal", 0)
 
             StockBodegasDB.objects.update_or_create(
                 idProducto=producto,
@@ -123,6 +106,7 @@ class ProductoRepository:
                     "stock_fisico": stock_fisico,
                     "stock_comprometido": stock_comprometido,
                     "stock_disponible": stock_disponible,
+                    "stock_disponible_real": stock_disponible_real
                 }
             )
 
