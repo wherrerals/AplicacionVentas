@@ -1237,7 +1237,10 @@ def obtenerStockBodegas(request):
         data = [
             {
                 'bodega': item.idBodega.codigo,
-                'stock_disponible': item.stock_disponible_real
+                'stock_disponible': item.stock_disponible_real,
+                'stock_transito': item.stock_disponible,
+                'stock_comprometido': item.stock_comprometido,
+                'stock_arribo': item.stock_disponible
             }
             for item in stock_por_bodegas
         ]
@@ -1249,6 +1252,8 @@ def obtenerStockBodegas(request):
                 'product_type': producto.TreeType,
                 'stock_total': stockTotal
             })
+
+        print(f"Stock por bodegas procesado: {data}")
 
         return JsonResponse(data, safe=False, status=200)
 
