@@ -122,6 +122,26 @@ class Producto {
             const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
             stockBodegaElem.textContent = `Stock: ${stockBodega}`;
             stockBodegaElem.setAttribute('data-stock', stockBodega);  // Almacenar el valor en un atributo data-stock
+
+
+            // otras BODEGAS - TOOLTIP
+
+            const tr_bodega = `TR_${bodegaSeleccionada}`;
+
+
+            const stockTRElem = row.querySelector('[name="stock_tr"]');
+            const stockTR = stockFiltrado.find(bodega => bodega.bodega === tr_bodega)?.stock_transito || 0;
+            stockTRElem.textContent = `TR: ${stockTR}`;
+
+            // Mostrar el stock en arribo
+            const stockArriboElem = row.querySelector('[name="stock_arribo"]');
+            const stockArribo = stockFiltrado.find(bodega => bodega.bodega === 'RECEP_CD')?.stock_arribo || 0;
+            stockArriboElem.textContent = `Arribo: ${stockArribo}`;
+
+            // Mostrar el stock comprometido
+            const stockComprometidoElem = row.querySelector('[name="stock_comprometido"]');
+            const stockComprometido = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock_comprometido || 0;
+            stockComprometidoElem.textContent = `Comp: ${stockComprometido}`;
     
             console.log("Stock actualizado:", stockBodega);
             
@@ -175,10 +195,15 @@ class Producto {
                             </optgroup>
                         </select>
                     </div>
-                    <div class="col" style="text-align: center;">
+                    <div class="col" style="text-align: left;">
                         <small style="font-size: 12px;" name="stock_bodega" id="stock_bodega">Stock: </small>
                         <small name="stock_total" id="stock_total">Total: </small>
                     </div>
+                    </div>
+                    <div class="col" style="text-align: left;">
+                        <small style="font-size: 12px;" name="stock_tr">TR:  </small>
+                        <small style="font-size: 12px;" name="stock_arribo">Arribo:  </small>
+                        <small style="font-size: 12px;" id="stock_comprometido" name="stock_comprometido">Comp: </small>
                     </div>
                 </td>
                 
