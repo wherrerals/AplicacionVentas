@@ -63,8 +63,9 @@ class ProductoRepository:
                     "precioVenta": precio_venta,
                     "dsctoMaxTienda": descuento_maximo,
                     "dctoMaxProyectos": descuento_maximo,
+                    "descontinuado": product.get("U_LED_ARTDESC", "0"),
                     "TreeType": product.get("TreeType", ""),
-                    "inactivo": "Y" if product.get("Frozen") else "N",
+                    "inactivo": product.get("Frozen"),
                 }
             )
 
