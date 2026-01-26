@@ -51,11 +51,12 @@ class Producto {
             };
 
             // Filtrar los datos de stock excluyendo la bodega "GR"
-            const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR" && bodegaMap[bodega.bodega]);
+            const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
+            const stockTotalBodegasValidas = stockData.filter(bodega => bodega.bodega !== "GR" && bodegaMap[bodega.bodega]);
+
 
             // Calcular el stock total sumando solo las bodegas válidas
-            // filtrar stock para incluir solo las bodegas en bodegaMap
-            const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock_disponible, 0);
+            const stockTotal = stockTotalBodegasValidas.reduce((total, bodega) => total + bodega.stock_disponible, 0);
 
             // Mostrar el stock total
             const stockTotalElem = row.querySelector('[name="stock_total"]');
