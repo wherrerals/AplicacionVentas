@@ -241,7 +241,8 @@ class SocioNegocio:
         direcciones_formateadas = []
 
         for direccion in direcciones:
-            if direccion.nombreDireccion not in nombres_direcciones_no_validos:
+            #if direccion.nombreDireccion not in nombres_direcciones_no_validos:
+            if direccion.nombreDireccion:
                 direcciones_formateadas.append({
                     "id": direccion.id,
                     'rowNum': direccion.rowNum,
