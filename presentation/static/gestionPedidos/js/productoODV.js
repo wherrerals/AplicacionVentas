@@ -84,11 +84,13 @@ class Producto {
     
             // Filtrar los datos de stock excluyendo la bodega "GR"
             const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
+            const stockTotalBodegasValidas = stockData.filter(bodega => bodega.bodega !== "GR" && bodegaMap[bodega.bodega]);
+
     
             console.log("Stock filtrado en actualizar Stock:", stockFiltrado);
     
             // Calcular el stock total sumando solo las bodegas válidas
-            const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock_disponible, 0);
+            const stockTotal = stockTotalBodegasValidas.reduce((total, bodega) => total + bodega.stock_disponible, 0);
             const treeTypeItem = stockData.find(item => item.product_type === 'iSalesTree');
 
     
