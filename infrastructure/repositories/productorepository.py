@@ -119,9 +119,12 @@ class ProductoRepository:
 
     def update_stock_total2(self, producto):
 
+        bogegas_permitas = ["LC", "ME", "VI", "PH"]
+
         stock_total = (
             StockBodegasDB.objects
-            .filter(idProducto=producto)
+            .filter(idProducto=producto
+                    , idBodega__in=bogegas_permitas)
             .aggregate(total=Sum("stock_disponible"))
             .get("total") or 0
         )
