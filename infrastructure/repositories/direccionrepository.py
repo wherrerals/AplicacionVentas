@@ -82,8 +82,14 @@ class DireccionRepository:
         
         try:
             # Obtiene la comuna y la región
+            print(f"comuna_id: {comuna_id}, region_id: {region_id}")
+
             comuna = get_object_or_404(ComunaDB, codigo=comuna_id)
-            region = get_object_or_404(RegionDB, numero=region_id)
+
+            if region_id is None:
+                region = comuna.region
+            else:
+                region = get_object_or_404(RegionDB, numero=region_id)
             
             # Obtiene el objeto SocioNegocioDB correspondiente al socio
             socio_obj = get_object_or_404(SocioNegocioDB, codigoSN=socio)
