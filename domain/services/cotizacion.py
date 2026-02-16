@@ -3,6 +3,7 @@ import math
 from django.http import JsonResponse
 from requests import request
 from adapters.sl_client import APIClient
+from adapters.sl_provider import get_api_client
 from infrastructure.models.productodb import ProductoDB
 from infrastructure.repositories.contactorepository import ContactoRepository
 from infrastructure.repositories.direccionrepository import DireccionRepository
@@ -52,7 +53,7 @@ class Cotizacion(Documento):
         """
 
         super().__init__(request)
-        self.client = APIClient()
+        self.client = get_api_client()
         self.cliente = None
         self.items = []
     
@@ -177,7 +178,7 @@ class Cotizacion(Documento):
             tuple: Líneas de documento de la cotización, mensaje de error.
         """
         try:
-            client = APIClient() 
+            client = get_api_client() 
             data = client.obtenerCotizacionesDE('Quotations', doc_entry)
 
             if 'value' not in data:

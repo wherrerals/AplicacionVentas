@@ -7,6 +7,9 @@ import re
 
 from adapters.batch.batch_product import BatchProduct
 
+_api_client_instance = None
+
+
 logger = logging.getLogger(__name__)
 
 

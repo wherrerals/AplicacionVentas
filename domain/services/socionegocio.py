@@ -552,6 +552,45 @@ class SocioNegocio:
                 return {'data': {'success': False, 'message': f'Error al decodificar JSON: {str(e)}'}, 'status': 400}
 
 
+    @staticmethod
+    def buscar(termino):
+
+        clientes = SocioNegocioRepository.buscar_clientes(termino)
+
+        resultados = []
+
+        for socio in clientes:
+            rut = socio.rut.split("-")[0] if "-" in socio.rut else socio.rut
+
+            direcciones = SocioNegocio.formatear_direcciones(
+                socio.direcciondb_set.all()
+            )
+
+            contactos = SocioNegocio.formatear_contactos(
+                socio.contactodb_set.all()
+            )
+
+            resultados.append({
+                "id": rut,
+                "nombre": socio.nombre,
+                "apellido": socio.apellido,
+                "razonSocial": socio.razonSocial,
+                "codigoSN": socio.codigoSN,
+                "rut": socio.rut,
+                "email": socio.email,
+                "telefono": socio.telefono,
+                "giro": socio.giro,
+                "condicionPago": socio.condicionPago,
+                "plazoReclamaciones": socio.plazoReclamaciones,
+                "clienteExportacion": socio.clienteExportacion,
+                "vendedor": socio.vendedor,
+                "direcciones": direcciones,
+                "contactos": contactos,
+            })
+
+        return resultados
+
+
     def infoCliente(self, identificador, buscar_por_nombre=False):
 
         try:

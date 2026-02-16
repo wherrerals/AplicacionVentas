@@ -1,3 +1,4 @@
+import re
 from django.http import JsonResponse
 from django.views.generic import View, FormView
 from adapters.sl_client import APIClient
@@ -107,8 +108,33 @@ class SocioNegocioView(FormView):
                     },
                     status=400)
 
-            
+
+    def _normalizar_numero(self, numero: str) -> str:
+        limpio = re.sub(r'[^0-9A-Za-z]', '', numero)
+        return limpio[:-1]
+
     def busquedaSocioNegocio(self, request):
+
+        if request.method != "GET":
+            return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+        termino = (
+            request.GET.get("numero", "").strip() or
+            request.GET.get("nombre", "").strip()
+        )
+
+        if not termino:
+            return JsonResponse({'error': 'Debe proporcionar un valor válido'})
+
+        resultados = SocioNegocio.buscar(termino)
+
+        if not resultados:
+            return JsonResponse({'error': 'No se encontraron resultados'})
+
+        return JsonResponse({'resultadosClientes': resultados})
+
+
+    def busquedaSocioNegocio2(self, request):
         """
         Método para buscar un socio de negocio
 
@@ -127,8 +153,8 @@ class SocioNegocioView(FormView):
 
                 # Búsqueda por número (rut)
                 if numero:
-                    # Limpiar la "C" al final del número si existe
-                    numero = numero.replace('C', '').replace('c', '')
+                    # Limpiar la "C" al final del número si existe y limpiar guiones y el numero que le sigue si existe 
+                    numero = self._normalizar_numero(numero)
                                         
                     resultados_por_numero = SocioNegocio.buscarSocioNegocio(numero)
                     resultados.extend(resultados_por_numero)

@@ -1,4 +1,8 @@
+from django.db.models import Q, Prefetch
+
 from infrastructure.models import SocioNegocioDB
+from infrastructure.models.direcciondb import DireccionDB
+
 
 
 class SocioNegocioRepository:
@@ -218,3 +222,43 @@ class SocioNegocioRepository:
             return cliente.rut
         except SocioNegocioDB.DoesNotExist:
             return None
+        
+    
+
+class SocioNegocioRepository:
+
+    @staticmethod
+    def buscar_clientes(termino):
+
+        termino = termino.strip()
+
+        return (
+            SocioNegocioDB.objects
+            .filter(
+                Q(nombre__icontains=termino) |
+                Q(rut__icontains=termino) |
+                Q(razonSocial__icontains=termino)
+            )
+            .prefetch_related(
+                Prefetch(
+                    "direcciondb_set",
+                    queryset=DireccionDB.objects.select_related("comuna", "region")
+                ),
+                "contactodb_set"
+            )
+            .only(
+                "codigoSN",
+                "nombre",
+                "apellido",
+                "razonSocial",
+                "rut",
+                "email",
+                "telefono",
+                "giro",
+                "condicionPago",
+                "plazoReclamaciones",
+                "clienteExportacion",
+                "vendedor"
+            )
+            .order_by("nombre")[:20]
+        )
