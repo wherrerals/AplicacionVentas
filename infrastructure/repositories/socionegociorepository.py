@@ -224,9 +224,6 @@ class SocioNegocioRepository:
             return None
         
     
-
-class SocioNegocioRepository:
-
     @staticmethod
     def buscar_clientes(termino):
 
