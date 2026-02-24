@@ -223,7 +223,6 @@ class SocioNegocioRepository:
         except SocioNegocioDB.DoesNotExist:
             return None
         
-
     @staticmethod
     def buscar_clientes(termino):
 
