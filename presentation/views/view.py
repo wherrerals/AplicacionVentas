@@ -1226,6 +1226,11 @@ def obtenerStockBodegas(request):
 
     producto = ProductoDB.objects.filter(codigo=producto_id).first()
 
+    # producto = None return nada 
+
+    if not producto:
+        return JsonResponse({'error': 'Producto no encontrado'}, status=404)
+
     if not producto_id:
         return JsonResponse({'error': 'Falta el parámetro: idProducto es obligatorio'}, status=400)
 
@@ -1252,8 +1257,6 @@ def obtenerStockBodegas(request):
                 'product_type': producto.TreeType,
                 'stock_total': stockTotal
             })
-
-        print(f"Stock por bodegas procesado: {data}")
 
         return JsonResponse(data, safe=False, status=200)
 

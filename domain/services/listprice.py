@@ -53,9 +53,7 @@ class ListPriceService:
         """Retorna el precio de la lista de precios para el producto"""
         self.load_data()
         if not (self.is_valid_by_date() and self.list_price_is_active()):
-            print("Lista de precios no válida o inactiva")
             return 0.0
-        print("Lista de precios válida y activa")
         return self.list_price_product.price_list
     
     def new_discounted_price(self) -> float:
@@ -64,18 +62,14 @@ class ListPriceService:
         self.load_data()
 
         if not self.list_price_product:
-            print("No hay lista de precios asociada")
-            # No hay lista de precios asociada
             return 0.0
 
-        print("Calculando margen y descuento...")
         margen_bruto, descuento = repo.calculate_margen_descuentos(
             float(self.list_price_product.price_list),
             self.costo,
             self.rentability
         )
 
-        print(f"Margen bruto: {margen_bruto}, Descuento aplicado: {descuento}")
         return descuento
 
     
@@ -85,8 +79,6 @@ class ListPriceService:
 
 
         new_price = self.get_price()
-        print(f"validando precio: {new_price}")
-
         new_discounted_price = self.new_discounted_price()
 
         if new_price == 0.0:

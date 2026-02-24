@@ -1,13 +1,8 @@
-import json
 import math
-from django.http import JsonResponse
-from requests import request
-from adapters.sl_client import APIClient
+from adapters.sl_provider import get_api_client
 from infrastructure.models.productodb import ProductoDB
 from infrastructure.models.stockbodegasdb import StockBodegasDB
-from infrastructure.repositories.contactorepository import ContactoRepository
 from infrastructure.repositories.couponrepository import CouponRepository
-from infrastructure.repositories.direccionrepository import DireccionRepository
 from infrastructure.repositories.productorepository import ProductoRepository
 from infrastructure.repositories.stockbodegasrepository import StockBodegasRepository
 from infrastructure.repositories.vendedorRepository import VendedorRepository
@@ -21,6 +16,22 @@ from taskApp.tasks import update_components_task
 logger = logging.getLogger(__name__)
 
 class OrdenVenta(Documento):
+
+
+    def __init__(self, request=None):
+        
+        """
+        Inicializa una nueva instancia de la clase Cotizacion.
+
+        Args:
+            request (dict): Datos de la cotización.
+        """
+
+        super().__init__(request)
+        self.client = get_api_client()
+        self.cliente = None
+        self.items = []
+    
 
 
     def construirFiltrosODV(data):
@@ -273,10 +284,10 @@ class OrdenVenta(Documento):
                 return {'error': errores}
 
             stock_service = StockService()
-            apiClient = APIClient()
+            client = get_api_client()
 
             # Obtener líneas del documento antes de actualizar stock
-            documents_lines = apiClient.detallesOrdenVentaLineas(docentry) 
+            documents_lines = client.detallesOrdenVentaLineas(docentry) 
 
             # Almacenar el stock inicial por SKU y bodega, sumando todas las cantidades
             stock_anterior = {}
@@ -378,8 +389,6 @@ class OrdenVenta(Documento):
 
             # Preparar JSON y actualizar documento en SAP
             jsonData = SerializerDocument.document_serializer(data)
-            client = APIClient()
-
             #hay_receta = any(item.get('TreeType') == 'iSalesTree' for item in jsonData.get('DocumentLines', []))
 
             #if hay_receta:
@@ -431,7 +440,7 @@ class OrdenVenta(Documento):
                 return {'error': errores}
 
             stock_service = StockService()
-            sl = APIClient()
+            sl = get_api_client()
             stock_inicial = [] 
 
             for item in data['DocumentLines']:
@@ -447,8 +456,6 @@ class OrdenVenta(Documento):
             response = sl.crearODV(jsonData)
 
             descento_porcentaje = response.get('DiscountPercent', 0)
-            print ("descento_porcentaje", descento_porcentaje)
-
             # validar si el descuento es un porcentaje válido
 
             if descento_porcentaje < 0 or descento_porcentaje > 100:

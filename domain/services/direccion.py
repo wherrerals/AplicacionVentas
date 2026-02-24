@@ -55,7 +55,7 @@ class Direccion:
             {
                 "Sucursal": "LC",
                 "nombreDireccion": "Showroom Las Condes",
-                "pais": "Chile",
+                "pais": "CL",
                 "region": "13",
                 "comuna": "13114",
                 "tipoDireccion": "12",
@@ -65,7 +65,7 @@ class Direccion:
             {
                 "Sucursal": "PH",
                 "nombreDireccion": "Showroom Vitacura",
-                "pais": "Chile",
+                "pais": "CL",
                 "region": "13",
                 "comuna": "13132",
                 "tipoDireccion": "12",
@@ -75,7 +75,7 @@ class Direccion:
             {
                 "Sucursal": "ME",
                 "nombreDireccion": "Showroom Renca",
-                "pais": "Chile",
+                "pais": "CL",
                 "region": "13",
                 "comuna": "13128",
                 "tipoDireccion": "12",

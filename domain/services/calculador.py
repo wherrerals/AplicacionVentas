@@ -109,9 +109,6 @@ class CalculadoraTotales:
 
         total_precio_final_neto = Decimal("0")
 
-        print("Calculando total del documento...")
-        print(f"Datos del documento: {self.data}")
-
         for item  in self.data.get('DocumentLines', []):
             cantidad = Decimal(item["Quantity"])
             precio_unitario_bruto = Decimal(item["UnitePrice"])
