@@ -53,7 +53,7 @@ class Cotizacion(Documento):
         """
 
         super().__init__(request)
-        self.client = get_api_client()
+        self.client = APIClient()
         self.cliente = None
         self.items = []
     
@@ -178,7 +178,7 @@ class Cotizacion(Documento):
             tuple: Líneas de documento de la cotización, mensaje de error.
         """
         try:
-            client = get_api_client() 
+            client = APIClient() 
             data = client.obtenerCotizacionesDE('Quotations', doc_entry)
 
             if 'value' not in data:

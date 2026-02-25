@@ -1,4 +1,5 @@
 import math
+from adapters.sl_client import APIClient
 from adapters.sl_provider import get_api_client
 from infrastructure.models.productodb import ProductoDB
 from infrastructure.models.stockbodegasdb import StockBodegasDB
@@ -28,7 +29,7 @@ class OrdenVenta(Documento):
         """
 
         super().__init__(request)
-        self.client = get_api_client()
+        self.client = APIClient()
         self.cliente = None
         self.items = []
     
@@ -284,7 +285,7 @@ class OrdenVenta(Documento):
                 return {'error': errores}
 
             stock_service = StockService()
-            client = get_api_client()
+            client = APIClient()
 
             # Obtener líneas del documento antes de actualizar stock
             documents_lines = client.detallesOrdenVentaLineas(docentry) 
@@ -440,7 +441,7 @@ class OrdenVenta(Documento):
                 return {'error': errores}
 
             stock_service = StockService()
-            sl = get_api_client()
+            sl = APIClient()
             stock_inicial = [] 
 
             for item in data['DocumentLines']:
