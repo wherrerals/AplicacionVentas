@@ -11,9 +11,9 @@ class SocioNegocioDB(models.Model):
         verbose_name_plural = 'Socios Negocio'
 
     codigoSN = models.CharField(primary_key=True, max_length=255) #Es un identiicador unico que lo diferencia de todas las otras entradas
-    nombre = models.CharField(max_length=150,)
-    apellido = models.CharField(max_length=150, null=True)
-    razonSocial = models.CharField(max_length=255, blank=True, default="")
+    nombre = models.CharField(max_length=150, null=True, blank=True)
+    apellido = models.CharField(max_length=150, null=True, blank=True)
+    razonSocial = models.CharField(max_length=255, blank=True, null=True)
     rut = models.CharField(max_length=255,null=False)
     email = models.EmailField(null=True, default="sinemali@gmail.com")
     telefono = models.CharField(max_length=18, null=True, default="+56000000000")

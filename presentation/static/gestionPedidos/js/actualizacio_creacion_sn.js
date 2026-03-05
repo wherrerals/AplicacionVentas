@@ -108,6 +108,8 @@ formularios.forEach(formulario => {
         // Convertir los datos a JSON
         dataSN = JSON.stringify(data);
 
+        console.log("Datos a enviar:", dataSN);
+
         // Deshabilitar el botón de envío para evitar múltiples envíos
         const submitButton = document.querySelector('button[type="submit"]');
         submitButton.disabled = true;

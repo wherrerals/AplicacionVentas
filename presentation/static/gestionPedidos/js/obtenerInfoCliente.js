@@ -62,8 +62,10 @@ function traerInformacionCliente(clienteId) {
                 const cliente = data.resultadosClientes.find(cliente => cliente.id == clienteId);
                 //const cliente = data.resultadosClientes[0];
                 const nombre = cliente.nombre || cliente.razonSocial;
+                const razonSocial = cliente.razonSocial;
                 const apellido = cliente.apellido;
                 const codigoSN = cliente.codigoSN;
+                const grupoSN = cliente.grupoSN
 
                 lista  = {
                     id: clienteId,
@@ -82,12 +84,12 @@ function traerInformacionCliente(clienteId) {
                 // Asignar el codigoSN como atributo data-codigoSN del input
                 $('#inputCliente').attr('data-codigoSN', codigoSN);
                 
-                if (cliente.nombre && cliente.razonSocial === '') {
+                if (grupoSN === '105') {
                     // Rellenar el campo de entrada con el nombre y apellido del cliente seleccionado
                     $('#inputCliente').val(codigoSN + " - " + nombre + ' ' + apellido);
                 } else {
                     // Rellenar el campo de entrada con la razón social del cliente seleccionado
-                    $('#inputCliente').val(codigoSN + " - " + cliente.razonSocial);
+                    $('#inputCliente').val(codigoSN + " - " + razonSocial);
                 }
                 
                 // Actualizar los contactos y direcciones del cliente seleccionado

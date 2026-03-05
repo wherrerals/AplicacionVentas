@@ -4,15 +4,15 @@ function cargarInformacionClienteEnModal(cliente) {
     console.log("Cargando información del cliente en el modal:", cliente);
     console.log("grupoSN:", cliente.grupoSN);
 
-    if (cliente.nombre && cliente.razonSocial === '') {
+    if (cliente.grupoSN === '105') {
         $('#nombreSN').val(cliente.nombre);
         $('#apellidoSN').val(cliente.apellido);
-
-    }
-    
-    if (cliente.razonSocial) {
+        console.log("Cliente pertenece al grupo 105");
+    } else {
+        console.log("Cliente pertenece al grupo 100");
         $('#nombreSN').val(cliente.razonSocial); 
     }
+    
 
     // RUT
     $('#rutSN').val(cliente.rut);
@@ -32,10 +32,17 @@ function cargarInformacionClienteEnModal(cliente) {
     //console.log("Email:", cliente.email);
 
     // Tipo de cliente (Persona o Empresa)
-    if (cliente.razonSocial === '') {
+    if (cliente.grupoSN === '105') {
+        console.log("Cliente pertenece al grupo 105");
         $('#formCheck-5').prop('checked', true);  // Persona
         //console.log("Tipo de cliente: Persona");
+        const razonSocialRadioName = 'grupoSN';
+        const nombreLabelId = 'nombreSN';
+        const apellidoInputId = 'apellidoSN';
+        const apellidolabelId = 'apellidorow';
+        cambiarLabel(razonSocialRadioName, nombreLabelId, apellidoInputId, apellidolabelId)
     } else {
+        console.log("Cliente pertenece al grupo 100");
         $('#formCheck-6').prop('checked', true);  // Empresa
         const razonSocialRadioName = 'grupoSN';
         const nombreLabelId = 'nombreSN';

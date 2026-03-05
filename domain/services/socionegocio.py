@@ -102,6 +102,8 @@ class SocioNegocio:
         grupo_sn = datos.get('tipoSN')
 
         datosSerializados = serializer.serializar(datos, cardcode)
+
+        print(f"Datos a enviar a SAP: {datosSerializados}")
         response = conexionSL.actualizarSocioNegocioSL(cardcode, datosSerializados)
 
         if response.get('error'):
@@ -221,6 +223,7 @@ class SocioNegocio:
                     'telefono': socio.telefono,
                     'giro': socio.giro,
                     'condicionPago': socio.condicionPago,
+                    'grupoSN': socio.grupoSN,
                     'plazoReclamaciones': socio.plazoReclamaciones,
                     'clienteExportacion': socio.clienteExportacion,
                     'vendedor': socio.vendedor,
@@ -581,6 +584,7 @@ class SocioNegocio:
                 "telefono": socio.telefono,
                 "giro": socio.giro,
                 "condicionPago": socio.condicionPago,
+                "grupoSN": socio.grupoSN.codigo if socio.grupoSN else None,
                 "plazoReclamaciones": socio.plazoReclamaciones,
                 "clienteExportacion": socio.clienteExportacion,
                 "vendedor": socio.vendedor,
@@ -791,7 +795,8 @@ class SocioNegocio:
         else:
             cliente = SocioNegocioRepository.crearClienteEmpresa(
                 codigoSN=socio_negocio["codigoSN"],
-                nombre=socio_negocio["razonSocial"],
+                nombre="",
+                apellido="",
                 razonSocial=socio_negocio["razonSocial"],
                 email=socio_negocio["email"],
                 telefono=socio_negocio["telefono"],

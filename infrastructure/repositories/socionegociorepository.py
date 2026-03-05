@@ -155,6 +155,8 @@ class SocioNegocioRepository:
 
     @staticmethod
     def actualizarCliente(codigoSN, datosActualizados):
+        print(f"datosActualizados: {datosActualizados}")
+
         try:
             cliente = SocioNegocioDB.objects.get(codigoSN=codigoSN)
             
@@ -180,12 +182,14 @@ class SocioNegocioRepository:
 
     @staticmethod
     def actualizarClienteEmpresa(codigoSN, datosActualizados):
+        print(f"datosActualizados: {datosActualizados}")
 
         try:
             cliente = SocioNegocioDB.objects.get(codigoSN=codigoSN)
             
             # Actualizar atributos específicos de empresa
-            cliente.nombre = datosActualizados.get('nombreSN', cliente.razonSocial)
+            cliente.nombre = ""
+            cliente.apellido = ""
             cliente.razonSocial = datosActualizados.get('nombreSN', cliente.razonSocial)
             cliente.rut = datosActualizados.get('rutSN', cliente.rut)
             cliente.telefono = datosActualizados.get('telefonoSN', cliente.telefono)
