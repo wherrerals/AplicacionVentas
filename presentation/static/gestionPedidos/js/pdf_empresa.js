@@ -51,6 +51,17 @@ document.addEventListener("DOMContentLoaded", function () {
         const lines = [];
         const productRows = document.querySelectorAll('.product-row');
 
+        // Validar que la cotización esté guardada antes de permitir imprimir
+        for (const row of productRows) {
+            const docEntryLinea = row.getAttribute("data-docentrylinea");
+
+            if (!docEntryLinea || docEntryLinea === "null") {
+                hideLoadingOverlay();
+                alert("Debe guardar la cotización antes de imprimir el documento.");
+                return; // corta la ejecución de crearPDF
+            }
+        }
+
         productRows.forEach((row, index) => {
             const itemCode = row.querySelector("[name='sku_producto']").innerText.trim();
             const name = row.querySelector("[name='nombre_producto']").innerText.trim();
