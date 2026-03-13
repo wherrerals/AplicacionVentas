@@ -414,7 +414,7 @@ class ProductoRepository:
         producto_query = ProductoDB.objects.annotate(
             stock_total=Sum('stockbodegasdb__stock_disponible_real')
         ).values(
-            'codigo', 'nombre', 'marca', 'costo', 'precioVenta', 'stockTotal', "dsctoMaxTienda", "dctoMaxProyectos", "precioLista"
+            'descontinuado', 'inactivo', 'imagen', 'codigo', 'nombre', 'marca', 'costo', 'precioVenta', 'stockTotal', "dsctoMaxTienda", "dctoMaxProyectos", "precioLista"
         )
 
         if filtro_nombre:

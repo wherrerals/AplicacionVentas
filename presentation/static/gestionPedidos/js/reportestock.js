@@ -140,6 +140,13 @@ document.addEventListener("DOMContentLoaded", function () {
       const stockPH = getStockBodega("PH");
       const stockLC = getStockBodega("LC");
       const stockVI = getStockBodega("VI");
+
+      // validar si descontinuado es igual a 1 = dEscontinado, si es igual a 0 = Linea
+      const descontinuado = product.descontinuado === "1" ? "Descontinuado" : "Linea";
+
+      // inactivo es igual a tNO = activo, tYES = inactivo
+      const inactivo = product.inactivo === "tNO" ? "Activo" : "Inactivo";
+      
       // quitar los decimales de los desucentos
       const descuentoTienda_float = parseFloat(product.dsctoMaxTienda * 100);
       const descuentoProyecto_float = parseFloat(product.dctoMaxProyectos * 100);
@@ -150,14 +157,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
+                <td class="col-img text-center"><img src="${product.imagen}" alt="${product.nombre}" class="img-preview img-fluid"></td>
                 <td>${product.codigo}</td>
                 <td>${product.nombre}</td>
+                <td style="text-align: center;">${descontinuado}</td>
+                <td style="text-align: center;">${inactivo}</td>
                 <td style="text-align: center;">${stockME}</td>
                 <td style="text-align: center;">${stockPH}</td>
                 <td style="text-align: center;">${stockLC}</td>
                 <td style="text-align: center;">${stockVI}</td>
                 <td style="text-align: center;">${product.stockTotal}</td>
-                <td style="text-align: right;">${product.precioVenta}</td>
+                <td style="text-align: center;">${product.precioVenta}</td>
                 <td style="text-align: center;">${descuentoTienda}</td>
                 <td style="text-align: center;">${descuentoProyecto}</td>
             `;
@@ -313,4 +323,20 @@ const fetchAndDisplayData = (page = 1) => {
     const filters = getFilterData();
     applyFiltersAndFetchData(filters);
   }
+});
+
+document.addEventListener("click", function(e) {
+
+    if (e.target.classList.contains("img-preview")) {
+
+        const modal = new bootstrap.Modal(
+            document.getElementById("imagePreviewModal")
+        );
+
+        const preview = document.getElementById("previewImage");
+        preview.src = e.target.src;
+
+        modal.show();
+    }
+
 });
