@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ficha de Producto - LED Studio</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: #fff;
+      color: #222;
+      font-size: 13px;
+    }
+
+    /* ── PAGE WRAPPER (210mm × 297mm para impresión A4) ── */
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER IMAGE ── */
+    .header {
+      width: 100%;
+      height: 90px; /* altura del header del PDF */
+      display: block;
+      line-height: 0;
+    }
+
+    .header img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* ── BODY ── */
+    .body {
+      padding: 22px 28px 18px;
+      flex: 1;
+    }
+
+    /* ── PRODUCT TITLE ── */
+    .product-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #1a1a1a;
+      margin-bottom: 14px;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 8px;
+    }
+
+    /* ── MAIN GRID ── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 22px;
+      margin-bottom: 18px;
+    }
+
+    /* ── LEFT COLUMN ── */
+    .col-left {}
+
+    .badge-codigo {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11.5px;
+      margin-bottom: 4px;
+    }
+
+    .badge-codigo span {
+      font-weight: 700;
+    }
+
+    .badge-color {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #c8963e;
+      margin-bottom: 10px;
+    }
+
+    .img-main-wrap {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border-radius: 6px;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    .img-main-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .img-thumbs {
+      display: flex;
+      gap: 6px;
+    }
+
+    .img-thumb {
+      width: 68px;
+      height: 68px;
+      border-radius: 4px;
+      overflow: hidden;
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .img-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .otros-colores-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #444;
+      margin-top: 10px;
+      margin-bottom: 5px;
+    }
+
+    .color-swatches {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .color-swatch {
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid #ccc;
+      background: #f5f5f5;
+    }
+
+    .color-swatch img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* ── RIGHT COLUMN ── */
+    .col-right {}
+
+    .description {
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: #333;
+      text-align: justify;
+      margin-bottom: 16px;
+    }
+
+    /* ── FICHA TECNICA ── */
+    .ficha-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .ficha-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .ficha-table tr:nth-child(odd) td {
+      background: #f7f7f7;
+    }
+
+    .ficha-table tr:nth-child(even) td {
+      background: #ffffff;
+    }
+
+    .ficha-table td {
+      padding: 6px 10px;
+      font-size: 12px;
+      border: none;
+      line-height: 1.4;
+    }
+
+    .ficha-table td:first-child {
+      font-weight: 600;
+      color: #555;
+      width: 55%;
+    }
+
+    .ficha-table td:last-child {
+      color: #222;
+    }
+
+    /* ── FOOTER IMAGE ── */
+    .footer {
+      width: 100%;
+      height: 52px; /* altura del footer del PDF */
+      display: block;
+      line-height: 0;
+    }
+
+    .footer img {
+      width: 100%;
+      height: 100%;
+      object-fit: none;
+      display: block;
+    }
+
+    /* ── PRINT STYLES ── */
+    @media print {
+      body { margin: 0; }
+      .page { width: 210mm; min-height: 297mm; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HEADER: imagen estática -->
+  <header class="header">
+    <img src="{{ header_img }}" alt="LED Studio Header">
+  </header>
+
+  <!-- BODY -->
+  <main class="body">
+
+    <!-- TÍTULO DEL PRODUCTO -->
+    <h1 class="product-title">{{ producto.nombre }}</h1>
+    <!-- Ej: "LÁMPARA COLGANTE LED STUDIO SERENA GLOBO (SIN AMPOLLETA E27)" -->
+
+    <div class="main-grid">
+
+      <!-- COLUMNA IZQUIERDA: imágenes -->
+      <div class="col-left">
+
+        <p class="badge-codigo"><span>Código:</span> {{ producto.codigo }}</p>
+        <p class="badge-color">Color: {{ producto.color }}</p>
+
+        <!-- Imagen principal del producto -->
+        <div class="img-main-wrap">
+          <img src="{{ producto.imagen_principal }}" alt="{{ producto.nombre }}">
+        </div>
+
+        <!-- Miniaturas (contexto / ambiente) -->
+        <div class="img-thumbs">
+          {% for thumb in producto.imagenes_thumb %}
+          <div class="img-thumb">
+            <img src="{{ thumb }}" alt="Vista {{ forloop.counter }}">
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Otros colores disponibles -->
+        {% if producto.otros_colores %}
+        <p class="otros-colores-label">Otros colores</p>
+        <div class="color-swatches">
+          {% for color in producto.otros_colores %}
+          <div class="color-swatch">
+            <img src="{{ color.imagen }}" alt="{{ color.nombre }}">
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+      </div>
+
+      <!-- COLUMNA DERECHA: descripción + ficha técnica -->
+      <div class="col-right">
+
+        <p class="description">{{ producto.descripcion }}</p>
+
+        <p class="ficha-title">Ficha Técnica</p>
+
+        <table class="ficha-table">
+          <tbody>
+            {% for fila in producto.ficha_tecnica %}
+            <tr>
+              <td>{{ fila.label }}</td>
+              <td>{{ fila.valor }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <!--
+          Ejemplo de datos esperados en producto.ficha_tecnica:
+          [
+            { "label": "Tipo de Producto",        "valor": "Lámpara Colgante" },
+            { "label": "Modelo",                  "valor": "Serena Globo" },
+            { "label": "Material",                "valor": "Vidrio" },
+            { "label": "Cantidad de Focos o LEDs","valor": "1" },
+            { "label": "Formato",                 "valor": "E27" },
+            { "label": "Ángulo de Luz (°)",       "valor": "120°" },
+            { "label": "Alimentación",            "valor": "Corriente Eléctrica 220V" },
+            { "label": "Voltaje",                 "valor": "220-240V" },
+            { "label": "Alto (cm)",               "valor": "28,5 cm" },
+            { "label": "Ancho (cm)",              "valor": "30 cm" },
+            { "label": "Largo (cm)",              "valor": "30 cm" },
+            { "label": "Diámetro (cm)",           "valor": "30 cm" },
+            { "label": "Peso (Kg)",               "valor": "0,9 kg" }
+          ]
+        -->
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER: imagen estática -->
+  <footer class="footer">
+    <img src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/fec8d6e3-34b0-42e1-b753-383cae1d49fa___df4e95879003eb4069f404088f2e21cc.jpg" alt="LED Studio Footer">
+  </footer>
+
+</div>
+
+</body>
+</html>
