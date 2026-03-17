@@ -410,8 +410,9 @@ class ProductoRepository:
 
     @staticmethod
     def obtener_productos(filtro_nombre=None, filtro_codigo=None, offset=0, limite=20):
+
         producto_query = ProductoDB.objects.annotate(
-            stock_total=Sum('stockbodegasdb__stock')
+            stock_total=Sum('stockbodegasdb__stock_disponible_real')
         ).values(
             'codigo', 'nombre', 'marca', 'costo', 'precioVenta', 'stockTotal', "dsctoMaxTienda", "dctoMaxProyectos", "precioLista"
         )

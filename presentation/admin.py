@@ -226,7 +226,7 @@ class LineaDBper(admin.ModelAdmin):
 
 
 class SocioNegocioDBper(admin.ModelAdmin):
-    list_display = ("nombre", "razonSocial", "email", "telefono", "condicionPago")
+    list_display = ("codigoSN", "nombre", "apellido", "razonSocial", "rut", "email", "telefono", "giro", "grupoSN", "tipoCliente", "price_list_asigned")
     search_fields = ["codigoSN", "nombre"]
 
 
