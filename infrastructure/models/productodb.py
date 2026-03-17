@@ -20,6 +20,7 @@ class ProductoDB(models.Model):
     descontinuado = models.CharField(max_length=10, default='0', null=True)
     inactivo = models.CharField(max_length=10, default='tNO', null=True)
     TreeType = models.CharField(max_length=50, default='DEFAULT', null=True)
+    certificacion = models.CharField(max_length=100, default='4', null=True)
     
 
     def __str__(self):

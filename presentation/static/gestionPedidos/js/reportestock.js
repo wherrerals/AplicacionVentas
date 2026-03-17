@@ -144,6 +144,10 @@ document.addEventListener("DOMContentLoaded", function () {
       // validar si descontinuado es igual a 1 = dEscontinado, si es igual a 0 = Linea
       const descontinuado = product.descontinuado === "1" ? "Descontinuado" : "Linea";
 
+      // valor Certificación 1 = No Requiere, 2 = Certificado, 3 = Ensayos Aprobados, 4 = Sin Certificación
+
+      const certificacion = product.certificacion === "1" ? "No Requiere" : product.certificacion === "2" ? "Certificado" : product.certificacion === "3" ? "Ensayos Aprobados" : "Sin Certificación";
+
       // inactivo es igual a tNO = activo, tYES = inactivo
       const inactivo = product.inactivo === "tNO" ? "Activo" : "Inactivo";
       
@@ -158,10 +162,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const tr = document.createElement("tr");
       tr.innerHTML = `
                 <td class="col-img text-center"><img src="${product.imagen}" alt="${product.nombre}" class="img-preview img-fluid"></td>
-                <td>${product.codigo}</td>
+                <td style="text-align: center;">${product.codigo}</td>
                 <td>${product.nombre}</td>
-                <td style="text-align: center;">${descontinuado}</td>
                 <td style="text-align: center;">${inactivo}</td>
+                <td style="text-align: center;">${certificacion}</td>
+                <td style="text-align: center;">${descontinuado}</td>
                 <td style="text-align: center;">${stockME}</td>
                 <td style="text-align: center;">${stockPH}</td>
                 <td style="text-align: center;">${stockLC}</td>

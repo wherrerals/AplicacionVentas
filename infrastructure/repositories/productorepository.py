@@ -66,6 +66,7 @@ class ProductoRepository:
                     "descontinuado": 0 if product.get("U_LED_ARTDESC") == False else 1,
                     "TreeType": product.get("TreeType", ""),
                     "inactivo": product.get("Frozen"),
+                    "certificacion": product.get("U_LED_SEC", "")
                 }
             )
 
@@ -414,7 +415,7 @@ class ProductoRepository:
         producto_query = ProductoDB.objects.annotate(
             stock_total=Sum('stockbodegasdb__stock_disponible_real')
         ).values(
-            'descontinuado', 'inactivo', 'imagen', 'codigo', 'nombre', 'marca', 'costo', 'precioVenta', 'stockTotal', "dsctoMaxTienda", "dctoMaxProyectos", "precioLista"
+            'descontinuado', 'inactivo', 'imagen', 'codigo', 'nombre', 'marca', 'costo', 'precioVenta', 'stockTotal', "dsctoMaxTienda", "dctoMaxProyectos", "precioLista", "certificacion"
         )
 
         if filtro_nombre:

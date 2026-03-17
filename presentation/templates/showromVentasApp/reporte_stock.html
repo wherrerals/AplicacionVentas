@@ -13,11 +13,10 @@
   <style>
       .stock-table {
           width: 100%;
-          table-layout: fixed;
+          table-layout: auto;
       }
 
-      .stock-table td,
-      .  {
+      .stock-table td{
           word-wrap: break-word;
           white-space: normal;
       }
@@ -33,7 +32,7 @@
 
 
       .stock-table .col-img img {
-          max-width: 60px;
+          width: 100%;
           height: auto;
           cursor: pointer;
       }
@@ -47,11 +46,7 @@
       }
 
       .stock-table .col-code {
-          min-width: 240px;
-      }
-
-      .stock-table .col-name {
-            width: 25%;
+          width: 6%;
       }
 
       .stock-table input {
@@ -64,6 +59,10 @@
 
     .img-preview:hover {
         transform: scale(1.2);
+    }
+
+    .stock-table .col-name {
+        width: 30%; /* Ajusta este valor a tu gusto */
     }
   </style>
 </head>
@@ -141,18 +140,22 @@
                   <div><span>Imagen</span></div>
                 </th>
               
-                <th style="background: transparent;color: var(--bs-table-bg); text-align: left;">
+                <th class="col-code" style="background: transparent;color: var(--bs-table-bg); text-align: left;">
                   <div><span>Código</span></div>
-                  <div><input class="form-control form-control-sm" name="sku_producto" type="search" style="width: 80%;"></div>
+                  <div><input class="form-control form-control-sm" name="sku_producto" type="search"></div>
                 </th>
 
-                <th style="background: transparent;color: var(--bs-table-bg);">
+                <th class="col-name" style="background: transparent;color: var(--bs-table-bg);">
                   <div><span>Nombre</span></div>
                   <div><input class="form-control form-control-sm" name="name_producto" type="search"></div>                
                 </th>
                 
                 <th style="background: transparent;color: var(--bs-table-bg);text-align: center;">
                   <div><span>Estado</span></div>
+                </th>
+
+                <th style="background: transparent;color: var(--bs-table-bg);text-align: center;">
+                  <div><span>Certificación</span></div>
                 </th>
 
                 <th style="background: transparent;color: var(--bs-table-bg);text-align: center;">
@@ -176,19 +179,19 @@
                 </th>
 
                 <th style="background: transparent;color: var(--bs-table-bg);text-align: center;">
-                  <div><span>Stock Total</span></div>
+                  <div><span>Total</span></div>
                 </th>
 
-                <th style="background: transparent;color: var(--bs-table-bg);text-align: center;">
+                <th class="col-precio-venta" style="background: transparent;color: var(--bs-table-bg);text-align: center;">
                   <div><span>Precio Venta</span></div>
                 </th>
 
-                <th style="background: transparent;color: var(--bs-table-bg);text-align: center;">
+                <th class="col-dscto-tienda" style="background: transparent;color: var(--bs-table-bg);text-align: center;">
                   <div><span>Dscto Máx. Tienda</span></div>
                   <div></div>
                 </th>
 
-                <th style="background: transparent;color: var(--bs-table-bg);text-align: center;">
+                <th class="col-dscto-proy" style="background: transparent;color: var(--bs-table-bg);text-align: center;">
                   <div><span>Dscto Máx. Proy.</span></div>
                   <div></div>
                 </th>
