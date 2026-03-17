@@ -144,81 +144,75 @@ class Productosper(admin.ModelAdmin):
         try:
             if request.method == "POST":
                 form = CsvImportForm(request.POST, request.FILES)
-                logger.debug(f"Form data: {request.POST}")
-                logger.debug(f"Files: {request.FILES}")
 
                 if form.is_valid():
                     csv_file = request.FILES["csv_file"]
+
                     if not csv_file.name.endswith(".csv"):
-                        self.message_user(
-                            request, "El archivo debe ser CSV", level=40
-                        )  # ERROR
+                        self.message_user(request, "El archivo debe ser CSV", level=40)
                         return render(request, "admin/csv_form.html", {"form": form})
 
-                    try:
-                        # Leer el archivo CSV correctamente
-                        decoded_file = csv_file.read().decode("utf-8-sig").splitlines()
-                        reader = csv.DictReader(decoded_file, delimiter=";")
+                    decoded_file = csv_file.read().decode("utf-8-sig").splitlines()
+                    reader = csv.DictReader(decoded_file, delimiter=";")
 
-                        # Registrar las columnas detectadas
-                        logger.debug(f"Column names: {reader.fieldnames}")
-
-                        updated_count = 0
-                        errors = []
-                        for row in reader:
-                            if "codigo" in row and "imagen" in row:
-                                try:
-                                    producto = self.model.objects.get(
-                                        codigo=row["codigo"]
-                                    )
-                                    producto.imagen = row["imagen"]
-                                    producto.save()
-                                    updated_count += 1
-                                except self.model.DoesNotExist:
-                                    errors.append(
-                                        f'Producto con código {row["codigo"]} no encontrado'
-                                    )
-                                    continue
-                            else:
-                                errors.append(
-                                    'El CSV debe contener las columnas "codigo" e "imagen"'
-                                )
-                                break
-
-                        if errors:
-                            for error in errors:
-                                self.message_user(request, error, level=30)  # WARNING
-                        if updated_count:
-                            self.message_user(
-                                request,
-                                f"Se actualizaron {updated_count} imágenes correctamente",
-                                level=25,  # SUCCESS
-                            )
-                        return self.changelist_view(request)
-
-                    except Exception as e:
-                        logger.error(f"Error processing CSV: {str(e)}")
+                    if "codigo" not in reader.fieldnames:
                         self.message_user(
                             request,
-                            f"Error procesando el archivo: {str(e)}",
-                            level=40,  # ERROR
+                            'El CSV debe contener la columna "codigo"',
+                            level=40,
                         )
                         return render(request, "admin/csv_form.html", {"form": form})
-                else:
-                    logger.error(f"Form errors: {form.errors}")
-                    for field, errors in form.errors.items():
+
+                    model_fields = {
+                        field.name
+                        for field in self.model._meta.fields
+                        if field.name != "codigo"  # evitar modificar PK
+                    }
+
+                    updated_count = 0
+                    errors = []
+
+                    for row in reader:
+                        codigo = row.get("codigo")
+
+                        if not codigo:
+                            errors.append("Fila sin código, omitida")
+                            continue
+
+                        update_data = {}
+
+                        for field in model_fields:
+                            if field in row and row[field] != "":
+                                update_data[field] = row[field]
+
+                        if not update_data:
+                            continue  # nada que actualizar
+
+                        updated = self.model.objects.filter(codigo=codigo).update(**update_data)
+
+                        if updated:
+                            updated_count += 1
+                        else:
+                            errors.append(f"Producto con código {codigo} no encontrado")
+
+                    if errors:
                         for error in errors:
-                            self.message_user(
-                                request, f"Error en {field}: {error}", level=40  # ERROR
-                            )
-                    return render(request, "admin/csv_form.html", {"form": form})
+                            self.message_user(request, error, level=30)
+
+                    self.message_user(
+                        request,
+                        f"Se actualizaron {updated_count} registros correctamente",
+                        level=25,
+                    )
+
+                    return self.changelist_view(request)
 
             form = CsvImportForm()
             return render(request, "admin/csv_form.html", {"form": form})
 
         except Exception as e:
-            logger.error(f"Unexpected error: {str(e)}")
-            self.message_user(request, f"Error inesperado: {str(e)}", level=40)  # ERROR
+            logger.error(f"Error inesperado: {str(e)}")
+            self.message_user(request, f"Error inesperado: {str(e)}", level=40)
 
 
 class LineaDBper(admin.ModelAdmin):
