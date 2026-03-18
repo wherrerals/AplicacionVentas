@@ -2,10 +2,16 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ficha de Producto - LED Studio</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;600&display=swap');
+    /*
+     * ⚠️  WEASYPRINT-SAFE CSS
+     * - Sin @import / Google Fonts (WeasyPrint no accede a internet)
+     * - Sin aspect-ratio (soporte limitado)
+     * - Sin object-fit (no soportado)
+     * - Sin gap en grid/flex (usar margin en su lugar)
+     * - Fuentes del sistema: sans-serif stack confiable
+     */
 
     * {
       margin: 0;
@@ -14,13 +20,18 @@
     }
 
     body {
-      font-family: 'Open Sans', sans-serif;
+      font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
       background: #fff;
       color: #222;
       font-size: 13px;
     }
 
-    /* ── PAGE WRAPPER (210mm × 297mm para impresión A4) ── */
+    /* ── PÁGINA A4 ── */
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
     .page {
       width: 210mm;
       min-height: 297mm;
@@ -30,19 +41,20 @@
       flex-direction: column;
     }
 
-    /* ── HEADER IMAGE ── */
+    /* ── HEADER ── */
     .header {
       width: 100%;
-      height: 90px; /* altura del header del PDF */
+      height: 90px;
       display: block;
       line-height: 0;
+      overflow: hidden;
     }
 
     .header img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
+      height: 90px;
       display: block;
+      /* object-fit no es soportado por WeasyPrint — usamos width/height fijo */
     }
 
     /* ── BODY ── */
@@ -51,11 +63,11 @@
       flex: 1;
     }
 
-    /* ── PRODUCT TITLE ── */
+    /* ── TÍTULO DEL PRODUCTO ── */
     .product-title {
-      font-family: 'Montserrat', sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 15px;
-      font-weight: 800;
+      font-weight: bold;
       text-transform: uppercase;
       letter-spacing: 0.4px;
       color: #1a1a1a;
@@ -64,94 +76,125 @@
       padding-bottom: 8px;
     }
 
-    /* ── MAIN GRID ── */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 200px 1fr;
-      gap: 22px;
+    /* ── MAIN GRID: tabla para máxima compatibilidad con WeasyPrint ── */
+    .main-table {
+      width: 100%;
+      border-collapse: collapse;
       margin-bottom: 18px;
+      table-layout: fixed;
     }
 
-    /* ── LEFT COLUMN ── */
-    .col-left {}
+    .main-table > tbody > tr > td {
+      vertical-align: top;
+      padding: 0;
+    }
 
+    .col-left {
+      width: 260px;
+      padding-right: 22px;
+    }
+
+    .col-right {
+      /* ocupa el resto */
+    }
+
+    /* ── BADGES ── */
     .badge-codigo {
-      font-family: 'Montserrat', sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 11.5px;
       margin-bottom: 4px;
     }
 
     .badge-codigo span {
-      font-weight: 700;
+      font-weight: bold;
     }
 
     .badge-color {
-      font-family: 'Montserrat', sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 11.5px;
-      font-weight: 700;
+      font-weight: bold;
       color: #c8963e;
       margin-bottom: 10px;
     }
 
+    /* ── IMAGEN PRINCIPAL ── */
+    /*
+     * WeasyPrint no soporta aspect-ratio ni object-fit.
+     * Usamos una caja cuadrada fija con overflow:hidden.
+     * La imagen se estira al 100% del ancho; el alto queda fijo.
+     */
     .img-main-wrap {
-      width: 100%;
-      aspect-ratio: 1 / 1;
+      width: 240px;   /* 300px col - 22px padding-right */
+      height: 240px;
       overflow: hidden;
       border-radius: 6px;
       background: #f5f5f5;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       margin-bottom: 8px;
+      text-align: center;
     }
 
     .img-main-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
+      width: 240px;
+      height: 240px;
+      /* Sin object-fit: la imagen se escala al tamaño exacto del contenedor */
     }
 
+    /* ── MINIATURAS ── */
     .img-thumbs {
-      display: flex;
-      gap: 6px;
+      /* Flex no tiene 'gap' seguro en WeasyPrint → usamos margin en cada thumb */
+      display: block; /* cambiamos a block y usamos float */
+      overflow: hidden; /* clearfix */
+      margin-bottom: 4px;
     }
 
     .img-thumb {
-      width: 68px;
-      height: 68px;
+      float: left;
+      width: 116px;
+      height: 116px;
+      margin-right: 6px;
+      margin-bottom: 6px;
       border-radius: 4px;
       overflow: hidden;
       background: #f5f5f5;
       border: 1px solid #ddd;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    }
+
+    .img-thumb:nth-child(2n) {
+      margin-right: 0;
     }
 
     .img-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
+      width: 116px;
+      height: 116px;
     }
 
+    .clearfix::after {
+      content: '';
+      display: table;
+      clear: both;
+    }
+
+    /* ── OTROS COLORES ── */
     .otros-colores-label {
-      font-family: 'Montserrat', sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 11px;
-      font-weight: 700;
+      font-weight: bold;
       color: #444;
       margin-top: 10px;
       margin-bottom: 5px;
+      clear: both;
     }
 
     .color-swatches {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
+      overflow: hidden; /* clearfix */
     }
 
     .color-swatch {
-      width: 36px;
-      height: 36px;
+      float: left;
+      width: 74px;
+      height: 74px;
+      margin-right: 6px;
+      margin-bottom: 6px;
       border-radius: 4px;
       overflow: hidden;
       border: 1px solid #ccc;
@@ -159,14 +202,11 @@
     }
 
     .color-swatch img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      width: 74px;
+      height: 74px;
     }
 
-    /* ── RIGHT COLUMN ── */
-    .col-right {}
-
+    /* ── DESCRIPCIÓN ── */
     .description {
       font-size: 12.5px;
       line-height: 1.65;
@@ -175,11 +215,11 @@
       margin-bottom: 16px;
     }
 
-    /* ── FICHA TECNICA ── */
+    /* ── FICHA TÉCNICA ── */
     .ficha-title {
-      font-family: 'Montserrat', sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 13px;
-      font-weight: 800;
+      font-weight: bold;
       color: #1a1a1a;
       margin-bottom: 8px;
     }
@@ -205,7 +245,7 @@
     }
 
     .ficha-table td:first-child {
-      font-weight: 600;
+      font-weight: bold;
       color: #555;
       width: 55%;
     }
@@ -214,25 +254,30 @@
       color: #222;
     }
 
-    /* ── FOOTER IMAGE ── */
+    /* ── FOOTER ── */
     .footer {
       width: 100%;
-      height: 52px; /* altura del footer del PDF */
+      height: 52px;
       display: block;
       line-height: 0;
+      overflow: hidden;
     }
 
     .footer img {
       width: 100%;
-      height: 100%;
-      object-fit: none;
+      height: 52px;
       display: block;
+      object-fit: none;
+
     }
 
-    /* ── PRINT STYLES ── */
-    @media print {
-      body { margin: 0; }
-      .page { width: 210mm; min-height: 297mm; }
+    /* ── EVITAR CORTE DE PÁGINA dentro de la ficha técnica ── */
+    .ficha-table tr {
+      page-break-inside: avoid;
+    }
+
+    .main-table {
+      page-break-inside: avoid;
     }
   </style>
 </head>
@@ -240,97 +285,88 @@
 
 <div class="page">
 
-  <!-- HEADER: imagen estática -->
+  <!-- HEADER -->
   <header class="header">
-    <img src="{{ header_img }}" alt="LED Studio Header">
+    <img src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/2b628720-7d2a-4b72-99e6-7882c673a2f1___3745cd2ca2258a118f97e92bec44b984.jpg" alt="LED Studio Header">
   </header>
 
   <!-- BODY -->
   <main class="body">
 
-    <!-- TÍTULO DEL PRODUCTO -->
+    <!-- TÍTULO -->
     <h1 class="product-title">{{ producto.nombre }}</h1>
-    <!-- Ej: "LÁMPARA COLGANTE LED STUDIO SERENA GLOBO (SIN AMPOLLETA E27)" -->
 
-    <div class="main-grid">
+    <!--
+      Usamos <table> en lugar de CSS Grid/Flexbox para el layout de dos columnas.
+      WeasyPrint tiene soporte nativo y confiable para tablas HTML.
+    -->
+    <table class="main-table">
+      <tbody>
+        <tr>
 
-      <!-- COLUMNA IZQUIERDA: imágenes -->
-      <div class="col-left">
+          <!-- COLUMNA IZQUIERDA -->
+          <td class="col-left">
 
-        <p class="badge-codigo"><span>Código:</span> {{ producto.codigo }}</p>
-        <p class="badge-color">Color: {{ producto.color }}</p>
+            <p class="badge-codigo"><span>Código:</span> {{ producto.codigo }}</p>
+            <p class="badge-color">Color: {{ producto.color }}</p>
 
-        <!-- Imagen principal del producto -->
-        <div class="img-main-wrap">
-          <img src="{{ producto.imagen_principal }}" alt="{{ producto.nombre }}">
-        </div>
+            <!-- Imagen principal -->
+            <div class="img-main-wrap">
+              <img src="{{ producto.imagen_principal }}" alt="{{ producto.nombre }}">
+            </div>
 
-        <!-- Miniaturas (contexto / ambiente) -->
-        <div class="img-thumbs">
-          {% for thumb in producto.imagenes_thumb %}
-          <div class="img-thumb">
-            <img src="{{ thumb }}" alt="Vista {{ forloop.counter }}">
-          </div>
-          {% endfor %}
-        </div>
+            <!-- Miniaturas con float (más estable que flexbox en WeasyPrint) -->
+            {% if producto.imagenes_thumb %}
+            <div class="img-thumbs clearfix">
+              {% for thumb in producto.imagenes_thumb %}
+              <div class="img-thumb">
+                <img src="{{ thumb }}" alt="Vista {{ forloop.counter }}">
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
 
-        <!-- Otros colores disponibles -->
-        {% if producto.otros_colores %}
-        <p class="otros-colores-label">Otros colores</p>
-        <div class="color-swatches">
-          {% for color in producto.otros_colores %}
-          <div class="color-swatch">
-            <img src="{{ color.imagen }}" alt="{{ color.nombre }}">
-          </div>
-          {% endfor %}
-        </div>
-        {% endif %}
+            <!-- Otros colores disponibles -->
+            {% if producto.otros_colores %}
+            <p class="otros-colores-label">Otros colores</p>
+            <div class="color-swatches clearfix">
+              {% for color in producto.otros_colores %}
+              <div class="color-swatch">
+                <img src="{{ color.imagen }}" alt="{{ color.codigo }}">
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
 
-      </div>
+          </td>
 
-      <!-- COLUMNA DERECHA: descripción + ficha técnica -->
-      <div class="col-right">
+          <!-- COLUMNA DERECHA -->
+          <td class="col-right">
 
-        <p class="description">{{ producto.descripcion }}</p>
+            <p class="description">{{ producto.descripcion }}</p>
 
-        <p class="ficha-title">Ficha Técnica</p>
+            <p class="ficha-title">Ficha Técnica</p>
 
-        <table class="ficha-table">
-          <tbody>
-            {% for fila in producto.ficha_tecnica %}
-            <tr>
-              <td>{{ fila.label }}</td>
-              <td>{{ fila.valor }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+            <table class="ficha-table">
+              <tbody>
+                {% for fila in producto.ficha_tecnica %}
+                <tr>
+                  <td>{{ fila.label }}</td>
+                  <td>{{ fila.valor }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
 
-        <!--
-          Ejemplo de datos esperados en producto.ficha_tecnica:
-          [
-            { "label": "Tipo de Producto",        "valor": "Lámpara Colgante" },
-            { "label": "Modelo",                  "valor": "Serena Globo" },
-            { "label": "Material",                "valor": "Vidrio" },
-            { "label": "Cantidad de Focos o LEDs","valor": "1" },
-            { "label": "Formato",                 "valor": "E27" },
-            { "label": "Ángulo de Luz (°)",       "valor": "120°" },
-            { "label": "Alimentación",            "valor": "Corriente Eléctrica 220V" },
-            { "label": "Voltaje",                 "valor": "220-240V" },
-            { "label": "Alto (cm)",               "valor": "28,5 cm" },
-            { "label": "Ancho (cm)",              "valor": "30 cm" },
-            { "label": "Largo (cm)",              "valor": "30 cm" },
-            { "label": "Diámetro (cm)",           "valor": "30 cm" },
-            { "label": "Peso (Kg)",               "valor": "0,9 kg" }
-          ]
-        -->
+          </td>
 
-      </div>
-    </div>
+        </tr>
+      </tbody>
+    </table>
 
   </main>
 
-  <!-- FOOTER: imagen estática -->
+  <!-- FOOTER -->
   <footer class="footer">
     <img src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/fec8d6e3-34b0-42e1-b753-383cae1d49fa___df4e95879003eb4069f404088f2e21cc.jpg" alt="LED Studio Footer">
   </footer>

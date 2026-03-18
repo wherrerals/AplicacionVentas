@@ -146,7 +146,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // valor Certificación 1 = No Requiere, 2 = Certificado, 3 = Ensayos Aprobados, 4 = Sin Certificación
 
-      const certificacion = product.certificacion === "1" ? "No Requiere" : product.certificacion === "2" ? "Certificado" : product.certificacion === "3" ? "Ensayos Aprobados" : "Sin Certificación";
+      const certificacion =
+        product.certificacion === "1" ? "No Requiere" :
+        product.certificacion === "2" ? "Certificado" :
+        product.certificacion === "3" ? "En Ensayos" :
+        product.certificacion === "4" ? "Sin Certificación" :
+        product.certificacion === "5" ? "Ensayos Aprobados" :
+        "Desconocido";
 
       // inactivo es igual a tNO = activo, tYES = inactivo
       const inactivo = product.inactivo === "tNO" ? "Activo" : "Inactivo";
