@@ -6,6 +6,8 @@ from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML, CSS
 from weasyprint.text.fonts import FontConfiguration
+#URL_DEV = "http://middleware-ls-dev:8000/api/v1/products_vtex/"
+URL_PROD = "http://middleware-ls-prod:7001/api/v1/products_vtex/"
 
 from infrastructure.models.productodb import ProductoDB
 
@@ -30,7 +32,7 @@ def generate_ficha_tecnica_pdf(request, sku):
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
     # ── 1. Fetch de datos desde el middleware ──────────────────────────
-    url = f"http://middleware-ls-dev:8000/api/v1/products_vtex/{sku}"
+    url = f"{URL_PROD}{sku}"
     logger.info("Fetching product data: %s", url)
 
     try:
