@@ -181,6 +181,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td style="text-align: center;">${product.precioVenta}</td>
                 <td style="text-align: center;">${descuentoTienda}</td>
                 <td style="text-align: center;">${descuentoProyecto}</td>
+                <td class="text-center align-middle">
+                  <button 
+                    class="btn btn-outline-primary btn-sm d-inline-flex justify-content-center align-items-center"
+                    onclick="generarFichaTecnica('${product.codigo}')"
+                    type="button"
+                    title="Descargar Ficha técnica"
+                  >
+                    <i class="bi bi-file-earmark-text"></i>
+                  </button>
+                </td>
+
             `;
       tbody.appendChild(tr);
     });

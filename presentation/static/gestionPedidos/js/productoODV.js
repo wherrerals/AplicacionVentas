@@ -267,7 +267,25 @@ class Producto {
             </tr>
             <tr style="font-size: 12px;background: transparent;">
                 <td colspan="3" style="padding-top: 0px;background: transparent;">
-                    <span name="nombre_producto">${this.nombre}</span>
+                    <div class="d-flex align-items-center gap-1">
+
+                        <!-- Botón ficha técnica -->
+                        <button 
+                            class="btn btn-outline-primary btn-sm py-0 px-1 d-flex align-items-center"
+                            style="font-size: 11px; line-height: 1;"
+                            onclick="generarFichaTecnica('${this.productoCodigo}')"
+                            type="button"
+                            title="Descargar Ficha técnica"
+                        >
+                            <i class="bi bi-file-earmark-text" style="font-size: 12px;">Ficha</i>
+                        </button>
+
+                        <!-- Nombre producto -->
+                        <span name="nombre_producto" style="font-size: 12px;">
+                            ${this.nombre}
+                        </span>
+
+                    </div>
                 </td>
                 <td style="font-size: 12px;background: transparent;" colspan="2">
                     <select class="form-select" id="tipoEntrega" style="font-size: 12px;">

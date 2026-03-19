@@ -219,7 +219,28 @@ class Producto {
                     </a>
                 </td>
             <tr style="font-size: 12px;background: transparent;">
-                <td colspan="7" style="padding-top: 0px;background: transparent;"><span name="nombre_producto">${this.nombre}</span></td>
+                
+                <td colspan="7" style="padding-top: 0px; background: transparent;">
+                    <div class="d-flex align-items-center gap-1">
+
+                        <!-- Botón ficha técnica -->
+                        <button 
+                            class="btn btn-outline-primary btn-sm py-0 px-1 d-flex align-items-center"
+                            style="font-size: 11px; line-height: 1;"
+                            onclick="generarFichaTecnica('${this.productoCodigo}')"
+                            type="button"
+                            title="Descargar Ficha técnica"
+                        >
+                            <i class="bi bi-file-earmark-text" style="font-size: 12px;">Ficha</i>
+                        </button>
+
+                        <!-- Nombre producto -->
+                        <span name="nombre_producto" style="font-size: 12px;">
+                            ${this.nombre}
+                        </span>
+
+                    </div>
+                </td>
             </tr>
             </tr>
         `;
