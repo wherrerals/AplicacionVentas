@@ -33,7 +33,7 @@ async function generarFichaTecnica(sku) {
 
     } catch (error) {
         console.error("Error al generar ficha técnica:", error);
-        alert("Ocurrió un error al generar la ficha técnica");
+        alert("El producto no tiene ficha técnica disponible.");
     } finally {
         // ✔️ AQUÍ debe ir
         hideLoadingOverlay();
