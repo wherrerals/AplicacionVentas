@@ -35,6 +35,8 @@ def generate_ficha_tecnica_pdf(request, sku):
     url = f"{URL_MW}{sku}"
     logger.info("Fetching product data: %s", url)
 
+    print("URL del middleware:", url)  # Debug log para verificar la URL construida
+
     try:
         api_response = requests.get(url, timeout=15)
         api_response.raise_for_status()
