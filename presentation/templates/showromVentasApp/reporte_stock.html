@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/styles.min.css' %}">
   <link rel="stylesheet" href="{% static 'gestionPedidos/css/moreStyles.css' %}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <style>
       .stock-table {
           width: 100%;
@@ -196,6 +197,11 @@
                   <div></div>
                 </th>
 
+                <th class="col-dscto-proy" style="background: transparent;color: var(--bs-table-bg);text-align: center;">
+                  <div><span>Ficha Técnica</span></div>
+                  <div></div>
+                </th>
+
               </tr>
             </thead>
             <tbody id="reporteStock">
@@ -246,6 +252,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'gestionPedidos/js/fichaTecnica.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/reportestock.js' %}"></script>
   <script src="{% static 'gestionPedidos/js/loader.js' %}"></script>
 

@@ -42,7 +42,7 @@ $(document).ready(function () {
     actualizarPreciosPorCliente(codigoSN);
 
 
-    rutDisplayParagraph.textContent = codigoSN;
+    //rutDisplayParagraph.textContent = codigoSN;
     
 
     // Llamar a las funciones cargarContactos y cargarDirecciones
@@ -95,6 +95,7 @@ $(document).ready(function () {
       data: parametros, // Enviamos los parámetros adecuados
       dataType: "json",
       success: function (data) {
+        console.log("Resultados de la búsqueda:", data);
         $("#resultadosClientes").empty();
         if (data.resultadosClientes && data.resultadosClientes.length > 0) {
           data.resultadosClientes.forEach(function (resultado) {
@@ -104,9 +105,19 @@ $(document).ready(function () {
             clientesElemento.attr("data-apellido", resultado.apellido);
             clientesElemento.attr("data-codigoSN", resultado.codigoSN);
             clientesElemento.attr("data-rut", resultado.rut);
+            console.log("grupoSN: ", resultado.grupoSN)
+            if (resultado.grupoSN == '100') {
+                console.log("Cliente pertenece al grupo 100")
+                clientesElemento.text(
+                  `${resultado.codigoSN} - ${resultado.razonSocial}`
+                );
+          }
+          else {
+            console.log("Cliente no pertenece al grupo 100")
             clientesElemento.text(
               `${resultado.codigoSN} - ${resultado.nombre} ${resultado.apellido}`
             );
+          }
 
             $("#resultadosClientes").append(clientesElemento);
           });

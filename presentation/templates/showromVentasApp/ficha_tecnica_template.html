@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ficha de Producto - LED Studio</title>
+  <style>
+    /*
+     * ⚠️  WEASYPRINT-SAFE CSS
+     * - Sin @import / Google Fonts (WeasyPrint no accede a internet)
+     * - Sin aspect-ratio (soporte limitado)
+     * - Sin object-fit (no soportado)
+     * - Sin gap en grid/flex (usar margin en su lugar)
+     * - Fuentes del sistema: sans-serif stack confiable
+     */
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
+      background: #fff;
+      color: #222;
+      font-size: 13px;
+    }
+
+    /* ── PÁGINA A4 ── */
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      width: 100%;
+      height: 90px;
+      display: block;
+      line-height: 0;
+      overflow: hidden;
+    }
+
+    .header img {
+      width: 100%;
+      height: 90px;
+      display: block;
+      /* object-fit no es soportado por WeasyPrint — usamos width/height fijo */
+    }
+
+    /* ── BODY ── */
+    .body {
+      padding: 22px 28px 18px;
+      flex: 1;
+    }
+
+    /* ── TÍTULO DEL PRODUCTO ── */
+    .product-title {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 15px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #1a1a1a;
+      margin-bottom: 14px;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 8px;
+    }
+
+    /* ── MAIN GRID: tabla para máxima compatibilidad con WeasyPrint ── */
+    .main-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 18px;
+      table-layout: fixed;
+    }
+
+    .main-table > tbody > tr > td {
+      vertical-align: top;
+      padding: 0;
+    }
+
+    .col-left {
+      width: 260px;
+      padding-right: 22px;
+    }
+
+    .col-right {
+      /* ocupa el resto */
+    }
+
+    /* ── BADGES ── */
+    .badge-codigo {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11.5px;
+      margin-bottom: 4px;
+    }
+
+    .badge-codigo span {
+      font-weight: bold;
+    }
+
+    .badge-color {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11.5px;
+      font-weight: bold;
+      color: #c8963e;
+      margin-bottom: 10px;
+    }
+
+    /* ── IMAGEN PRINCIPAL ── */
+    /*
+     * WeasyPrint no soporta aspect-ratio ni object-fit.
+     * Usamos una caja cuadrada fija con overflow:hidden.
+     * La imagen se estira al 100% del ancho; el alto queda fijo.
+     */
+    .img-main-wrap {
+      width: 240px;   /* 300px col - 22px padding-right */
+      height: 240px;
+      overflow: hidden;
+      border-radius: 6px;
+      background: #f5f5f5;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .img-main-wrap img {
+      width: 240px;
+      height: 240px;
+      /* Sin object-fit: la imagen se escala al tamaño exacto del contenedor */
+    }
+
+    /* ── MINIATURAS ── */
+    .img-thumbs {
+      /* Flex no tiene 'gap' seguro en WeasyPrint → usamos margin en cada thumb */
+      display: block; /* cambiamos a block y usamos float */
+      overflow: hidden; /* clearfix */
+      margin-bottom: 4px;
+    }
+
+    .img-thumb {
+      float: left;
+      width: 116px;
+      height: 116px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      border-radius: 4px;
+      overflow: hidden;
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+    }
+
+    .img-thumb:nth-child(2n) {
+      margin-right: 0;
+    }
+
+    .img-thumb img {
+      width: 116px;
+      height: 116px;
+    }
+
+    .clearfix::after {
+      content: '';
+      display: table;
+      clear: both;
+    }
+
+    /* ── OTROS COLORES ── */
+    .otros-colores-label {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11px;
+      font-weight: bold;
+      color: #444;
+      margin-top: 10px;
+      margin-bottom: 5px;
+      clear: both;
+    }
+
+    .color-swatches {
+      overflow: hidden; /* clearfix */
+    }
+
+    .color-swatch {
+      float: left;
+      width: 74px;
+      height: 74px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid #ccc;
+      background: #f5f5f5;
+    }
+
+    .color-swatch img {
+      width: 74px;
+      height: 74px;
+    }
+
+    /* ── DESCRIPCIÓN ── */
+    .description {
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: #333;
+      text-align: justify;
+      margin-bottom: 16px;
+    }
+
+    /* ── FICHA TÉCNICA ── */
+    .ficha-title {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13px;
+      font-weight: bold;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+
+    .ficha-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .ficha-table tr:nth-child(odd) td {
+      background: #f7f7f7;
+    }
+
+    .ficha-table tr:nth-child(even) td {
+      background: #ffffff;
+    }
+
+    .ficha-table td {
+      padding: 6px 10px;
+      font-size: 12px;
+      border: none;
+      line-height: 1.4;
+    }
+
+    .ficha-table td:first-child {
+      font-weight: bold;
+      color: #555;
+      width: 55%;
+    }
+
+    .ficha-table td:last-child {
+      color: #222;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      width: 100%;
+      height: 52px;
+      display: block;
+      line-height: 0;
+      overflow: hidden;
+    }
+
+    .footer img {
+      width: 100%;
+      height: 52px;
+      display: block;
+      object-fit: none;
+
+    }
+
+    /* ── EVITAR CORTE DE PÁGINA dentro de la ficha técnica ── */
+    .ficha-table tr {
+      page-break-inside: avoid;
+    }
+
+    .main-table {
+      page-break-inside: avoid;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <img src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/5fbc62c0-41ac-4b55-b3b1-dd8e66d59ff1___a21895d475b579369c7c0e6d1cc39480.jpg" alt="LED Studio Header">
+  </header>
+
+  <!-- BODY -->
+  <main class="body">
+
+    <!-- TÍTULO -->
+    <h1 class="product-title">{{ producto.nombre }}</h1>
+
+    <!--
+      Usamos <table> en lugar de CSS Grid/Flexbox para el layout de dos columnas.
+      WeasyPrint tiene soporte nativo y confiable para tablas HTML.
+    -->
+    <table class="main-table">
+      <tbody>
+        <tr>
+
+          <!-- COLUMNA IZQUIERDA -->
+          <td class="col-left">
+
+            <p class="badge-codigo"><span>Código:</span> {{ producto.codigo }}</p>
+            <p class="badge-color">Color: {{ producto.color }}</p>
+
+            <!-- Imagen principal -->
+            <div class="img-main-wrap">
+              <img src="{{ producto.imagen_principal }}" alt="{{ producto.nombre }}">
+            </div>
+
+            <!-- Miniaturas con float (más estable que flexbox en WeasyPrint) -->
+            {% if producto.imagenes_thumb %}
+            <div class="img-thumbs clearfix">
+              {% for thumb in producto.imagenes_thumb %}
+              <div class="img-thumb">
+                <img src="{{ thumb }}" alt="Vista {{ forloop.counter }}">
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Otros colores disponibles -->
+            {% if producto.otros_colores %}
+            <p class="otros-colores-label">Otros colores</p>
+            <div class="color-swatches clearfix">
+              {% for color in producto.otros_colores %}
+              <div class="color-swatch">
+                <img src="{{ color.imagen }}" alt="{{ color.codigo }}">
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+          </td>
+
+          <!-- COLUMNA DERECHA -->
+          <td class="col-right">
+
+            <p class="description">{{ producto.descripcion|safe }}</p>
+
+            <p class="ficha-title">Ficha Técnica</p>
+
+            <table class="ficha-table">
+              <tbody>
+                {% for fila in producto.ficha_tecnica %}
+                <tr>
+                  <td>{{ fila.label }}</td>
+                  <td>{{ fila.valor }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <img src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/fec8d6e3-34b0-42e1-b753-383cae1d49fa___df4e95879003eb4069f404088f2e21cc.jpg" alt="LED Studio Footer">
+  </footer>
+
+</div>
+
+</body>
+</html>
