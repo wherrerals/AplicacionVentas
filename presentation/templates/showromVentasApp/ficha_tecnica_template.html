@@ -23,44 +23,68 @@
       font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
       background: #fff;
       color: #222;
-      font-size: 13px;
+      font-size: 11px;
     }
 
     /* ── PÁGINA A4 ── */
+    /*
+     * Los márgenes superiores e inferiores dejan espacio al header y footer fijos.
+     * Header = 90px ≈ 34mm  |  Footer = 52px ≈ 20mm
+     * Usamos mm para que WeasyPrint los respete con precisión.
+     */
     @page {
       size: A4;
-      margin: 0;
+      margin: 34mm 0 20mm 0;
     }
 
-    .page {
-      width: 210mm;
-      min-height: 297mm;
-      margin: 0 auto;
-      background: #fff;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ── HEADER ── */
+    /* ── HEADER FIJO (se repite en cada página) ── */
+    /*
+     * WeasyPrint interpreta position:fixed en el cuerpo del documento
+     * como un elemento que se repite en cada página, anclado a la
+     * región de margen indicada (top:0 → margen superior).
+     */
     .header {
-      width: 100%;
-      height: 90px;
-      display: block;
+      position: fixed;
+      top: -34mm;          /* sube hasta el margen superior de @page */
+      left: 0;
+      right: 0;
+      height: 34mm;
       line-height: 0;
       overflow: hidden;
+      z-index: 100;
     }
 
     .header img {
       width: 100%;
-      height: 90px;
+      height: 90px; /* 34mm ≈ 90px a 72dpi */
       display: block;
-      /* object-fit no es soportado por WeasyPrint — usamos width/height fijo */
+    }
+
+    /* ── FOOTER FIJO (se repite en cada página) ── */
+    .footer {
+      position: fixed;
+      bottom: -20mm;       /* baja hasta el margen inferior de @page */
+      left: 0;
+      right: 0;
+      height: 20mm;
+      line-height: 0;
+      overflow: hidden;
+      z-index: 100;
+    }
+
+    .footer img {
+      width: 100%;
+      height: 52px;
+      display: block;
     }
 
     /* ── BODY ── */
-    .body {
+    /*
+     * Al usar @page con márgenes, el body no necesita estructura .page.
+     * El contenido fluye naturalmente y WeasyPrint pagina automáticamente.
+     */
+    main.body {
       padding: 22px 28px 18px;
-      flex: 1;
     }
 
     /* ── TÍTULO DEL PRODUCTO ── */
@@ -74,6 +98,8 @@
       margin-bottom: 14px;
       border-bottom: 2px solid #e0e0e0;
       padding-bottom: 8px;
+      /* Evita que el título quede solo al inicio de una página nueva */
+      page-break-after: avoid;
     }
 
     /* ── MAIN GRID: tabla para máxima compatibilidad con WeasyPrint ── */
@@ -82,6 +108,12 @@
       border-collapse: collapse;
       margin-bottom: 18px;
       table-layout: fixed;
+      /*
+       * ⚠️ REMOVIDO: page-break-inside: avoid en la main-table completa.
+       * Eso impedía cualquier salto de página dentro del contenido.
+       * Ahora dejamos que el contenido fluya y controlamos los saltos
+       * a nivel de fila en la ficha técnica.
+       */
     }
 
     .main-table > tbody > tr > td {
@@ -92,10 +124,6 @@
     .col-left {
       width: 260px;
       padding-right: 22px;
-    }
-
-    .col-right {
-      /* ocupa el resto */
     }
 
     /* ── BADGES ── */
@@ -118,13 +146,8 @@
     }
 
     /* ── IMAGEN PRINCIPAL ── */
-    /*
-     * WeasyPrint no soporta aspect-ratio ni object-fit.
-     * Usamos una caja cuadrada fija con overflow:hidden.
-     * La imagen se estira al 100% del ancho; el alto queda fijo.
-     */
     .img-main-wrap {
-      width: 240px;   /* 300px col - 22px padding-right */
+      width: 240px;
       height: 240px;
       overflow: hidden;
       border-radius: 6px;
@@ -136,14 +159,12 @@
     .img-main-wrap img {
       width: 240px;
       height: 240px;
-      /* Sin object-fit: la imagen se escala al tamaño exacto del contenedor */
     }
 
     /* ── MINIATURAS ── */
     .img-thumbs {
-      /* Flex no tiene 'gap' seguro en WeasyPrint → usamos margin en cada thumb */
-      display: block; /* cambiamos a block y usamos float */
-      overflow: hidden; /* clearfix */
+      display: block;
+      overflow: hidden;
       margin-bottom: 4px;
     }
 
@@ -186,7 +207,7 @@
     }
 
     .color-swatches {
-      overflow: hidden; /* clearfix */
+      overflow: hidden;
     }
 
     .color-swatch {
@@ -222,6 +243,11 @@
       font-weight: bold;
       color: #1a1a1a;
       margin-bottom: 8px;
+      /*
+       * Evita que el título "Ficha Técnica" quede solo al final
+       * de una página sin ninguna fila debajo.
+       */
+      page-break-after: avoid;
     }
 
     .ficha-table {
@@ -254,52 +280,40 @@
       color: #222;
     }
 
-    /* ── FOOTER ── */
-    .footer {
-      width: 100%;
-      height: 52px;
-      display: block;
-      line-height: 0;
-      overflow: hidden;
-    }
-
-    .footer img {
-      width: 100%;
-      height: 52px;
-      display: block;
-      object-fit: cover;
-
-    }
-
-    /* ── EVITAR CORTE DE PÁGINA dentro de la ficha técnica ── */
+    /*
+     * ── PAGE-BREAK EN FILAS DE FICHA TÉCNICA ──
+     *
+     * page-break-inside: avoid  → impide que una fila se parta en dos páginas.
+     *                             El label y su valor siempre van juntos.
+     *
+     * SIN page-break-inside: avoid en el contenedor padre (.main-table),
+     * WeasyPrint puede insertar el salto entre filas con normalidad.
+     * El salto ocurrirá justo antes de la siguiente fila, no en medio de ella.
+     */
     .ficha-table tr {
       page-break-inside: avoid;
     }
 
-    .main-table {
-      page-break-inside: avoid;
-    }
   </style>
 </head>
 <body>
 
-<div class="page">
-
-  <!-- HEADER -->
+  <!-- HEADER (fixed → se repite en cada página) -->
   <header class="header">
     <img src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/5fbc62c0-41ac-4b55-b3b1-dd8e66d59ff1___a21895d475b579369c7c0e6d1cc39480.jpg" alt="LED Studio Header">
   </header>
 
-  <!-- BODY -->
+  <!-- FOOTER (fixed → se repite en cada página) -->
+  <footer class="footer">
+    <img src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/49dae9e4-3731-4853-8fe0-1cd941494428___1263f606589b5a11caf1a7adf758d04d.jpg" alt="LED Studio Footer">
+  </footer>
+
+  <!-- BODY (flujo normal, paginado automáticamente por WeasyPrint) -->
   <main class="body">
 
     <!-- TÍTULO -->
     <h1 class="product-title">{{ producto.nombre }}</h1>
 
-    <!--
-      Usamos <table> en lugar de CSS Grid/Flexbox para el layout de dos columnas.
-      WeasyPrint tiene soporte nativo y confiable para tablas HTML.
-    -->
     <table class="main-table">
       <tbody>
         <tr>
@@ -310,12 +324,10 @@
             <p class="badge-codigo"><span>Código:</span> {{ producto.codigo }}</p>
             <p class="badge-color">Color: {{ producto.color }}</p>
 
-            <!-- Imagen principal -->
             <div class="img-main-wrap">
               <img src="{{ producto.imagen_principal }}" alt="{{ producto.nombre }}">
             </div>
 
-            <!-- Miniaturas con float (más estable que flexbox en WeasyPrint) -->
             {% if producto.imagenes_thumb %}
             <div class="img-thumbs clearfix">
               {% for thumb in producto.imagenes_thumb %}
@@ -326,7 +338,6 @@
             </div>
             {% endif %}
 
-            <!-- Otros colores disponibles -->
             {% if producto.otros_colores %}
             <p class="otros-colores-label">Otros colores</p>
             <div class="color-swatches clearfix">
@@ -343,7 +354,7 @@
           <!-- COLUMNA DERECHA -->
           <td class="col-right">
 
-            <p class="description">{{ producto.descripcion|safe }}</p>
+            <p class="description" style="font-size: 11px;">{{ producto.descripcion|safe }}</p>
 
             <p class="ficha-title">Ficha Técnica</p>
 
@@ -351,8 +362,8 @@
               <tbody>
                 {% for fila in producto.ficha_tecnica %}
                 <tr>
-                  <td>{{ fila.label }}</td>
-                  <td>{{ fila.valor|safe  }}</td>
+                  <td style="font-size: 11px;">{{ fila.label }}</td>
+                  <td style="font-size: 11px;">{{ fila.valor|safe }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -365,13 +376,6 @@
     </table>
 
   </main>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <img src="https://ledstudiocl.vtexassets.com/assets/vtex.file-manager-graphql/images/49dae9e4-3731-4853-8fe0-1cd941494428___1263f606589b5a11caf1a7adf758d04d.jpg" alt="LED Studio Footer">
-  </footer>
-
-</div>
 
 </body>
 </html>
