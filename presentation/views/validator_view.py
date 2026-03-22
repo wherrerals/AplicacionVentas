@@ -31,9 +31,12 @@ def procesar_chunk(codigos):
 
     for idx, (codigo, url) in enumerate(productos.items(), start=1):
 
-        if _is_out_of_time():
+        """
+         if _is_out_of_time():
             logger.warning("Corte de chunk por horario")
-            break
+            break       
+        """
+
 
         status_code = _validar_url(url)
 

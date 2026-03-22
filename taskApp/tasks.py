@@ -280,9 +280,11 @@ def validar_imagenes_task(limit=None):
     - Dispara subtareas
     """
 
+    """     
     if _is_out_of_time():
         logger.warning("La tarea inició fuera de la ventana válida")
-        return
+        return 
+    """
 
     queryset = (
         ProductoDB.objects
