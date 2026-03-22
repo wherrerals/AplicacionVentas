@@ -302,10 +302,11 @@ def validar_imagenes_task(limit=None):
     logger.info(f"Total productos a validar: {total}")
 
     for i in range(0, total, CHUNK_SIZE):
-
+        """
         if _is_out_of_time():
             logger.warning("Corte de generación de subtareas por horario")
             break
+        """
 
         chunk = codigos[i:i + CHUNK_SIZE]
 
