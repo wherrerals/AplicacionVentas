@@ -81,71 +81,13 @@ services:
       - shared_network
       - a_network
 
-  celery-worker-products:
+  celery-worker-images-update:
     build:
       context: .
       dockerfile: ./docker/dockerfile.app
-    image: cw-products:prod
-    container_name: cw-products
-    command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in
-    depends_on:
-      - rabbitmq
-      - db
-    volumes:
-      - .:/app
-    environment:
-      CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
-      DJANGO_SETTINGS_MODULE: "config.settings.production"
-    networks:
-      - a_network
-      - shared_network
-
-
-  celery-worker-products-recetas:
-    build:
-      context: .
-      dockerfile: ./docker/dockerfile.app
-    image: cw-recetas:prod
-    container_name: cw-recetas
-    command: celery -A config worker --loglevel=info --concurrency=4 -Q q_products_in_receta
-    depends_on:
-      - rabbitmq
-      - db
-    volumes:
-      - .:/app
-    environment:
-      CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
-      DJANGO_SETTINGS_MODULE: "config.settings.production"
-    networks:
-      - a_network
-      - shared_network
-
-  celery-worker-products-importados:
-    build:
-      context: .
-      dockerfile: ./docker/dockerfile.app
-    image: cw-importados:prod
-    container_name: cw-products-importados
-    command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in_importado
-    depends_on:
-      - rabbitmq
-      - db
-    volumes:
-      - .:/app
-    environment:
-      CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
-      DJANGO_SETTINGS_MODULE: "config.settings.production"
-    networks:
-      - a_network
-      - shared_network
-
-  celery-worker-users:
-    build:
-      context: .
-      dockerfile: ./docker/dockerfile.app
-    image: cw-users:prod
-    container_name: cw-users
-    command: celery -A config worker --loglevel=info --concurrency=2 -Q q_clients_in
+    image: cw-images-update:prod
+    container_name: cw-images-update
+    command: celery -A config worker -Q update_images -l info -E
     depends_on:
       - rabbitmq
       - db

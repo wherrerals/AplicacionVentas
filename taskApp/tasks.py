@@ -3,6 +3,7 @@ from venv import logger
 from celery import shared_task, states
 from celery.result import AsyncResult
 from domain.services.socionegocio import SocioNegocio
+from presentation.views.validator_view import procesar_chunk
 from taskApp.models import CeleryTask
 from domain.services.producto import Producto
 
@@ -12,6 +13,16 @@ from weasyprint import HTML
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from infrastructure.repositories.productorepository import ProductoRepository
+
+
+from django.utils import timezone
+import logging
+
+from infrastructure.models.productodb import ProductoDB
+
+logger = logging.getLogger(__name__)
+
+CHUNK_SIZE = 100
 
 @shared_task
 def prueba12(datos):
@@ -251,3 +262,61 @@ def sync_products_task(self, products):
         "processed": len(products),
         "result": list_product,
     }
+
+
+
+
+def _is_out_of_time():
+    now = timezone.localtime()
+    return now.hour >= 6
+
+
+@shared_task(queue="update_images")
+def validar_imagenes_task(limit=None):
+    """
+    Task orquestadora:
+    - Se ejecuta 1 vez (1 AM)
+    - Divide en chunks
+    - Dispara subtareas
+    """
+
+    if _is_out_of_time():
+        logger.warning("La tarea inició fuera de la ventana válida")
+        return
+
+    queryset = (
+        ProductoDB.objects
+        .exclude(imagen__isnull=True)
+        .exclude(imagen__exact="")
+        .values_list("codigo", flat=True)
+    )
+
+    if limit:
+        queryset = queryset[:limit]
+
+    codigos = list(queryset)
+
+    total = len(codigos)
+    logger.info(f"Total productos a validar: {total}")
+
+    for i in range(0, total, CHUNK_SIZE):
+
+        if _is_out_of_time():
+            logger.warning("Corte de generación de subtareas por horario")
+            break
+
+        chunk = codigos[i:i + CHUNK_SIZE]
+
+        validar_imagenes_chunk.delay(chunk)
+
+@shared_task(
+    queue="update_images",
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 3},
+)
+def validar_imagenes_chunk(codigos):
+    """
+    Procesa un grupo pequeño de productos
+    """
+    procesar_chunk(codigos)

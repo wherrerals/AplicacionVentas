@@ -48,7 +48,17 @@ app.conf.update(
 )
 
 # Configuración de beat_schedule para ejecutar múltiples tareas
+
+
 app.conf.beat_schedule = {
+    'validar-imagenes-diario': {
+        'task': 'taskApp.tasks.validar_imagenes_task',  # Ruta correcta a la tarea
+        'schedule': crontab(hour=1, minute=0),
+    },
+}
+
+
+""" app.conf.beat_schedule = {
     "data-product": {
         "task": "taskApp.tasks.sync_products",  # Ruta correcta a la tarea
         #"schedule": crontab(minute="*/1"),  # Ejecutar cada minuto
@@ -73,4 +83,4 @@ app.conf.beat_schedule = {
         #"schedule": crontab(minute="*/1"),  # Ejecutar cada minuto
         "schedule": timedelta(seconds=10),  # Ejecutar cada 10 segundos
     },
-}
+} """

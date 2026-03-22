@@ -85,70 +85,13 @@ services:
       - a_network
       - shared_network   # solo si necesita RabbitMQ
 
-  celery-worker-products:
+  celery-worker-images-update:
     build:
       context: .
-      dockerfile: ./docker/dockerfile.app
-    image: cw-products:dev
-    container_name: cw-products
-    command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in
-    depends_on:
-      - rabbitmq
-      - db
-    volumes:
-      - .:/app
-    environment:
-      CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
-      DJANGO_SETTINGS_MODULE: "config.settings.develop"
-    networks:
-      - a_network
-      - shared_network
-
-  celery-worker-products-recetas:
-    build:
-      context: .
-      dockerfile: ./docker/dockerfile.app
-    image: cw-products-recetas:dev
-    container_name: cw-products-recetas
-    command: celery -A config worker --loglevel=info --concurrency=4 -Q q_products_in_receta
-    depends_on:
-      - rabbitmq
-      - db
-    volumes:
-      - .:/app
-    environment:
-      CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
-      DJANGO_SETTINGS_MODULE: "config.settings.develop"
-    networks:
-      - a_network
-      - shared_network
-
-  celery-worker-products-importados:
-    build:
-      context: .
-      dockerfile: ./docker/dockerfile.app
-    image: cw-products-importados:dev
-    container_name: cw-products-importados
-    command: celery -A config worker --loglevel=info --concurrency=2 -Q q_products_in_importado
-    depends_on:
-      - rabbitmq
-      - db
-    volumes:
-      - .:/app
-    environment:
-      CELERY_BROKER_URL: "amqp://admin:admin123@rabbitmq:5672//"
-      DJANGO_SETTINGS_MODULE: "config.settings.develop"
-    networks:
-      - a_network
-      - shared_network
-
-  celery-worker-users:
-    build:
-      context: .
-      dockerfile: ./docker/dockerfile.app
-    image: cw-users:dev
-    container_name: cw-users
-    command: celery -A config worker --loglevel=info --concurrency=2 -Q q_clients_in
+      dockerfile: ./docker/dockerfile.app2
+    image: cw-images-update:dev
+    container_name: cw-images-update
+    command: celery -A config worker -Q update_images -l info -E
     depends_on:
       - rabbitmq
       - db

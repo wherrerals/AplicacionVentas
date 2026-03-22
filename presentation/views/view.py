@@ -29,7 +29,6 @@ from infrastructure.repositories.socionegociorepository import SocioNegocioRepos
 from infrastructure.repositories.stockbodegasrepository import StockBodegasRepository
 from domain.services.calculador import CalculadoraTotales
 from domain.services.contacto import Contacto
-from domain.services.cotizacion import Cotizacion
 from domain.services.coupons import Coupons
 from domain.services.direccion import Direccion
 from domain.services.producto import Producto
@@ -1103,7 +1102,8 @@ def probandoSL(request):
         "Client": documentClient,
         "DocumentLine": documentLine
     }
-
+    
+    from domain.services.cotizacion import Cotizacion
     cotiza = Cotizacion()
 
     lines_data = cotiza.formatearDatos(data)
@@ -1776,9 +1776,6 @@ def validar_cupon(request):
     print(f"Datos del cupón: {data_coupon}")
 
     return JsonResponse(data_coupon, status=200)
-def validar_imagenes(request):
-    productos = ProductoDB.objects.all()
-    return render(request, 'validar_imagenes.html', {'productos': productos})
 
 
 @csrf_exempt

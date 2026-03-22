@@ -21,7 +21,7 @@ class ProductoDB(models.Model):
     inactivo = models.CharField(max_length=10, default='tNO', null=True)
     TreeType = models.CharField(max_length=50, default='DEFAULT', null=True)
     certificacion = models.CharField(max_length=100, default='4', null=True)
-    
+    imagenStatusHttp = models.IntegerField(null=True, blank=True, default=9999)  # 9999 = no validado, "error" se guardará como string
 
     def __str__(self):
         return self.codigo
