@@ -79,7 +79,8 @@ class Producto {
                 "LC": "LC",
                 "PH": "PH",
                 "ME": "ME",
-                "VI": "VI"
+                "VI": "VI",
+                "GR": "GR"
             };
     
             // Filtrar los datos de stock excluyendo la bodega "GR"
@@ -194,6 +195,7 @@ class Producto {
                             <option id="ME" data-stock="" value="ME" ${this.sucursal === 'ME' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'ME' && this.cantidad !== undefined ? this.cantidad : 0}">ME</option>
                             <option id="PH" data-stock="" value="PH" ${this.sucursal === 'PH' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'PH' && this.cantidad !== undefined ? this.cantidad : 0}">PH</option>
                             <option id="VI" data-stock="" value="VI" ${this.sucursal === 'VI' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'VI' && this.cantidad !== undefined ? this.cantidad : 0}">VI</option>
+                            <option id="GR" data-stock="" value="GR" ${this.sucursal === 'GR' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'GR' && this.cantidad !== undefined ? this.cantidad : 0}">GR</option>
                             </optgroup>
                         </select>
                     </div>
@@ -335,7 +337,8 @@ class Producto {
                     "LC": "LC",
                     "PH": "PH",
                     "ME": "ME",
-                    "VI": "VI"
+                    "VI": "VI",
+                    "GR": "GR"
                 };
 
                 const stockFiltrado = stockData.filter(bodega => bodega.bodega in bodegaMap);
