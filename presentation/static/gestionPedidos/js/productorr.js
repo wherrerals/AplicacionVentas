@@ -65,11 +65,12 @@ class Producto {
                 "LC": "LC",
                 "PH": "PH",
                 "ME": "ME",
-                "VI": "VI"
+                "VI": "VI",
+                "GR": "GR"
             };
 
             // Filtrar los datos de stock excluyendo la bodega "GR"
-            const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
+            const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "LLLLL");
 
             // Calcular el stock total sumando solo las bodegas válidas
             const stockTotal = stockFiltrado.reduce((total, bodega) => total + bodega.stock_disponible, 0);
@@ -130,6 +131,7 @@ class Producto {
                             <option value="PH" ${this.sucursal === 'PH' ? 'selected' : ''}>PH</option>
                             <option value="ME" ${this.sucursal === 'ME' ? 'selected' : ''}>ME</option>
                             <option value="VI" ${this.sucursal === 'VI' ? 'selected' : ''}>VI</option>
+                            <option value="GR" ${this.sucursal === 'GR' ? 'selected' : ''}>GR</option>
                             </optgroup>
                           </select>
                         </div>
@@ -213,7 +215,7 @@ class Producto {
             const stockData = await this.obtenerStock(this.productoCodigo);
             if (stockData) {
                 // Filtrar las bodegas para excluir "GR"
-                const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
+                const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "LLLLL");
 
                 // Crear el contenido del tooltip solo con las bodegas válidas
                 const tooltipContent = stockFiltrado

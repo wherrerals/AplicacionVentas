@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const stockPH = getStockBodega("PH");
       const stockLC = getStockBodega("LC");
       const stockVI = getStockBodega("VI");
-
+      const stockGR = getStockBodega("GR");
       // validar si descontinuado es igual a 1 = dEscontinado, si es igual a 0 = Linea
       const descontinuado = product.descontinuado === "1" ? "Descontinuado" : "Linea";
 
@@ -177,6 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td style="text-align: center;">${stockPH}</td>
                 <td style="text-align: center;">${stockLC}</td>
                 <td style="text-align: center;">${stockVI}</td>
+                <td style="text-align: center;">${stockGR}</td>                
                 <td style="text-align: center;">${product.stockTotal}</td>
                 <td style="text-align: center;">${product.precioVenta}</td>
                 <td style="text-align: center;">${descuentoTienda}</td>

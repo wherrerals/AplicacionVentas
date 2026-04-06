@@ -52,8 +52,8 @@ class Producto {
             };
 
             // Filtrar los datos de stock excluyendo la bodega "GR"
-            const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "GR");
-            const stockTotalBodegasValidas = stockData.filter(bodega => bodega.bodega !== "GR" && bodegaMap[bodega.bodega]);
+            const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "LLLLL");
+            const stockTotalBodegasValidas = stockData.filter(bodega => bodega.bodega !== "LLLLL" && bodegaMap[bodega.bodega]);
 
 
             // Calcular el stock total sumando solo las bodegas válidas
