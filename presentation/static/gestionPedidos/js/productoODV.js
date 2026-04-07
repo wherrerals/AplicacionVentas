@@ -191,11 +191,11 @@ class Producto {
                     <div class="col-sm-12 col-lg-12 col-xl-11 col-xxl-10">
                         <select class="form-select bodega-select" style="font-size: 11px;">
                           <optgroup label="Bodega">
-                            <option id="LC" data-stock="" value="LC" ${this.sucursal === 'LC' ? 'selected' : '' } data-cantidadInicialSAP="${this.sucursal === 'LC' && this.cantidad !== undefined ? this.cantidad : 0}">LC</option>
-                            <option id="ME" data-stock="" value="ME" ${this.sucursal === 'ME' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'ME' && this.cantidad !== undefined ? this.cantidad : 0}">ME</option>
-                            <option id="PH" data-stock="" value="PH" ${this.sucursal === 'PH' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'PH' && this.cantidad !== undefined ? this.cantidad : 0}">PH</option>
-                            <option id="VI" data-stock="" value="VI" ${this.sucursal === 'VI' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'VI' && this.cantidad !== undefined ? this.cantidad : 0}">VI</option>
-                            <option id="GR" data-stock="" value="GR" ${this.sucursal === 'GR' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'GR' && this.cantidad !== undefined ? this.cantidad : 0}">GR</option>
+                            <option id="LC" data-stock="" value="LC" ${this.sucursal === 'LC' ? 'selected' : '' } data-cantidadInicialSAP="${this.sucursal === 'LC' && this.cantidad !== undefined ? this.cantidad : 0}">Las Condes (LC)</option>
+                            <option id="ME" data-stock="" value="ME" ${this.sucursal === 'ME' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'ME' && this.cantidad !== undefined ? this.cantidad : 0}">Panal (ME)</option>
+                            <option id="PH" data-stock="" value="PH" ${this.sucursal === 'PH' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'PH' && this.cantidad !== undefined ? this.cantidad : 0}">Vitacura (PH)</option>
+                            <option id="VI" data-stock="" value="VI" ${this.sucursal === 'VI' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'VI' && this.cantidad !== undefined ? this.cantidad : 0}">Viña del Mar (VI)</option>
+                            <option id="GR" data-stock="" value="GR" ${this.sucursal === 'GR' ? 'selected' : ''} data-cantidadInicialSAP="${this.sucursal === 'GR' && this.cantidad !== undefined ? this.cantidad : 0}">Ñuñoa (GR)</option>
                             </optgroup>
                         </select>
                     </div>

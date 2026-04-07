@@ -94,13 +94,13 @@ class Producto {
                 <td style="font-size: 12px; background: transparent; border-style: none; padding-bottom: 0px;" rowspan="2">
                     <div class="row">
                         <div class="col-sm-12 col-lg-12 col-xl-11 col-xxl-10">
-                          <select class="form-select bodega-select" style="font-size: 11px; disabled>
+                          <select class="form-select bodega-select" style="font-size: 11px;" disabled>
                             <optgroup label="Bodega" disabled>
-                            <option value="LC" ${this.sucursal === 'LC' ? 'selected' : ''}>LC</option>
-                            <option value="PH" ${this.sucursal === 'PH' ? 'selected' : ''}>PH</option>
-                            <option value="ME" ${this.sucursal === 'ME' ? 'selected' : ''}>ME</option>
-                            <option value="VI" ${this.sucursal === 'VI' ? 'selected' : ''}>VI</option>
-                            <option value="GR" ${this.sucursal === 'GR' ? 'selected' : ''}>GR</option>
+                            <option value="LC" ${this.sucursal === 'LC' ? 'selected' : ''}>Las Condes (LC)</option>
+                            <option value="PH" ${this.sucursal === 'PH' ? 'selected' : ''}>Vitacura (PH)</option>
+                            <option value="ME" ${this.sucursal === 'ME' ? 'selected' : ''}>Panal (ME)</option>
+                            <option value="VI" ${this.sucursal === 'VI' ? 'selected' : ''}>Viña del Mar (VI)</option>
+                            <option value="GR" ${this.sucursal === 'GR' ? 'selected' : ''}>Ñuñoa (GR)</option>
                             </optgroup>
                           </select>
                         </div>
