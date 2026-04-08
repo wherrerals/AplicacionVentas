@@ -1,10 +1,11 @@
 from django.urls import path
 
-from api_go.views.views import ProductsAPIView
+from api_go.views.views import DocumentAPIView, ProductsAPIView
 
 
 urlpatterns = [
 
     path('products/', ProductsAPIView.as_view()),
+    path('documents/', DocumentAPIView.as_view())
 
 ]
