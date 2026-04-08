@@ -51,6 +51,7 @@ class Direccion:
             return JsonResponse({'success': False, 'message': f'Error inesperado: {str(e)}'}, status=500)
 
     def generate_store_address(sucursal):
+        print(f"Generando dirección para la sucursal: {sucursal}")
         direcciones = [
             {
                 "Sucursal": "LC",
@@ -73,6 +74,16 @@ class Direccion:
                 "direccion": "Padre Hurtado Norte 1199, Vitacura, Santiago, Chile"
             },
             {
+                "Sucursal": "GR",
+                "nombreDireccion": "Showroom Ñuñoa",
+                "pais": "CL",
+                "region": "13",
+                "comuna": "13114",
+                "tipoDireccion": "12",
+                "ciudad": "Santiago",
+                "direccion": "Avenida Irarrázabal 2366, Local 01, Ñuñoa, Santiago, Chile"
+            },
+            {
                 "Sucursal": "ME",
                 "nombreDireccion": "Showroom Renca",
                 "pais": "CL",
@@ -89,7 +100,8 @@ class Direccion:
             "LC": "LC",
             "RS": "LC",
             "ME": "ME",
-            "PH": "PH"
+            "PH": "PH",
+            "GR": "GR"
         }
         
         # Buscar la sucursal con la equivalencia
