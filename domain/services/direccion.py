@@ -98,7 +98,7 @@ class Direccion:
                 "nombreDireccion": "Showroom Viña del Mar",
                 "pais": "CL",
                 "region": "5",
-                "comuna": "	05109",
+                "comuna": "05109",
                 "tipoDireccion": "12",
                 "ciudad": "Santiago",
                 "direccion": "Reñaca Norte 25, Local 6, Viña del Mar"
