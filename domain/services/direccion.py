@@ -92,6 +92,16 @@ class Direccion:
                 "tipoDireccion": "12",
                 "ciudad": "Santiago",
                 "direccion": "Av. Presidente Frei Montalva 550, Bodega 02, Renca, Santiago, Chile"
+            },
+            {
+                "Sucursal": "VI",
+                "nombreDireccion": "Showroom Viña del Mar",
+                "pais": "CL",
+                "region": "5",
+                "comuna": "	05109",
+                "tipoDireccion": "12",
+                "ciudad": "Santiago",
+                "direccion": "Reñaca Norte 25, Local 6, Viña del Mar"
             }
         ]
         
@@ -101,7 +111,8 @@ class Direccion:
             "RS": "LC",
             "ME": "ME",
             "PH": "PH",
-            "GR": "GR"
+            "GR": "GR",
+            "VI": "VI"
         }
         
         # Buscar la sucursal con la equivalencia
