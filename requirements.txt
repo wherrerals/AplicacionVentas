@@ -1,3 +1,4 @@
+"""
 asgiref==3.8.1
 certifi==2024.7.4
 charset-normalizer==3.3.2
@@ -7,6 +8,29 @@ idna==3.7
 mysqlclient==2.2.7
 requests==2.32.4
 sqlparse==0.5.1
+tzdata==2024.1
+urllib3==2.5.0
+celery==5.2.3
+whitenoise==6.8.2
+gunicorn==23.0.0
+redi
+pika
+weasyprint
+python-dotenv
+rapidfuzz
+unidecode
+
+"""
+# version de depend databot 
+asgiref==3.8.1
+certifi==2024.7.4
+charset-normalizer==3.3.2
+Django>=5.1.15
+djangorestframework
+idna==3.7
+mysqlclient==2.2.7
+requests==2.32.4
+sqlparse>=0.5.4
 tzdata==2024.1
 urllib3==2.5.0
 celery==5.2.3
