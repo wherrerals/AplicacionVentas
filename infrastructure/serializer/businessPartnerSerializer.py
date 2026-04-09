@@ -37,7 +37,10 @@ class BusinessPartnerSerializer:
 
         for address in direcciones:
             id_comuna = address.get('comuna')
+            print(f"Procesando comuna: {id_comuna}")
             comunas = ComunaRepository().obtenerComunaPorId(id_comuna)    
+
+            print(f"comuna: {comunas.nombre}, código: {comunas.codigo} ")
             tipo_direccion = address.get("tipoDireccion", "")
 
             serialized_address = {
