@@ -16,9 +16,10 @@ class SerializerDocument:
 
     @staticmethod
     def document_serializer(doc_data):
+        print(f"Serializing document with data: {doc_data}")
             
-        calculator = CalculadoraTotales(doc_data)
-        doc_total = calculator.calculate_docTotal()
+        #calculator = CalculadoraTotales(doc_data)
+        #doc_total = calculator.calculate_docTotal()
 
         type_sales = Seller.tipoVentaTipoVendedor(doc_data.get('SalesPersonCode'))
         
@@ -79,7 +80,12 @@ class SerializerDocument:
             warehouseCode = linea.get('WarehouseCode')
 
             unit_price = linea.get('UnitePrice')
-            unit_price_neto = round(unit_price / 1.19, 4)
+            if unit_price not in(None, "", "None"):
+
+                unit_price_neto = round(unit_price / 1.19, 4)
+
+            else:
+                unit_price_neto = repo_producto.obtener_precio_unitario_neto(linea.get('ItemCode'))
 
             nueva_linea = {
                 'ItemCode': item_code,

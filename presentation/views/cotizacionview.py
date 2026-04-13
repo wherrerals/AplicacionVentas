@@ -139,6 +139,8 @@ class CotizacionView(View):
         docnum = data.get('DocNum')
         cotizacion = Cotizacion()
 
+        print(f"Data: {data}")
+
         if docEntry:
             if self.validar_vendedor(users_data['vendedor'], data['SalesPersonCode']) == True:
                 actualizacion = cotizacion.actualizarDocumento(docnum, docEntry, data)
