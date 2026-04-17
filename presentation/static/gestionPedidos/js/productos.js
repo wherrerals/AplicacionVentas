@@ -127,6 +127,41 @@ class Producto {
         newRow.setAttribute('data-docentryLinea', this.docEntry_linea);
         newRow.setAttribute('data-itemcode', this.productoCodigo);
 
+
+        // Al crear cada fila, agregar los atributos y eventos
+        newRow.setAttribute('draggable', 'true');
+
+        newRow.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', newRow.id);
+            newRow.classList.add('dragging');
+        });
+
+        newRow.addEventListener('dragover', (e) => {
+            e.preventDefault(); // necesario para permitir el drop
+        });
+
+        newRow.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const draggedId = e.dataTransfer.getData('text/plain');
+            const draggedEl = document.getElementById(draggedId);
+            const container = newRow.parentNode;
+
+            // Insertar antes o después según posición del cursor
+            const rect = newRow.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            if (e.clientY < midY) {
+                container.insertBefore(draggedEl, newRow);
+            } else {
+                container.insertBefore(draggedEl, newRow.nextSibling);
+            }
+
+            recalcularIndices(); // <-- clave
+        });
+
+        newRow.addEventListener('dragend', () => {
+            newRow.classList.remove('dragging');
+        });
+
         // Verificar si el valor de docEntry_linea es "null"
         if (this.docEntry_linea === "null") {
             newRow.style.backgroundColor = '#F0F2F5'; // Color gris claro cuando es "null"
@@ -226,14 +261,15 @@ class Producto {
                     <div class="d-flex align-items-center gap-1">
 
                         <!-- Botón ficha técnica -->
-                        <button 
-                            class="btn btn-outline-primary btn-sm py-0 px-1 d-flex align-items-center"
-                            style="font-size: 11px; line-height: 1;"
+                          <button 
+                            class="btn btn-link btn-sm p-0 d-flex align-items-center justify-content-center text-danger"
+                            style="width: 22px; height: 22px;"
                             onclick="generarFichaTecnica('${this.productoCodigo}')"
                             type="button"
-                            title="Descargar Ficha técnica"
+                            title="Descargar ficha técnica PDF"
+                            aria-label="Descargar ficha técnica PDF"
                         >
-                            <i class="bi bi-file-earmark-text" style="font-size: 12px;">Ficha</i>
+                            <i class="bi bi-file-earmark-pdf-fill" style="font-size: 16px;"></i>
                         </button>
 
                         <!-- Nombre producto -->
@@ -289,6 +325,9 @@ class Producto {
         });
 
         this.limitarMaxDescuento(newRow);
+        inicializarDragAndDrop(newRow);
+
+
         return newRow;
     }
 
@@ -441,3 +480,104 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
     // Llamar a la función agregarInteractividad si es necesario
     agregarInteractividad(newRow, productoCodigo, indiceProducto);
 }
+
+    function recalcularIndices() {
+        const filas = document.querySelectorAll('tbody.product-row');
+
+        filas.forEach((fila, index) => {
+            const nuevoIndice = index + 1;
+
+            // Actualizar id y atributo del tbody
+            fila.setAttribute('id', nuevoIndice);
+
+            // Actualizar el texto visible del índice
+            const indiceTd = fila.querySelector('#indixe_producto');
+            if (indiceTd) {
+                indiceTd.textContent = `${nuevoIndice})`;
+                indiceTd.setAttribute('data-indice', nuevoIndice);
+            }
+        });
+    }
+
+    let draggedRow = null;
+
+    function inicializarDragAndDrop(fila) {
+        fila.setAttribute('draggable', 'true');
+
+        fila.addEventListener('dragstart', (e) => {
+            draggedRow = fila;
+            // Pequeño delay para que el browser tome el snapshot ANTES de opacar
+            setTimeout(() => fila.classList.add('dragging'), 0);
+            e.dataTransfer.effectAllowed = 'move';
+        });
+
+        fila.addEventListener('dragend', () => {
+            fila.classList.remove('dragging');
+            draggedRow = null;
+            // Limpiar todos los indicadores visuales
+            limpiarIndicadores();
+        });
+
+        fila.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+
+            if (fila === draggedRow) return;
+
+            limpiarIndicadores();
+
+            const rect = fila.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+
+            if (e.clientY < midY) {
+                fila.classList.add('drag-over-top');    // va ANTES de esta fila
+            } else {
+                fila.classList.add('drag-over-bottom'); // va DESPUÉS de esta fila
+            }
+        });
+
+        fila.addEventListener('dragleave', (e) => {
+            // Solo limpiar si realmente salimos de la fila (no de un hijo)
+            if (!fila.contains(e.relatedTarget)) {
+                fila.classList.remove('drag-over-top', 'drag-over-bottom');
+            }
+        });
+
+        fila.addEventListener('drop', (e) => {
+            e.preventDefault();
+
+            if (!draggedRow || fila === draggedRow) return;
+
+            const container = fila.parentNode;
+            const rect = fila.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+
+            if (e.clientY < midY) {
+                container.insertBefore(draggedRow, fila);          // insertar ANTES
+            } else {
+                container.insertBefore(draggedRow, fila.nextSibling); // insertar DESPUÉS
+            }
+
+            limpiarIndicadores();
+            recalcularIndices();
+        });
+    }
+
+    function limpiarIndicadores() {
+        document.querySelectorAll('.product-row').forEach(f => {
+            f.classList.remove('drag-over-top', 'drag-over-bottom');
+        });
+    }
+
+    function recalcularIndices() {
+        document.querySelectorAll('tbody.product-row').forEach((fila, index) => {
+            const nuevoIndice = index + 1;
+            fila.setAttribute('id', nuevoIndice);
+
+            const indiceTd = fila.querySelector('[id="indixe_producto"]');
+            if (indiceTd) {
+                indiceTd.textContent = `${nuevoIndice})`;
+                indiceTd.setAttribute('data-indice', nuevoIndice);
+            }
+        });
+    }

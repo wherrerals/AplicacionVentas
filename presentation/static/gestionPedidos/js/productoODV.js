@@ -172,6 +172,41 @@ class Producto {
         newRow.setAttribute('data-docentryLinea', this.docEntry_linea);
         newRow.setAttribute('data-itemcode', this.productoCodigo);
 
+
+        // Al crear cada fila, agregar los atributos y eventos
+        newRow.setAttribute('draggable', 'true');
+
+        newRow.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', newRow.id);
+            newRow.classList.add('dragging');
+        });
+
+        newRow.addEventListener('dragover', (e) => {
+            e.preventDefault(); // necesario para permitir el drop
+        });
+
+        newRow.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const draggedId = e.dataTransfer.getData('text/plain');
+            const draggedEl = document.getElementById(draggedId);
+            const container = newRow.parentNode;
+
+            // Insertar antes o después según posición del cursor
+            const rect = newRow.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            if (e.clientY < midY) {
+                container.insertBefore(draggedEl, newRow);
+            } else {
+                container.insertBefore(draggedEl, newRow.nextSibling);
+            }
+
+            recalcularIndices(); // <-- clave
+        });
+
+        newRow.addEventListener('dragend', () => {
+            newRow.classList.remove('dragging');
+        });
+
         // Verificar si el valor de docEntry_linea es "null"
         if (this.docEntry_linea === "null") {
             newRow.style.backgroundColor = '#F0F2F5'; // Color gris claro cuando es "null"
@@ -258,12 +293,7 @@ class Producto {
                 </td>
                     <td style="background: transparent;padding-top: 8px;padding-left: 50px;border-style: none;padding-bottom: 0px;">
                         <a class="navbar-brand d-flex align-items-center bi bi-trash" href="#" style="width: 18px;"  id="eliminarp">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-trash" style="width: 18px;height: 18px;">
-                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z">
-                                </path>
-                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z">
-                                </path>
-                            </svg>
+
                         </a>
                     </td>
             </tr>
@@ -273,13 +303,14 @@ class Producto {
 
                         <!-- Botón ficha técnica -->
                         <button 
-                            class="btn btn-outline-primary btn-sm py-0 px-1 d-flex align-items-center"
-                            style="font-size: 11px; line-height: 1;"
+                            class="btn btn-link btn-sm p-0 d-flex align-items-center justify-content-center text-danger"
+                            style="width: 22px; height: 22px;"
                             onclick="generarFichaTecnica('${this.productoCodigo}')"
                             type="button"
-                            title="Descargar Ficha técnica"
+                            title="Descargar ficha técnica PDF"
+                            aria-label="Descargar ficha técnica PDF"
                         >
-                            <i class="bi bi-file-earmark-text" style="font-size: 12px;">Ficha</i>
+                            <i class="bi bi-file-earmark-pdf-fill" style="font-size: 16px;"></i>
                         </button>
 
                         <!-- Nombre producto -->
@@ -355,6 +386,8 @@ class Producto {
 
         this.limitarMaxDescuento(newRow);
         this.limitarCantidad(newRow);
+        inicializarDragAndDrop(newRow);
+
         return newRow;
     }
 
@@ -890,6 +923,89 @@ function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre
     agregarInteractividad(newRow, productoCodigo, contprod);
 
 }
+
+    let draggedRow = null;
+
+    function inicializarDragAndDrop(fila) {
+        fila.setAttribute('draggable', 'true');
+
+        fila.addEventListener('dragstart', (e) => {
+            draggedRow = fila;
+            // Pequeño delay para que el browser tome el snapshot ANTES de opacar
+            setTimeout(() => fila.classList.add('dragging'), 0);
+            e.dataTransfer.effectAllowed = 'move';
+        });
+
+        fila.addEventListener('dragend', () => {
+            fila.classList.remove('dragging');
+            draggedRow = null;
+            // Limpiar todos los indicadores visuales
+            limpiarIndicadores();
+        });
+
+        fila.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+
+            if (fila === draggedRow) return;
+
+            limpiarIndicadores();
+
+            const rect = fila.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+
+            if (e.clientY < midY) {
+                fila.classList.add('drag-over-top');    // va ANTES de esta fila
+            } else {
+                fila.classList.add('drag-over-bottom'); // va DESPUÉS de esta fila
+            }
+        });
+
+        fila.addEventListener('dragleave', (e) => {
+            // Solo limpiar si realmente salimos de la fila (no de un hijo)
+            if (!fila.contains(e.relatedTarget)) {
+                fila.classList.remove('drag-over-top', 'drag-over-bottom');
+            }
+        });
+
+        fila.addEventListener('drop', (e) => {
+            e.preventDefault();
+
+            if (!draggedRow || fila === draggedRow) return;
+
+            const container = fila.parentNode;
+            const rect = fila.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+
+            if (e.clientY < midY) {
+                container.insertBefore(draggedRow, fila);          // insertar ANTES
+            } else {
+                container.insertBefore(draggedRow, fila.nextSibling); // insertar DESPUÉS
+            }
+
+            limpiarIndicadores();
+            recalcularIndices();
+        });
+    }
+
+    function limpiarIndicadores() {
+        document.querySelectorAll('.product-row').forEach(f => {
+            f.classList.remove('drag-over-top', 'drag-over-bottom');
+        });
+    }
+
+    function recalcularIndices() {
+        document.querySelectorAll('tbody.product-row').forEach((fila, index) => {
+            const nuevoIndice = index + 1;
+            fila.setAttribute('id', nuevoIndice);
+
+            const indiceTd = fila.querySelector('[id="indixe_producto"]');
+            if (indiceTd) {
+                indiceTd.textContent = `${nuevoIndice})`;
+                indiceTd.setAttribute('data-indice', nuevoIndice);
+            }
+        });
+    }
 
 document.addEventListener('productoEliminado', function(event) {
     const { codigoProducto } = event.detail;

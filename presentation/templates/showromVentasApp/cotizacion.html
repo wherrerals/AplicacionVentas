@@ -36,6 +36,55 @@
         text-decoration: overline;
     }
 
+    .product-row {
+        cursor: grab;
+        transition: all 0.15s ease;
+        border-radius: 6px;
+    }
+
+    /* Elemento que se está arrastrando */
+    .product-row.dragging {
+        opacity: 0.85;
+        cursor: grabbing;
+        transform: scale(1.02);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        background: #fff;
+        z-index: 10;
+    }
+
+    /* Hover mientras se puede dropear */
+    .product-row.drag-over {
+        background: rgba(13, 110, 253, 0.05);
+    }
+
+    /* Línea indicadora MÁS visible */
+    .product-row.drag-over-top::before,
+    .product-row.drag-over-bottom::after {
+        content: "";
+        display: block;
+        height: 4px;
+        background: #0d6efd;
+        border-radius: 2px;
+        animation: pulse 0.8s infinite;
+    }
+
+    /* Posición arriba */
+    .product-row.drag-over-top::before {
+        margin-bottom: 4px;
+    }
+
+    /* Posición abajo */
+    .product-row.drag-over-bottom::after {
+        margin-top: 4px;
+    }
+
+    /* Animación suave */
+    @keyframes pulse {
+        0% { opacity: 0.4; }
+        50% { opacity: 1; }
+        100% { opacity: 0.4; }
+    }
+
   </style>
 
     <script>
