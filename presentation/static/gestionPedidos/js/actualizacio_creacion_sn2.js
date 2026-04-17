@@ -1,7 +1,6 @@
 // Funcionalidades para la creación y actualización de clientes y pedidos en el sistema
 
 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value; // Obtener el token CSRF
-
 const formularios = document.querySelectorAll('#forCrearPedidos, #forCrearCliente'); // Ajustar los IDs según el HTML
 
 // Función para mostrar el overlay de carga
@@ -13,85 +12,62 @@ formularios.forEach(formulario => {
         const nombre = document.getElementById('nombreSN').value;
         const apellido = document.getElementById('apellidoSN').value;
         const rut = document.getElementById('rutSN').value;
-        const tipo = document.querySelector('input[name="grupoSN"]:checked').value;
-        const cardCode = document.getElementById('inputCliente').getAttribute('data-codigosn') || null;
+
+        // Defensivo: el elemento puede no existir
+        const inputClienteEl = document.getElementById('inputCliente');
+        const cardCode = inputClienteEl ? inputClienteEl.getAttribute('data-codigosn') || null : null;
+
+        const tipoEl = document.querySelector('input[name="grupoSN"]:checked');
+        const tipo = tipoEl ? tipoEl.value : null;
+
         const email = document.getElementById('emailSN').value;
         const telefono = document.getElementById('telefonoSN').value;
         const giro = document.getElementById('giroSN').value;
         const sucursal = document.getElementById('sucursal').textContent;
+
         // docentry es el número de la cotización o numero_orden
         let docentry = null;
-
-        // Intenta capturar el contenido de "numero_cotizacion"
-        const cotizacionElement = document.getElementById("numero_cotizacion");
-        
-        console.log(cardCode);
-
-        // Si no encuentra "numero_cotizacion", busca "numero_orden"
+        const cotizacionElement = document.getElementById("numero_cotizacion");      
         if (cotizacionElement) {
             docentry = cotizacionElement.textContent;
-            console.log(docentry);
         } else {
             const ordenElement = document.getElementById("numero_orden");
-            if (ordenElement) {
-                docentry = ordenElement.textContent;
-            }
+            if (ordenElement) docentry = ordenElement.textContent;
         }
 
         // Obtener las direcciones y contactos
         const lines = [];
-        const contactos = [];
-
-        // Obtener las filas de direcciones y contactos
-        const productRows = document.querySelectorAll('.direcciones');
-        productRows.forEach((row, index) => {
-            const tipoDireccion = row.querySelector("#direccionSN")?.value || "";
-            const nombreDireccion = row.querySelector("#nombreDireccionSN")?.value || "";
-            const pais = row.querySelector("#paisSN")?.value || "";
-            const region = row.querySelector("#regionSN")?.value || "";
-            const comuna = row.querySelector("#comunaSN")?.value || "";
-            const ciudad = row.querySelector("#ciudad")?.value || "";
-            const direccion = row.querySelector("#direccion")?.value || "";
-
+        document.querySelectorAll('.direcciones').forEach((row, index) => {
             // Crear un objeto con los datos de la fila de direcciones
-            const line = {
+             lines.push({
                 direccionSN: index,
-                tipoDireccion: tipoDireccion,
-                nombreDireccion: nombreDireccion,
-                pais: pais,
-                region: region,
-                comuna: comuna,
-                ciudad: ciudad,
-                direccion: direccion
-            };
-
-            lines.push(line);
+                tipoDireccion: row.querySelector("#direccionSN")?.value || "",
+                nombreDireccion: row.querySelector("#nombreDireccionSN")?.value || "",
+                pais: row.querySelector("#paisSN")?.value || "",
+                region: row.querySelector("#regionSN")?.value || "",
+                comuna: row.querySelector("#comunaSN")?.value || "",
+                ciudad: row.querySelector("#ciudad")?.value || "",
+                direccion: row.querySelector("#direccion")?.value || ""
+            });
         });
 
-        // Obtener las filas de contactos
-        const contactoRows = document.querySelectorAll('.contactos');
-        contactoRows.forEach((row, index) => {
-            const nombreContacto = row.querySelector("#nombreContacto")?.value || "";
-            const apellidoContacto = row.querySelector("#apellidoContacto")?.value || "";
-            const telefonoContacto = row.querySelector("#telefonoContacto")?.value || "";
-            const celularContacto = row.querySelector("#celularContacto")?.value || "";
-            const emailContacto = row.querySelector("#emailContacto")?.value || "";
+                
+        const contactos = [];
+        document.querySelectorAll('.contactos').forEach((row, index) => {
 
             // Crear un objeto con los datos de la fila de contactos
-            const contactoData = {
+            contactos.push({
                 contactoSN: index,
-                nombreContacto: nombreContacto,
-                apellidoContacto: apellidoContacto,
-                telefonoContacto: telefonoContacto,
-                puestoContacto: celularContacto,
-                emailContacto: emailContacto
-            };
-
-            contactos.push(contactoData);
+                nombreContacto: row.querySelector("#nombreContacto")?.value || "",
+                apellidoContacto: row.querySelector("#apellidoContacto")?.value || "",
+                telefonoContacto: row.querySelector("#telefonoContacto")?.value || "",
+                puestoContacto: row.querySelector("#puestoContacto")?.value || "",
+                emailContacto: row.querySelector("#emailContacto")?.value || ""
+            });
         });
 
         // Crear un objeto con los datos del formulario
-        data = {
+        const data = {
             sucursal: sucursal,
             docentry: docentry,
             nombreSN: nombre,
@@ -107,53 +83,37 @@ formularios.forEach(formulario => {
         }
 
         // Convertir los datos a JSON
-        dataSN = JSON.stringify(data);
-
-        // Deshabilitar el botón de envío para evitar múltiples envíos
+        const dataSN = JSON.stringify(data);
         const submitButton = document.querySelector('button[type="submit"]');
         submitButton.disabled = true;
-
         showLoadingOverlay();
 
         // Enviar los datos del formulario
         fetch('/ventas/agregar_editar_clientes/', {  
             method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken
-            },
+            headers: {'X-CSRFToken': csrftoken},
             body: dataSN
         })
 
-        // Procesar la respuesta
-        // En tu bloque .then()
         .then(response => {
             submitButton.disabled = false;
-
-            if (!response.ok) {
-                if (response.status === 400) {
-                    hideLoadingOverlay();
-                    return response.json().then(data => {
-                        throw new Error(data.message || 'Error en los datos enviados');
-                    });
-                } else if (response.status === 500) {
-                    hideLoadingOverlay();
-                    throw new Error('Error interno del servidor');
-                } else {
-                    hideLoadingOverlay();
-                    throw new Error('Error desconocido');
-                }
-            }
             hideLoadingOverlay();
 
-            // Obtener el RUT del cliente para buscar la información 
+            if (!response.ok) {
+                return response.json().then(errData => {
+                    const msg = errData.message || errData.details || `Error ${response.status}`;
+                    throw new Error(msg);
+                }).catch(err => {
+                    // Si el body no es JSON válido
+                    throw new Error(err.message || `Error ${response.status}`);
+                });
+            }
+
             const rutInput = document.getElementById('rutSN') || document.getElementById('inputCliente');
             const rutCliente = rutInput ? rutInput.value : '';
 
             if (rutCliente) {
-                console.log('RUT del cliente XXXX:', rutCliente);
-                $('#resultadosClientes').empty(); // Limpiar los resultados de la búsqueda 
-
-                // Llamar a traerInformacionCliente y luego actualizar los datos en el DOM
+                $('#resultadosClientes').empty();  
                 traerInformacionCliente(rutCliente)
                 actualizarDatosCliente(rutCliente, rutCliente);
             }
@@ -161,7 +121,6 @@ formularios.forEach(formulario => {
             return response.json();
         })
 
-        // Procesar los datos de la respuesta
         .then(data => {
             limpiarMensajes();
 
@@ -173,16 +132,13 @@ formularios.forEach(formulario => {
 
                 const modalElement = document.getElementById('clienteModal'); 
                 const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                if (modalInstance) {
-                    modalInstance.hide();
-                }
+                if (modalInstance) modalInstance.hide();
             }
         })
 
         // Capturar errores en la solicitud
         .catch(error => {
             submitButton.disabled = false;
-            console.error('Error en la solicitud:', error);
             hideLoadingOverlay();
             mostrarMensaje(error.message || 'Ocurrió un error desconocido', 'error');
         });
