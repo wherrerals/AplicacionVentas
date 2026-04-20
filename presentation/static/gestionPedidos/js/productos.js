@@ -128,39 +128,7 @@ class Producto {
         newRow.setAttribute('data-itemcode', this.productoCodigo);
 
 
-        // Al crear cada fila, agregar los atributos y eventos
-        newRow.setAttribute('draggable', 'true');
-
-        newRow.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', newRow.id);
-            newRow.classList.add('dragging');
-        });
-
-        newRow.addEventListener('dragover', (e) => {
-            e.preventDefault(); // necesario para permitir el drop
-        });
-
-        newRow.addEventListener('drop', (e) => {
-            e.preventDefault();
-            const draggedId = e.dataTransfer.getData('text/plain');
-            const draggedEl = document.getElementById(draggedId);
-            const container = newRow.parentNode;
-
-            // Insertar antes o después según posición del cursor
-            const rect = newRow.getBoundingClientRect();
-            const midY = rect.top + rect.height / 2;
-            if (e.clientY < midY) {
-                container.insertBefore(draggedEl, newRow);
-            } else {
-                container.insertBefore(draggedEl, newRow.nextSibling);
-            }
-
-            recalcularIndices(); // <-- clave
-        });
-
-        newRow.addEventListener('dragend', () => {
-            newRow.classList.remove('dragging');
-        });
+        // draggable se maneja solo desde el handle, no en toda la fila
 
         // Verificar si el valor de docEntry_linea es "null"
         if (this.docEntry_linea === "null") {
@@ -248,36 +216,46 @@ class Producto {
                     <input class="form-control" type="text" placeholder="Comentario" id="comentarios-1" style="font-size: 12px;" value="${this.comentario ?? ''}"></input>
                 </td>
                 <td style="background: transparent;padding-top: 8px;padding-left: 50px;border-style: none;padding-bottom: 0px;">
-                    <a class="navbar-brand d-flex align-items-center" href="#" style="width: 18px;">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="eliminarp" class="bi bi-trash" style="width: 18px;height: 18px;">
-                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"> </path>
-                        <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"> </path>
-                      </svg>
-                    </a>
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Botón eliminar -->
+                        <a class="navbar-brand d-flex align-items-center" href="#" style="width: 18px;">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" id="eliminarp" class="bi bi-trash" style="width: 18px;height: 18px;">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"> </path>
+                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"> </path>
+                          </svg>
+                        </a>
+
+                    </div>
                 </td>
             <tr style="font-size: 12px;background: transparent;">
                 
                 <td colspan="7" style="padding-top: 0px; background: transparent;">
-                    <div class="d-flex align-items-center gap-1">
+                <div class="d-flex align-items-center gap-1">
 
-                        <!-- Botón ficha técnica -->
-                          <button 
-                            class="btn btn-link btn-sm p-0 d-flex align-items-center justify-content-center text-danger"
-                            style="width: 22px; height: 22px;"
-                            onclick="generarFichaTecnica('${this.productoCodigo}')"
-                            type="button"
-                            title="Descargar ficha técnica PDF"
-                            aria-label="Descargar ficha técnica PDF"
-                        >
-                            <i class="bi bi-file-earmark-pdf-fill" style="font-size: 16px;"></i>
-                        </button>
+                    <button 
+                        class="btn btn-link btn-sm p-0 d-flex align-items-center justify-content-center text-danger"
+                        style="width: 22px; height: 22px;"
+                        onclick="generarFichaTecnica('${this.productoCodigo}')"
+                        type="button"
+                        title="Descargar ficha técnica PDF"
+                    >
+                        <i class="bi bi-file-earmark-pdf-fill" style="font-size: 16px;"></i>
+                    </button>
 
-                        <!-- Nombre producto -->
-                        <span name="nombre_producto" style="font-size: 12px;">
-                            ${this.nombre}
-                        </span>
+                    <span name="nombre_producto" style="font-size: 12px; flex-grow: 1;">
+                        ${this.nombre}
+                    </span>
 
-                    </div>
+                    <span id="drag-handle" 
+                        title="Arrastrar para reordenar" 
+                        style="cursor: grab; color: #888; user-select: none; padding: 4px 12px; display: flex; align-items: center; justify-content: center;">
+                        
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                        </svg>
+                    </span>
+
+                </div>
                 </td>
             </tr>
             </tr>
@@ -502,9 +480,26 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
     let draggedRow = null;
 
     function inicializarDragAndDrop(fila) {
-        fila.setAttribute('draggable', 'true');
+        const handle = fila.querySelector('#drag-handle');
+
+        if (handle) {
+            // Solo activar draggable cuando el usuario presiona el handle
+            handle.addEventListener('mousedown', () => {
+                fila.setAttribute('draggable', 'true');
+            });
+
+            // Desactivar draggable al soltar para evitar arrastre accidental en toda la fila
+            handle.addEventListener('mouseup', () => {
+                fila.setAttribute('draggable', 'false');
+            });
+        }
 
         fila.addEventListener('dragstart', (e) => {
+            // Bloquear si el drag no viene del handle
+            if (!fila.getAttribute('draggable') || fila.getAttribute('draggable') === 'false') {
+                e.preventDefault();
+                return;
+            }
             draggedRow = fila;
             // Pequeño delay para que el browser tome el snapshot ANTES de opacar
             setTimeout(() => fila.classList.add('dragging'), 0);
@@ -512,6 +507,7 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
         });
 
         fila.addEventListener('dragend', () => {
+            fila.setAttribute('draggable', 'false');
             fila.classList.remove('dragging');
             draggedRow = null;
             // Limpiar todos los indicadores visuales

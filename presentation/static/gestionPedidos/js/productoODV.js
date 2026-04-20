@@ -172,41 +172,6 @@ class Producto {
         newRow.setAttribute('data-docentryLinea', this.docEntry_linea);
         newRow.setAttribute('data-itemcode', this.productoCodigo);
 
-
-        // Al crear cada fila, agregar los atributos y eventos
-        newRow.setAttribute('draggable', 'true');
-
-        newRow.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', newRow.id);
-            newRow.classList.add('dragging');
-        });
-
-        newRow.addEventListener('dragover', (e) => {
-            e.preventDefault(); // necesario para permitir el drop
-        });
-
-        newRow.addEventListener('drop', (e) => {
-            e.preventDefault();
-            const draggedId = e.dataTransfer.getData('text/plain');
-            const draggedEl = document.getElementById(draggedId);
-            const container = newRow.parentNode;
-
-            // Insertar antes o después según posición del cursor
-            const rect = newRow.getBoundingClientRect();
-            const midY = rect.top + rect.height / 2;
-            if (e.clientY < midY) {
-                container.insertBefore(draggedEl, newRow);
-            } else {
-                container.insertBefore(draggedEl, newRow.nextSibling);
-            }
-
-            recalcularIndices(); // <-- clave
-        });
-
-        newRow.addEventListener('dragend', () => {
-            newRow.classList.remove('dragging');
-        });
-
         // Verificar si el valor de docEntry_linea es "null"
         if (this.docEntry_linea === "null") {
             newRow.style.backgroundColor = '#F0F2F5'; // Color gris claro cuando es "null"
@@ -301,21 +266,27 @@ class Producto {
                 <td colspan="3" style="padding-top: 0px;background: transparent;">
                     <div class="d-flex align-items-center gap-1">
 
-                        <!-- Botón ficha técnica -->
                         <button 
                             class="btn btn-link btn-sm p-0 d-flex align-items-center justify-content-center text-danger"
                             style="width: 22px; height: 22px;"
                             onclick="generarFichaTecnica('${this.productoCodigo}')"
                             type="button"
                             title="Descargar ficha técnica PDF"
-                            aria-label="Descargar ficha técnica PDF"
                         >
                             <i class="bi bi-file-earmark-pdf-fill" style="font-size: 16px;"></i>
                         </button>
 
-                        <!-- Nombre producto -->
-                        <span name="nombre_producto" style="font-size: 12px;">
+                        <span name="nombre_producto" style="font-size: 12px; flex-grow: 1;">
                             ${this.nombre}
+                        </span>
+
+                        <span id="drag-handle" 
+                            title="Arrastrar para reordenar" 
+                            style="cursor: grab; color: #888; user-select: none; padding: 4px 12px; display: flex; align-items: center; justify-content: center;">
+                            
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                            </svg>
                         </span>
 
                     </div>
@@ -927,9 +898,26 @@ function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre
     let draggedRow = null;
 
     function inicializarDragAndDrop(fila) {
-        fila.setAttribute('draggable', 'true');
+        const handle = fila.querySelector('#drag-handle');
+
+        if (handle) {
+            // Solo activar draggable cuando el usuario presiona el handle
+            handle.addEventListener('mousedown', () => {
+                fila.setAttribute('draggable', 'true');
+            });
+
+            // Desactivar draggable al soltar para evitar arrastre accidental en toda la fila
+            handle.addEventListener('mouseup', () => {
+                fila.setAttribute('draggable', 'false');
+            });
+        }
 
         fila.addEventListener('dragstart', (e) => {
+            // Bloquear si el drag no viene del handle
+            if (!fila.getAttribute('draggable') || fila.getAttribute('draggable') === 'false') {
+                e.preventDefault();
+                return;
+            }
             draggedRow = fila;
             // Pequeño delay para que el browser tome el snapshot ANTES de opacar
             setTimeout(() => fila.classList.add('dragging'), 0);
@@ -937,6 +925,7 @@ function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre
         });
 
         fila.addEventListener('dragend', () => {
+            fila.setAttribute('draggable', 'false');
             fila.classList.remove('dragging');
             draggedRow = null;
             // Limpiar todos los indicadores visuales
