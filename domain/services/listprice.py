@@ -14,7 +14,7 @@ class ListPriceService:
         self.sku = sku
         self.costo = costo
         self.user = user
-        self.rentability = 50
+        self.rentability = 60
         self.price_list = 0
         self.list_price_product = 0
         self.cardCode = cardCode

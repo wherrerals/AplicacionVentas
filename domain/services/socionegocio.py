@@ -380,22 +380,15 @@ class SocioNegocio:
 
 
     def verify_valid_rut(self, rut):
-        """
-        Método para verificar si un RUT es válido.
-
-        Args:
-            rut (str): RUT a verificar. Debe tener el formato "XXXXXXXX-X".
-
-        Returns:
-            bool: True si el RUT es válido, False si no.
-        """
         try:
+            if not rut or not isinstance(rut, str):
+                return False, "El RUT no puede estar vacío."
+            
+            rut = rut.strip()
 
             # RUT sin puntos y guion
             if '.' in rut:
                 return False, "El RUT no debe contener puntos."
-
-
             if "-" not in rut:
                 return False, "El RUT debe contener un guion antes del dígito verificador."
             
@@ -408,13 +401,10 @@ class SocioNegocio:
             #numero base en entero
             numero = numero.replace(".", "")  # Quitar puntos
             digito_verificador = digito_verificador.upper()  # Convertir a mayúsculas
-            
             # Invertir los dígitos del número base para el cálculo
             numero_invertido = str(numero)[::-1]
-
             # Lista de multiplicadores cíclicos 2, 3, 4, 5, 6, 7
             multiplicadores = [2, 3, 4, 5, 6, 7]
-
             # Sumar los productos de los dígitos por los multiplicadores
             suma = 0
             for i, digito in enumerate(numero_invertido):
@@ -422,23 +412,22 @@ class SocioNegocio:
 
             # Calcular el residuo
             residuo = suma % 11
-
             # Calcular el dígito verificador según el módulo 11
             digito_calculado = 11 - residuo
-
             if digito_calculado == 11:
                 digito_calculado = '0'
             elif digito_calculado == 10:
                 digito_calculado = 'K'
             else:
                 digito_calculado = str(digito_calculado)
-
             # Retornar si el dígito verificador coincide con el calculado
             return (digito_calculado == digito_verificador, "El RUT es válido." if digito_calculado == digito_verificador else "El RUT es inválido.")
 
         except Exception as e:
-            print(f"Error al verificar RUT: {str(e)}")
-            return False
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error inesperado al verificar RUT '{rut}': {str(e)}", exc_info=True)            
+            return False, f"Error inesperado al verificar el RUT: {str(e)}"
 
         
     
@@ -945,7 +934,6 @@ class SocioNegocio:
     #Creacion Socio Negocio
     def create_or_update_bp(self):
         bp_data = self.request
-
         is_valid, message = self.verify_valid_rut(self.rut)
         
         if not is_valid:
@@ -957,21 +945,30 @@ class SocioNegocio:
             return JsonResponse({'success': False, 'message': str(e)}, status=400)
         
         rut_sap = self.rut.split("-")[0] + "C"
-
         exiting_bp = SocioNegocioRepository.get_by_rut(self.rut)
         exiting_bp_sap = self.verify_sap_bp(rut_sap)
 
-        if exiting_bp_sap:
-            if exiting_bp is not None:
-                return self.process_existing_bp(bp_data.get('cardCodeSN'), exiting_bp, newData=bp_data)
-            
-            self.crearYresponderCliente(rut_sap, rut_sap)
-            return JsonResponse({'success': True, 'message': 'Cliente Creado desde SAP exitosamente'})
+        try:
+            if exiting_bp_sap:
+                if exiting_bp is not None:
+                    card_code = bp_data.get('cardCodeSN')
+                    if card_code is None:
+                        return JsonResponse({'success': False, 'message': 'cardCodeSN es requerido para actualizar'}, status=400) 
+                    result = self.process_existing_bp(bp_data.get('cardCodeSN'), exiting_bp, newData=bp_data)
+                    if result is None: 
+                        return JsonResponse({'success': False, 'message': 'Error al procesar cliente existente'}, status=500)
+                    return result
+                
+                self.crearYresponderCliente(rut_sap, rut_sap)
+                return JsonResponse({'success': True, 'message': 'Cliente Creado desde SAP exitosamente'})
 
-        self.process_new_bp(SocioNegocio.generate_bp_code(self.rut), bp_data)
-
-        return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
-        
+            self.process_new_bp(SocioNegocio.generate_bp_code(self.rut), bp_data)
+            return JsonResponse({'success': True, 'message': 'Cliente creado exitosamente'})
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error en create_or_update_bp: {str(e)}", exc_info=True)
+            return JsonResponse({'success': False, 'message': 'Error interno', 'details': str(e)}, status=500)
 
     def process_new_bp(self, card_code, data_bp):
         # get branch from data_bp, if not found, generate a new one for default
