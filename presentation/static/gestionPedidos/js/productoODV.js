@@ -280,14 +280,7 @@ class Producto {
                             ${this.nombre}
                         </span>
 
-                        <span id="drag-handle" 
-                            title="Arrastrar para reordenar" 
-                            style="cursor: grab; color: #888; user-select: none; padding: 4px 12px; display: flex; align-items: center; justify-content: center;">
-                            
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-                            </svg>
-                        </span>
+
 
                     </div>
                 </td>
@@ -302,8 +295,23 @@ class Producto {
                         </optgroup>
                     </select>
                 </td>
-                <td td colspan="2" style="background: transparent;">
-                    <input class="form-control" type="date" name="fechaEntrega" id="fecha_entrega_lineas" style="width: 90%;font-size: 13px;" value="${this.fechaEntrega}">
+                <td colspan="2" style="background: transparent; border: none;">
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <input class="form-control" 
+                            type="date" 
+                            name="fechaEntrega" 
+                            id="fecha_entrega_lineas" 
+                            style="width: 100%; font-size: 13px; flex-grow: 1;" 
+                            value="${this.fechaEntrega}">
+                        
+                        <span id="drag-handle" 
+                            title="Arrastrar para reordenar" 
+                            style="cursor: grab; color: #888; user-select: none; padding: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                            </svg>
+                        </span>
+                    </div>
                 </td>
             </tr>
         `;

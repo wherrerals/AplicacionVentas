@@ -93,7 +93,6 @@ input::-webkit-inner-spin-button {
 
 
     .product-row {
-        cursor: grab;
         transition: all 0.15s ease;
         border-radius: 6px;
     }
@@ -884,6 +883,28 @@ input::-webkit-inner-spin-button {
           <div id="loadingOverlay" style="display: none;">
             <div class="spinner"></div>
           </div>
+
+          <script>
+          // 1. Creamos una lista con los IDs de los inputs que queremos limpiar
+          const idsParaLimpiar = ['rutSN', 'inputCliente'];
+
+          // 2. Definimos la función que realiza la limpieza
+          function eliminarPuntos(e) {
+              let valor = e.target.value;
+              // Reemplaza todos los puntos por un string vacío
+              e.target.value = valor.replace(/\./g, '');
+          }
+
+          // 3. Recorremos la lista y asignamos el evento a cada input
+          idsParaLimpiar.forEach(id => {
+              const elemento = document.getElementById(id);
+              
+              // Verificamos que el elemento exista en el HTML antes de asignar el evento
+              if (elemento) {
+                  elemento.addEventListener('input', eliminarPuntos);
+              }
+          });
+          </script>
 
           <!-- Agrega este script antes de usar cualquier función de jQuery -->
           <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
