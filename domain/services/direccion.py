@@ -130,7 +130,9 @@ class Direccion:
     def assign_bill_ship_addres(address1, address2, branch):
 
         no_address = "No hay direcciones disponibles"
-        if address1 == no_address or address2 == no_address:
+        adress = None
+        
+        if address1 == no_address or address2 == no_address or address1 == adress or address2 == adress:
                 direcciones = Direccion.generate_store_address(branch)
                 return direcciones, direcciones
         

@@ -16,7 +16,6 @@ class SerializerDocument:
 
     @staticmethod
     def document_serializer(doc_data):
-        print(f"Serializing document with data: {doc_data}")
             
         #calculator = CalculadoraTotales(doc_data)
         #doc_total = calculator.calculate_docTotal()
@@ -122,7 +121,7 @@ class SerializerDocument:
             } 
         else:
             taxExtension = SerializerDocument.build_tax_extension(addres_bill, address_ship)
-    
+
         return {
             **cabecera,
             'DocumentLines': lineas_json,

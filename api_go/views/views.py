@@ -1,7 +1,10 @@
 import json
 from django.contrib.auth import authenticate
 from adapters.sl_client import APIClient
+from api_go.serializers.document_serializer import CotizacionSerializer
+from api_go.utils.documents_utils import CotizacionPayloadBuilder
 from presentation.views.cotizacionview import CotizacionView
+from presentation.views.view import generar_cotizacion_pdf_2
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from infrastructure.repositories.productorepository import ProductoRepository
@@ -76,14 +79,17 @@ class DocumentAPIView(APIView):
             )
 
         # 3. Construir request sintético para CotizacionView
+        payload = CotizacionPayloadBuilder.build(data)
+
         factory = RequestFactory()
         synthetic_request = factory.post(
             '/documents/',
-            data=json.dumps(data),
+            data=json.dumps(payload),
             content_type='application/json'
         )
         synthetic_request.user = user  # ← inyectar usuario autenticado
 
+        print(f"Payload para la cotización: {payload}")
         # 4. Llamar a la vista con el request sintético
         try:
             view_instance = CotizacionView()
@@ -91,11 +97,38 @@ class DocumentAPIView(APIView):
 
             # JsonResponse → dict para poder retornarlo en DRF
             result = json.loads(json_response.content)
+            docEntry = result.get("docEntry")
+            docNum = result.get("docNum")
 
-            return Response(
-                {"success": True, "result": result},
-                status=json_response.status_code
+            if not docEntry:
+                return Response(
+                    {"success": False, "error": "No se obtuvo docEntry"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            get_request = factory.get(f'/ventas/detalles_cotizacion/?docentry={docEntry}')
+            get_request.user = user
+            detalle_view = CotizacionView()
+            detalle_response = detalle_view.detallesCotizacion(get_request)
+            detalle_result = json.loads(detalle_response.content)
+
+            print(f"Detalle de la cotización: {detalle_result}")
+
+            serializer = CotizacionSerializer(detalle_result)
+
+            print(f"Detalle serializado: {serializer.data}")
+
+            pdf_generator = factory.post(
+                f'/cotizacion/{docNum}/pdf/',
+                data=json.dumps(serializer.data),
+                content_type='application/json'
             )
+
+            
+            pdf_generator.user = user
+
+            return generar_cotizacion_pdf_2(pdf_generator, docNum)
+
 
         except Exception as e:
             return Response(
