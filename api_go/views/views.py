@@ -3,14 +3,15 @@ from django.contrib.auth import authenticate
 from adapters.sl_client import APIClient
 from api_go.serializers.document_serializer import CotizacionSerializer
 from api_go.utils.documents_utils import CotizacionPayloadBuilder
+from domain.services.pdf_services import CotizacionPDFService
 from presentation.views.cotizacionview import CotizacionView
-from presentation.views.view import generar_cotizacion_pdf_2
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from infrastructure.repositories.productorepository import ProductoRepository
 from taskApp.tasks import sync_products_task
 from django.test import RequestFactory
 from rest_framework import status
+from django.http import HttpResponse
 
 class ProductsAPIView(APIView):
     http_method_names = ["post"]
@@ -111,32 +112,15 @@ class DocumentAPIView(APIView):
             detalle_view = CotizacionView()
             detalle_response = detalle_view.detallesCotizacion(get_request)
             detalle_result = json.loads(detalle_response.content)
-
-            print(f"Detalle de la cotización: {detalle_result}")
-
             serializer = CotizacionSerializer(detalle_result)
 
-            print(f"Detalle serializado: {serializer.data}")
+            pdf_service = CotizacionPDFService()
+            pdf_file, tipo_documento, numero = pdf_service.generar_pdf(serializer.data)
 
-            pdf_generator = factory.post(
-                f'/cotizacion/{docNum}/pdf/',
-                data=json.dumps(serializer.data),
-                content_type='application/json'
-            )
+            response = HttpResponse(pdf_file, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="{tipo_documento}_{numero}.pdf"'
 
-            
-            pdf_generator.user = user
-            pdf_response = generar_cotizacion_pdf_2(pdf_generator, docNum)
-
-            if hasattr(pdf_response, "content"):
-                print(f"Contenido del PDF generado")
-                return pdf_response  # HttpResponse directo
-
-            return Response(
-                {"success": False, "error": "Error generando PDF"},
-                status=500
-            )
-
+            return response  # <-- ESTO FALTA
 
         except Exception as e:
             return Response(

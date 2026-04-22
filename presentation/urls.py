@@ -4,6 +4,7 @@ from presentation.views.cuponesView import CuponCreateView, CuponDetailView, Cup
 from presentation.views.devolucionesview import ReturnsView
 from presentation.views.odvView import OdvView
 from presentation.views.invoiceView import InvoiceView
+from presentation.views.pdf_views import CotizacionPDFView
 from presentation.views.socionegocioview import SocioNegocioView
 from presentation.views.productoview import Productos
 from presentation.views import pdf_view, view
@@ -65,7 +66,7 @@ urlpatterns = [
     path('solicitudes_devolucion/', view.return_requests, name='solicitudes_devolucion'),
     path('imagen/', view.onbtenerImgProducto, name='imagen'),
     path('pruebas/', view.pryebas, name='pruebas'),
-    path('cotizacion/<int:cotizacion_id>/pdf/', view.generar_cotizacion_pdf_2, name='cotizacion_pdf'),
+    path('cotizacion/<int:cotizacion_id>/pdf/', CotizacionPDFView.as_view(), name='cotizacion_pdf'),
     path('ficha_tecnica/<str:sku>/pdf/', pdf_view.generate_ficha_tecnica_pdf, name='ficha_tecnica_pdf'),
     path('get_vendedor_sucursal/', view.get_vendedor_sucursal, name='get_vendedor_sucursal'),
     path('generar_cotizacion_pdf/<int:cotizacion_id>/pdf/', view.generar_cotizacion_pdf, name='generar_cotizacion_pdf'),
