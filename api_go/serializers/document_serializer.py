@@ -14,10 +14,6 @@ class DocumentLineSerializer(serializers.Serializer):
     precio_unitario = serializers.SerializerMethodField()
     subtotal_neto = serializers.SerializerMethodField()
 
-    def get_imagen(self, obj):
-        # lo fuerzas a null como pediste
-        return None
-
     def get_cantidad(self, obj):
         return str(int(obj.get("Quantity", 0)))
 
@@ -33,6 +29,34 @@ class DocumentLineSerializer(serializers.Serializer):
     def get_subtotal_neto(self, obj):
         return self._format_currency(obj.get("PriceAfterVAT", 0))
 
+    def get_imagen(self, obj):
+        from infrastructure.models.productodb import ProductoDB
+
+        item_code = obj.get("ItemCode")
+
+        if not item_code:
+            return None
+
+        # cache para evitar N queries
+        if not hasattr(self, "_producto_cache"):
+            self._producto_cache = {}
+
+        if item_code in self._producto_cache:
+            return self._producto_cache[item_code]
+
+        producto = ProductoDB.objects.filter(
+            codigo=item_code
+        ).only("imagen").first()
+
+        if not producto or not producto.imagen:
+            self._producto_cache[item_code] = None
+            return None
+
+        # si es ImageField
+        imagen_url = producto.imagen
+
+        self._producto_cache[item_code] = imagen_url
+        return imagen_url
 
 class CotizacionSerializer(serializers.Serializer):
     tipo_documento = serializers.SerializerMethodField()
