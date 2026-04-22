@@ -129,6 +129,7 @@ class DocumentAPIView(APIView):
             pdf_response = generar_cotizacion_pdf_2(pdf_generator, docNum)
 
             if hasattr(pdf_response, "content"):
+                print(f"Contenido del PDF generado")
                 return pdf_response  # HttpResponse directo
 
             return Response(
