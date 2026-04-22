@@ -126,8 +126,15 @@ class DocumentAPIView(APIView):
 
             
             pdf_generator.user = user
+            pdf_response = generar_cotizacion_pdf_2(pdf_generator, docNum)
 
-            return generar_cotizacion_pdf_2(pdf_generator, docNum)
+            if hasattr(pdf_response, "content"):
+                return pdf_response  # HttpResponse directo
+
+            return Response(
+                {"success": False, "error": "Error generando PDF"},
+                status=500
+            )
 
 
         except Exception as e:
