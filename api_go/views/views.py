@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate
 from adapters.sl_client import APIClient
 from api_go.serializers.document_serializer import CotizacionSerializer
 from api_go.utils.documents_utils import CotizacionPayloadBuilder
+from domain.services.cotizacion import Cotizacion
 from domain.services.pdf_services import CotizacionPDFService
 from presentation.views.cotizacionview import CotizacionView
 from rest_framework.views import APIView
@@ -51,69 +52,44 @@ class DocumentAPIView(APIView):
     http_method_names = ["post"]
 
     def post(self, request):
-        # 1. Validar que existan los bloques requeridos
-        auth_data = request.data.get("auth")
+        auth_data = request.data.get("auth")    
         data = request.data.get("data")
 
         if not auth_data or not data:
-            return Response(
-                {"success": False, "error": "Se requieren los campos 'auth' y 'data'"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"success": False, "error": "Se requieren los campos 'auth' y 'data'"},status=status.HTTP_400_BAD_REQUEST)
 
-        # 2. Autenticar y validar usuario
-        user = authenticate(
-            username=auth_data.get("username"),
-            password=auth_data.get("password"),
-        )
+        user = authenticate(username=auth_data.get("username"),password=auth_data.get("password"))
 
         if user is None:
-            return Response(
-                {"success": False, "error": "Credenciales inválidas"},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
+            return Response({"success": False, "error": "Credenciales inválidas"},status=status.HTTP_401_UNAUTHORIZED)
 
         if not user.is_active:
-            return Response(
-                {"success": False, "error": "Usuario inactivo"},
-                status=status.HTTP_403_FORBIDDEN
-            )
+            return Response({"success": False, "error": "Usuario inactivo"},status=status.HTTP_403_FORBIDDEN)
 
-        # 3. Construir request sintético para CotizacionView
         payload = CotizacionPayloadBuilder.build(data)
-
         factory = RequestFactory()
-        synthetic_request = factory.post(
-            '/documents/',
-            data=json.dumps(payload),
-            content_type='application/json'
-        )
-        synthetic_request.user = user  # ← inyectar usuario autenticado
-
-        print(f"Payload para la cotización: {payload}")
-        # 4. Llamar a la vista con el request sintético
+ 
         try:
-            view_instance = CotizacionView()
-            json_response = view_instance.crearOActualizarCotizacion(synthetic_request)
 
-            # JsonResponse → dict para poder retornarlo en DRF
-            result = json.loads(json_response.content)
+            # Creacion de cotización
+            quotate = Cotizacion()
+            quotate_response = quotate.crearDocumento(payload)
+            result = quotate_response
             docEntry = result.get("docEntry")
-            docNum = result.get("docNum")
+
 
             if not docEntry:
-                return Response(
-                    {"success": False, "error": "No se obtuvo docEntry"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                return Response({"success": False, "error": "No se obtuvo docEntry"},status=status.HTTP_400_BAD_REQUEST)
 
+            # Pendiente por refactorizar (inicio)
             get_request = factory.get(f'/ventas/detalles_cotizacion/?docentry={docEntry}')
             get_request.user = user
             detalle_view = CotizacionView()
             detalle_response = detalle_view.detallesCotizacion(get_request)
             detalle_result = json.loads(detalle_response.content)
-            serializer = CotizacionSerializer(detalle_result)
+            # Pendiente por refactorizar (fin)
 
+            serializer = CotizacionSerializer(detalle_result)
             pdf_service = CotizacionPDFService()
             pdf_file, tipo_documento, numero = pdf_service.generar_pdf(serializer.data)
 
