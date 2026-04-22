@@ -38,7 +38,7 @@ class CotizacionSerializer(serializers.Serializer):
     tipo_documento = serializers.SerializerMethodField()
     numero = serializers.CharField(source="Cliente.Quotations.DocNum")
     fecha = serializers.CharField(source="Cliente.Quotations.DocDate")
-    valido_hasta = serializers.SerializerMethodField()
+    valido_hasta = serializers.CharField(source="Cliente.Quotations.DocDate")
     rut = serializers.CharField(source="Cliente.Quotations.CardCode")
     vendedor = serializers.CharField(source="Cliente.SalesPersons.SalesEmployeeCode")
 
@@ -62,11 +62,6 @@ class CotizacionSerializer(serializers.Serializer):
     def get_tipo_documento(self, obj):
         return "COTI"
 
-    def get_valido_hasta(self, obj):
-        # OJO: estás hardcodeando lógica de negocio aquí
-        fecha = obj["Cliente"]["Quotations"]["DocDate"]
-        dt = datetime.strptime(fecha, "%Y-%m-%d")
-        return (dt.replace(day=dt.day + 9)).strftime("%Y-%m-%d")
 
     def _format_currency(self, value):
         return f"$ {int(round(value, 0)):,}".replace(",", ".")
