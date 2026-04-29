@@ -1,6 +1,7 @@
 from django.utils import timezone
 
 from domain.services import producto
+from infrastructure.models.confiEmpresaDB import ConfiEmpresaDB
 from infrastructure.repositories.pricelistrepository import PriceListRepository
 from infrastructure.repositories.productorepository import ProductoRepository
 
