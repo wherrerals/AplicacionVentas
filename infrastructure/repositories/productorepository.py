@@ -5,12 +5,19 @@ from django.db.models import Sum
 import math
 from django.db.models import Sum, F
 
+from infrastructure.models.confiEmpresaDB import ConfiEmpresaDB
 from infrastructure.repositories.stockbodegasrepository import StockBodegasRepository
 
 
 
 
 class ProductoRepository:
+
+    @classmethod
+    def obtener_rentabilidad_minima(cls) -> int | None:
+        empresa = cls.objects.only("rentabilidadBrutaMin").first()
+        return empresa.rentabilidadBrutaMin if empresa else None
+
     def calculate_margen_descuentos(self, precio_venta, costo, rentabilidad_minima):
 
         if precio_venta <= 0 or costo <= 0:
@@ -24,7 +31,7 @@ class ProductoRepository:
 
     def sync_products_and_stock2(self, products):
 
-        rentabilidad_minima = 60
+        rentabilidad_minima = ConfiEmpresaDB.obtener_rentabilidad_minima()
         productos_procesados = []
 
         for product in products:
@@ -136,7 +143,7 @@ class ProductoRepository:
 
     def sync_products_and_stock(self, products):
 
-        rentabilidad_minima = 60
+        rentabilidad_minima = ConfiEmpresaDB.obtener_rentabilidad_minima()
         productos_procesados = []
         
         for product_data in products:

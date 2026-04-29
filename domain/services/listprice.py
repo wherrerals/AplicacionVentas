@@ -1,6 +1,7 @@
 from django.utils import timezone
 
 from domain.services import producto
+from infrastructure.models.confiEmpresaDB import ConfiEmpresaDB
 from infrastructure.repositories.pricelistrepository import PriceListRepository
 from infrastructure.repositories.productorepository import ProductoRepository
 
@@ -14,7 +15,7 @@ class ListPriceService:
         self.sku = sku
         self.costo = costo
         self.user = user
-        self.rentability = 60
+        self.rentability = ConfiEmpresaDB.obtener_rentabilidad_minima()
         self.price_list = 0
         self.list_price_product = 0
         self.cardCode = cardCode
