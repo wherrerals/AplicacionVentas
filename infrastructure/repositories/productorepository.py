@@ -24,7 +24,7 @@ class ProductoRepository:
 
     def sync_products_and_stock2(self, products):
 
-        rentabilidad_minima = 60
+        rentabilidad_minima = 55
         productos_procesados = []
 
         for product in products:
@@ -136,7 +136,7 @@ class ProductoRepository:
 
     def sync_products_and_stock(self, products):
 
-        rentabilidad_minima = 60
+        rentabilidad_minima = 55
         productos_procesados = []
         
         for product_data in products:
