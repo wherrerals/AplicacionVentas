@@ -174,7 +174,7 @@ function actualizarDirecciones(direcciones, selectId, tipoDireccion) {
         direccionesFiltradas.forEach(function(direccion) {
             let option = $('<option></option>');
             option.val(direccion.id); //Ver este valor que se quiere usar como id unico
-            option.text(direccion.nombreDireccion + ' - ' + direccion.ciudad + ', ' + direccion.comuna);
+            option.text(direccion.ciudad + ' - ' + direccion.comuna + ', ' + direccion.calleNumero);
             select.append(option); 
         });
     } else {

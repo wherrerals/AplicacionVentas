@@ -88,7 +88,6 @@ class SocioNegocioView(FormView):
         if request.method == 'POST':
 
             business_partner = SocioNegocio(request)
-
             response = json.loads(business_partner.create_or_update_bp().content)
 
             if response.get('success'):
@@ -96,8 +95,7 @@ class SocioNegocioView(FormView):
                         'success': True,
                         'message': response.get('message', 'Cliente creado o actualizado con éxito'),
                         'codigoSN': response.get('codigoSN')  # Este campo es opcional
-                    },
-                    status=201)
+                    }, status=201)
 
             else:
                 return JsonResponse(
@@ -105,8 +103,7 @@ class SocioNegocioView(FormView):
                         'error': False,
                         'message': response.get('message', 'Error al crear o actualizar el cliente'),
                         'details': response.get('details', 'Detalles no disponibles')  # Si hay más detalles
-                    },
-                    status=400)
+                    },status=400)
 
 
     def _normalizar_numero(self, numero: str) -> str:

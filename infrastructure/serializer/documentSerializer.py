@@ -109,15 +109,15 @@ class SerializerDocument:
         # validar si es una lista o un class el tipo de addres_bill y address_ship
         if not isinstance(addres_bill, list) and not isinstance(address_ship, list):
             taxExtension = {
-                "StreetS": addres_bill.calleNumero,
-                "CityS": addres_bill.ciudad,
-                "CountyS": f"{addres_bill.comuna.codigo} - {addres_bill.comuna.nombre}",
-                "StateS": addres_bill.region.numero,
+                "StreetS": address_ship.calleNumero,
+                "CityS": address_ship.ciudad,
+                "CountyS": f"{address_ship.comuna.codigo} - {address_ship.comuna.nombre}",
+                "StateS": address_ship.region.numero,
                 "CountryS": "CL",
-                "StreetB": address_ship.calleNumero,
-                "CityB": address_ship.ciudad,
-                "CountyB": f"{address_ship.comuna.codigo} - {address_ship.comuna.nombre}",
-                "StateB": address_ship.region.numero,
+                "StreetB": addres_bill.calleNumero,
+                "CityB": addres_bill.ciudad,
+                "CountyB": f"{addres_bill.comuna.codigo} - {addres_bill.comuna.nombre}",
+                "StateB": addres_bill.region.numero,
                 "CountryB": "CL",
             } 
         else:
