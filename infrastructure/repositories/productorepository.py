@@ -4,13 +4,17 @@ from infrastructure.models import ProductoDB, StockBodegasDB, BodegaDB
 from django.db.models import Sum
 import math
 from django.db.models import Sum, F
-
+from infrastructure.repositories.confi_empresa_repository import ConfiEmpresaRepository
 from infrastructure.repositories.stockbodegasrepository import StockBodegasRepository
+
+MINIMUM_PROFITABILITY = ConfiEmpresaRepository.obtener_rentabilidad_minima()
 
 
 
 
 class ProductoRepository:
+
+
     def calculate_margen_descuentos(self, precio_venta, costo, rentabilidad_minima):
 
         if precio_venta <= 0 or costo <= 0:

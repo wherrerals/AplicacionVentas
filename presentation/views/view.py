@@ -1424,6 +1424,7 @@ def generar_cotizacion_pdf_2(request, cotizacion_id):
 
             # Obtener contacto
             contacto_id = data.get('contacto')
+            print(f"Contacto obtenido: {contacto_id}")
             contactos = ''
             if contacto_id and contacto_id != 'No hay contactos disponibles':
                 contacto = ContactoRepository.obtenerContacto(contacto_id)

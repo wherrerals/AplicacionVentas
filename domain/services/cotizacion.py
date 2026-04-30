@@ -300,7 +300,6 @@ class Cotizacion(Documento):
             return {'error': str(e)}
 
     def crearDocumento(self, data):
-        print("Creando cotización con los siguientes datos:", data)
         try:
             # Verificar los datos antes de preparar el JSON
             errores = self.validarDatosCotizacion(data)
@@ -308,10 +307,8 @@ class Cotizacion(Documento):
                 return {'error': errores}
 
             # Preparar el JSON para la cotización
-            print("Preparando datos para crear cotización...")
             jsonData = SerializerDocument.document_serializer(data)
 
-            print("JSON Data para crear cotización:", jsonData)
             
             # Realizar la solicitud a la API
             response = self.client.crearCotizacionSL(self.get_endpoint(), jsonData)
@@ -329,9 +326,7 @@ class Cotizacion(Documento):
 
                     DocumentsLogs.register_logs(docNum=doc_num, docEntry=doc_entry, tipoDoc='Cotizacion', url="", json=jsonData, response=response, estate='Create')
                     from infrastructure.repositories.couponrepository import CouponRepository
-                    
-                    print("Datos de la cotización:", data)
-                    
+                                        
                     if data.get('Cupon_code') != '':
                         #quitar los espacio en blanco
                         cupon = data.get('Cupon_code').strip()
