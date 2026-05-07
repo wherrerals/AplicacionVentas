@@ -2,8 +2,8 @@ import requests
 import logging
 from django.utils import timezone
 
+from domain.services.pdf_services import URL_MW
 from infrastructure.models.productodb import ProductoDB
-from presentation.views.pdf_view import URL_MW
 
 logger = logging.getLogger(__name__)
 

@@ -1,16 +1,29 @@
-# services/pdf/cotizacion_pdf_service.py
-
-import json
+import logging
+import os
 from datetime import date, timedelta
+
+import requests
 from django.template.loader import render_to_string
+from weasyprint import HTML
+from weasyprint.text.fonts import FontConfiguration
+
+from domain.exeptions.pdf_exceptions import (
+    MiddlewareTimeoutError,
+    MiddlewareConnectionError,
+    MiddlewareHTTPError,
+    ProductoNotFoundError,
+)
 from domain.services.calculador import CalculadoraTotales
+from infrastructure.models.productodb import ProductoDB
 from infrastructure.models.sucursaldb import SucursalDB
 from infrastructure.models.usuariodb import UsuarioDB
 from infrastructure.repositories.contactorepository import ContactoRepository
 from infrastructure.repositories.direccionrepository import DireccionRepository
 from infrastructure.repositories.socionegociorepository import SocioNegocioRepository
-from presentation.views.view import obtener_nombre_documento
-from weasyprint import HTML
+
+logger = logging.getLogger(__name__)
+URL_MW = os.environ.get("URL_MW")
+
 
 class CotizacionPDFService:
 
@@ -67,6 +80,8 @@ class CotizacionPDFService:
                 p["descripcion"] = descripcion.replace("(Descontinuado)", "(Últimas unidades)") \
                                               .replace("(descontinuado)", "(Últimas unidades)")
 
+        from presentation.views.view import obtener_nombre_documento
+
         tipo_documento = obtener_nombre_documento(data.get('tipo_documento'))
 
         cotizacion = {
@@ -120,3 +135,89 @@ class CotizacionPDFService:
         pdf_file = HTML(string=html_string, base_url=base_url).write_pdf()
 
         return pdf_file, tipo_documento, cotizacion["numero"]
+    
+class FichaTecnicaPDFService:
+    """
+    Orquesta la generación del PDF de ficha técnica:
+      1. Fetch de datos desde el middleware
+      2. Validación y transformaciones
+      3. Render HTML → PDF con WeasyPrint
+    """
+
+    def generar_pdf(self, sku: str, base_url: str) -> bytes:
+        producto, header_img = self._fetch_producto(sku)
+        producto = self._transformar_producto(producto)
+        return self._render_pdf(sku, producto, header_img, base_url)
+
+    # ── Pasos privados ────────────────────────────────────────────────
+
+    def _fetch_producto(self, sku: str) -> tuple[dict, str]:
+        """Consulta el middleware y devuelve (producto, header_img)."""
+        url = f"{URL_MW}{sku}"
+        logger.info("Fetching product data: %s", url)
+
+        try:
+            api_response = requests.get(url, timeout=15)
+            api_response.raise_for_status()
+        except requests.exceptions.Timeout:
+            logger.error("Timeout al consultar el middleware para SKU %s", sku)
+            raise MiddlewareTimeoutError()
+        except requests.exceptions.ConnectionError:
+            logger.error("No se pudo conectar al middleware para SKU %s", sku)
+            raise MiddlewareConnectionError()
+        except requests.exceptions.HTTPError as e:
+            code = api_response.status_code
+            logger.warning("HTTP %s para SKU %s: %s", code, sku, e)
+            raise MiddlewareHTTPError(code)
+
+        data = api_response.json()
+        logger.debug("Data recibida del middleware para SKU %s: %s", sku, data)
+
+        producto = data.get('producto')
+        if not producto:
+            logger.error("Respuesta sin 'producto' para SKU %s: %s", sku, data)
+            raise ProductoNotFoundError(f"Sin campo 'producto' para SKU {sku}")
+
+        return producto, data.get('header_img', '')
+
+    def _transformar_producto(self, producto: dict) -> dict:
+        """Enriquece y sanitiza el dict de producto."""
+        producto['otros_colores'] = self._map_otros_colores(
+            producto.get('otros_colores', [])
+        )
+        producto.setdefault('imagenes_thumb', [])
+        producto.setdefault('ficha_tecnica', [])
+        producto.setdefault('descripcion', '')
+        producto.setdefault('color', '')
+        return producto
+
+    def _render_pdf(self, sku: str, producto: dict, header_img: str, base_url: str) -> bytes:
+        """Renderiza el template HTML y genera el PDF con WeasyPrint."""
+        html_string = render_to_string(
+            'ficha_tecnica_template.html',
+            {'producto': producto, 'header_img': header_img}
+        )
+        font_config = FontConfiguration()
+        return HTML(string=html_string, base_url=base_url).write_pdf(
+            font_config=font_config
+        )
+
+    # ── Helper ────────────────────────────────────────────────────────
+
+    @staticmethod
+    def _map_otros_colores(otros_colores_skus: list[str]) -> list[dict]:
+        """Convierte lista de SKUs a lista de dicts {codigo, imagen}."""
+        if not otros_colores_skus:
+            return []
+
+        productos = ProductoDB.objects.filter(
+            codigo__in=otros_colores_skus
+        ).values('codigo', 'imagen')
+
+        productos_map = {p['codigo']: p['imagen'] for p in productos}
+
+        return [
+            {'codigo': sku, 'imagen': imagen}
+            for sku in otros_colores_skus
+            if (imagen := productos_map.get(sku))
+        ]
