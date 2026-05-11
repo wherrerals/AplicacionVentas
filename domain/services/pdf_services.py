@@ -185,6 +185,7 @@ class FichaTecnicaPDFService:
     def _fetch_producto(self, sku: str) -> tuple[dict, str]:
         """Consulta el middleware y devuelve (producto, header_img)."""
         url = f"{URL_MW}{sku}"
+        print(f"URL: {url}")
         logger.info("Fetching product data: %s", url)
 
         try:
