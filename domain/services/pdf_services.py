@@ -184,7 +184,7 @@ class FichaTecnicaPDFService:
 
     def _fetch_producto(self, sku: str) -> tuple[dict, str]:
         """Consulta el middleware y devuelve (producto, header_img)."""
-        url = f"{URL_MW}{sku}"
+        url = f"{URL_MW.strip().rstrip('/')}/{sku}"        
         print(f"URL: {url}")
         logger.info("Fetching product data: %s", url)
 
@@ -195,8 +195,12 @@ class FichaTecnicaPDFService:
         except requests.exceptions.Timeout:
             logger.error("Timeout al consultar el middleware para SKU %s", sku)
             raise MiddlewareTimeoutError()
-        except requests.exceptions.ConnectionError:
-            logger.error("No se pudo conectar al middleware para SKU %s", sku)
+        except requests.exceptions.ConnectionError as e:
+            logger.exception(
+                "No se pudo conectar al middleware para SKU %s. Error: %s",
+                sku,
+                str(e)
+            )
             raise MiddlewareConnectionError()
         except requests.exceptions.HTTPError as e:
             code = api_response.status_code
