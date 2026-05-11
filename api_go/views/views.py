@@ -155,19 +155,31 @@ class TechnicalSheetAPIView(APIView):
 
         service = FichaTecnicaPDFService()
         base_url = request.build_absolute_uri("/")
-        
-        from weasyprint import Document as WeasyDocument  # Evitar confusión con xml.dom.minidom.Document
 
-        documentos: list[WeasyDocument] = []   # ← WeasyPrint Documents, no bytes
+        from weasyprint import Document as WeasyDocument
+
+        documentos: list[WeasyDocument] = []
+        skus_procesados: list[str] = []
         skus_fallidos: dict[str, str] = {}
 
         for sku in skus:
             try:
-                doc = service.generar_documento(sku=sku, base_url=base_url)  # ← nuevo método
+                doc = service.generar_documento(
+                    sku=sku,
+                    base_url=base_url,
+                )
+
                 documentos.append(doc)
+                skus_procesados.append(sku)
+
             except Exception as e:
                 skus_fallidos[sku] = self._mensaje_error(e)
-                logger.warning("SKU %s falló en lote: %s", sku, e)
+
+                logger.warning(
+                    "SKU %s falló en lote: %s",
+                    sku,
+                    e,
+                )
 
         if not documentos:
             return Response(
@@ -178,20 +190,26 @@ class TechnicalSheetAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Merge nativo WeasyPrint: el primer Document absorbe las páginas del resto
         documento_combinado = documentos[0].copy(
             [page for doc in documentos for page in doc.pages]
         )
+
         pdf_combinado = documento_combinado.write_pdf()
 
         nombre_archivo = f"fichas_tecnicas_{'_'.join(skus[:3])}.pdf"
-        response = HttpResponse(pdf_combinado, content_type="application/pdf")
-        response["Content-Disposition"] = f'attachment; filename="{nombre_archivo}"'
 
-        if skus_fallidos:
-            response["X-Skus-Failed"] = ",".join(skus_fallidos.keys())
-            response["X-Skus-Failed-Detail"] = str(skus_fallidos)
+        response = HttpResponse(
+            pdf_combinado,
+            content_type="application/pdf",
+        )
 
+        response["Content-Disposition"] = (
+            f'attachment; filename="{nombre_archivo}"'
+        )
+
+        response["X-Skus-Processed"] = json.dumps(skus_procesados)
+
+        response["X-Skus-Failed"] = json.dumps(skus_fallidos)
         return response
 
     # ── Helpers ────────────────────────────────────────────────────
