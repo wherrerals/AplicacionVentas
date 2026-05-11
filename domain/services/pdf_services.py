@@ -190,6 +190,7 @@ class FichaTecnicaPDFService:
 
         try:
             api_response = requests.get(url, timeout=15)
+            print(f"Response: {api_response}")
             api_response.raise_for_status()
         except requests.exceptions.Timeout:
             logger.error("Timeout al consultar el middleware para SKU %s", sku)
