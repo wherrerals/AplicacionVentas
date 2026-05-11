@@ -135,21 +135,52 @@ class CotizacionPDFService:
         pdf_file = HTML(string=html_string, base_url=base_url).write_pdf()
 
         return pdf_file, tipo_documento, cotizacion["numero"]
-    
+
+
+
 class FichaTecnicaPDFService:
-    """
-    Orquesta la generación del PDF de ficha técnica:
-      1. Fetch de datos desde el middleware
-      2. Validación y transformaciones
-      3. Render HTML → PDF con WeasyPrint
-    """
 
     def generar_pdf(self, sku: str, base_url: str) -> bytes:
+        """Comportamiento original — sin cambios."""
         producto, header_img = self._fetch_producto(sku)
         producto = self._transformar_producto(producto)
         return self._render_pdf(sku, producto, header_img, base_url)
 
-    # ── Pasos privados ────────────────────────────────────────────────
+    def generar_documento(self, sku: str, base_url: str):
+        """
+        Igual que generar_pdf pero devuelve el Document de WeasyPrint
+        en lugar de bytes, para poder mergearlo con otros documentos.
+        """
+        producto, header_img = self._fetch_producto(sku)
+        producto = self._transformar_producto(producto)
+        return self._render_documento(sku, producto, header_img, base_url)
+
+    # ── Pasos privados ──────────────────────────────────────────────────
+
+    def _render_pdf(self, sku, producto, header_img, base_url) -> bytes:
+        """Renderiza y escribe el PDF directamente a bytes."""
+        font_config = FontConfiguration()
+        return self._build_html(producto, header_img, base_url).write_pdf(
+            font_config=font_config
+        )
+
+    def _render_documento(self, sku, producto, header_img, base_url):
+        """Renderiza y devuelve el Document (sin escribir a bytes aún)."""
+        font_config = FontConfiguration()
+        return self._build_html(producto, header_img, base_url).render(
+            font_config=font_config
+        )
+
+    def _build_html(self, producto, header_img, base_url) -> HTML:
+        """Factoriza la construcción del objeto HTML de WeasyPrint."""
+        html_string = render_to_string(
+            "ficha_tecnica_template.html",
+            {"producto": producto, "header_img": header_img},
+        )
+        return HTML(string=html_string, base_url=base_url)
+
+    # ... _fetch_producto, _transformar_producto, _map_otros_colores sin cambios ...
+
 
     def _fetch_producto(self, sku: str) -> tuple[dict, str]:
         """Consulta el middleware y devuelve (producto, header_img)."""
@@ -179,6 +210,7 @@ class FichaTecnicaPDFService:
             raise ProductoNotFoundError(f"Sin campo 'producto' para SKU {sku}")
 
         return producto, data.get('header_img', '')
+    
 
     def _transformar_producto(self, producto: dict) -> dict:
         """Enriquece y sanitiza el dict de producto."""
@@ -190,20 +222,7 @@ class FichaTecnicaPDFService:
         producto.setdefault('descripcion', '')
         producto.setdefault('color', '')
         return producto
-
-    def _render_pdf(self, sku: str, producto: dict, header_img: str, base_url: str) -> bytes:
-        """Renderiza el template HTML y genera el PDF con WeasyPrint."""
-        html_string = render_to_string(
-            'ficha_tecnica_template.html',
-            {'producto': producto, 'header_img': header_img}
-        )
-        font_config = FontConfiguration()
-        return HTML(string=html_string, base_url=base_url).write_pdf(
-            font_config=font_config
-        )
-
-    # ── Helper ────────────────────────────────────────────────────────
-
+    
     @staticmethod
     def _map_otros_colores(otros_colores_skus: list[str]) -> list[dict]:
         """Convierte lista de SKUs a lista de dicts {codigo, imagen}."""
@@ -221,3 +240,4 @@ class FichaTecnicaPDFService:
             for sku in otros_colores_skus
             if (imagen := productos_map.get(sku))
         ]
+
