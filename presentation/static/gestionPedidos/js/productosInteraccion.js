@@ -1,10 +1,11 @@
 // Dependencias: valorTributario.js
 class valorTributario {
-    constructor(codigoProducto, precioFinal, precioDescuento, indiceProducto) {
+    constructor(codigoProducto, precioFinal, precioDescuento, indiceProducto, uid) {
         this.codigoProducto = codigoProducto;
         this.precioFinal = precioFinal;
         this.precioDescuento = precioDescuento;
-        this.indiceProducto = indiceProducto;
+        this.indiceProducto = indiceProducto; // referencia informativa; ya no es llave de búsqueda
+        this.uid = uid;                       // llave estable: única e inmutable por fila
     }
 
     // Metodo para modificar el precio final
@@ -36,7 +37,7 @@ class valorTributario {
 // Array global para almacenar las instancias de valorTributario
 const productos = [];
 
-function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
+function agregarInteractividad(newRow, codigoProducto, indiceProducto, uid) {
     // Obtener referencias a los elementos dentro de la fila
     var inputCantidad = newRow.querySelector('#calcular_cantidad');
     var inputDescuento = newRow.querySelector('#agg_descuento');
@@ -50,7 +51,7 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
     var valorNeto = document.querySelector('#total_neto small');
 
     // Crear instancia de valorTributario y agregarla al array
-    var producto = new valorTributario(codigoProducto, 0, 0, indiceProducto);
+    var producto = new valorTributario(codigoProducto, 0, 0, indiceProducto, uid);
     productos.push(producto);
 
     console.log('Producto agregado:', producto);
@@ -120,20 +121,17 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
     }
 
     document.addEventListener('productoEliminado', function (event) {
-        const { codigoProducto, indiceProducto } = event.detail;
-    
-        console.log(`Producto eliminado: ${codigoProducto}, Índice: ${indiceProducto}`);
-    
-        // Eliminar solo el producto con el índice específico
-        const index = productos.findIndex(producto => 
-            producto.codigoProducto === codigoProducto && producto.indiceProducto == indiceProducto
-        );
-    
+        const { uid, codigoProducto, indiceProducto } = event.detail;
+
+        console.log(`Producto eliminado: ${codigoProducto}, uid: ${uid}, Índice: ${indiceProducto}`);
+
+        // Buscar por uid estable: insensible a reordenamientos por drag&drop
+        const index = productos.findIndex(producto => producto.uid === uid);
+
         if (index > -1) {
             productos.splice(index, 1);
         }
 
-    
         // Actualizar los valores totales
         actualizarValores();
     });

@@ -362,6 +362,12 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
     
     let newRow = producto.crearFila(contprod);
 
+    // uid estable por fila — no cambia con drag&drop ni con recalcularIndices
+    const uid = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : `prod_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    newRow.setAttribute('data-uid', uid);
+
     document.getElementById('productos').appendChild(newRow);
 
 
@@ -413,17 +419,19 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
     });
 
     newRow.querySelector('#eliminarp').addEventListener('click', function () {
+        const uid = newRow.getAttribute('data-uid');
         // Obtener el índice del producto dentro de la tabla
-        const indiceProducto = newRow.querySelector('#indixe_producto').getAttribute('data-indice'); 
-    
+        const indiceProducto = newRow.querySelector('#indixe_producto').getAttribute('data-indice');
+
         // Eliminar la fila del DOM
         newRow.remove();
-    
-        // Emitir el evento con código del producto e índice
+
+        // Emitir el evento con uid estable (clave de búsqueda) + datos legacy para debug
         const event = new CustomEvent('productoEliminado', {
-            detail: { 
+            detail: {
+                uid: uid,
                 codigoProducto: productoCodigo,
-                indiceProducto: indiceProducto // Pasar el índice específico
+                indiceProducto: indiceProducto
             }
         });
     
@@ -456,7 +464,7 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
     });
 
     // Llamar a la función agregarInteractividad si es necesario
-    agregarInteractividad(newRow, productoCodigo, indiceProducto);
+    agregarInteractividad(newRow, productoCodigo, indiceProducto, uid);
 }
 
     function recalcularIndices() {

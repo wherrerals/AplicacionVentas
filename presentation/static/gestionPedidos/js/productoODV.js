@@ -749,6 +749,12 @@ function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre
     const producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, precioCoti, tipoEntrega2, fechaEntrega, cuponDescuento, descuentoAplcado);
     const newRow = producto.crearFila(contprod); // Crear la fila del producto
 
+    // uid estable por fila — no cambia con drag&drop ni con recalcularIndices
+    const uid = (window.crypto && crypto.randomUUID)
+        ? crypto.randomUUID()
+        : `prod_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    newRow.setAttribute('data-uid', uid);
+
     document.getElementById('productos').appendChild(newRow); // Agregar la fila al tbody
 
 
@@ -777,11 +783,14 @@ function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre
 
     newRow.querySelector('#eliminarp').addEventListener('click', function () {
         // Eliminar la fila del DOM
+        const uid = newRow.getAttribute('data-uid');
+
         newRow.remove();
     
-        // Emitir un evento personalizado pasando el código del producto
+        // Emitir el evento con uid estable (clave de búsqueda) + datos legacy para debug
         const event = new CustomEvent('productoEliminado', {
-            detail: { codigoProducto: productoCodigo,
+            detail: { uid: uid, 
+                codigoProducto: productoCodigo,
                 indiceProducto: contprod
 
             }
@@ -899,8 +908,8 @@ function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre
     const inputNumero = document.getElementById("inputNumero");
 
     // Llamar a la función agregarInteractividad si es necesario
-    agregarInteractividad(newRow, productoCodigo, contprod);
 
+    agregarInteractividad(newRow, productoCodigo, contprod, uid);
 }
 
     let draggedRow = null;
