@@ -22,38 +22,15 @@ class Producto {
     
 
     async obtenerStock(codigoProducto) {
-        try {
-            const response = await fetch(`/ventas/obtener_stock_bodegas/?idProducto=${codigoProducto}`);
-            if (!response.ok) {
-                throw new Error("Error al obtener el stock");
-            }
-            const data = await response.json();
-            //console.log("info bodegas:", data)
-            return data; // Lista de objetos con bodega y stock
-        } catch (error) {
-            console.error("Error al obtener el stock:", error);
-            return null;
-        }
+        return obtenerStockBodegas(codigoProducto);
     }
 
     async actualizarStock(row) {
         const stockData = await this.obtenerStock(this.productoCodigo);
 
-        console.log("Stock data obtenido para el producto", this.productoCodigo, ":", stockData);
-
         if (stockData) {
-            // Mapear las bodegas válidas (excluyendo GR)
-            const bodegaMap = {
-                "LC": "LC",
-                "PH": "PH",
-                "ME": "ME",
-                "VI": "VI",
-                "GR": "GR"
-            };
-
-            // Filtrar los datos de stock excluyendo la bodega "GR"
             const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "LLLLL");
-            const stockTotalBodegasValidas = stockData.filter(bodega => bodega.bodega !== "LLLLL" && bodegaMap[bodega.bodega]);
+            const stockTotalBodegasValidas = stockData.filter(bodega => bodega.bodega !== "LLLLL" && BODEGA_MAP[bodega.bodega]);
 
 
             // Calcular el stock total sumando solo las bodegas válidas
@@ -73,22 +50,14 @@ class Producto {
             }
 
             let warningIcon = row.querySelector('#warning_container');
-            console.log("capturado el warning icon:", warningIcon);
-
-            if (stockTotal === 0) {
-                console.log("No hay stock disponible para el producto:", this.productoCodigo);
-                warningIcon.hidden = false;
-            } else {
-                console.log("Hay stock disponible para el producto:", this.productoCodigo);
-                warningIcon.hidden = true;
-            }
+            warningIcon.hidden = stockTotal !== 0;
 
             // Obtener el value de la bodega seleccionada
             const selectBodega = row.querySelector('.form-select');
             const valueSeleccionado = selectBodega.value;
 
             // Usar el mapa para obtener el código correspondiente
-            const bodegaSeleccionada = bodegaMap[valueSeleccionado];
+            const bodegaSeleccionada = BODEGA_MAP[valueSeleccionado];
 
             // Encontrar el stock de la bodega seleccionada
             const stockBodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock_disponible || 0;
@@ -275,36 +244,10 @@ class Producto {
             return `$ ${formattedValue}`;
         }
 
-        // Agregar evento mouseover para mostrar stock en otras tiendas
-        const precioVentaElem = newRow.querySelector('#stock_total');
-        precioVentaElem.addEventListener('mouseover', async () => {
-            const stockData = await this.obtenerStock(this.productoCodigo);
-            if (stockData) {
-                // Filtrar las bodegas para incluir solo las del mapa válido
-
-                const bodegaMap = {
-                    "LC": "LC",
-                    "PH": "PH",
-                    "ME": "ME",
-                    "VI": "VI",
-                    "GR": "GR"
-                };
-
-                const stockFiltrado = stockData.filter(bodega => bodega.bodega in bodegaMap);
-
-                // Crear el contenido del tooltip solo con las bodegas válidas
-                const tooltipContent = stockFiltrado
-                    .map(bodega => `${bodega.bodega}: ${bodega.stock_disponible}`)
-                    .join('\n');
-
-                // Asignar el contenido del tooltip
-                precioVentaElem.title = `Stock en otras tiendas:\n${tooltipContent}`;
-            }
-        });
+        agregarTooltipStockBodegas(newRow, this.productoCodigo);
 
         this.limitarMaxDescuento(newRow);
         inicializarDragAndDrop(newRow);
-
 
         return newRow;
     }
@@ -351,15 +294,10 @@ class Producto {
 
 // Función global para manejar la adición de productos
 function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, cuponDescuento, descuentoAplcado) {
-    // Contador de productos
-    console.log("cantidad: ", cantidad);
-    console.log("sucursal: ", sucursal);
-
     let contprod = document.querySelectorAll('#productos tbody').length + 1;
 
-    // Crear una instancia de Producto
     let producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, cuponDescuento, descuentoAplcado);
-    
+
     let newRow = producto.crearFila(contprod);
 
     // uid estable por fila — no cambia con drag&drop ni con recalcularIndices
@@ -370,32 +308,9 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
 
     document.getElementById('productos').appendChild(newRow);
 
+    aplicarUICupon(newRow, producto.cuponDescuento);
 
-    console.log("Producto creado xxx:", producto);
-    console.log("Producto creado:", producto.cuponDescuento, producto.precioDescuento);
-
-
-    // ---- APLICAR UI DEL CUPÓN ANTES de inicializar interactividad ----
-    if (producto.cuponDescuento && Number(producto.cuponDescuento) > 0) {
-        const descuentoCupon = Number(producto.cuponDescuento);
-
-        const inputDescuentoRow = newRow.querySelector('#agg_descuento');
-        if (inputDescuentoRow) {
-            inputDescuentoRow.max = descuentoCupon;
-            inputDescuentoRow.value = 0;
-            inputDescuentoRow.setAttribute('disabled', 'disabled');
-        }
-
-        const descElem = newRow.querySelector('#desc_cupon');
-        if (descElem) {
-            descElem.textContent = `Cupon: ${descuentoCupon}%`;
-            descElem.hidden = false;
-            descElem.dataset.value = descuentoCupon; // <- importante para calcular correctamente
-        }
-    }
-
-
-    const indiceProducto = newRow.querySelector('#indixe_producto').getAttribute('data-indice'); 
+    const indiceProducto = newRow.querySelector('#indixe_producto').getAttribute('data-indice');
 
     const input_descuento = newRow.querySelector('#agg_descuento');
     const value_defecto = "0";
@@ -419,42 +334,24 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
     });
 
     newRow.querySelector('#eliminarp').addEventListener('click', function () {
-        const uid = newRow.getAttribute('data-uid');
-        // Obtener el índice del producto dentro de la tabla
+        const uidFila = newRow.getAttribute('data-uid');
         const indiceProducto = newRow.querySelector('#indixe_producto').getAttribute('data-indice');
 
-        // Eliminar la fila del DOM
         newRow.remove();
 
-        // Emitir el evento con uid estable (clave de búsqueda) + datos legacy para debug
         const event = new CustomEvent('productoEliminado', {
             detail: {
-                uid: uid,
+                uid: uidFila,
                 codigoProducto: productoCodigo,
                 indiceProducto: indiceProducto
             }
         });
-    
-        console.log('Evento emitido:', event);
         document.dispatchEvent(event);
-    
-        // Actualizar los índices de los productos visibles
+
         actualizarIndicesProductos();
 
         document.getElementById('inputNumero').focus();
     });
-    
-    function actualizarIndicesProductos() {
-        // Seleccionar todas las filas de los productos
-        const filasProductos = document.querySelectorAll('.product-row'); // Asegúrate de que las filas tengan esta clase
-        filasProductos.forEach((fila, index) => {
-            // Buscar el elemento que muestra el índice y actualizarlo
-            const indiceElemento = fila.querySelector('#indixe_producto'); // Ajusta el selector si es necesario
-            if (indiceElemento) {
-                indiceElemento.textContent = `${index + 1})`; // Actualiza el índice visible
-            }
-        });
-    }    
 
     producto.actualizarStock(newRow);
 
@@ -466,122 +363,3 @@ function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre,
     // Llamar a la función agregarInteractividad si es necesario
     agregarInteractividad(newRow, productoCodigo, indiceProducto, uid);
 }
-
-    function recalcularIndices() {
-        const filas = document.querySelectorAll('tbody.product-row');
-
-        filas.forEach((fila, index) => {
-            const nuevoIndice = index + 1;
-
-            // Actualizar id y atributo del tbody
-            fila.setAttribute('id', nuevoIndice);
-
-            // Actualizar el texto visible del índice
-            const indiceTd = fila.querySelector('#indixe_producto');
-            if (indiceTd) {
-                indiceTd.textContent = `${nuevoIndice})`;
-                indiceTd.setAttribute('data-indice', nuevoIndice);
-            }
-        });
-    }
-
-    let draggedRow = null;
-
-    function inicializarDragAndDrop(fila) {
-        const handle = fila.querySelector('#drag-handle');
-
-        if (handle) {
-            // Solo activar draggable cuando el usuario presiona el handle
-            handle.addEventListener('mousedown', () => {
-                fila.setAttribute('draggable', 'true');
-            });
-
-            // Desactivar draggable al soltar para evitar arrastre accidental en toda la fila
-            handle.addEventListener('mouseup', () => {
-                fila.setAttribute('draggable', 'false');
-            });
-        }
-
-        fila.addEventListener('dragstart', (e) => {
-            // Bloquear si el drag no viene del handle
-            if (!fila.getAttribute('draggable') || fila.getAttribute('draggable') === 'false') {
-                e.preventDefault();
-                return;
-            }
-            draggedRow = fila;
-            // Pequeño delay para que el browser tome el snapshot ANTES de opacar
-            setTimeout(() => fila.classList.add('dragging'), 0);
-            e.dataTransfer.effectAllowed = 'move';
-        });
-
-        fila.addEventListener('dragend', () => {
-            fila.setAttribute('draggable', 'false');
-            fila.classList.remove('dragging');
-            draggedRow = null;
-            // Limpiar todos los indicadores visuales
-            limpiarIndicadores();
-        });
-
-        fila.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-
-            if (fila === draggedRow) return;
-
-            limpiarIndicadores();
-
-            const rect = fila.getBoundingClientRect();
-            const midY = rect.top + rect.height / 2;
-
-            if (e.clientY < midY) {
-                fila.classList.add('drag-over-top');    // va ANTES de esta fila
-            } else {
-                fila.classList.add('drag-over-bottom'); // va DESPUÉS de esta fila
-            }
-        });
-
-        fila.addEventListener('dragleave', (e) => {
-            // Solo limpiar si realmente salimos de la fila (no de un hijo)
-            if (!fila.contains(e.relatedTarget)) {
-                fila.classList.remove('drag-over-top', 'drag-over-bottom');
-            }
-        });
-
-        fila.addEventListener('drop', (e) => {
-            e.preventDefault();
-
-            if (!draggedRow || fila === draggedRow) return;
-
-            const container = fila.parentNode;
-            const rect = fila.getBoundingClientRect();
-            const midY = rect.top + rect.height / 2;
-
-            if (e.clientY < midY) {
-                container.insertBefore(draggedRow, fila);          // insertar ANTES
-            } else {
-                container.insertBefore(draggedRow, fila.nextSibling); // insertar DESPUÉS
-            }
-
-            limpiarIndicadores();
-            recalcularIndices();
-        });
-    }
-
-    function limpiarIndicadores() {
-        document.querySelectorAll('.product-row').forEach(f => {
-            f.classList.remove('drag-over-top', 'drag-over-bottom');
-        });
-    }
-
-    function recalcularIndices() {
-        document.querySelectorAll('tbody.product-row').forEach((fila, index) => {
-            const nuevoIndice = index + 1;
-            fila.setAttribute('id', nuevoIndice);
-
-            const indiceTd = fila.querySelector('[id="indixe_producto"]');
-            if (indiceTd) {
-                indiceTd.textContent = `${nuevoIndice})`;
-                indiceTd.setAttribute('data-indice', nuevoIndice);
-            }
-        });
-    }

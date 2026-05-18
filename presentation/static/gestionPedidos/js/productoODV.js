@@ -21,106 +21,47 @@ class Producto {
         this.fechaEntrega = fechaEntrega;
         this.descuentoAplcado = descuentoAplcado ?? 0;
         this.cuponDescuento = cuponDescuento
-
-
-        console.log("atributos del constructor mapeados",
-            {
-                docEntry_linea: this.docEntry_linea,
-                linea_documento: this.linea_documento,
-                productoCodigo: this.productoCodigo,
-                nombre: this.nombre,
-                imagen: this.imagen,
-                precioVenta: this.precioVenta,
-                stockTotal: this.stockTotal,
-                precioLista: this.precioLista,
-                precioDescuento: this.precioDescuento,
-                precioSinDescuento: this.precioSinDescuento,
-                totalProducto: this.totalProducto,
-                cantidad: this.cantidad,
-                sucursal: this.sucursal,
-                cantidadCoti: this.cantidadCoti,
-                precioCoti: this.precioCoti,
-                comentario: this.comentario,
-                tipoEntrega2: this.tipoEntrega2,
-                fechaEntrega: this.fechaEntrega,
-                descuentoAplcado: this.descuentoAplcado}
-
-        );
-
-
-
     }
 
     async obtenerStock(codigoProducto) {
-        try {
-            const response = await fetch(`/ventas/obtener_stock_bodegas/?idProducto=${codigoProducto}`);
-            if (!response.ok) {
-                throw new Error("Error al obtener el stock");
-            }
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error al obtener el stock:", error);
-            return null;
-        }
+        return obtenerStockBodegas(codigoProducto);
     }
 
 
     async actualizarStock(row, actualizarStockTotal = true) {
-        console.log("Producto a actualizar:", this.productoCodigo);
-    
         const stockData = await this.obtenerStock(this.productoCodigo);
-        
-        console.log("Stock data en actualizar Stock:", stockData);
-    
-        if (stockData) {
-            // Mapear las bodegas válidas (excluyendo GR)
-            const bodegaMap = {
-                "LC": "LC",
-                "PH": "PH",
-                "ME": "ME",
-                "VI": "VI",
-                "GR": "GR"
-            };
-    
-            // Filtrar los datos de stock excluyendo la bodega "GR"
-            const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "LLLLL");
-            const stockTotalBodegasValidas = stockData.filter(bodega => bodega.bodega !== "LLLLL" && bodegaMap[bodega.bodega]);
 
-    
-            console.log("Stock filtrado en actualizar Stock:", stockFiltrado);
-    
+        if (stockData) {
+            const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "LLLLL");
+            const stockTotalBodegasValidas = stockData.filter(bodega => bodega.bodega !== "LLLLL" && BODEGA_MAP[bodega.bodega]);
+
             // Calcular el stock total sumando solo las bodegas válidas
             const stockTotal = stockTotalBodegasValidas.reduce((total, bodega) => total + bodega.stock_disponible, 0);
             const treeTypeItem = stockData.find(item => item.product_type === 'iSalesTree');
 
-    
+
             // Mostrar el stock total solo si se solicita
             if (actualizarStockTotal) {
                 const stockTotalElem = row.querySelector('[name="stock_total"]');
-                console.log("Stock total actualizado en actualizar Stock:", stockTotal);
                 if (treeTypeItem) {
                     stockTotalElem.textContent = `Total: ${treeTypeItem.stock_total}`;
                     stockTotalElem.style.color = treeTypeItem.stock_total === 0 ? 'red' : 'black';
                 } else {
                     stockTotalElem.textContent = `Total: ${stockTotal}`;
                     stockTotalElem.style.color = stockTotal === 0 ? 'red' : 'black';
-                }            
+                }
         }
-    
+
             // Obtener el value de la bodega seleccionada
             const selectBodega = row.querySelector('.form-select');
             const valueSeleccionado = selectBodega.value;
-    
+
             // Usar el mapa para obtener el código correspondiente
-            const bodegaSeleccionada = bodegaMap[valueSeleccionado];
-    
+            const bodegaSeleccionada = BODEGA_MAP[valueSeleccionado];
+
             // Encontrar el stock de la bodega seleccionada
             const stockBodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock_disponible || 0;
-            const name_bodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.bodega || 0;
-    
-            console.log("Bodega seleccionada zzzzz:", name_bodega);
-    
+
             // Mostrar el stock de la bodega seleccionada
             const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
             stockBodegaElem.textContent = `Stock: ${stockBodega}`;
@@ -145,9 +86,7 @@ class Producto {
             const stockComprometidoElem = row.querySelector('[name="stock_comprometido"]');
             const stockComprometido = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock_comprometido || 0;
             stockComprometidoElem.textContent = `Comp: ${stockComprometido}`;
-    
-            console.log("Stock actualizado:", stockBodega);
-            
+
             // NUEVO: Asignar stock a cada option del select
             for (const bodega of stockFiltrado) {
                 const optionElement = selectBodega.querySelector(`option[id="${bodega.bodega}"]`);
@@ -333,35 +272,10 @@ class Producto {
         // Limpiar el contenido de inputNumero
         const inputNumero = document.getElementById('inputNumero');
         if (inputNumero) {
-            inputNumero.value = ''; // Limpia el campo
-            console.log("Campo 'inputNumero' limpiado.");
+            inputNumero.value = '';
         }
 
-        // Agregar evento mouseover para mostrar stock en otras tiendas
-        const precioVentaElem = newRow.querySelector('#stock_total');
-        precioVentaElem.addEventListener('mouseover', async () => {
-            const stockData = await this.obtenerStock(this.productoCodigo);
-            if (stockData) {
-                // Filtrar las bodegas para excluir "GR"
-                const bodegaMap = {
-                    "LC": "LC",
-                    "PH": "PH",
-                    "ME": "ME",
-                    "VI": "VI",
-                    "GR": "GR"
-                };
-
-                const stockFiltrado = stockData.filter(bodega => bodega.bodega in bodegaMap);
-                // Crear el contenido del tooltip solo con las bodegas válidas
-                const tooltipContent = stockFiltrado
-                    .map(bodega => `${bodega.bodega}: ${bodega.stock_disponible}`)
-                    .join('\n');
-
-                // Asignar el contenido del tooltip
-                precioVentaElem.title = `Stock en otras tiendas:\n${tooltipContent}`;
-            }
-        });
-
+        agregarTooltipStockBodegas(newRow, this.productoCodigo);
 
         this.limitarMaxDescuento(newRow);
         this.limitarCantidad(newRow);
@@ -436,19 +350,14 @@ class Producto {
 
         if (!numeroOrdenElem) {
             console.error("Error: No se encontró el elemento con la clase .product-row en:", row);
-        } else {
-            console.log("Elemento encontrado:", numeroOrdenElem);
-            console.log("DocEntry en limitarCantidad:", numeroOrdenElem.getAttribute('data-docentryLinea'));
         }
-        
+
         const docEntry = numeroOrdenElem?.getAttribute('data-docentryLinea');
-        
-    
+
+
         // Referencias a elementos DOM
         const cantidadInput = row.querySelector('#calcular_cantidad');
         const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
-
-        console.log("Stock bodega en limitarCantidad:", stockBodegaElem.textContent);
 
         const stockTotalElem = row.querySelector('[name="stock_total"]') || { textContent: '0' };
         const skuElem = row.querySelector('[name="sku_producto"]');
@@ -465,8 +374,6 @@ class Producto {
         // Almacenar la cantidad inicial cuando carga el documento
         if (!cantidadInput.hasAttribute('data-initial-value') && docEntry) {
             cantidadInput.setAttribute('data-initial-value', cantidadInput.value || '0');
-
-            console.log("Cantidad inicial:", cantidadInput.value);
         }
         
         const cantidadInputs = row.querySelectorAll('#calcular_cantidad');
@@ -484,7 +391,6 @@ class Producto {
             if (docEntry !== 'null') {
                 return valores.cantidadInicial + valores.stockBodega2;
             } else {
-                console.log("Stock bodega 2 en calcularCantidadMaxima:", valores.stockBodega2);
                 return valores.stockBodega2;
             }
         };
@@ -586,11 +492,8 @@ class Producto {
                     
                     // Actualizar stockTotal
                     if (stockTotalElem && stockTotalElem.textContent) {
-                        console.log("diferencia de entrada:", diferencia);
-                        
                         // Calcular stock total basado en la diferencia exacta
                         const stockTotalActualizado = valores.stockTotalTexto - diferencia;
-                        
                         //stockTotalElem.textContent = `Total: ${Math.max(0, stockTotalActualizado)}`;
                     }
                     
@@ -736,18 +639,13 @@ function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre
     lineasDocumento[productoCodigo] = {
         bodega: sucursal,
         cantidad: cantidad
-    };    
-
-    console.log("Cantidad recibida en agregarProducto:", cantidad);
-
+    };
 
     let contprod = document.querySelectorAll('#productos tbody').length + 1; // Contador de productos
 
-    // Crear instancia del producto
-
     const cantidadFinal = cantidad !== undefined ? cantidad : 1;
     const producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, precioCoti, tipoEntrega2, fechaEntrega, cuponDescuento, descuentoAplcado);
-    const newRow = producto.crearFila(contprod); // Crear la fila del producto
+    const newRow = producto.crearFila(contprod);
 
     // uid estable por fila — no cambia con drag&drop ni con recalcularIndices
     const uid = (window.crypto && crypto.randomUUID)
@@ -755,68 +653,33 @@ function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre
         : `prod_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     newRow.setAttribute('data-uid', uid);
 
-    document.getElementById('productos').appendChild(newRow); // Agregar la fila al tbody
+    document.getElementById('productos').appendChild(newRow);
 
-
-    // ---- APLICAR UI DEL CUPÓN ANTES de inicializar interactividad ----
-    if (producto.cuponDescuento && Number(producto.cuponDescuento) > 0) {
-        const descuentoCupon = Number(producto.cuponDescuento);
-
-        const inputDescuentoRow = newRow.querySelector('#agg_descuento');
-        if (inputDescuentoRow) {
-            inputDescuentoRow.max = descuentoCupon;
-            inputDescuentoRow.value = 0;
-            inputDescuentoRow.setAttribute('disabled', 'disabled');
-        }
-
-        const descElem = newRow.querySelector('#desc_cupon');
-        if (descElem) {
-            descElem.textContent = `Cupon: ${descuentoCupon}%`;
-            descElem.hidden = false;
-            descElem.dataset.value = descuentoCupon; // <- importante para calcular correctamente
-        }
-    }
+    aplicarUICupon(newRow, producto.cuponDescuento);
 
     newRow.querySelector('#mostrar-descuento').addEventListener('click', function () {
         producto.alternarMaxDescuento(newRow);
     });
 
     newRow.querySelector('#eliminarp').addEventListener('click', function () {
-        // Eliminar la fila del DOM
-        const uid = newRow.getAttribute('data-uid');
+        const uidFila = newRow.getAttribute('data-uid');
 
         newRow.remove();
-    
-        // Emitir el evento con uid estable (clave de búsqueda) + datos legacy para debug
+
         const event = new CustomEvent('productoEliminado', {
-            detail: { uid: uid, 
+            detail: {
+                uid: uidFila,
                 codigoProducto: productoCodigo,
                 indiceProducto: contprod
-
             }
         });
-        console.log('Evento emitido:', event);
         document.dispatchEvent(event);
 
-        // Actualizar los índices de los productos visibles
         actualizarIndicesProductos();
 
         document.getElementById('inputNumero').focus();
-        
     });
-    
-    function actualizarIndicesProductos() {
-        // Seleccionar todas las filas de los productos
-        const filasProductos = document.querySelectorAll('.product-row'); // Asegúrate de que las filas tengan esta clase
-        filasProductos.forEach((fila, index) => {
-            // Buscar el elemento que muestra el índice y actualizarlo
-            const indiceElemento = fila.querySelector('#indixe_producto'); // Ajusta el selector si es necesario
-            if (indiceElemento) {
-                indiceElemento.textContent = `${index + 1})`; // Actualiza el índice visible
-            }
-        });
-    }
-    
+
     producto.actualizarStock(newRow);
 
 
@@ -833,31 +696,24 @@ function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre
         let cantidadInput = newRow.querySelector('#calcular_cantidad');
         let stockTotalElem = newRow.querySelector('[name="stock_total"]');
 
-        console.log("Stock bodega actual:", stockBodegaElem.textContent);
-        console.log("Stock total actual:", stockTotalElem.textContent);
-        console.log("Cantidad actual:", cantidadInput.value);
-        
         // Obtener valores antes del cambio
         let stockTotalActual = parseInt(stockTotalElem.textContent.replace('Total: ', '') || '0', 10);
         let cantidadActual = parseInt(cantidadInput.value || '0', 10);
 
-        
-        
         // Actualizar stock de la nueva bodega sin modificar el stock total
         producto.actualizarStock(newRow, false); // Pasar false para evitar la actualización del total
-        
+
         setTimeout(() => { // Pequeño delay para asegurar que `actualizarStock` termine
             // Obtener el stock disponible de la NUEVA bodega seleccionada
             let stockDisponible = parseInt(stockBodegaElem.getAttribute('data-stock') || '0', 10);
             if (isNaN(stockDisponible) || stockDisponible < 0) stockDisponible = 0;
-            
+
             // Establecer el nuevo máximo permitido
             cantidadInput.max = stockDisponible;
-            
-            // Verificar el stock y ajustar la cantidad
+
             let nuevaCantidad = 0;
-    
-             // **Disparar evento manualmente para forzar actualización**
+
+            // **Disparar evento manualmente para forzar actualización**
             cantidadInput.dispatchEvent(new Event('input', { bubbles: true }));
 
             if (stockDisponible > 0) {
@@ -869,22 +725,7 @@ function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre
             }
 
             cantidadInput.dispatchEvent(new Event('input', { bubbles: true }));
-
-            
-            // Calcular la diferencia de cantidad y corregir el stock total
-            let diferenciaCantidad = nuevaCantidad - cantidadActual;
-            
-            // Actualizar el stock de la bodega actual basado en el stock disponible
-            let stockBodegaActualizado = stockDisponible - nuevaCantidad;
-            //stockBodegaElem.textContent = `Stock: ${stockBodegaActualizado}`;
-            console.log("Nuevo stock de bodega:", stockBodegaActualizado);
-            
-            // Ajustar el total asegurando que no quede negativo
-            let nuevoStockTotal = Math.max(0, stockTotalActual - diferenciaCantidad);
-            //stockTotalElem.textContent = `Total: ${nuevoStockTotal}`;
-            console.log("Nuevo stock total:", nuevoStockTotal);
         }, 50);
-        
     });
     
     // Función para mostrar la alerta con Bootstrap
@@ -911,107 +752,6 @@ function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre
 
     agregarInteractividad(newRow, productoCodigo, contprod, uid);
 }
-
-    let draggedRow = null;
-
-    function inicializarDragAndDrop(fila) {
-        const handle = fila.querySelector('#drag-handle');
-
-        if (handle) {
-            // Solo activar draggable cuando el usuario presiona el handle
-            handle.addEventListener('mousedown', () => {
-                fila.setAttribute('draggable', 'true');
-            });
-
-            // Desactivar draggable al soltar para evitar arrastre accidental en toda la fila
-            handle.addEventListener('mouseup', () => {
-                fila.setAttribute('draggable', 'false');
-            });
-        }
-
-        fila.addEventListener('dragstart', (e) => {
-            // Bloquear si el drag no viene del handle
-            if (!fila.getAttribute('draggable') || fila.getAttribute('draggable') === 'false') {
-                e.preventDefault();
-                return;
-            }
-            draggedRow = fila;
-            // Pequeño delay para que el browser tome el snapshot ANTES de opacar
-            setTimeout(() => fila.classList.add('dragging'), 0);
-            e.dataTransfer.effectAllowed = 'move';
-        });
-
-        fila.addEventListener('dragend', () => {
-            fila.setAttribute('draggable', 'false');
-            fila.classList.remove('dragging');
-            draggedRow = null;
-            // Limpiar todos los indicadores visuales
-            limpiarIndicadores();
-        });
-
-        fila.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-
-            if (fila === draggedRow) return;
-
-            limpiarIndicadores();
-
-            const rect = fila.getBoundingClientRect();
-            const midY = rect.top + rect.height / 2;
-
-            if (e.clientY < midY) {
-                fila.classList.add('drag-over-top');    // va ANTES de esta fila
-            } else {
-                fila.classList.add('drag-over-bottom'); // va DESPUÉS de esta fila
-            }
-        });
-
-        fila.addEventListener('dragleave', (e) => {
-            // Solo limpiar si realmente salimos de la fila (no de un hijo)
-            if (!fila.contains(e.relatedTarget)) {
-                fila.classList.remove('drag-over-top', 'drag-over-bottom');
-            }
-        });
-
-        fila.addEventListener('drop', (e) => {
-            e.preventDefault();
-
-            if (!draggedRow || fila === draggedRow) return;
-
-            const container = fila.parentNode;
-            const rect = fila.getBoundingClientRect();
-            const midY = rect.top + rect.height / 2;
-
-            if (e.clientY < midY) {
-                container.insertBefore(draggedRow, fila);          // insertar ANTES
-            } else {
-                container.insertBefore(draggedRow, fila.nextSibling); // insertar DESPUÉS
-            }
-
-            limpiarIndicadores();
-            recalcularIndices();
-        });
-    }
-
-    function limpiarIndicadores() {
-        document.querySelectorAll('.product-row').forEach(f => {
-            f.classList.remove('drag-over-top', 'drag-over-bottom');
-        });
-    }
-
-    function recalcularIndices() {
-        document.querySelectorAll('tbody.product-row').forEach((fila, index) => {
-            const nuevoIndice = index + 1;
-            fila.setAttribute('id', nuevoIndice);
-
-            const indiceTd = fila.querySelector('[id="indixe_producto"]');
-            if (indiceTd) {
-                indiceTd.textContent = `${nuevoIndice})`;
-                indiceTd.setAttribute('data-indice', nuevoIndice);
-            }
-        });
-    }
 
 document.addEventListener('productoEliminado', function(event) {
     const { codigoProducto } = event.detail;
