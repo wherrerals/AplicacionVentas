@@ -1,106 +1,14 @@
-class Producto {
+class Producto extends ProductoBase {
     constructor(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, cuponDescuento, descuentoAplcado, tipoentrega2, cantidadCoti, precioCoti, fechaEntrega = new Date().toISOString().split('T')[0]) {
-        
-        this.docEntry_linea = docEntry_linea;
-        this.linea_documento = linea_documento;
-        this.productoCodigo = productoCodigo;
-        this.nombre = nombre;
-        this.imagen = imagen;
-        this.precioVenta = precioVenta;
-        this.stockTotal = stockTotal;
-        this.precioLista = precioLista;
-        this.precioDescuento = Math.round(precioDescuento);
-        this.precioSinDescuento = 0;
-        this.totalProducto = precioVenta * cantidad;
-        this.cantidad = cantidad;
-        this.sucursal = sucursal;
+        super({
+            docEntry_linea, linea_documento, productoCodigo, nombre, imagen,
+            precioVenta, stockTotal, precioLista, precioDescuento, cantidad,
+            sucursal, comentario, cuponDescuento, descuentoAplcado
+        });
         this.cantidadCoti = cantidadCoti;
         this.precioCoti = precioCoti;
-        this.comentario = comentario;
         this.tipoEntrega2 = tipoentrega2;
         this.fechaEntrega = fechaEntrega;
-        this.descuentoAplcado = descuentoAplcado ?? 0;
-        this.cuponDescuento = cuponDescuento
-    }
-
-    async obtenerStock(codigoProducto) {
-        return obtenerStockBodegas(codigoProducto);
-    }
-
-
-    async actualizarStock(row, actualizarStockTotal = true) {
-        const stockData = await this.obtenerStock(this.productoCodigo);
-
-        if (stockData) {
-            const stockFiltrado = stockData.filter(bodega => bodega.bodega !== "LLLLL");
-            const stockTotalBodegasValidas = stockData.filter(bodega => bodega.bodega !== "LLLLL" && BODEGA_MAP[bodega.bodega]);
-
-            // Calcular el stock total sumando solo las bodegas válidas
-            const stockTotal = stockTotalBodegasValidas.reduce((total, bodega) => total + bodega.stock_disponible, 0);
-            const treeTypeItem = stockData.find(item => item.product_type === 'iSalesTree');
-
-
-            // Mostrar el stock total solo si se solicita
-            if (actualizarStockTotal) {
-                const stockTotalElem = row.querySelector('[name="stock_total"]');
-                if (treeTypeItem) {
-                    stockTotalElem.textContent = `Total: ${treeTypeItem.stock_total}`;
-                    stockTotalElem.style.color = treeTypeItem.stock_total === 0 ? 'red' : 'black';
-                } else {
-                    stockTotalElem.textContent = `Total: ${stockTotal}`;
-                    stockTotalElem.style.color = stockTotal === 0 ? 'red' : 'black';
-                }
-        }
-
-            // Obtener el value de la bodega seleccionada
-            const selectBodega = row.querySelector('.form-select');
-            const valueSeleccionado = selectBodega.value;
-
-            // Usar el mapa para obtener el código correspondiente
-            const bodegaSeleccionada = BODEGA_MAP[valueSeleccionado];
-
-            // Encontrar el stock de la bodega seleccionada
-            const stockBodega = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock_disponible || 0;
-
-            // Mostrar el stock de la bodega seleccionada
-            const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
-            stockBodegaElem.textContent = `Stock: ${stockBodega}`;
-            stockBodegaElem.setAttribute('data-stock', stockBodega);  // Almacenar el valor en un atributo data-stock
-
-
-            // otras BODEGAS - TOOLTIP
-
-            const tr_bodega = `TR_${bodegaSeleccionada}`;
-
-
-            const stockTRElem = row.querySelector('[name="stock_tr"]');
-            const stockTR = stockFiltrado.find(bodega => bodega.bodega === tr_bodega)?.stock_transito || 0;
-            stockTRElem.textContent = `TR: ${stockTR}`;
-
-            // Mostrar el stock en arribo
-            const stockArriboElem = row.querySelector('[name="stock_arribo"]');
-            const stockArribo = stockFiltrado.find(bodega => bodega.bodega === 'RECEP_CD')?.stock_arribo || 0;
-            stockArriboElem.textContent = `Arribo: ${stockArribo}`;
-
-            // Mostrar el stock comprometido
-            const stockComprometidoElem = row.querySelector('[name="stock_comprometido"]');
-            const stockComprometido = stockFiltrado.find(bodega => bodega.bodega === bodegaSeleccionada)?.stock_comprometido || 0;
-            stockComprometidoElem.textContent = `Comp: ${stockComprometido}`;
-
-            // NUEVO: Asignar stock a cada option del select
-            for (const bodega of stockFiltrado) {
-                const optionElement = selectBodega.querySelector(`option[id="${bodega.bodega}"]`);
-                if (optionElement) {
-                    optionElement.setAttribute('data-stock', bodega.stock_disponible);
-                    // Opcionalmente, puedes mostrar el stock en el texto del option
-                    // optionElement.textContent = `${bodega.bodega} (${bodega.stock})`;
-                }
-            }
-            
-            // Retornar el stock total calculado para uso externo
-            return stockTotal;
-        }
-        return 0;
     }
 
     crearFila(contprod) {
@@ -152,10 +60,10 @@ class Producto {
                 
                 <td style="background: transparent;border-style: none;padding-bottom: 0px;" rowspan="2">
                     <div style="font-size: 12px;">
-                        <small name="precio_venta" data-precio-unitario="100.00" data-precioUnitario="${this.precioVenta}">${formatCurrency(this.precioVenta)}</small>
+                        <small name="precio_venta" data-precio-unitario="100.00" data-precioUnitario="${this.precioVenta}">${formatCurrencyCLP(this.precioVenta)}</small>
                     </div>
                     <div style="font-size: 11px;">
-                        <small style="color: rgb(153,153,153); name="precio_lista">Antes: ${formatCurrency(this.precioLista)}</small>
+                        <small style="color: rgb(153,153,153); name="precio_lista">Antes: ${formatCurrencyCLP(this.precioLista)}</small>
                     </div>
 
                     <div class="row" style="font-size: 11px;">
@@ -187,7 +95,7 @@ class Producto {
                 <td style="font-size: 11px;font-weight: bold;background: transparent;border-style: none;text-align: center;">
                     <span id="precio_Venta">${this.totalProducto}</span>
                     <div class="valorCotizacion" data-itemcode=${this.productoCodigo} style="font-size: 11px;" hidden>
-                    <span style="color: #FF0000;"><b>${formatCurrency(this.precioCoti)}</b></span>
+                    <span style="color: #FF0000;"><b>${formatCurrencyCLP(this.precioCoti)}</b></span>
                     </div>
                 </td>
             </tr>
@@ -255,20 +163,6 @@ class Producto {
             </tr>
         `;
 
-        function formatCurrency(value) {
-            // Convertimos el valor a número entero
-            const integerValue = Math.floor(value);
-            let formattedValue = integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-        
-            // Si el valor tiene 4 dígitos y no incluye un punto, lo añadimos manualmente
-            if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
-                formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
-            }
-        
-            // Agregamos el símbolo de peso al principio
-            return `$ ${formattedValue}`;
-        }
-
         // Limpiar el contenido de inputNumero
         const inputNumero = document.getElementById('inputNumero');
         if (inputNumero) {
@@ -282,38 +176,6 @@ class Producto {
         inicializarDragAndDrop(newRow);
 
         return newRow;
-    }
-
-    // Método para alternar la visibilidad del descuento
-    alternarMaxDescuento(row) {
-        let elemento = row.querySelector('#descuento');
-        if (elemento.getAttribute('hidden') !== null) {
-            elemento.removeAttribute('hidden');
-        } else {
-            elemento.setAttribute('hidden', '');
-        }
-    }
-
-
-
-    limitarMaxDescuento(row) {
-        let descuentoMaxElem = row.querySelector('#descuento');
-        let descuentoMax = parseFloat(descuentoMaxElem.textContent.replace('Max: ', ''));
-
-        let inputDescuento = row.querySelector('#agg_descuento');
-        inputDescuento.max = descuentoMax;
-
-        inputDescuento.value = this.descuentoAplcado;  // Cambié de 0 a this.descuentoAplcado
-
-        inputDescuento.addEventListener('input', function () {
-            let valor = parseFloat(inputDescuento.value);
-            if (valor > descuentoMax) {
-                inputDescuento.value = descuentoMax;
-            }
-            if (valor < 0) {
-                inputDescuento.value = 0;
-            }
-        });
     }
 
     botonesCantidad(row) {
