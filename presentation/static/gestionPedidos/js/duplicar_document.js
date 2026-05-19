@@ -116,8 +116,8 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log("Linea Documento:", linea_documento);
       if (cantidad > 0) {
         if (tipoDocumento == 'Solicitud') {
-          //(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado)
-          agregarProducto(
+          // Duplicar copia cantidad como cantidadOriginal y deja la solicitud abierta (estadoCheck = 0).
+          agregarProducto({
             docEntry_linea,
             linea_documento,
             productoCodigo,
@@ -128,12 +128,12 @@ document.addEventListener("DOMContentLoaded", function () {
             precioLista,
             precioDescuento,
             cantidad,
-            cantidad,
+            cantidadOriginal: cantidad,
             sucursal,
             comentario,
             descuentoAplcado,
-            estadoCheck = 0,
-          );
+            estadoCheck: 0
+          });
 
         } else {
           // Cotización u Orden de Venta. cuponDescuento y fechaEntrega no se

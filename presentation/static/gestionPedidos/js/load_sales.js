@@ -215,7 +215,22 @@ document.addEventListener("DOMContentLoaded", function () {
               const totalProducto = line.GrossTotal;
               let linea_documento_real = parseInt(linea_documento);
   
-              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, descuentoAplcado, totalProducto);
+              agregarProducto({
+                docEntry_linea,
+                linea_documento: linea_documento_real,
+                productoCodigo,
+                nombre,
+                imagen,
+                precioVenta,
+                stockTotal,
+                precioLista,
+                precioDescuento,
+                cantidad: line.Quantity,
+                sucursal,
+                comentario,
+                descuentoAplcado,
+                totalProducto
+              });
             });
           }
   
