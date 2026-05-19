@@ -172,7 +172,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
               if(cantidad > 0) {
   
-              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, line.Quantity2, sucursal, comentario, precioDescuento, checked);
+              // NOTA: precioDescuento aquí es line.DiscountPercent (% aplicado),
+              // no el % máximo permitido. Se reutiliza como descuentoAplcado para
+              // preservar comportamiento histórico. Bug latente conocido: el badge
+              // "Max: X%" muestra el valor aplicado, no el máximo. Requiere agregar
+              // line.DescuentoMax (u otro campo) desde el backend para arreglarse.
+              agregarProducto({
+                docEntry_linea,
+                linea_documento: linea_documento_real,
+                productoCodigo,
+                nombre,
+                imagen,
+                precioVenta,
+                stockTotal,
+                precioLista,
+                precioDescuento,
+                cantidad: line.Quantity,
+                cantidadOriginal: line.Quantity2,
+                sucursal,
+                comentario,
+                descuentoAplcado: precioDescuento,
+                estadoCheck: checked
+              });
               }
               
             });
