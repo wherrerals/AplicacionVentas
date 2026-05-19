@@ -186,7 +186,26 @@ document.addEventListener("DOMContentLoaded", function () {
                       });
               }, 100);
 
-              agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, cuponDescuento, descuentoAplcado, tipoentrega2, cantidadCoti, precioCoti);
+              agregarProducto({
+                docEntry_linea,
+                linea_documento: linea_documento_real,
+                productoCodigo,
+                nombre,
+                imagen,
+                precioVenta,
+                stockTotal,
+                precioLista,
+                precioDescuento,
+                cantidad: line.Quantity,
+                sucursal,
+                comentario,
+                cuponDescuento,
+                descuentoAplcado,
+                tipoEntrega2: tipoentrega2,
+                fechaEntrega,
+                cantidadCoti,
+                precioCoti
+              });
           });
           
              

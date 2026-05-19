@@ -136,8 +136,9 @@ document.addEventListener("DOMContentLoaded", function () {
           );
 
         } else {
-          //(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, descuentoAplcado)
-          agregarProducto(
+          // Cotización u Orden de Venta. cuponDescuento y fechaEntrega no se
+          // capturan en este flujo de duplicado; tipoEntrega2 sí (de line.ShippingMethod).
+          agregarProducto({
             docEntry_linea,
             linea_documento,
             productoCodigo,
@@ -151,9 +152,10 @@ document.addEventListener("DOMContentLoaded", function () {
             sucursal,
             comentario,
             descuentoAplcado,
+            tipoEntrega2: tipoentrega2,
             cantidadCoti,
             precioCoti
-          );
+          });
         }
       }
     }); //ok

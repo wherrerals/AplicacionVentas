@@ -528,7 +528,8 @@ function agregarProducto(...rawArgs) {
         tipoEntrega2,
         fechaEntrega,
         cuponDescuento,
-        descuentoAplcado = 0
+        descuentoAplcado = 0,
+        cantidadCoti
     } = opts;
 
     lineasDocumento[productoCodigo] = {
@@ -539,7 +540,15 @@ function agregarProducto(...rawArgs) {
     let contprod = document.querySelectorAll('#productos tbody').length + 1; // Contador de productos
 
     const cantidadFinal = cantidad !== undefined ? cantidad : 1;
-    const producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal, sucursal, comentario, precioCoti, tipoEntrega2, fechaEntrega, cuponDescuento, descuentoAplcado);
+    // Orden de args alineado con el constructor de Producto:
+    // (..., cuponDescuento, descuentoAplcado, tipoentrega2, cantidadCoti, precioCoti, fechaEntrega)
+    const producto = new Producto(
+        docEntry_linea, linea_documento, productoCodigo, nombre, imagen,
+        precioVenta, stockTotal, precioLista, precioDescuento, cantidadFinal,
+        sucursal, comentario,
+        cuponDescuento, descuentoAplcado, tipoEntrega2,
+        cantidadCoti, precioCoti, fechaEntrega
+    );
     const newRow = producto.crearFila(contprod);
 
     // uid estable por fila — no cambia con drag&drop ni con recalcularIndices
