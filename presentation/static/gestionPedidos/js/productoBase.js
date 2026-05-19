@@ -128,34 +128,6 @@ class ProductoBase {
     }
 }
 
-/**
- * Normaliza los argumentos de agregarProducto(...).
- *
- * Si rawArgs es `[opts]` con un único objeto plano, lo devuelve tal cual
- * (forma nueva: agregarProducto({ ... })).
- *
- * En caso contrario asume forma posicional y mapea cada índice a la clave
- * correspondiente de `ordenPosicional` (forma vieja: agregarProducto(a, b, c, ...)).
- *
- * Permite migrar agregarProducto a una firma única basada en objeto
- * sin romper los call sites existentes que pasan args posicionales.
- */
-function argsAOpts(rawArgs, ordenPosicional) {
-    if (
-        rawArgs.length === 1 &&
-        rawArgs[0] !== null &&
-        typeof rawArgs[0] === 'object' &&
-        !Array.isArray(rawArgs[0])
-    ) {
-        return rawArgs[0];
-    }
-    const opts = {};
-    ordenPosicional.forEach((key, i) => {
-        opts[key] = rawArgs[i];
-    });
-    return opts;
-}
-
 function formatCurrencyCLP(value) {
     const integerValue = Math.floor(value);
     let formattedValue = integerValue.toLocaleString('es-ES', { minimumFractionDigits: 0, maximumFractionDigits: 2 });

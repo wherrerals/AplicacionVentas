@@ -271,9 +271,39 @@ class Producto {
     
 }
 
-// Función global para manejar la adición de productos
-function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, cantidadOriginal, sucursal, comentario, descuentoAplcado, estadoCheck) {
-    // Contador de productos
+// Orden posicional histórico de agregarProducto en solicitud de devolución.
+// Mantenido para compatibilidad con call sites que aún pasan args sueltos.
+const POSICIONALES_AGREGAR_PRODUCTO_RR = [
+    'docEntry_linea', 'linea_documento', 'productoCodigo', 'nombre', 'imagen',
+    'precioVenta', 'stockTotal', 'precioLista', 'precioDescuento', 'cantidad',
+    'cantidadOriginal', 'sucursal', 'comentario', 'descuentoAplcado', 'estadoCheck'
+];
+
+/**
+ * Agrega un producto a la tabla de solicitud de devolución. Acepta:
+ *   - Forma nueva: agregarProducto({ docEntry_linea, linea_documento, ... })
+ *   - Forma vieja: agregarProducto(docEntry_linea, linea_documento, ...)
+ */
+function agregarProducto(...rawArgs) {
+    const opts = argsAOpts(rawArgs, POSICIONALES_AGREGAR_PRODUCTO_RR);
+    const {
+        docEntry_linea,
+        linea_documento,
+        productoCodigo,
+        nombre,
+        imagen,
+        precioVenta,
+        stockTotal,
+        precioLista,
+        precioDescuento,
+        cantidad = 1,
+        cantidadOriginal,
+        sucursal,
+        comentario,
+        descuentoAplcado,
+        estadoCheck
+    } = opts;
+
     console.log("cantidad: ", cantidad);
     console.log("sucursal: ", sucursal);
 
