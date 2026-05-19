@@ -495,9 +495,42 @@ class Producto extends ProductoBase {
 let lineasDocumento = {}; // Objeto para almacenar las líneas por producto
 
 
-function agregarProducto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, precioCoti, tipoEntrega2, fechaEntrega, cuponDescuento, descuentoAplcado = 1 - 1) {
-    
-    
+// Orden posicional histórico de agregarProducto en orden de venta.
+// Mantenido para compatibilidad con call sites que aún pasan args sueltos.
+const POSICIONALES_AGREGAR_PRODUCTO_ODV = [
+    'docEntry_linea', 'linea_documento', 'productoCodigo', 'nombre', 'imagen',
+    'precioVenta', 'stockTotal', 'precioLista', 'precioDescuento', 'cantidad',
+    'sucursal', 'comentario', 'precioCoti', 'tipoEntrega2', 'fechaEntrega',
+    'cuponDescuento', 'descuentoAplcado'
+];
+
+/**
+ * Agrega un producto a la tabla de orden de venta. Acepta:
+ *   - Forma nueva: agregarProducto({ docEntry_linea, linea_documento, ... })
+ *   - Forma vieja: agregarProducto(docEntry_linea, linea_documento, ...)
+ */
+function agregarProducto(...rawArgs) {
+    const opts = argsAOpts(rawArgs, POSICIONALES_AGREGAR_PRODUCTO_ODV);
+    const {
+        docEntry_linea,
+        linea_documento,
+        productoCodigo,
+        nombre,
+        imagen,
+        precioVenta,
+        stockTotal,
+        precioLista,
+        precioDescuento,
+        cantidad = 1,
+        sucursal,
+        comentario,
+        precioCoti,
+        tipoEntrega2,
+        fechaEntrega,
+        cuponDescuento,
+        descuentoAplcado = 0
+    } = opts;
+
     lineasDocumento[productoCodigo] = {
         bodega: sucursal,
         cantidad: cantidad

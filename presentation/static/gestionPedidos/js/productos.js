@@ -157,8 +157,38 @@ class Producto extends ProductoBase {
     }
 }
 
-// Función global para manejar la adición de productos
-function agregarProducto(docEntry_linea,linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad = 1, sucursal, comentario, cuponDescuento, descuentoAplcado) {
+// Orden posicional histórico de agregarProducto en cotización.
+// Mantenido para compatibilidad con call sites que aún pasan args sueltos.
+const POSICIONALES_AGREGAR_PRODUCTO_COTIZACION = [
+    'docEntry_linea', 'linea_documento', 'productoCodigo', 'nombre', 'imagen',
+    'precioVenta', 'stockTotal', 'precioLista', 'precioDescuento', 'cantidad',
+    'sucursal', 'comentario', 'cuponDescuento', 'descuentoAplcado'
+];
+
+/**
+ * Agrega un producto a la tabla. Acepta:
+ *   - Forma nueva: agregarProducto({ docEntry_linea, linea_documento, ... })
+ *   - Forma vieja: agregarProducto(docEntry_linea, linea_documento, ...)
+ */
+function agregarProducto(...rawArgs) {
+    const opts = argsAOpts(rawArgs, POSICIONALES_AGREGAR_PRODUCTO_COTIZACION);
+    const {
+        docEntry_linea,
+        linea_documento,
+        productoCodigo,
+        nombre,
+        imagen,
+        precioVenta,
+        stockTotal,
+        precioLista,
+        precioDescuento,
+        cantidad = 1,
+        sucursal,
+        comentario,
+        cuponDescuento,
+        descuentoAplcado
+    } = opts;
+
     let contprod = document.querySelectorAll('#productos tbody').length + 1;
 
     let producto = new Producto(docEntry_linea, linea_documento, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal, comentario, cuponDescuento, descuentoAplcado);
