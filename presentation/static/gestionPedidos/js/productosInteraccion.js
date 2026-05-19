@@ -1,23 +1,15 @@
-// Dependencias: valorTributario.js
-class valorTributario {
+// Hereda de ValorTributarioBase (interaccionBase.js).
+// Suma precioDescuento propio para el cálculo de descuento global.
+class valorTributario extends ValorTributarioBase {
     constructor(codigoProducto, precioFinal, precioDescuento, indiceProducto, uid) {
-        this.codigoProducto = codigoProducto;
-        this.precioFinal = precioFinal;
+        super(codigoProducto, precioFinal, indiceProducto, uid);
         this.precioDescuento = precioDescuento;
-        this.indiceProducto = indiceProducto; // referencia informativa; ya no es llave de búsqueda
-        this.uid = uid;                       // llave estable: única e inmutable por fila
-    }
-
-    // Metodo para modificar el precio final
-    modificarPrecioFinal(precioFinal) {
-        this.precioFinal = precioFinal;
     }
 
     modificarPrecioDescuento(precioDescuento) {
         this.precioDescuento = precioDescuento;
     }
 
-    // Metodo para calcular IVA, bruto y neto
     calcularValores() {
         var precioFinal = parseFloat(this.precioFinal) || 0;
         var bruto = Math.round(precioFinal / 1.19);
@@ -33,9 +25,6 @@ class valorTributario {
         };
     }
 }
-
-// Array global para almacenar las instancias de valorTributario
-const productos = [];
 
 function agregarInteractividad(newRow, codigoProducto, indiceProducto, uid) {
     // Obtener referencias a los elementos dentro de la fila

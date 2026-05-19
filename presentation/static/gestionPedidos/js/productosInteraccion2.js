@@ -1,15 +1,5 @@
-// Dependencias: valorTributario.js
-class valorTributario {
-    constructor(codigoProducto, precioFinal, indiceProducto) {
-        this.codigoProducto = codigoProducto;
-        this.precioFinal = precioFinal;
-        this.indiceProducto = indiceProducto;
-    }
-
-    modificarPrecioFinal(precioFinal) {
-        this.precioFinal = precioFinal;
-    }
-
+// Hereda de ValorTributarioBase (interaccionBase.js).
+class valorTributario extends ValorTributarioBase {
     calcularValores() {
         var precioFinal = parseFloat(this.precioFinal) || 0;
         var bruto = Math.round(precioFinal / 1.19);
@@ -22,8 +12,6 @@ class valorTributario {
         };
     }
 }
-
-const productos = [];
 
 function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
     var inputCantidad = newRow.querySelector('#calcular_cantidad');

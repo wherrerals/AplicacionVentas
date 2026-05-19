@@ -1,17 +1,7 @@
-// Dependencias: valorTributario.js
-class valorTributario {
-    constructor(codigoProducto, precioFinal, indiceProducto) {
-        this.codigoProducto = codigoProducto;
-        this.precioFinal = precioFinal;
-        this.indiceProducto = indiceProducto;
-    }
-
-    // Metodo para modificar el precio final
-    modificarPrecioFinal(precioFinal) {
-        this.precioFinal = precioFinal;
-    }
-
-    // Metodo para calcular IVA, bruto y neto
+// Hereda de ValorTributarioBase (interaccionBase.js).
+// Sales consultation usa una convención distinta: aquí precioFinal ya es bruto
+// (incluye IVA) y el neto se obtiene dividiendo por 1.19.
+class valorTributario extends ValorTributarioBase {
     calcularValores() {
         var precioFinal = parseFloat(this.precioFinal) || 0;
         var bruto = precioFinal;
@@ -24,9 +14,6 @@ class valorTributario {
         };
     }
 }
-
-// Array global para almacenar las instancias de valorTributario
-const productos = [];
 
 function agregarInteractividad(newRow, codigoProducto, indiceProducto) {
     // Obtener referencias a los elementos dentro de la fila
