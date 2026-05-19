@@ -69,23 +69,34 @@ class ProductoBase {
         const valueSeleccionado = selectBodega.value;
         const bodegaSeleccionada = BODEGA_MAP[valueSeleccionado];
 
+        // Los selectores siguientes son opcionales: cotización y ODV los tienen,
+        // pero solic_devolución (productorr) muestra una versión simplificada y
+        // varios de ellos no existen en su HTML.
         const stockBodega = stockFiltrado.find(b => b.bodega === bodegaSeleccionada)?.stock_disponible || 0;
         const stockBodegaElem = row.querySelector('[name="stock_bodega"]');
-        stockBodegaElem.textContent = `Stock: ${stockBodega}`;
-        stockBodegaElem.setAttribute('data-stock', stockBodega);
+        if (stockBodegaElem) {
+            stockBodegaElem.textContent = `Stock: ${stockBodega}`;
+            stockBodegaElem.setAttribute('data-stock', stockBodega);
+        }
 
         const tr_bodega = `TR_${bodegaSeleccionada}`;
         const stockTRElem = row.querySelector('[name="stock_tr"]');
-        const stockTR = stockFiltrado.find(b => b.bodega === tr_bodega)?.stock_transito || 0;
-        stockTRElem.textContent = `TR: ${stockTR}`;
+        if (stockTRElem) {
+            const stockTR = stockFiltrado.find(b => b.bodega === tr_bodega)?.stock_transito || 0;
+            stockTRElem.textContent = `TR: ${stockTR}`;
+        }
 
         const stockArriboElem = row.querySelector('[name="stock_arribo"]');
-        const stockArribo = stockFiltrado.find(b => b.bodega === 'RECEP_CD')?.stock_arribo || 0;
-        stockArriboElem.textContent = `Arribo: ${stockArribo}`;
+        if (stockArriboElem) {
+            const stockArribo = stockFiltrado.find(b => b.bodega === 'RECEP_CD')?.stock_arribo || 0;
+            stockArriboElem.textContent = `Arribo: ${stockArribo}`;
+        }
 
         const stockComprometidoElem = row.querySelector('[name="stock_comprometido"]');
-        const stockComprometido = stockFiltrado.find(b => b.bodega === bodegaSeleccionada)?.stock_comprometido || 0;
-        stockComprometidoElem.textContent = `Comp: ${stockComprometido}`;
+        if (stockComprometidoElem) {
+            const stockComprometido = stockFiltrado.find(b => b.bodega === bodegaSeleccionada)?.stock_comprometido || 0;
+            stockComprometidoElem.textContent = `Comp: ${stockComprometido}`;
+        }
 
         // ODV usa options con id="LC", id="PH", etc. para data-stock por bodega.
         // En cotización las options no tienen id; el querySelector retorna null y no hace nada.
