@@ -190,3 +190,21 @@ function argsAOpts(rawArgs, ordenPosicional) {
     });
     return opts;
 }
+
+/**
+ * Formatea un valor numérico como moneda chilena: `$ 1.234`.
+ * Usa Math.floor para descartar decimales (precios CLP enteros).
+ * Maneja el caso de 4 dígitos sin separador de miles que toLocaleString
+ * a veces omite ("1234" → "1.234").
+ */
+function formatCurrency(value) {
+    const integerValue = Math.floor(value);
+    let formattedValue = integerValue.toLocaleString('es-ES', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
+    if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
+        formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
+    }
+    return `$ ${formattedValue}`;
+}

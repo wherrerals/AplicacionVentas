@@ -67,10 +67,10 @@ class Producto extends ProductoBase {
                 </td>
                 <td style="background: transparent;border-style: none;padding-bottom: 0px;" rowspan="2">
                     <div style="font-size: 12px;">
-                        <small class="numeric-value" name="precio_venta" data-precio-unitario="100.00" data-precioUnitario="${this.precioVenta}">${formatCurrencyCLP(this.precioVenta)}</small>
+                        <small class="numeric-value" name="precio_venta" data-precio-unitario="100.00" data-precioUnitario="${this.precioVenta}">${formatCurrency(this.precioVenta)}</small>
                     </div>
                     <div style="font-size: 11px;">
-                        <small class="numeric-value" style="color: rgb(153,153,153);" name="precio_lista">${formatCurrencyCLP(this.precioLista)}</small>
+                        <small class="numeric-value" style="color: rgb(153,153,153);" name="precio_lista">${formatCurrency(this.precioLista)}</small>
                     </div>
 
                     <div class="row" style="font-size: 11px;">
@@ -90,12 +90,12 @@ class Producto extends ProductoBase {
                         <strong style="font-size: 9;width: 100px; color: red" id="desc_cupon" ${this.cuponDescuento ? '' : 'hidden'}>Cupon: ${this.cuponDescuento ?? 0}%</strong>
                     </div>
                 </td>
-                <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${formatCurrencyCLP(this.precioSinDescuento)}</td>
+                <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;" id="Precio_Descuento">${formatCurrency(this.precioSinDescuento)}</td>
                 <td style="font-size: 12px;background: transparent;border-style: none;">
                     <input class="form-control format-number" type="number" style="font-size: 12px;width: 80px;"  id="calcular_cantidad" name="cantidad" min="1" max="1000" value="${this.cantidad}" onclick="this.select()">
                 </td>
                 <td style="font-size: 11px;background: transparent;font-weight: bold;border-style: none;text-align: center;">
-                    <span id="precio_Venta" data-totalProductValue="${this.totalProducto}">${formatCurrencyCLP(this.totalProducto)}</span>
+                    <span id="precio_Venta" data-totalProductValue="${this.totalProducto}">${formatCurrency(this.totalProducto)}</span>
                 </td>
             </tr> 
             <tr style="font-size: 12px;background: transparent;">

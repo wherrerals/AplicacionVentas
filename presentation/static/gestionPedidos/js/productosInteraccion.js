@@ -196,21 +196,4 @@ function agregarInteractividad(newRow, codigoProducto, indiceProducto, uid) {
 }
 
 
-function formatCurrency(value) {
-    // Convertimos el valor a número entero
-    const integerValue = Math.floor(value);
-    
-    // Usamos toLocaleString con minimumFractionDigits: 0 para no mostrar decimales
-    let formattedValue = integerValue.toLocaleString('es-ES', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0  // Esto asegura que no se muestren decimales
-    });
-
-    // Si el valor tiene 4 dígitos y no incluye un punto, lo añadimos manualmente
-    if (integerValue >= 1000 && integerValue < 10000 && !formattedValue.includes(".")) {
-        formattedValue = `${formattedValue.slice(0, 1)}.${formattedValue.slice(1)}`;
-    }
-
-    // Agregamos el símbolo de peso al principio
-    return `$ ${formattedValue}`;
-}
+// formatCurrency vive en productosUtils.js

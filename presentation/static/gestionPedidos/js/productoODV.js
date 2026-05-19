@@ -60,10 +60,10 @@ class Producto extends ProductoBase {
                 
                 <td style="background: transparent;border-style: none;padding-bottom: 0px;" rowspan="2">
                     <div style="font-size: 12px;">
-                        <small name="precio_venta" data-precio-unitario="100.00" data-precioUnitario="${this.precioVenta}">${formatCurrencyCLP(this.precioVenta)}</small>
+                        <small name="precio_venta" data-precio-unitario="100.00" data-precioUnitario="${this.precioVenta}">${formatCurrency(this.precioVenta)}</small>
                     </div>
                     <div style="font-size: 11px;">
-                        <small style="color: rgb(153,153,153); name="precio_lista">Antes: ${formatCurrencyCLP(this.precioLista)}</small>
+                        <small style="color: rgb(153,153,153); name="precio_lista">Antes: ${formatCurrency(this.precioLista)}</small>
                     </div>
 
                     <div class="row" style="font-size: 11px;">
@@ -95,7 +95,7 @@ class Producto extends ProductoBase {
                 <td style="font-size: 11px;font-weight: bold;background: transparent;border-style: none;text-align: center;">
                     <span id="precio_Venta">${this.totalProducto}</span>
                     <div class="valorCotizacion" data-itemcode=${this.productoCodigo} style="font-size: 11px;" hidden>
-                    <span style="color: #FF0000;"><b>${formatCurrencyCLP(this.precioCoti)}</b></span>
+                    <span style="color: #FF0000;"><b>${formatCurrency(this.precioCoti)}</b></span>
                     </div>
                 </td>
             </tr>
