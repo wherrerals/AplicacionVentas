@@ -202,7 +202,22 @@ document.addEventListener("DOMContentLoaded", function () {
               cuponDescuento
             });
 
-            agregarProducto(docEntry_linea, linea_documento_real, productoCodigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, line.Quantity, sucursal, comentario, cuponDescuento, descuentoAplcado);
+            agregarProducto({
+              docEntry_linea,
+              linea_documento: linea_documento_real,
+              productoCodigo,
+              nombre,
+              imagen,
+              precioVenta,
+              stockTotal,
+              precioLista,
+              precioDescuento,
+              cantidad: line.Quantity,
+              sucursal,
+              comentario,
+              cuponDescuento,
+              descuentoAplcado
+            });
           });
         }
 
