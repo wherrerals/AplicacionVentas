@@ -52,7 +52,19 @@ $(document).ready(function () {
                                 }
 
                                 const sucursal = $('#sucursal').text().trim();
-                                agregarProducto('null', null, codigo, nombre, imagen, precioVenta, stockTotal, precioLista, precioDescuento, cantidad, sucursal);
+                                agregarProducto({
+                                    docEntry_linea: 'null',
+                                    linea_documento: null,
+                                    productoCodigo: codigo,
+                                    nombre,
+                                    imagen,
+                                    precioVenta,
+                                    stockTotal,
+                                    precioLista,
+                                    precioDescuento,
+                                    cantidad,
+                                    sucursal
+                                });
 
                                 $('#inputNumero').val('');
                             });
