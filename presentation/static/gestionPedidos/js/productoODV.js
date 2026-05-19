@@ -142,7 +142,7 @@ class Producto extends ProductoBase {
                         </optgroup>
                     </select>
                 </td>
-                <td colspan="2" style="background: transparent; border: none;">
+                <td colspan="2" style="background: transparent;">
                     <div style="display: flex; align-items: center; gap: 5px;">
                         <input class="form-control" 
                             type="date" 
