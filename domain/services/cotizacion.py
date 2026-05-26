@@ -440,8 +440,7 @@ class Cotizacion(Documento):
             logger.error(f"Error al actualizar el estado de la cotización: {str(e)}")
             return {'error': str(e)}
 
-    def user_data(self, request):
-        user = request.user
+    def user_data(self, user):
         from infrastructure.models.usuariodb import UsuarioDB
 
         codigoVendedor = UsuarioDB.objects.get(usuarios=user).vendedor.codigo
@@ -460,14 +459,42 @@ class Cotizacion(Documento):
             'tipoVendedor': tipoVendedor
         }
 
-    def formatearDatos(self, json_data, request):
+    def obtenerDetalles(self, docentry, user):
+        from domain.services.socionegocio import SocioNegocio
+
+        client = APIClient()
+
+        documentClient = client.detalleCotizacionCliente(docentry)
+
+        if documentClient.get("odata.metadata") == "$metadata#Collection(Edm.ComplexType)" and not documentClient.get("value"):
+            documentClient = client.detalleCotizacionCliente2(docentry)
+
+        documentLine = client.detalleCotizacionLineas(docentry)
+
+        quotations_data = documentClient.get('value', [{}])[0].get('Quotations', {})
+        cardCode = quotations_data.get('CardCode')
+        rut = quotations_data.get('FederalTaxID')
+
+        sn = SocioNegocio(None)
+
+        if not sn.verificarSocioDB(cardCode):
+            sn.crearYresponderCliente(cardCode, rut)
+
+        data = {
+            "Client": documentClient,
+            "DocumentLine": documentLine,
+        }
+
+        return self.formatearDatos(data, user)
+
+    def formatearDatos(self, json_data, user):
         # Extraer y limpiar la información del cliente
 
         print("Formateando datos de cotización...")
         print("JSON Data recibido para formatear:", json_data)
 
         bodegas = ["ME", "LC", "PH"]
-        user_data = self.user_data(request)
+        user_data = self.user_data(user)
 
 
         client_info = json_data["Client"]["value"][0]
