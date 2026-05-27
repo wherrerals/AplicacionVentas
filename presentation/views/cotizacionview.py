@@ -212,45 +212,10 @@ class CotizacionView(View):
         return JsonResponse(doc_entry, safe=False)
 
     def detallesCotizacion(self, request):
-        # Obtener el parámetro 'docentry' de la solicitud
         docentry = request.GET.get('docentry')
-        client = APIClient()
-
-        # Llamar al método para obtener los detalles del cliente
-        documentClient = client.detalleCotizacionCliente(docentry)
-
-        if documentClient.get("odata.metadata") == "$metadata#Collection(Edm.ComplexType)" and not documentClient.get("value"):
-            documentClient = client.detalleCotizacionCliente2(docentry)
-
-        documentLine = client.detalleCotizacionLineas(docentry)
-
-        print("Lineas de documento:", documentLine)
-
-        # Extraer los datos de la clave 'value', asegurándose de manejar la estructura correctamente
-        quotations_data = documentClient.get('value', [{}])[0].get('Quotations', {})
-        cardCode = quotations_data.get('CardCode')
-        rut = quotations_data.get('FederalTaxID')
-
-        sn = SocioNegocio(request)
-        
-        # Preparar la estructura de datos para enviar como respuesta
-        data = {
-            "Client": documentClient,
-            "DocumentLine": documentLine
-        }
-
-        # Verificar si el socio de negocio ya existe en la base de datos
-        if sn.verificarSocioDB(cardCode):
-            cotiza = Cotizacion()
-            lines_data = cotiza.formatearDatos(data, request)
-
-            return JsonResponse(lines_data, safe=False)
-        else:
-            # Crear el cliente en caso de que no exista y responder
-            sn.crearYresponderCliente(cardCode, rut)
-            cotiza = Cotizacion()
-            lines_data = cotiza.formatearDatos(data, request)
-            return JsonResponse(lines_data, safe=False)
+        cotiza = Cotizacion()
+        lines_data = cotiza.obtenerDetalles(docentry, request.user)
+        return JsonResponse(lines_data, safe=False)
         
     def copiarAODV(self, request):
         docentry = request.GET.get('documento_copiado')
@@ -274,7 +239,7 @@ class CotizacionView(View):
         }
 
         cotiza = Cotizacion()
-        datosQuotations = cotiza.formatearDatos(data, request)
+        datosQuotations = cotiza.formatearDatos(data, request.user)
 
         lines_data = cotiza.reemplazarQuotationsPorOrders(datosQuotations)
 
