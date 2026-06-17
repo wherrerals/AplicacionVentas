@@ -228,12 +228,49 @@
     }
 
     /* ── DESCRIPCIÓN ── */
+    /*
+     * El campo `producto.descripcion` viene como HTML enriquecido (puede
+     * incluir <p>, <ul>, <li>, <strong>). Por eso el contenedor es <div>
+     * y NO <p>: anidar block-level dentro de <p> rompe el render en
+     * WeasyPrint (cierra el <p> implícitamente y las listas quedan
+     * sueltas, sin viñetas ni espaciado).
+     */
     .description {
       font-size: 12.5px;
       line-height: 1.65;
       color: #333;
       text-align: justify;
       margin-bottom: 16px;
+    }
+
+    .description p {
+      margin: 0 0 8px 0;
+    }
+
+    .description p:last-child {
+      margin-bottom: 0;
+    }
+
+    .description strong {
+      color: #1a1a1a;
+      font-weight: bold;
+    }
+
+    .description ul {
+      list-style: disc outside;
+      margin: 6px 0 10px 16px;
+      padding: 0;
+    }
+
+    .description li {
+      margin-bottom: 4px;
+      line-height: 1.5;
+      text-align: left;
+      padding-left: 2px;
+    }
+
+    .description li strong {
+      color: #1a1a1a;
     }
 
     /* ── FICHA TÉCNICA ── */
@@ -354,7 +391,7 @@
           <!-- COLUMNA DERECHA -->
           <td class="col-right">
 
-            <p class="description" style="font-size: 11px;">{{ producto.descripcion|safe }}</p>
+            <div class="description" style="font-size: 11px;">{{ producto.descripcion|safe }}</div>
 
             <p class="ficha-title">Ficha Técnica</p>
 

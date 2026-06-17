@@ -173,6 +173,8 @@ class FichaTecnicaPDFService:
 
     def _build_html(self, producto, header_img, base_url) -> HTML:
         """Factoriza la construcción del objeto HTML de WeasyPrint."""
+
+        print(f"producto: {producto}")
         html_string = render_to_string(
             "ficha_tecnica_template.html",
             {"producto": producto, "header_img": header_img},
