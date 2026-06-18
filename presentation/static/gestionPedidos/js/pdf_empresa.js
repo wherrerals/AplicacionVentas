@@ -38,9 +38,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const docType = docNumElement?.getAttribute("data-type") || "tipo_desconocido";
         const docDate = fechaSolo;
         const codigoVendedor = document.getElementById("vendedor_data").getAttribute("data-codeVen");
-        const totalNeto = document.querySelector("#total_neto").textContent;
-        const ivaGeneral = document.querySelector("#iva").textContent;
-        const totalbruto = document.querySelector("#total_bruto").textContent;
+        const totalNeto = document.querySelector("#total_neto").textContent.trim();          // Total Neto
+        const ivaGeneral = document.querySelector("#iva").textContent.trim();                 // IVA
+        const totalbruto = document.querySelector("#total_bruto").textContent.trim();         // Total Bruto Sin Dcto
+        const totalDescuento = document.querySelector("#total_descuento").textContent.trim(); // Total Bruto Con Dcto (Total a Pagar)
         const selectElement = document.getElementById("direcciones_despacho");
         const direccion2 = selectElement.value;
         const contactoCliente = document.getElementById("contactos_cliete");
@@ -116,6 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "vendedor": codigoVendedor,
             "DocumentLines": lines,
             "totalbruto": totalbruto,
+            "totalDescuento": totalDescuento,
             "iva": ivaGeneral,
             "totalNeto": totalNeto,
             "direccion": direccion2,

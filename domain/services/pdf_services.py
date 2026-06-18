@@ -125,7 +125,26 @@ class CotizacionPDFService:
             producto["linea_neto"] = lineas_neto[i]
 
         cotizacion["productos"] = productos
-        cotizacion["totales"] = calculadora.calcular_totales()
+
+        totales = calculadora.calcular_totales()
+
+        # Priorizar los totales calculados en el frontend (productosInteraccion.js),
+        # que son los que el usuario ve en pantalla. Llegan ya formateados ("$ 494.820").
+        total_neto_front = (data.get('totalNeto') or '').strip()
+        iva_front = (data.get('iva') or '').strip()
+        total_descuento_front = (data.get('totalDescuento') or '').strip()
+        total_bruto_front = (data.get('totalbruto') or '').strip()
+
+        if total_neto_front:
+            totales['total_valor_neto'] = total_neto_front
+        if iva_front:
+            totales['iva'] = iva_front
+        if total_descuento_front:  # Total Bruto Con Dcto = Total a Pagar
+            totales['total_valor_bruto'] = total_descuento_front
+        if total_bruto_front:      # Total Bruto Sin Dcto
+            totales['total_sin_descuento_bruto'] = total_bruto_front
+
+        cotizacion["totales"] = totales
         cotizacion["tiene_descuento"] = any(cotizacion["descuento_por_producto"])
 
         # Template
