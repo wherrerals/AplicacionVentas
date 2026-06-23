@@ -13,7 +13,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 DEBUG = False
 
-ALLOWED_HOSTS = ["ventas.ledstudio.cl", "studio-go"]
+ALLOWED_HOSTS = ["ventas.ledstudio.cl", "studio-go", "sgo2.ledstudio.cl"]
 
 # Base service Layer
 API_BASE_URL = os.environ.get("API_BASE_URL")
