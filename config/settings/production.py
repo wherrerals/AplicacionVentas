@@ -15,6 +15,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = ["ventas.ledstudio.cl", "studio-go", "sgo2.ledstudio.cl"]
 
+CSRF_TRUSTED_ORIGINS = ["https://sgo2.ledstudio.cl"]
+
 # Base service Layer
 API_BASE_URL = os.environ.get("API_BASE_URL")
 COMPANY_DB = os.environ.get("COMPANY_DB")
