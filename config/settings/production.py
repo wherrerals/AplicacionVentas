@@ -23,6 +23,14 @@ COMPANY_DB = os.environ.get("COMPANY_DB")
 API_USERNAME = os.environ.get("API_USERNAME")
 API_PASSWORD = os.environ.get("API_PASSWORD")
 
+# Google OAuth (login con cuentas @ledstudio.cl)
+GOOGLE_OAUTH_CLIENT_ID = os.environ.get("GOOGLE_OAUTH_CLIENT_ID")
+GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET")
+GOOGLE_ALLOWED_DOMAIN = os.environ.get("GOOGLE_ALLOWED_DOMAIN", "ledstudio.cl")
+
+# Detrás de nginx: confía en el header del proxy para armar redirect_uri en https
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 
 # Database local Production
 DATABASES = {

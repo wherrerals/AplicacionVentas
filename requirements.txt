@@ -19,3 +19,4 @@ weasyprint
 python-dotenv
 rapidfuzz
 unidecode
+google-auth

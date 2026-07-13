@@ -4,10 +4,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
 
+from presentation.views import auth_google
+
 urlpatterns = [
     path('', lambda request: redirect('ventas/')),
     path('admin/', admin.site.urls),
     path('ventas/', include('presentation.urls')),
+    path('accounts/google/login/', auth_google.google_login, name='google_login'),
+    path('accounts/google/callback/', auth_google.google_callback, name='google_callback'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('upload/', include('uploadApp.urls')),
     path('api/v1/sgo/', include('api_go.urls')),
