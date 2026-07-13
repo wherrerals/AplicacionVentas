@@ -33,6 +33,7 @@ from infrastructure.models.collectiondb import CollectionDB
 from infrastructure.models.couponcollectiondb import CouponCollectionsDB
 from infrastructure.models.pricelistsdb import PriceListsDB
 from infrastructure.models.pricelistproductdb import PriceListProductDB
+from infrastructure.models.menu import MenuGroup, MenuItem
 
 
 

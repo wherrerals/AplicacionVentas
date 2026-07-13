@@ -25,7 +25,9 @@ from infrastructure.models import (
     TipoClienteDB,
     TipoEntregaDB,
     TipoObjetoSapDB,
-    CollectionDB
+    CollectionDB,
+    MenuGroup,
+    MenuItem,
 )
 
 from infrastructure.models.couponsdb import CouponsDB
@@ -399,6 +401,31 @@ class PriceListProductDBper(admin.ModelAdmin):
 
 
 
+class MenuItemInline(admin.StackedInline):
+    """Permite editar los accesos (ítems) directamente dentro de su card."""
+
+    model = MenuItem
+    extra = 1
+    filter_horizontal = ("visible_para",)
+    fields = ("titulo", "url_name", "descripcion", "orden", "activo", "visible_para")
+
+
+class MenuGroupAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "orden", "activo")
+    list_editable = ("orden", "activo")
+    ordering = ("orden", "id")
+    inlines = [MenuItemInline]
+
+
+class MenuItemAdmin(admin.ModelAdmin):
+    list_display = ("titulo", "grupo", "orden", "activo")
+    list_editable = ("grupo", "orden", "activo")
+    list_filter = ("grupo", "activo", "visible_para")
+    search_fields = ("titulo", "url_name")
+    filter_horizontal = ("visible_para",)
+    ordering = ("grupo", "orden")
+
+
 # Register your models here.
 admin.site.register(TipoDocTributarioDB, TipoDocTributarioDBper)
 admin.site.register(SucursalDB, SucursalDBper)
@@ -429,3 +456,5 @@ admin.site.register(CouponsDB, CuponesDBper)
 admin.site.register(CollectionDB, CollectionDBper)
 admin.site.register(PriceListsDB, PriceListsDBper)
 admin.site.register(PriceListProductDB, PriceListProductDBper)
+admin.site.register(MenuGroup, MenuGroupAdmin)
+admin.site.register(MenuItem, MenuItemAdmin)

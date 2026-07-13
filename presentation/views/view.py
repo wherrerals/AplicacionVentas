@@ -33,6 +33,7 @@ from domain.services.coupons import Coupons
 from domain.services.direccion import Direccion
 from domain.services.producto import Producto
 from domain.services.socionegocio import SocioNegocio
+from presentation.menu import get_menu_for_user
 from django.contrib.auth import authenticate
 
 #librerias Python usadas
@@ -78,27 +79,24 @@ def home(request):
         HttpResponse: Si el usuario está autenticado, renderiza el template 'home.html' con el nombre de usuario y los grupos.
         HttpResponse: Si el usuario no está autenticado, redirige al template del login.
     """
-    if request.user.is_authenticated:
-        username = request.user.username
+    username = request.user.username
 
-        try:
-            usuario = UsuarioDB.objects.get(usuarios=request.user)
-            nameUser = usuario.nombre
+    # El perfil UsuarioDB es opcional para el Home: si el usuario no lo tiene,
+    # usamos el username como nombre a mostrar en lugar de cortar con un 404.
+    # Así el menú (controlado por permisos) se muestra igual para cualquier
+    # usuario autenticado, tenga o no perfil UsuarioDB.
+    usuario = UsuarioDB.objects.filter(usuarios=request.user).first()
+    nameUser = usuario.nombre if usuario else username
 
+    context = {
+        'username': username,
+        'nameUser': nameUser,
+        'menu': get_menu_for_user(request.user),
+    }
 
-        except UsuarioDB.DoesNotExist:
-            return JsonResponse({'error': 'User related to authenticated user not found'}, status=404)
-        
+    return render(request, 'home.html', context)
 
-        
-        context = {
-            'username': username,
-            'nameUser': nameUser,
-        }
-
-        return render(request, 'home.html', context)
-
-@login_required  
+@login_required
 def odv(request):
     # Verifica si el usuario está autenticado
     if request.user.is_authenticated:
