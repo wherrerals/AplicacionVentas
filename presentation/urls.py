@@ -45,6 +45,7 @@ urlpatterns = [
     path('lista_clientes/', view.lista_clientes, name='lista_clientes'),
     path('creacion_clientes/', view.creacion_clientes, name='creacion_clientes'),
     path('reporte_stock/', view.reporte_stock, name='reporte_stock'),
+    path('reporte_phillips/', view.reporte_phillips, name='reporte_phillips'),
     path('micuenta/', view.micuenta, name='micuenta'),
     path('lista_usuarios/', view.lista_usuarios, name='lista_usuarios'),
     path('salir/', view.userLogout, name='salir'),

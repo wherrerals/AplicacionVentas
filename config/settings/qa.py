@@ -26,6 +26,11 @@ GOOGLE_OAUTH_CLIENT_ID = os.environ.get("GOOGLE_OAUTH_CLIENT_ID")
 GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET")
 GOOGLE_ALLOWED_DOMAIN = os.environ.get("GOOGLE_ALLOWED_DOMAIN", "ledstudio.cl")
 
+# Google Sheets - Reporte Philips (philips_stock_transito, solo lectura)
+GOOGLE_SA_CREDENTIALS = os.environ.get("GOOGLE_SA_CREDENTIALS")  # ruta al .json o JSON inline
+PHILIPS_SHEET_ID = os.environ.get("PHILIPS_SHEET_ID")
+PHILIPS_SHEET_RANGE = os.environ.get("PHILIPS_SHEET_RANGE", "Hoja 1")
+
 # Detrás de nginx: confía en el header del proxy para armar redirect_uri en https
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 

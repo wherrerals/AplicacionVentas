@@ -33,6 +33,7 @@ from domain.services.coupons import Coupons
 from domain.services.direccion import Direccion
 from domain.services.producto import Producto
 from domain.services.socionegocio import SocioNegocio
+from domain.services.philips_stock import obtener_stock_transito, PhilipsStockError
 from presentation.menu import get_menu_for_user
 from django.contrib.auth import authenticate
 
@@ -440,6 +441,30 @@ def reporte_stock(request):
     """
 
     return render(request, "reporte_stock.html")
+
+@login_required
+def reporte_phillips(request):
+    """
+    Previsualizador (solo lectura) del Google Sheet `philips_stock_transito`.
+
+    No persiste datos: lee el Sheet en vivo vía la cuenta de servicio y renderiza
+    la tabla. Si la lectura falla, muestra el template con un mensaje de error en
+    lugar de romper la página.
+
+    Args:
+        request (HttpRequest): La petición HTTP recibida.
+
+    Returns:
+        HttpResponse: renderiza el template 'reporte_phillips.html'.
+    """
+    contexto = {"meses": [], "filas": [], "error": None}
+    try:
+        datos = obtener_stock_transito()
+        contexto["meses"] = datos["meses"]
+        contexto["filas"] = datos["filas"]
+    except PhilipsStockError as exc:
+        contexto["error"] = str(exc)
+    return render(request, "reporte_phillips.html", contexto)
 
 @login_required
 def micuenta(request):
